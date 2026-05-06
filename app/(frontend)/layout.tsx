@@ -30,7 +30,7 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       className={cn(
-        "h-full",
+        "overflow-x-hidden",
         "antialiased",
         geistSans.variable,
         geistMono.variable,
@@ -38,9 +38,9 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body>
         <Header />
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );
