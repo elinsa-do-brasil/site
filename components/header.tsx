@@ -38,11 +38,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./ui/theme-toggle";
 
 export function Header() {
   return (
-    <div className="w-full bg-background p-4 flex justify-center">
-      <header className="flex h-14 w-full max-w-5xl items-center justify-between rounded-2xl border border-border bg-card px-4 shadow-sm">
+    <div className="fixed top-0 z-50 w-full p-4 flex justify-center pointer-events-none">
+      <header className="pointer-events-auto flex h-14 w-full max-w-5xl items-center justify-between rounded-2xl border border-border bg-card/80 backdrop-blur-md px-4 shadow-sm">
         <div className="flex items-center gap-6">
           <Link
             href="/"
@@ -62,11 +63,11 @@ export function Header() {
           <div className="hidden md:block">
             <NavigationMenu>
               <NavigationMenuList className="gap-1">
-                <NavigationMenuItem>
+                <NavigationMenuItem className="">
                   <NavigationMenuTrigger className="bg-transparent">
                     Conteúdo
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent>
+                  <NavigationMenuContent> 
                     <div className="grid gap-4 w-150 grid-cols-2 p-4">
                       {/* Left Column */}
                       <div>
@@ -163,7 +164,8 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-4">
-          <DropdownMenu>
+          <ThemeToggle />
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button className="font-medium rounded-md h-9 px-4">
                 Portal Interno
