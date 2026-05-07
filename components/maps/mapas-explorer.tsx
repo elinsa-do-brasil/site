@@ -779,13 +779,14 @@ function RegionalSelectionLayer({
             "symbol-placement": "point",
             "text-allow-overlap": shouldForceLabels(viewModeRef.current),
             "text-field": MUNICIPALITY_NAME_EXPRESSION,
+            "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
             "text-ignore-placement": shouldForceLabels(viewModeRef.current),
             "text-size": MUNICIPALITY_LABEL_SIZE_EXPRESSION,
           },
           paint: {
-            "text-color": BASE_COLOR_EXPRESSION,
+            "text-color": getThemeTextColor(),
             "text-halo-blur": 0.5,
-            "text-halo-color": "rgba(255, 255, 255, 0.95)",
+            "text-halo-color": getThemeTextHaloColor(),
             "text-halo-width": 2.5,
             "text-opacity": getLabelOpacity(viewModeRef.current),
           },
@@ -805,6 +806,16 @@ function RegionalSelectionLayer({
           ACTIVE_LABEL_LAYER_ID,
           "text-opacity",
           getLabelOpacity(viewModeRef.current),
+        );
+        mapInstance.setPaintProperty(
+          ACTIVE_LABEL_LAYER_ID,
+          "text-color",
+          getThemeTextColor(),
+        );
+        mapInstance.setPaintProperty(
+          ACTIVE_LABEL_LAYER_ID,
+          "text-halo-color",
+          getThemeTextHaloColor(),
         );
       }
     }
@@ -933,6 +944,18 @@ function getLabelOpacity(viewMode: ViewMode) {
 
 function shouldForceLabels(viewMode: ViewMode) {
   return viewMode !== "regional";
+}
+
+function getThemeTextColor() {
+  return document.documentElement.classList.contains("dark")
+    ? "#fafafa"
+    : "#252525";
+}
+
+function getThemeTextHaloColor() {
+  return document.documentElement.classList.contains("dark")
+    ? "rgba(0, 0, 0, 0.72)"
+    : "rgba(255, 255, 255, 0.95)";
 }
 
 function getModeLabel(viewMode: ViewMode) {
