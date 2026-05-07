@@ -109,14 +109,6 @@ export function BaseMapCard({
   // Se tem localização base, um zoom de rua (ex: 14) fica melhor. Caso não passe zoom explícito, usa 14 ou 9.
   const effectiveZoom = zoom ?? (baseLocation ? 14 : 9);
 
-  const cleanStyles = cleanMap
-    ? {
-        light:
-          "https://api.maptiler.com/maps/base-v4/style.json?key=7VhWIxgYriUJMk5Om7Pj",
-        dark: "https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json",
-      }
-    : undefined;
-
   return (
     <Card className="relative overflow-hidden w-full h-100 font-sans group rounded-3xl">
       {/* Container expandido e movido para cima para compensar o gradiente inferior e deixar o pino bem visível */}
@@ -124,7 +116,6 @@ export function BaseMapCard({
         <MapComponent
           center={baseLocation ? [baseLocation.lng, baseLocation.lat] : center}
           zoom={effectiveZoom}
-          styles={cleanStyles}
           attributionControl={false}
         >
           {/* Opacidade menor (0.15) para permitir ver ruas e satélite no fundo */}
