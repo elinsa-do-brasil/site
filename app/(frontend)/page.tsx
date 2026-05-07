@@ -2,31 +2,43 @@ import { ArrowRight02Icon, Building01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity,
-  Cable,
   Factory,
   HardHat,
+  Heart,
+  Leaf,
+  Lightbulb,
   type LucideIcon,
   Map as MapIcon,
   MapPin,
+  Scale,
   ShieldCheck,
+  Users,
   Wrench,
   Zap,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { connection } from "next/server";
 import type { ReactNode } from "react";
-import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import {
   MapAbaetetuba,
   MapAltamira,
   MapBelem,
+  MapItaituba,
+  MapMonteAlegre,
   MapParagominas,
   MapSantarem,
 } from "@/components/maps/municipalities";
-import { Card, Carousel } from "@/components/ui/apple-cards-carousel";
+import { Card as AppleCard, Carousel } from "@/components/ui/apple-cards-carousel";
+import {
+  Card as ShadcnCard,
+  CardContent,
+} from "@/components/ui/card";
 import { BentoGrid } from "@/components/ui/bento-grid";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import Eletricista from "@/public/images/eletricistas.png";
+import Lampada from "@/public/images/lampada.webp";
 
 type ServiceCard = {
   id: string;
@@ -50,34 +62,100 @@ type FeatureItem = {
   content: ReactNode;
 };
 
+type RegionalBentoCard = {
+  id: string;
+  name: string;
+  description: string;
+  bases: string;
+  coverage: string;
+  accentClassName: string;
+  badgeClassName: string;
+  surfaceClassName: string;
+};
+
+const LAST_ACCIDENT_DATE_FALLBACK = "2025-05-03";
+const SAFETY_TIME_ZONE = "America/Sao_Paulo";
+const MS_PER_DAY = 86_400_000;
+
+type ValueCard = {
+  id: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  accentClassName: string;
+};
+
+const companyValues: ValueCard[] = [
+  {
+    id: "respeito-vida",
+    title: "Respeito à Vida",
+    description:
+      "Priorizamos a vida em primeiro lugar. Cada decisão operacional passa pela segurança das pessoas antes de qualquer meta ou prazo.",
+    icon: Heart,
+    accentClassName: "text-rose-500 bg-rose-500/10",
+  },
+  {
+    id: "gente",
+    title: "Gente",
+    description:
+      "Nossas realizações são conquistas de cada pessoa do nosso time. O crescimento da empresa começa pelo desenvolvimento de quem faz parte dela.",
+    icon: Users,
+    accentClassName: "text-amber-500 bg-amber-500/10",
+  },
+  {
+    id: "inovacao",
+    title: "Inovação e Geração de Valor",
+    description:
+      "Inovamos em busca da excelência e da rentabilidade para clientes, colaboradores, fornecedores e acionistas.",
+    icon: Lightbulb,
+    accentClassName: "text-sky-500 bg-sky-500/10",
+  },
+  {
+    id: "integridade",
+    title: "Integridade",
+    description:
+      "Éticas e transparentes em todas as nossas relações. A confiança se constrói com coerência entre discurso e prática.",
+    icon: Scale,
+    accentClassName: "text-violet-500 bg-violet-500/10",
+  },
+  {
+    id: "sustentabilidade",
+    title: "Sustentabilidade e Responsabilidade Socioambiental",
+    description:
+      "Somos agentes ativos da preservação do meio ambiente, investindo para contribuir com o desenvolvimento social e ambiental.",
+    icon: Leaf,
+    accentClassName: "text-emerald-500 bg-emerald-500/10",
+  },
+];
+
 const services: ServiceCard[] = [
   {
     id: "postes",
     title: "Obras de distribuição",
     description:
-      "Implantação, ampliação e requalificação de redes de distribuição para frentes do Grupo Equatorial Energia.",
-    detail: "Equipes de campo, frota e execução elétrica integrada.",
+      "Ampliação, recondutoramento e correções de rede saem com escopo, equipe, materiais e janela de atendimento alinhados antes da mobilização.",
+    detail: "Planejamento técnico, frota e execução na mesma cadência.",
     icon: Zap,
   },
   {
     id: "manutencao",
     title: "Manutenção operacional",
     description:
-      "Rotinas preventivas e corretivas para apoiar a continuidade operacional dos ativos atendidos.",
-    detail: "Atendimento coordenado para ativos críticos.",
+      "Preventivas e corretivas entram por criticidade, risco e impacto no ativo, com retorno de campo para orientar a próxima decisão.",
+    detail: "Menos retrabalho entre chamado, rota e encerramento.",
     icon: Wrench,
   },
   {
     id: "planejamento",
     title: "Planejamento e suporte",
     description:
-      "Apoio técnico, programação de equipes e controle das frentes de obra e manutenção no Brasil.",
-    detail: "Atuação exclusiva para o Grupo Equatorial Energia.",
+      "Acompanhamento de frentes, produtividade, suprimentos e documentação para manter a operação dedicada previsível.",
+    detail: "Base administrativa conectada às equipes em campo.",
     icon: HardHat,
   },
 ];
 
-const impactMetrics: ImpactMetric[] = [
+const baseImpactMetrics: ImpactMetric[] = [
   {
     id: "experiencia",
     value: "14",
@@ -86,9 +164,9 @@ const impactMetrics: ImpactMetric[] = [
   },
   {
     id: "bases",
-    value: "5",
+    value: "6",
     label: "bases",
-    description: "operacionais no Pará",
+    description: "regionais no Pará",
   },
   {
     id: "equipes",
@@ -96,33 +174,114 @@ const impactMetrics: ImpactMetric[] = [
     label: "colaboradores",
     description: "estimados em operação",
   },
-  {
-    id: "seguranca",
-    value: "369",
-    label: "dias",
-    description: "sem acidentes e contando",
-  },
 ];
 
-const siteLinks = [
-  { href: "/", label: "Início" },
-  { href: "/quem-somos", label: "Quem somos" },
-  { href: "/posts", label: "Publicações" },
-  { href: "/admin", label: "Portal interno" },
-];
+function getImpactMetrics(): ImpactMetric[] {
+  return [
+    ...baseImpactMetrics,
+    {
+      id: "seguranca",
+      value: String(getDaysSinceLastAccident()),
+      label: "dias",
+      description: "sem acidentes e contando",
+    },
+  ];
+}
 
-const socialLinks = [
-  {
-    href: "https://www.instagram.com/elinsadobrasil/",
-    label: "Instagram",
-    icon: FaInstagram,
+function getDaysSinceLastAccident() {
+  const lastAccidentDate =
+    process.env.ELINSA_LAST_ACCIDENT_DATE ?? LAST_ACCIDENT_DATE_FALLBACK;
+  const lastAccidentDay = parseLocalDateDayNumber(lastAccidentDate);
+  const today = getTodayDayNumber(SAFETY_TIME_ZONE);
+
+  if (lastAccidentDay === null) {
+    return Math.max(
+      0,
+      today - (parseLocalDateDayNumber(LAST_ACCIDENT_DATE_FALLBACK) ?? today),
+    );
+  }
+
+  return Math.max(0, today - lastAccidentDay);
+}
+
+function parseLocalDateDayNumber(dateString: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const timestamp = Date.UTC(year, month - 1, day);
+  const parsed = new Date(timestamp);
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return Math.floor(timestamp / MS_PER_DAY);
+}
+
+function getTodayDayNumber(timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const dateParts = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+  const dateString = `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
+
+  return (
+    parseLocalDateDayNumber(dateString) ?? Math.floor(Date.now() / MS_PER_DAY)
+  );
+}
+
+const regionalBentoCards: Record<string, RegionalBentoCard> = {
+  centro: {
+    id: "centro",
+    name: "Centro",
+    description: "Xingu e Transamazônica",
+    bases: "1 base",
+    coverage: "12 municípios",
+    accentClassName: "bg-yellow-500",
+    badgeClassName: "bg-yellow-400 text-elinsa-dark",
+    surfaceClassName:
+      "bg-[linear-gradient(135deg,rgba(234,179,8,0.18),rgba(255,255,255,0)_62%)] dark:bg-[linear-gradient(135deg,rgba(234,179,8,0.20),rgba(255,255,255,0)_58%)]",
   },
-  {
-    href: "https://www.linkedin.com/in/elinsadobrasil/",
-    label: "LinkedIn",
-    icon: FaLinkedin,
+  nordeste: {
+    id: "nordeste",
+    name: "Nordeste",
+    description: "Baixo Tocantins, Capim e Guamá",
+    bases: "2 bases",
+    coverage: "20 municípios",
+    accentClassName: "bg-emerald-500",
+    badgeClassName: "bg-emerald-500 text-white",
+    surfaceClassName:
+      "bg-[linear-gradient(135deg,rgba(22,163,74,0.14),rgba(245,158,11,0.08)_44%,rgba(255,255,255,0)_70%)] dark:bg-[linear-gradient(135deg,rgba(22,163,74,0.18),rgba(245,158,11,0.12)_48%,rgba(255,255,255,0)_72%)]",
   },
-];
+  oeste: {
+    id: "oeste",
+    name: "Oeste",
+    description: "Tapajós, Calha Norte e Baixo Amazonas",
+    bases: "3 bases",
+    coverage: "19 municípios",
+    accentClassName: "bg-violet-500",
+    badgeClassName: "bg-violet-500 text-white",
+    surfaceClassName:
+      "bg-[linear-gradient(135deg,rgba(139,92,246,0.16),rgba(6,182,212,0.11)_44%,rgba(239,68,68,0.08)_72%)] dark:bg-[linear-gradient(135deg,rgba(139,92,246,0.18),rgba(6,182,212,0.12)_44%,rgba(239,68,68,0.10)_72%)]",
+  },
+};
 
 function NewsContent({
   children,
@@ -146,6 +305,98 @@ function NewsContent({
         ))}
       </ul>
     </div>
+  );
+}
+
+function RegionalIntroCard({
+  regional,
+  className,
+}: {
+  regional: RegionalBentoCard;
+  className?: string;
+}) {
+  return (
+    <article
+      className={cn(
+        "relative flex h-full min-h-[15rem] flex-col justify-between overflow-hidden rounded-3xl border border-border/70 bg-card p-6 shadow-sm",
+        regional.surfaceClassName,
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-y-0 left-0 w-1.5",
+          regional.accentClassName,
+        )}
+      />
+      <div className="relative z-10">
+        <div
+          className={cn(
+            "mb-5 flex size-11 items-center justify-center rounded-md",
+            regional.badgeClassName,
+          )}
+        >
+          <MapPin className="size-5" />
+        </div>
+        <p className="text-xs font-bold uppercase tracking-normal text-muted-foreground">
+          Regional
+        </p>
+        <h3 className="mt-1 text-3xl font-black tracking-normal text-foreground">
+          {regional.name}
+        </h3>
+        <p className="mt-3 max-w-64 text-sm leading-6 text-muted-foreground">
+          {regional.description}
+        </p>
+      </div>
+      <dl className="relative z-10 mt-8 grid grid-cols-2 gap-2 text-sm">
+        <div className="rounded-md border border-border/70 bg-background/65 p-3 backdrop-blur">
+          <dt className="text-muted-foreground">Bases</dt>
+          <dd className="mt-1 font-bold text-foreground">{regional.bases}</dd>
+        </div>
+        <div className="rounded-md border border-border/70 bg-background/65 p-3 backdrop-blur">
+          <dt className="text-muted-foreground">Cobertura</dt>
+          <dd className="mt-1 font-bold text-foreground">
+            {regional.coverage}
+          </dd>
+        </div>
+      </dl>
+    </article>
+  );
+}
+
+function CoverageMapCard({ className }: { className?: string }) {
+  return (
+    <Link
+      href="/mapas"
+      className={cn(
+        "group relative flex h-full min-h-[13rem] overflow-hidden rounded-3xl border border-elinsa-primary/25 bg-elinsa-dark p-6 text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-elinsa-primary hover:shadow-xl",
+        className,
+      )}
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(36,163,221,0.28),rgba(255,255,255,0)_58%)]" />
+      <MapIcon className="absolute -right-8 -top-14 size-48 text-white/10 transition-transform duration-300 group-hover:scale-105" />
+      <div className="relative z-10 grid w-full gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div className="max-w-2xl">
+          <div className="mb-5 flex size-11 items-center justify-center rounded-md bg-white/12">
+            <Factory className="size-5" />
+          </div>
+          <h3 className="text-2xl font-black tracking-normal md:text-3xl">
+            Mapa operacional completo
+          </h3>
+          <p className="mt-3 leading-7 text-white/80">
+            Explore as regionais, bases, municípios atendidos e arquivos de
+            download em uma visão dedicada.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 font-semibold">
+          <span>Ver mapas</span>
+          <HugeiconsIcon
+            icon={ArrowRight02Icon}
+            className="size-5 transition-transform group-hover:translate-x-1"
+          />
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -188,26 +439,29 @@ const featureItems: FeatureItem[] = [
   },
   {
     category: "Bases",
-    title: "Cinco bases em operação no Pará",
+    title: "Seis bases regionais em operação no Pará",
     src: "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2400&auto=format&fit=crop",
     content: (
-      <NewsContent points={["Belém", "Altamira", "Santarém"]}>
-        A operação atual conta com cinco bases, mantendo equipes e estrutura
-        mais próximas das frentes atendidas em diferentes regiões do Pará.
+      <NewsContent points={["Centro", "Nordeste", "Oeste"]}>
+        A operação regional conta com seis bases, mantendo equipes e estrutura
+        mais próximas das frentes atendidas em diferentes áreas do Pará.
       </NewsContent>
     ),
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  await connection();
+
+  const impactMetrics = getImpactMetrics();
   const carouselCards = featureItems.map((card, index) => (
-    <Card key={card.src} card={card} index={index} layout />
+    <AppleCard key={card.src} card={card} index={index} layout />
   ));
 
   return (
     <div className="bg-background text-foreground">
-      <section className="relative flex min-h-[calc(100dvh-12rem)] items-end overflow-hidden px-6 pb-10 pt-28 md:min-h-[calc(100dvh-10rem)] md:items-center md:px-8 md:pb-14">
-        <div className="absolute inset-0">
+      <section className="relative flex min-h-[calc(100dvh-12rem)] items-end overflow-visible px-6 pb-10 pt-28 md:min-h-[calc(100dvh-10rem)] md:items-center md:px-8 md:pb-14">
+        <div className="absolute inset-x-0 top-0 -bottom-28 overflow-hidden">
           <Image
             src={Eletricista}
             alt="Equipe técnica da Elinsa em operação de infraestrutura elétrica"
@@ -217,6 +471,7 @@ export default function Home() {
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.82)_42%,rgba(255,255,255,0.28)_72%,rgba(255,255,255,0.06)_100%)] dark:bg-[linear-gradient(90deg,rgba(8,16,24,0.92)_0%,rgba(8,16,24,0.76)_44%,rgba(8,16,24,0.28)_74%,rgba(8,16,24,0.08)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-b from-transparent to-background" />
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-72 sm:max-w-6xl">
@@ -262,34 +517,42 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-y border-border bg-muted/35 px-6 py-[clamp(0.75rem,2dvh,1.5rem)] md:px-8">
-        <div className="mx-auto grid max-w-6xl gap-4 text-center text-sm sm:grid-cols-2 md:grid-cols-4">
-          {impactMetrics.map((metric) => (
-            <div
-              key={metric.id}
-              className="flex flex-col items-center justify-center gap-1 rounded-md border border-border/70 bg-background/55 px-4 py-[clamp(0.75rem,2dvh,1.25rem)]"
-            >
-              <span className="text-[clamp(2.25rem,4.8dvh,3.5rem)] font-black leading-none text-elinsa-primary">
-                {metric.value}
-              </span>
-              <p className="font-semibold uppercase tracking-normal">
-                {metric.label}
-              </p>
-              <p className="text-muted-foreground">{metric.description}</p>
-            </div>
-          ))}
+      <section className="relative z-20 -mt-10 px-6 pb-12 md:-mt-12 md:px-8">
+        <div className="mx-auto max-w-6xl rounded-3xl border border-border/70 bg-background/95 p-3 shadow-xl shadow-elinsa-dark/5 backdrop-blur">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {impactMetrics.map((metric) => (
+              <article
+                key={metric.id}
+                className="relative overflow-hidden rounded-2xl border border-border/60 bg-muted/30 px-5 py-5 transition-colors hover:border-elinsa-primary/40 hover:bg-elinsa-light/45 dark:hover:bg-elinsa-primary/10"
+              >
+                <div className="absolute right-4 top-4 size-14 rounded-full bg-elinsa-primary/8" />
+                <p className="text-xs font-bold uppercase tracking-normal text-muted-foreground">
+                  {metric.label}
+                </p>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-4xl font-black leading-none text-elinsa-primary md:text-5xl">
+                    {metric.value}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {metric.description}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section id="bases" className="mx-auto max-w-6xl px-6 py-20 md:px-8">
-        <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-end">
+      <section id="bases" className="mx-auto max-w-6xl py-20">
+        <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
           <div>
             <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
               <MapPin className="size-4" />
               Bases estratégicas
             </div>
             <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
-              Operação distribuída no Pará
+              Operação distribuída <br />
+              no Pará
             </h2>
           </div>
           <p className="text-lg text-muted-foreground">
@@ -299,96 +562,179 @@ export default function Home() {
           </p>
         </div>
 
-        <BentoGrid className="max-w-none grid-cols-1 gap-5 md:auto-rows-[25rem] md:grid-cols-2 lg:grid-cols-6">
-          <div className="lg:col-span-2">
-            <MapAbaetetuba />
-          </div>
-          <div className="lg:col-span-2">
-            <MapAltamira />
-          </div>
-          <div className="lg:col-span-2">
-            <MapBelem />
-          </div>
-          <div className="lg:col-span-2">
-            <MapParagominas />
-          </div>
-          <div className="lg:col-span-2">
-            <MapSantarem />
-          </div>
-          <div className="lg:col-span-2">
-            <Link
-              href="/mapas"
-              className="group relative flex h-full min-h-100 flex-col justify-between overflow-hidden rounded-3xl bg-elinsa-dark p-7 text-white shadow-sm transition-colors hover:bg-elinsa-primary"
-            >
-              <MapIcon className="absolute -right-12 -top-12 size-48 text-white/10 transition-transform duration-300 group-hover:scale-105" />
-              <div className="relative z-10">
-                <div className="mb-6 flex size-11 items-center justify-center rounded-md bg-white/12">
-                  <Factory className="size-5" />
-                </div>
-                <h3 className="text-3xl font-bold tracking-normal">
-                  Cobertura operacional
-                </h3>
-                <p className="mt-3 leading-7 text-white/82">
-                  A nossa estrutura completa e alguns arquivos de mapas
-                  detalhados estão disponíveis para download.
-                </p>
-              </div>
-              <div className="relative z-10 mt-8 flex items-center gap-2 font-semibold">
-                <span>Ver os mapas</span>
-                <HugeiconsIcon
-                  icon={ArrowRight02Icon}
-                  className="size-5 transition-transform group-hover:translate-x-1"
-                />
-              </div>
-            </Link>
-          </div>
+        <BentoGrid className="max-w-none grid-cols-1 gap-4 md:auto-rows-[12rem] md:grid-cols-6 lg:auto-rows-[11rem] lg:grid-cols-12">
+          <MapBelem className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-4" />
+          <RegionalIntroCard
+            regional={regionalBentoCards.centro}
+            className="md:col-span-3 md:row-span-2 lg:col-span-3"
+          />
+          <MapAltamira className="h-full min-h-[19rem] md:col-span-6 md:row-span-2 md:min-h-0 lg:col-span-5" />
+
+          <RegionalIntroCard
+            regional={regionalBentoCards.nordeste}
+            className="md:col-span-2 md:row-span-2 lg:col-span-3"
+          />
+          <MapAbaetetuba className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-4" />
+          <MapParagominas className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-5" />
+
+          <RegionalIntroCard
+            regional={regionalBentoCards.oeste}
+            className="md:col-span-2 md:row-span-2 lg:col-span-3"
+          />
+          <MapSantarem className="h-full min-h-[19rem] md:col-span-4 md:row-span-2 md:min-h-0 lg:col-span-3" />
+          <MapItaituba className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
+          <MapMonteAlegre className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
+
+          <CoverageMapCard className="md:col-span-6 md:row-span-1 lg:col-span-12" />
         </BentoGrid>
       </section>
 
-      <section className="bg-muted/35 px-6 py-20 md:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl font-extrabold tracking-normal md:text-5xl">
-                Engenharia, campo e manutenção no mesmo ritmo
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                A atuação integra obra elétrica, manutenção, planejamento e
-                operação em campo para o Grupo Equatorial Energia, com prazos,
-                segurança e previsibilidade.
-              </p>
+      <section className="overflow-hidden bg-muted/25 px-6 py-14 md:px-8 lg:h-[min(44rem,calc(100dvh-5rem))] lg:py-8">
+        <div className="mx-auto grid h-full max-w-6xl gap-5 lg:grid-cols-[0.88fr_1.12fr] lg:items-stretch">
+          <div className="relative min-h-[22rem] overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark p-6 text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0">
+            <Image
+              src={Lampada}
+              alt="Lâmpada acesa em uma composição conceitual de operação elétrica"
+              fill
+              className="object-cover object-center opacity-45"
+              sizes="(min-width: 1024px) 31vw, 100vw"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,16,24,0.96)_0%,rgba(8,16,24,0.82)_48%,rgba(8,16,24,0.54)_100%)]" />
+            <div className="relative flex h-full flex-col justify-between gap-8">
+              <div className="inline-flex w-fit items-center gap-2 rounded-md border border-white/18 bg-white/10 px-3 py-2 text-sm font-semibold backdrop-blur">
+                <Zap className="size-4 text-yellow-300" />
+                Programação em campo
+              </div>
+
+              <div>
+                <p className="max-w-sm text-2xl font-black leading-tight tracking-normal md:text-3xl">
+                  Ordem, rota, equipe e material fechados antes da mobilização.
+                </p>
+                <p className="mt-4 max-w-sm text-sm leading-6 text-white/72">
+                  A execução fica mais clara quando cada frente sai com
+                  responsável, janela de atendimento e retorno esperado.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-sm">
+                {["Escopo", "Rota", "Retorno"].map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-md border border-white/14 bg-white/10 px-3 py-2 text-center font-semibold text-white/88 backdrop-blur"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
-            <Button
-              size="xl"
-              className="w-fit bg-elinsa-primary text-white hover:bg-elinsa-dark"
-              asChild
-            >
-              <a href="mailto:comercial@elinsa.com.br">
-                Entrar em contato
-                <HugeiconsIcon icon={ArrowRight02Icon} />
-              </a>
-            </Button>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {services.map((service) => (
-              <article
-                key={service.id}
-                className="group rounded-md border border-border bg-card p-6 shadow-sm transition-colors hover:border-elinsa-primary/45"
+          <div className="flex flex-col justify-center gap-5 lg:min-h-0">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm font-semibold text-muted-foreground">
+                <Factory className="size-4 text-elinsa-primary" />
+                Fluxo de execução
+              </div>
+              <h2 className="max-w-3xl text-3xl font-extrabold tracking-normal md:text-4xl">
+                Engenharia, campo e manutenção no mesmo ritmo
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
+                Uma frente só funciona quando escopo, deslocamento, equipe,
+                material e retorno de campo chegam juntos. Essa cadência
+                organiza obras, manutenção e suporte técnico nas bases
+                atendidas.
+              </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              {services.map((service, index) => (
+                <ShadcnCard
+                  key={service.id}
+                  className={cn(
+                    "group relative overflow-hidden border-border bg-background shadow-sm transition-colors hover:border-elinsa-primary/45",
+                    index === 0
+                      ? "md:col-span-2"
+                      : "flex flex-col md:min-h-[13rem]",
+                  )}
+                >
+                  <service.icon
+                    className={cn(
+                      "pointer-events-none absolute -right-7 -top-9 size-32 text-elinsa-primary/8 transition duration-300 group-hover:scale-105 group-hover:text-elinsa-primary/12",
+                      index === 0 && "md:-right-9 md:-top-12 md:size-40",
+                    )}
+                    strokeWidth={1.5}
+                  />
+                  <CardContent className="relative z-10">
+                    <div className="flex items-start justify-between gap-4">
+                      <h3 className="text-lg font-bold tracking-normal">
+                        {service.title}
+                      </h3>
+                      <span className="shrink-0 text-sm font-black text-elinsa-primary/55">
+                        0{index + 1}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
+                      {service.description}
+                    </p>
+                    <p className="mt-3 border-t border-border pt-2.5 text-sm font-semibold text-elinsa-dark dark:text-elinsa-sky">
+                      {service.detail}
+                    </p>
+                  </CardContent>
+                </ShadcnCard>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="valores" className="bg-background px-6 py-20 md:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 max-w-2xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm font-semibold text-muted-foreground">
+              <Heart className="size-4 text-elinsa-primary" />
+              Cultura e identidade
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
+              Nossos valores
+            </h2>
+            <p className="mt-4 text-lg leading-8 text-muted-foreground">
+              Os princípios que orientam cada decisão, cada frente de trabalho e
+              cada relacionamento dentro da Elinsa do Brasil.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+            {companyValues.map((value, index) => (
+              <ShadcnCard
+                key={value.id}
+                className={cn(
+                  "group relative overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-elinsa-primary/30 hover:shadow-lg",
+                  index < 2
+                    ? "lg:col-span-3"
+                    : "lg:col-span-2",
+                )}
               >
-                <div className="mb-6 flex size-12 items-center justify-center rounded-md bg-elinsa-light text-elinsa-dark transition-colors group-hover:bg-elinsa-primary group-hover:text-white">
-                  <service.icon className="size-6" />
-                </div>
-                <h3 className="text-2xl font-bold tracking-normal">
-                  {service.title}
-                </h3>
-                <p className="mt-3 leading-7 text-muted-foreground">
-                  {service.description}
-                </p>
-                <p className="mt-6 border-t border-border pt-4 text-sm font-semibold text-elinsa-dark dark:text-elinsa-sky">
-                  {service.detail}
-                </p>
-              </article>
+                <value.icon
+                  className="pointer-events-none absolute -right-6 -top-6 size-28 text-foreground/[0.04] transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground/[0.07]"
+                  strokeWidth={1.2}
+                />
+                <CardContent className="relative z-10">
+                  <div
+                    className={cn(
+                      "mb-4 flex size-11 items-center justify-center rounded-xl",
+                      value.accentClassName,
+                    )}
+                  >
+                    <value.icon className="size-5" />
+                  </div>
+                  <h3 className="text-lg font-bold tracking-normal">
+                    {value.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {value.description}
+                  </p>
+                </CardContent>
+              </ShadcnCard>
             ))}
           </div>
         </div>
@@ -411,7 +757,7 @@ export default function Home() {
         <Carousel items={carouselCards} />
       </section>
 
-      <section className="border-y border-border bg-elinsa-dark px-6 py-16 text-white md:px-8">
+      {/* <section className="border-y border-border bg-elinsa-dark px-6 py-16 text-white md:px-8">
         <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1fr_auto] md:items-center">
           <div>
             <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
@@ -433,67 +779,7 @@ export default function Home() {
             </a>
           </Button>
         </div>
-      </section>
-
-      <footer className="bg-background px-6 py-12 md:px-8">
-        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
-          <div>
-            <h2 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
-              Elinsa do Brasil
-            </h2>
-            <p className="mt-4 max-w-md leading-7 text-muted-foreground">
-              Infraestrutura elétrica, manutenção e obras complexas para frentes
-              do Grupo Equatorial Energia.
-            </p>
-            <div className="mt-6 flex items-center gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.href}
-                  href={social.href}
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex size-10 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-elinsa-primary hover:text-elinsa-primary"
-                >
-                  <social.icon className="size-5" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-bold">Mapa do site</h3>
-            <ul className="mt-4 space-y-3 text-muted-foreground">
-              {siteLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="transition-colors hover:text-elinsa-primary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-bold">Contato</h3>
-            <ul className="mt-4 space-y-3 text-muted-foreground">
-              <li>
-                <a
-                  href="mailto:comercial@elinsa.com.br"
-                  className="transition-colors hover:text-elinsa-primary"
-                >
-                  comercial@elinsa.com.br
-                </a>
-              </li>
-              <li>Belém, Pará - Brasil</li>
-              <li>Atendimento empresarial</li>
-            </ul>
-          </div>
-        </div>
-      </footer>
+      </section> */}
     </div>
   );
 }
