@@ -81,9 +81,13 @@ function GeoJsonLayer({
     }
 
     return () => {
-      if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
-      if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
-      if (map.getSource(sourceId)) map.removeSource(sourceId);
+      try {
+        if (map.getLayer(lineLayerId)) map.removeLayer(lineLayerId);
+        if (map.getLayer(fillLayerId)) map.removeLayer(fillLayerId);
+        if (map.getSource(sourceId)) map.removeSource(sourceId);
+      } catch {
+        // MapLibre pode remover o style antes do cleanup das camadas filhas.
+      }
     };
   }, [map, isLoaded, url, color, fillColor]);
 
