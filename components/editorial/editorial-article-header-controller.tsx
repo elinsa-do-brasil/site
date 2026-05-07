@@ -7,28 +7,20 @@ export function EditorialArticleHeaderController() {
     const header = document.querySelector<HTMLElement>(
       "[data-editorial-article-header]",
     );
-    const scroller = document.querySelector<HTMLElement>(
-      "[data-editorial-article-scroll]",
-    );
 
-    if (!header || !scroller) {
+    if (!header) {
       return;
     }
 
     const updateHeaderState = () => {
-      header.classList.toggle(
-        "is-condensed",
-        scroller.scrollTop > 8 || window.scrollY > 16,
-      );
+      header.classList.toggle("is-condensed", window.scrollY > 18);
     };
 
     updateHeaderState();
 
-    scroller.addEventListener("scroll", updateHeaderState, { passive: true });
     window.addEventListener("scroll", updateHeaderState, { passive: true });
 
     return () => {
-      scroller.removeEventListener("scroll", updateHeaderState);
       window.removeEventListener("scroll", updateHeaderState);
     };
   }, []);
