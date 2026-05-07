@@ -18,7 +18,7 @@ export function EditorialArticleHeaderController() {
     const updateHeaderState = () => {
       header.classList.toggle(
         "is-condensed",
-        scroller.scrollTop > 32 || window.scrollY > 64,
+        scroller.scrollTop > 8 || window.scrollY > 16,
       );
     };
 
