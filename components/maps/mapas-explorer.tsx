@@ -66,6 +66,23 @@ type ActiveMunicipality = Municipality & {
   regionalName: string;
 };
 
+type ActiveMunicipalityGroup = {
+  id: string;
+  baseName: string;
+  color: string;
+  municipalities: ActiveMunicipality[];
+};
+
+type MunicipalityFeature = GeoJSON.Feature<
+  GeoJSON.Geometry,
+  Record<string, unknown>
+>;
+
+type MunicipalityFeatureCollection = GeoJSON.FeatureCollection<
+  GeoJSON.Geometry,
+  Record<string, unknown>
+>;
+
 const CLEAN_MAP_STYLES = {
   light:
     "https://api.maptiler.com/maps/base-v4/style.json?key=7VhWIxgYriUJMk5Om7Pj",
@@ -270,6 +287,32 @@ export function MapasExplorer() {
     () => activeMunicipalities.map((municipality) => municipality.url),
     [activeMunicipalities],
   );
+
+  const activeMunicipalityGroups = useMemo(() => {
+    if (viewMode === "municipio") {
+      return [
+        toActiveMunicipalityGroup(
+          "municipio",
+          selectedBase,
+          activeMunicipalities,
+        ),
+      ];
+    }
+
+    if (viewMode === "base") {
+      return [
+        toActiveMunicipalityGroup("base", selectedBase, activeMunicipalities),
+      ];
+    }
+
+    return selectedRegional.bases.map((base) => {
+      const municipalities = base.municipalities.map((municipality) =>
+        toActiveMunicipality(selectedRegional, base, municipality),
+      );
+
+      return toActiveMunicipalityGroup("regional", base, municipalities);
+    });
+  }, [activeMunicipalities, selectedBase, selectedRegional, viewMode]);
 
   const visibleBases =
     viewMode === "regional" ? selectedRegional.bases : [selectedBase];
@@ -510,10 +553,10 @@ export function MapasExplorer() {
             zoom={5.8}
           >
             <FitBounds urls={activeMunicipalityUrls} viewMode={viewMode} />
-            {activeMunicipalities.map((municipality) => (
-              <MunicipalityLayer
-                key={municipality.id}
-                municipality={municipality}
+            {activeMunicipalityGroups.map((group) => (
+              <MunicipalityGroupLayer
+                group={group}
+                key={group.id}
                 viewMode={viewMode}
               />
             ))}
@@ -603,11 +646,11 @@ function BaseMarker({
   );
 }
 
-function MunicipalityLayer({
-  municipality,
+function MunicipalityGroupLayer({
+  group,
   viewMode,
 }: {
-  municipality: ActiveMunicipality;
+  group: ActiveMunicipalityGroup;
   viewMode: ViewMode;
 }) {
   const { map, isLoaded } = useMap();
@@ -617,69 +660,93 @@ function MunicipalityLayer({
       return;
     }
 
-    const sourceId = `mapas-source-${municipality.id}`;
-    const fillLayerId = `mapas-fill-${municipality.id}`;
-    const lineLayerId = `mapas-line-${municipality.id}`;
+    const mapInstance = map;
+    const controller = new AbortController();
+    const sourceId = `mapas-source-${group.id}`;
+    const fillLayerId = `mapas-fill-${group.id}`;
+    const lineLayerId = `mapas-line-${group.id}`;
+    let collection: MunicipalityFeatureCollection | null = null;
 
     function addLayer() {
-      if (!map?.isStyleLoaded()) {
+      if (!collection || !mapInstance.isStyleLoaded()) {
         return;
       }
 
-      if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, {
+      const source = mapInstance.getSource(sourceId) as
+        | { setData: (data: MunicipalityFeatureCollection) => void }
+        | undefined;
+
+      if (source) {
+        source.setData(collection);
+      } else {
+        mapInstance.addSource(sourceId, {
           type: "geojson",
-          data: municipality.url,
+          data: collection,
         });
       }
 
-      if (!map.getLayer(fillLayerId)) {
-        map.addLayer({
+      if (!mapInstance.getLayer(fillLayerId)) {
+        mapInstance.addLayer({
           id: fillLayerId,
           type: "fill",
           source: sourceId,
           paint: {
-            "fill-color": municipality.color,
-            "fill-opacity": viewMode === "municipio" ? 0.28 : 0.14,
+            "fill-color": group.color,
+            "fill-opacity": viewMode === "municipio" ? 0.34 : 0.24,
           },
         });
       }
 
-      if (!map.getLayer(lineLayerId)) {
-        map.addLayer({
+      if (!mapInstance.getLayer(lineLayerId)) {
+        mapInstance.addLayer({
           id: lineLayerId,
           type: "line",
           source: sourceId,
           paint: {
-            "line-color": municipality.color,
+            "line-color": group.color,
             "line-opacity": 0.95,
-            "line-width": viewMode === "municipio" ? 2.8 : 1.5,
+            "line-width": viewMode === "municipio" ? 3 : 2.4,
           },
         });
       }
     }
 
-    addLayer();
-    map.on("styledata", addLayer);
+    async function loadGroupLayer() {
+      try {
+        collection = await loadMunicipalityCollection(group, controller.signal);
+
+        if (!controller.signal.aborted) {
+          addLayer();
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error(error);
+        }
+      }
+    }
+
+    loadGroupLayer();
+    mapInstance.on("styledata", addLayer);
 
     return () => {
-      map.off("styledata", addLayer);
+      controller.abort();
+      mapInstance.off("styledata", addLayer);
 
       try {
-        if (map.getLayer(lineLayerId)) {
-          map.removeLayer(lineLayerId);
+        if (mapInstance.getLayer(lineLayerId)) {
+          mapInstance.removeLayer(lineLayerId);
         }
-        if (map.getLayer(fillLayerId)) {
-          map.removeLayer(fillLayerId);
+        if (mapInstance.getLayer(fillLayerId)) {
+          mapInstance.removeLayer(fillLayerId);
         }
-        if (map.getSource(sourceId)) {
-          map.removeSource(sourceId);
+        if (mapInstance.getSource(sourceId)) {
+          mapInstance.removeSource(sourceId);
         }
       } catch {
         // MapLibre may clear layers while switching styles.
       }
     };
-  }, [map, isLoaded, municipality, viewMode]);
+  }, [map, isLoaded, group, viewMode]);
 
   return null;
 }
@@ -753,6 +820,99 @@ function toActiveMunicipality(
     baseName: base.name,
     regionalName: regional.name,
   };
+}
+
+function toActiveMunicipalityGroup(
+  viewMode: ViewMode,
+  base: OperationalBase,
+  municipalities: ActiveMunicipality[],
+): ActiveMunicipalityGroup {
+  return {
+    id: `${viewMode}-${municipalities[0]?.regionalName ?? "regional"}-${base.slug}-${municipalities.length}`,
+    baseName: base.name,
+    color: base.color,
+    municipalities,
+  };
+}
+
+async function loadMunicipalityCollection(
+  group: ActiveMunicipalityGroup,
+  signal: AbortSignal,
+): Promise<MunicipalityFeatureCollection> {
+  const collections = await Promise.all(
+    group.municipalities.map(async (municipality) => {
+      const response = await fetch(municipality.url, { signal });
+
+      if (!response.ok) {
+        throw new Error(`GeoJSON indisponível: ${municipality.url}`);
+      }
+
+      const geoJson = (await response.json()) as unknown;
+      const features = extractMunicipalityFeatures(geoJson);
+
+      return features.map((feature) => ({
+        ...feature,
+        properties: {
+          ...getFeatureProperties(feature.properties),
+          baseName: group.baseName,
+          color: group.color,
+          municipalityName: municipality.name,
+          regionalName: municipality.regionalName,
+        },
+      }));
+    }),
+  );
+
+  return {
+    type: "FeatureCollection",
+    features: collections.flat(),
+  };
+}
+
+function extractMunicipalityFeatures(geoJson: unknown): MunicipalityFeature[] {
+  if (isFeatureCollection(geoJson)) {
+    return geoJson.features.filter(isFeature);
+  }
+
+  if (isFeature(geoJson)) {
+    return [geoJson];
+  }
+
+  return [];
+}
+
+function isFeatureCollection(
+  value: unknown,
+): value is { type: "FeatureCollection"; features: unknown[] } {
+  return (
+    Boolean(value) &&
+    typeof value === "object" &&
+    (value as Record<string, unknown>).type === "FeatureCollection" &&
+    Array.isArray((value as Record<string, unknown>).features)
+  );
+}
+
+function isFeature(value: unknown): value is MunicipalityFeature {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return (
+    record.type === "Feature" &&
+    "geometry" in record &&
+    Boolean(record.geometry) &&
+    typeof record.geometry === "object"
+  );
+}
+
+function getFeatureProperties(properties: unknown): Record<string, unknown> {
+  if (!properties || typeof properties !== "object") {
+    return {};
+  }
+
+  return properties as Record<string, unknown>;
 }
 
 function getModeLabel(viewMode: ViewMode) {
