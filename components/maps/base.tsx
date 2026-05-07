@@ -114,7 +114,7 @@ export function BaseMapCard({
     : undefined;
 
   return (
-    <Card className="relative overflow-hidden w-full h-100 font-sans group">
+    <Card className="relative overflow-hidden w-full h-100 font-sans group rounded-3xl">
       {/* Container expandido e movido para cima para compensar o gradiente inferior e deixar o pino bem visível */}
       <div className="absolute left-0 right-0 -top-30 h-130">
         <MapComponent
@@ -160,11 +160,17 @@ export function BaseMapCard({
           )}
         </div>
 
-        <Button size={"lg"} className="w-fit pointer-events-auto" asChild>
-          <a href={href || "#"} target="_blank" rel="noopener noreferrer">
-            <MapPin /> Como chegar
-          </a>
-        </Button>
+        {href ? (
+          <Button size="lg" className="w-fit pointer-events-auto" asChild>
+            <a href={href} target="_blank" rel="noopener noreferrer">
+              <MapPin /> Como chegar
+            </a>
+          </Button>
+        ) : (
+          <Button size="lg" className="w-fit pointer-events-auto" disabled>
+            <MapPin /> Rota em atualização
+          </Button>
+        )}
       </div>
     </Card>
   );

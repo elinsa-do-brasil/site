@@ -1,25 +1,28 @@
 "use client";
 
-// Assuming we want a specific icon that looks like the AppleNews or News icon,
-// since Newspaper01Icon wasn't in the grep I'll use LayoutGridIcon if Newspaper isn't found.
-// Actually, I'll use the ones I'm sure exist from my grep.
 import {
   Activity01Icon,
   AiUserIcon,
-  Megaphone01Icon,
+  Alert01Icon,
   Building01Icon,
-  LayoutGridIcon,
   DashboardSquareEditIcon,
-  News01Icon,
   Globe02Icon,
-  Alert01Icon
+  LayoutGridIcon,
+  Megaphone01Icon,
+  News01Icon,
 } from "@hugeicons/core-free-icons";
-
-import { FaInstagram, FaLinkedin } from "react-icons/fa";
-
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -29,21 +32,13 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ui/theme-toggle";
 
 export function Header() {
   return (
     <div className="fixed top-0 z-50 w-full p-4 flex justify-center pointer-events-none">
-      <header className="pointer-events-auto flex h-14 w-full max-w-5xl items-center justify-between rounded-2xl border border-border bg-card/80 backdrop-blur-md px-4 shadow-sm">
+      <header className="pointer-events-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl border border-border bg-card/80 backdrop-blur-md px-4 shadow-sm">
         <div className="flex items-center gap-6">
           <Link
             href="/"
@@ -67,7 +62,7 @@ export function Header() {
                   <NavigationMenuTrigger className="bg-transparent">
                     Conteúdo
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent> 
+                  <NavigationMenuContent>
                     <div className="grid gap-4 w-150 grid-cols-2 p-4">
                       {/* Left Column */}
                       <div>
@@ -125,7 +120,7 @@ export function Header() {
                           Social
                         </h4>
                         <ul className="flex flex-col gap-2">
-                          <DropdownItem 
+                          <DropdownItem
                             href="https://www.instagram.com/elinsadobrasil/"
                             icon={FaInstagram}
                             title="Instagram"
@@ -167,7 +162,7 @@ export function Header() {
           <ThemeToggle />
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button className="font-medium rounded-md h-9 px-4">
+              <Button className="hidden h-9 rounded-md px-4 font-medium sm:inline-flex">
                 Portal Interno
               </Button>
             </DropdownMenuTrigger>
@@ -192,7 +187,8 @@ export function Header() {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/admin" className="cursor-pointer w-full">
-                  <HugeiconsIcon icon={DashboardSquareEditIcon} />Painel de controle
+                  <HugeiconsIcon icon={DashboardSquareEditIcon} />
+                  Painel de controle
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -225,10 +221,7 @@ function DropdownItem({
         {isReactIcon ? (
           <Icon className="size-4 text-muted-foreground" />
         ) : (
-          <HugeiconsIcon
-            icon={Icon}
-            className="size-4 text-muted-foreground"
-          />
+          <HugeiconsIcon icon={Icon} className="size-4 text-muted-foreground" />
         )}
       </div>
       <div className="flex flex-col">

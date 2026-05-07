@@ -27,7 +27,13 @@ export function MapAltamira() {
       description="Base administrativa e operacional"
       geoJsonUrl="/json/altamira.json"
       center={[-52.2069, -3.2033]}
-      zoom={6}
+      zoom={16}
+      baseLocation={{
+        lng: -52.2335258,
+        lat: -3.2326965,
+        tooltip: "Base de Altamira",
+      }}
+      href="https://maps.app.goo.gl/UpNypwUHdpw7Y1g66"
     />
   );
 }
@@ -38,7 +44,7 @@ export function MapBelem() {
       title="Belém"
       description="Base administrativa e operacional"
       geoJsonUrl="/json/belem.json"
-      center={[-48.4902, -1.4550]}
+      center={[-48.4902, -1.455]}
       zoom={10}
     />
   );
@@ -51,7 +57,7 @@ export function MapParagominas() {
       description="Base administrativa e operacional"
       geoJsonUrl="/json/paragominas.json"
       center={[-47.4833, -2.9972]}
-      zoom={14}
+      zoom={16}
       baseLocation={{
         lng: -47.3835003,
         lat: -2.9916131,
@@ -69,7 +75,7 @@ export function MapSantarem() {
       description="Base administrativa e operacional"
       geoJsonUrl="/json/santarem.json"
       center={[-54.7119, -2.4431]}
-      zoom={14}
+      zoom={16}
       baseLocation={{
         lng: -54.7010172,
         lat: -2.4329974,
