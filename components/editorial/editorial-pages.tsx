@@ -10,6 +10,7 @@ import {
 import { draftMode } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EditorialArticleHeaderController } from "@/components/editorial/editorial-article-header-controller";
 import { EditorialRichText } from "@/components/editorial/editorial-rich-text";
 import {
   type EditorialCollectionSlug,
@@ -173,17 +174,22 @@ export async function EditorialArticlePage({
         </div>
       )}
 
-      <header className="sticky top-24 z-30 border-b border-border bg-background/95 backdrop-blur-md">
-        <div className="mx-auto max-w-6xl px-6 py-5 md:px-8">
+      <EditorialArticleHeaderController />
+
+      <header
+        className="editorial-article-header sticky top-24 z-30 border-b border-border bg-background/95 backdrop-blur-md"
+        data-editorial-article-header
+      >
+        <div className="editorial-article-header__inner mx-auto max-w-6xl px-6 py-5 md:px-8">
           <Link
-            className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-elinsa-primary"
+            className="editorial-article-header__back inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-elinsa-primary"
             href={config.href}
           >
             <ArrowLeft className="size-4" />
             Voltar para {config.navLabel}
           </Link>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <div className="editorial-article-header__meta mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 font-semibold text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
               <FileText className="size-4" />
               {getEditorialSubjectLabel(getPostSubjectValue(post))}
@@ -202,19 +208,19 @@ export async function EditorialArticlePage({
             </span>
           </div>
 
-          <h1 className="mt-4 max-w-4xl text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
+          <h1 className="editorial-article-header__title mt-4 max-w-4xl text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
             {post.title}
           </h1>
 
-          <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="editorial-article-header__summary-row mt-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             {post.summary && (
-              <p className="max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+              <p className="editorial-article-header__summary max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
                 {post.summary}
               </p>
             )}
 
             {updatedDate && (
-              <p className="inline-flex shrink-0 items-center gap-2 text-sm text-muted-foreground">
+              <p className="editorial-article-header__updated inline-flex shrink-0 items-center gap-2 text-sm text-muted-foreground">
                 <RefreshCw className="size-4 text-elinsa-primary" />
                 Atualizado em {updatedDate}
               </p>
@@ -225,7 +231,10 @@ export async function EditorialArticlePage({
 
       <section className="mx-auto max-w-6xl px-6 py-8 md:px-8 lg:h-[calc(100dvh-23rem)] lg:min-h-[34rem]">
         <div className="grid h-full min-h-0 gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
-          <article className="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:pr-8 lg:pb-12">
+          <article
+            className="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:pr-8 lg:pb-12"
+            data-editorial-article-scroll
+          >
             <MobileTopics headings={headings} />
             <EditorialRichText data={post.content} />
 
