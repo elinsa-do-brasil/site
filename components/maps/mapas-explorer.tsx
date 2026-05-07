@@ -96,11 +96,27 @@ const EMPTY_MUNICIPALITY_COLLECTION: MunicipalityFeatureCollection = {
 const ACTIVE_SOURCE_ID = "mapas-active-source";
 const ACTIVE_FILL_LAYER_ID = "mapas-active-fill";
 const ACTIVE_LINE_LAYER_ID = "mapas-active-line";
+const ACTIVE_LABEL_LAYER_ID = "mapas-active-label";
 const DEFAULT_LAYER_COLOR = "#0ea5e9";
 const BASE_COLOR_EXPRESSION: ExpressionSpecification = [
   "coalesce",
   ["get", "baseColor"],
   DEFAULT_LAYER_COLOR,
+];
+const MUNICIPALITY_NAME_EXPRESSION: ExpressionSpecification = [
+  "get",
+  "municipalityName",
+];
+const MUNICIPALITY_LABEL_SIZE_EXPRESSION: ExpressionSpecification = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  4,
+  10,
+  7,
+  12,
+  10,
+  15,
 ];
 
 const CLEAN_MAP_STYLES = {
@@ -753,6 +769,44 @@ function RegionalSelectionLayer({
           getLineWidth(viewModeRef.current),
         );
       }
+
+      if (!mapInstance.getLayer(ACTIVE_LABEL_LAYER_ID)) {
+        mapInstance.addLayer({
+          id: ACTIVE_LABEL_LAYER_ID,
+          type: "symbol",
+          source: ACTIVE_SOURCE_ID,
+          layout: {
+            "symbol-placement": "point",
+            "text-allow-overlap": shouldForceLabels(viewModeRef.current),
+            "text-field": MUNICIPALITY_NAME_EXPRESSION,
+            "text-ignore-placement": shouldForceLabels(viewModeRef.current),
+            "text-size": MUNICIPALITY_LABEL_SIZE_EXPRESSION,
+          },
+          paint: {
+            "text-color": BASE_COLOR_EXPRESSION,
+            "text-halo-blur": 0.5,
+            "text-halo-color": "rgba(255, 255, 255, 0.95)",
+            "text-halo-width": 2.5,
+            "text-opacity": getLabelOpacity(viewModeRef.current),
+          },
+        });
+      } else {
+        mapInstance.setLayoutProperty(
+          ACTIVE_LABEL_LAYER_ID,
+          "text-allow-overlap",
+          shouldForceLabels(viewModeRef.current),
+        );
+        mapInstance.setLayoutProperty(
+          ACTIVE_LABEL_LAYER_ID,
+          "text-ignore-placement",
+          shouldForceLabels(viewModeRef.current),
+        );
+        mapInstance.setPaintProperty(
+          ACTIVE_LABEL_LAYER_ID,
+          "text-opacity",
+          getLabelOpacity(viewModeRef.current),
+        );
+      }
     }
 
     syncLayerRef.current = syncLayer;
@@ -764,6 +818,9 @@ function RegionalSelectionLayer({
       mapInstance.off("styledata", syncLayer);
 
       try {
+        if (mapInstance.getLayer(ACTIVE_LABEL_LAYER_ID)) {
+          mapInstance.removeLayer(ACTIVE_LABEL_LAYER_ID);
+        }
         if (mapInstance.getLayer(ACTIVE_LINE_LAYER_ID)) {
           mapInstance.removeLayer(ACTIVE_LINE_LAYER_ID);
         }
@@ -868,6 +925,14 @@ function getFillOpacity(viewMode: ViewMode) {
 
 function getLineWidth(viewMode: ViewMode) {
   return viewMode === "municipio" ? 3 : 2.4;
+}
+
+function getLabelOpacity(viewMode: ViewMode) {
+  return viewMode === "regional" ? 0.82 : 0.95;
+}
+
+function shouldForceLabels(viewMode: ViewMode) {
+  return viewMode !== "regional";
 }
 
 function getModeLabel(viewMode: ViewMode) {
