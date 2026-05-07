@@ -11,6 +11,7 @@ import {
   MarkerTooltip,
   useMap,
 } from "@/components/ui/map";
+import { cn } from "@/lib/utils";
 
 interface BaseLocationProps {
   lng: number;
@@ -29,6 +30,9 @@ interface BaseMapProps {
   baseLocation?: BaseLocationProps;
   cleanMap?: boolean;
   href?: string;
+  className?: string;
+  eyebrow?: string;
+  accentClassName?: string;
 }
 
 function GeoJsonLayer({
@@ -103,16 +107,31 @@ export function BaseMapCard({
   title,
   description,
   baseLocation,
-  cleanMap = true,
   href,
+  className,
+  eyebrow,
+  accentClassName,
 }: BaseMapProps) {
   // Se tem localização base, um zoom de rua (ex: 14) fica melhor. Caso não passe zoom explícito, usa 14 ou 9.
   const effectiveZoom = zoom ?? (baseLocation ? 14 : 9);
 
   return (
-    <Card className="relative overflow-hidden w-full h-100 font-sans group rounded-3xl">
+    <Card
+      className={cn(
+        "group relative w-full overflow-hidden rounded-3xl border-border/70 bg-card font-sans shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-xl",
+        className ?? "h-100",
+      )}
+    >
+      {accentClassName && (
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-x-0 top-0 z-20 h-1.5",
+            accentClassName,
+          )}
+        />
+      )}
       {/* Container expandido e movido para cima para compensar o gradiente inferior e deixar o pino bem visível */}
-      <div className="absolute left-0 right-0 -top-30 h-130">
+      <div className="absolute inset-x-0 -top-12 bottom-0">
         <MapComponent
           center={baseLocation ? [baseLocation.lng, baseLocation.lat] : center}
           zoom={effectiveZoom}
@@ -145,6 +164,11 @@ export function BaseMapCard({
       {/* Conteúdo sobreposto */}
       <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-3 pointer-events-none">
         <div>
+          {eyebrow && (
+            <p className="mb-2 w-fit rounded-md border border-border/70 bg-background/75 px-2.5 py-1 text-xs font-bold uppercase tracking-normal text-muted-foreground backdrop-blur">
+              {eyebrow}
+            </p>
+          )}
           <h3 className="text-2xl font-bold tracking-tight text-foreground">
             {title}
           </h3>

@@ -114,6 +114,7 @@ const ACTIVE_SOURCE_ID = "mapas-active-source";
 const ACTIVE_FILL_LAYER_ID = "mapas-active-fill";
 const ACTIVE_LINE_LAYER_ID = "mapas-active-line";
 const ACTIVE_LABEL_LAYER_ID = "mapas-active-label";
+const CENTRO_REGIONAL_COLOR = "#eab308";
 const DEFAULT_LAYER_COLOR = "#0ea5e9";
 const BASE_COLOR_EXPRESSION: ExpressionSpecification = [
   "coalesce",
@@ -142,12 +143,12 @@ const REGIONALS: Regional[] = [
     name: "Centro",
     description: "Xingu e Transamazônica",
     center: [-52.8, -4.3],
-    color: "#0ea5e9",
+    color: CENTRO_REGIONAL_COLOR,
     bases: [
       {
         slug: "altamira",
         name: "Altamira",
-        color: "#0ea5e9",
+        color: CENTRO_REGIONAL_COLOR,
         marker: [-52.2335258, -3.2326965],
         municipalities: [
           { slug: "almeirim", name: "Almeirim" },
@@ -196,7 +197,7 @@ const REGIONALS: Regional[] = [
       {
         slug: "paragominas",
         name: "Paragominas",
-        color: "#f59e0b",
+        color: "#ef4444",
         marker: [-47.3835003, -2.9916131],
         municipalities: [
           { slug: "acara", name: "Acará" },
@@ -241,7 +242,7 @@ const REGIONALS: Regional[] = [
       {
         slug: "monte-alegre",
         name: "Monte Alegre",
-        color: "#ef4444",
+        color: "#f59e0b",
         marker: [-54.0742, -2.0008],
         municipalities: [
           { slug: "alenquer", name: "Alenquer" },
@@ -957,7 +958,7 @@ function buildSelectionCollection(
         ...feature,
         properties: {
           ...feature.properties,
-          baseColor: base.color,
+          baseColor: getBaseColor(regionalMap.slug, base.slug, base.color),
           baseName: base.name,
           baseSlug: base.slug,
           municipalityName: municipality.name,
@@ -973,6 +974,17 @@ function buildSelectionCollection(
     type: "FeatureCollection",
     features,
   };
+}
+
+function getBaseColor(
+  regionalSlug: RegionalSlug,
+  baseSlug: string,
+  baseColor: string,
+) {
+  if (regionalSlug === "centro") return CENTRO_REGIONAL_COLOR;
+  if (baseSlug === "paragominas") return "#ef4444";
+  if (baseSlug === "monte-alegre") return "#f59e0b";
+  return baseColor;
 }
 
 function isAggregatedRegional(value: unknown): value is AggregatedRegional {
