@@ -26,7 +26,7 @@ import {
 import { Card, Carousel } from "@/components/ui/apple-cards-carousel";
 import { BentoGrid } from "@/components/ui/bento-grid";
 import { Button } from "@/components/ui/button";
-import Eletricista from "@/public/eletricistas.png";
+import Eletricista from "@/public/images/eletricistas.png";
 
 type ServiceCard = {
   id: string;

@@ -1,5 +1,6 @@
 "use client";
 
+import { mapAsset } from "@/lib/map-assets";
 import { BaseMapCard } from "./base";
 
 export function MapAbaetetuba() {
@@ -7,7 +8,7 @@ export function MapAbaetetuba() {
     <BaseMapCard
       title="Abaetetuba"
       description="Base administrativa e operacional"
-      geoJsonUrl="/json/abaetetuba.json"
+      geoJsonUrl={mapAsset("regionais/nordeste/abaetetuba/abaetetuba.json")}
       center={[-48.8844, -1.7214]}
       zoom={14}
       baseLocation={{
@@ -25,7 +26,7 @@ export function MapAltamira() {
     <BaseMapCard
       title="Altamira"
       description="Base administrativa e operacional"
-      geoJsonUrl="/json/altamira.json"
+      geoJsonUrl={mapAsset("regionais/centro/altamira/altamira.json")}
       center={[-52.2069, -3.2033]}
       zoom={16}
       baseLocation={{
@@ -43,7 +44,7 @@ export function MapBelem() {
     <BaseMapCard
       title="Belém"
       description="Base administrativa e operacional"
-      geoJsonUrl="/json/belem.json"
+      geoJsonUrl={mapAsset("belem.json")}
       center={[-48.4902, -1.455]}
       zoom={10}
     />
@@ -55,7 +56,7 @@ export function MapParagominas() {
     <BaseMapCard
       title="Paragominas"
       description="Base administrativa e operacional"
-      geoJsonUrl="/json/paragominas.json"
+      geoJsonUrl={mapAsset("regionais/nordeste/paragominas/paragominas.json")}
       center={[-47.4833, -2.9972]}
       zoom={16}
       baseLocation={{
@@ -73,7 +74,7 @@ export function MapSantarem() {
     <BaseMapCard
       title="Santarém"
       description="Base administrativa e operacional"
-      geoJsonUrl="/json/santarem.json"
+      geoJsonUrl={mapAsset("regionais/oeste/santarem/santarem.json")}
       center={[-54.7119, -2.4431]}
       zoom={16}
       baseLocation={{

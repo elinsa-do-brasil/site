@@ -5,19 +5,21 @@ import {
   Building2,
   Check,
   CircleDot,
+  Code,
   Layers3,
   MapPin,
   Navigation,
+  VectorSquare,
 } from "lucide-react";
 import type { ExpressionSpecification } from "maplibre-gl";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SiPenpot } from "react-icons/si";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -30,7 +32,22 @@ import {
   MarkerTooltip,
   useMap,
 } from "@/components/ui/map";
-import { Separator } from "@/components/ui/separator";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarSeparator,
+} from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { mapAsset } from "@/lib/map-assets";
 import { cn } from "@/lib/utils";
 
 type Coordinates = [number, number];
@@ -118,12 +135,6 @@ const MUNICIPALITY_LABEL_SIZE_EXPRESSION: ExpressionSpecification = [
   10,
   15,
 ];
-
-const CLEAN_MAP_STYLES = {
-  light:
-    "https://api.maptiler.com/maps/base-v4/style.json?key=7VhWIxgYriUJMk5Om7Pj",
-  dark: "https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json",
-};
 
 const REGIONALS: Regional[] = [
   {
@@ -336,10 +347,13 @@ export function MapasExplorer() {
   }
 
   return (
-    <div className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[22rem_1fr]">
-      <aside className="border-b border-border bg-card/95 lg:h-dvh lg:border-r lg:border-b-0">
-        <div className="flex h-full flex-col">
-          <div className="space-y-5 p-4">
+    <SidebarProvider className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[376px_minmax(0,1fr)]">
+      <Sidebar
+        variant="floating"
+        className="m-3 max-h-[calc(100dvh-1.5rem)] w-auto lg:sticky lg:top-3 lg:h-[calc(100dvh-1.5rem)]"
+      >
+        <SidebarHeader className="gap-5">
+          <div className="flex items-center justify-between gap-2">
             <Button
               asChild
               variant="ghost"
@@ -350,138 +364,153 @@ export function MapasExplorer() {
                 Home
               </Link>
             </Button>
-
-            <div className="space-y-2">
-              <Badge
-                variant="outline"
-                className="border-primary/25 bg-primary/10 text-primary"
-              >
-                Cobertura operacional
-              </Badge>
-              <h1 className="font-heading text-3xl font-semibold tracking-tight">
-                Mapas regionais
-              </h1>
-              <p className="text-sm/relaxed text-muted-foreground">
-                Regionais, bases e municípios atendidos pela Elinsa do Brasil.
-              </p>
-            </div>
+            <ThemeToggle />
           </div>
 
-          <Separator />
+          <div className="space-y-2">
+            <Badge
+              variant="outline"
+              className="border-primary/25 bg-primary/10 text-primary"
+            >
+              Cobertura operacional
+            </Badge>
+            <h1 className="font-heading text-3xl font-semibold tracking-tight">
+              Mapas regionais
+            </h1>
+            <p className="text-sm/relaxed text-muted-foreground">
+              Regionais, bases e municípios atendidos pela Elinsa do Brasil.
+            </p>
+          </div>
+        </SidebarHeader>
 
-          <div className="flex-1 space-y-4 overflow-y-auto p-4">
-            <Card className="rounded-xl py-0" size="sm">
-              <CardHeader className="border-b py-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Layers3 className="size-4 text-primary" />
-                  Regionais
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-3 gap-2 py-3">
+        <SidebarSeparator />
+
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              <Layers3 className="size-4 text-primary" />
+              Regionais
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="grid grid-cols-3 gap-2">
                 {REGIONALS.map((regional) => {
                   const isActive = selectedRegional.slug === regional.slug;
 
                   return (
-                    <Button
-                      key={regional.slug}
-                      type="button"
-                      variant={isActive ? "default" : "outline"}
-                      className="h-auto min-h-16 flex-col items-start justify-between whitespace-normal px-2.5 py-2 text-left"
-                      onClick={() => selectRegional(regional)}
-                    >
-                      <span className="font-semibold">{regional.name}</span>
-                      <span
-                        className={cn(
-                          "text-[0.625rem]",
-                          isActive
-                            ? "text-primary-foreground/85"
-                            : "text-muted-foreground",
-                        )}
+                    <SidebarMenuItem key={regional.slug}>
+                      <Button
+                        type="button"
+                        variant={isActive ? "default" : "outline"}
+                        className="h-auto min-h-16 w-full flex-col items-start justify-between whitespace-normal px-2.5 py-2 text-left"
+                        onClick={() => selectRegional(regional)}
                       >
-                        {regional.bases.length} bases
-                      </span>
-                    </Button>
+                        <span className="font-semibold">{regional.name}</span>
+                        <span
+                          className={cn(
+                            "text-[0.625rem]",
+                            isActive
+                              ? "text-primary-foreground/85"
+                              : "text-muted-foreground",
+                          )}
+                        >
+                          {regional.bases.length} bases
+                        </span>
+                      </Button>
+                    </SidebarMenuItem>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-            <Card className="rounded-xl py-0" size="sm">
-              <CardHeader className="border-b py-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Building2 className="size-4 text-primary" />
-                  Bases
-                </CardTitle>
-                <CardDescription>
+          <SidebarGroup>
+            <SidebarGroupLabel className="items-start">
+              <Building2 className="mt-0.5 size-4 text-primary" />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span>Bases</span>
+                <span className="font-normal text-muted-foreground text-xs leading-tight">
                   {selectedRegional.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 py-3">
-                <Button
-                  type="button"
-                  variant={viewMode === "regional" ? "secondary" : "ghost"}
-                  className="h-auto w-full justify-between whitespace-normal rounded-lg border border-border/70 px-3 py-2.5"
-                  onClick={() => {
-                    setSelectedMunicipalitySlug(null);
-                    setViewMode("regional");
-                  }}
-                >
-                  <span className="flex items-center gap-2">
-                    <Navigation className="size-4 text-primary" />
-                    Regional inteira
-                  </span>
-                  <Badge variant="outline">{regionalAssignments}</Badge>
-                </Button>
+                </span>
+              </span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    type="button"
+                    isActive={viewMode === "regional"}
+                    className="h-auto justify-between whitespace-normal border border-border/70 bg-background/50 py-2.5"
+                    onClick={() => {
+                      setSelectedMunicipalitySlug(null);
+                      setViewMode("regional");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Navigation className="size-4 text-primary" />
+                      Regional inteira
+                    </span>
+                    <Badge variant="outline" className="ml-auto shrink-0">
+                      {regionalAssignments}
+                    </Badge>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
                 {selectedRegional.bases.map((base) => {
                   const isActive =
                     selectedBase.slug === base.slug && viewMode !== "regional";
 
                   return (
-                    <Button
-                      key={base.slug}
-                      type="button"
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="h-auto w-full justify-between whitespace-normal rounded-lg border border-border/70 px-3 py-2.5"
-                      onClick={() => selectBase(base)}
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <span
-                          className="size-2.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: base.color }}
-                        />
-                        <span className="truncate">{base.name}</span>
-                      </span>
-                      <Badge variant="outline">
-                        {base.municipalities.length}
-                      </Badge>
-                    </Button>
+                    <SidebarMenuItem key={base.slug}>
+                      <SidebarMenuButton
+                        type="button"
+                        isActive={isActive}
+                        className="h-auto justify-between whitespace-normal border border-border/70 bg-background/50 py-2.5"
+                        onClick={() => selectBase(base)}
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span
+                            className="size-2.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: base.color }}
+                          />
+                          <span className="truncate">{base.name}</span>
+                        </span>
+                        <Badge variant="outline" className="ml-auto shrink-0">
+                          {base.municipalities.length}
+                        </Badge>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-            <Card className="rounded-xl py-0" size="sm">
-              <CardHeader className="border-b py-3">
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="size-4 text-primary" />
-                  Municípios
-                </CardTitle>
-                <CardDescription>{selectedBase.name}</CardDescription>
-              </CardHeader>
-              <CardContent className="grid max-h-72 gap-1.5 overflow-y-auto py-3 pr-2">
-                <Button
-                  type="button"
-                  variant={viewMode === "base" ? "secondary" : "ghost"}
-                  className="h-8 justify-between rounded-md px-2"
-                  onClick={() => {
-                    setSelectedMunicipalitySlug(null);
-                    setViewMode("base");
-                  }}
-                >
-                  <span>Todos da base</span>
-                  {viewMode === "base" && <Check className="size-3.5" />}
-                </Button>
+          <SidebarGroup>
+            <SidebarGroupLabel className="items-start">
+              <MapPin className="mt-0.5 size-4 text-primary" />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span>Municípios</span>
+                <span className="font-normal text-muted-foreground text-xs leading-tight">
+                  {selectedBase.name}
+                </span>
+              </span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="pr-1">
+              <SidebarMenu className="grid max-h-72 gap-1.5 overflow-y-auto pr-2">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    type="button"
+                    isActive={viewMode === "base"}
+                    className="h-8 justify-between rounded-md px-2"
+                    onClick={() => {
+                      setSelectedMunicipalitySlug(null);
+                      setViewMode("base");
+                    }}
+                  >
+                    <span>Todos da base</span>
+                    {viewMode === "base" && <Check className="size-3.5" />}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
 
                 {selectedBase.municipalities.map((municipality) => {
                   const isActive =
@@ -489,40 +518,71 @@ export function MapasExplorer() {
                     selectedMunicipality.slug === municipality.slug;
 
                   return (
-                    <Button
-                      key={municipality.slug}
-                      type="button"
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="h-8 justify-between rounded-md px-2"
-                      onClick={() => selectMunicipality(municipality)}
-                    >
-                      <span className="truncate">{municipality.name}</span>
-                      {isActive && <Check className="size-3.5" />}
-                    </Button>
+                    <SidebarMenuItem key={municipality.slug}>
+                      <SidebarMenuButton
+                        type="button"
+                        isActive={isActive}
+                        className="h-8 justify-between rounded-md px-2"
+                        onClick={() => selectMunicipality(municipality)}
+                      >
+                        <span className="truncate">{municipality.name}</span>
+                        {isActive && <Check className="size-3.5" />}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-            <Card className="rounded-xl py-0" size="sm">
-              <CardHeader className="py-3">
-                <CardTitle>Inventário</CardTitle>
-                <CardDescription>Visão consolidada da rota.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-3 gap-2 pb-3">
-                <Metric value={REGIONALS.length} label="regionais" />
-                <Metric value={TOTAL_BASES} label="bases" />
-                <Metric value={TOTAL_ASSIGNMENTS} label="municípios" />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </aside>
+          <SidebarGroup>
+            <SidebarGroupLabel className="items-start">
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span>Inventário</span>
+                <span className="font-normal text-muted-foreground text-xs leading-tight">
+                  Visão consolidada da rota.
+                </span>
+              </span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="grid grid-cols-3 gap-2">
+              <Metric value={REGIONALS.length} label="regionais" />
+              <Metric value={TOTAL_BASES} label="bases" />
+              <Metric value={TOTAL_ASSIGNMENTS} label="municípios" />
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-      <section className="flex min-h-[calc(100dvh-1px)] flex-col p-3 sm:p-4 lg:h-dvh">
+          <SidebarGroup>
+            <SidebarGroupLabel className="items-start">
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span>Downloads</span>
+                <span className="font-normal text-muted-foreground text-xs leading-tight">
+                  Dados geoespaciais para uso em SIG/GIS ou outras aplicações.
+                </span>
+              </span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="flex justify-between items-center">
+              <Button size={"lg"} asChild>
+                <a
+                  href={mapAsset("downloads/regionais.7z")}
+                  download="regionais.7z"
+                >
+                  <Code /> GeoJSON
+                </a>
+              </Button>
+              <Button size={"lg"} disabled>
+                <VectorSquare /> Shapefile
+              </Button>
+              <Button size={"lg"} disabled>
+                <SiPenpot /> Penpot
+              </Button>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+
+      <SidebarInset className="flex min-h-[calc(100dvh-1px)] flex-col p-3 pt-0 sm:p-4 sm:pt-0 lg:h-dvh lg:p-3 lg:pl-0">
         <Card className="relative min-h-[620px] flex-1 gap-0 overflow-hidden rounded-2xl border-border/80 bg-card py-0 shadow-sm lg:min-h-0">
           <MapComponent
-            attributionControl={false}
             center={selectedRegional.center}
             className="min-h-[620px] flex-1 lg:min-h-0"
             dragRotate={false}
@@ -530,7 +590,6 @@ export function MapasExplorer() {
             minZoom={4}
             pitchWithRotate={false}
             scrollZoom
-            styles={CLEAN_MAP_STYLES}
             zoom={5.8}
           >
             <RegionalSelectionLayer
@@ -575,8 +634,8 @@ export function MapasExplorer() {
             </Card>
           </div>
         </Card>
-      </section>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
@@ -673,7 +732,7 @@ function RegionalSelectionLayer({
 
       try {
         const response = await fetch(
-          `/regionais/agregados/${regionalSlug}.json`,
+          mapAsset(`regionais/agregados/${regionalSlug}.json`),
           {
             signal: controller.signal,
           },
