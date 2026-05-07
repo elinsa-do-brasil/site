@@ -6,6 +6,7 @@ import { pt } from "@payloadcms/translations/languages/pt";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { Blog, Imprensa } from "./collections/Editorial";
 import { Media } from "./collections/Media";
 import { Posts } from "./collections/Posts";
 import { Users } from "./collections/Users";
@@ -23,7 +24,7 @@ export default buildConfig({
     user: Users.slug,
   },
 
-  collections: [Users, Posts, Media],
+  collections: [Users, Posts, Imprensa, Blog, Media],
 
   secret: process.env.PAYLOAD_SECRET || "",
 

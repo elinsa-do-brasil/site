@@ -15,9 +15,12 @@ export async function GET(req: Request): Promise<Response> {
   const draft = await draftMode();
   draft.enable();
 
-  // Redireciona para a página do post (vamos criar a rota /posts/[slug])
   if (collection === "posts") {
     redirect(`/posts/${slug}`);
+  }
+
+  if (collection === "blog" || collection === "imprensa") {
+    redirect(`/${collection}/${slug}`);
   }
 
   return new Response("Collection not supported", { status: 400 });
