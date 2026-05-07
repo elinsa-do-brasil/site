@@ -143,70 +143,62 @@
   }
 }
 
-@layer components {
-  .editorial-article-header,
-  .editorial-article-header__inner,
-  .editorial-article-header__meta,
-  .editorial-article-header__summary-row,
-  .editorial-article-header__summary,
-  .editorial-article-header__title,
-  .editorial-article-header__updated,
-  .editorial-article-header__back {
-    transition-duration: 220ms;
-    transition-property:
-      opacity, margin, padding, font-size, line-height, max-height, transform,
-      visibility;
-    transition-timing-function: ease;
-  }
+/*
+ * These rules intentionally sit outside Tailwind layers so the condensed
+ * reading bar can override responsive text and spacing utilities.
+ */
+.editorial-article-header,
+.editorial-article-header__inner,
+.editorial-article-header__meta,
+.editorial-article-header__summary-row,
+.editorial-article-header__summary,
+.editorial-article-header__title,
+.editorial-article-header__updated,
+.editorial-article-header__back {
+  transition-duration: 220ms;
+  transition-property:
+    opacity, margin, padding, font-size, line-height, max-height, transform,
+    visibility;
+  transition-timing-function: ease;
+}
 
-  .editorial-article-header__summary {
-    max-height: 8rem;
-    overflow: hidden;
-  }
+.editorial-article-header__summary {
+  max-height: 8rem;
+  overflow: hidden;
+}
 
-  .editorial-article-header.is-condensed .editorial-article-header__inner {
-    padding-bottom: 0.625rem;
-    padding-top: 0.625rem;
-  }
+.editorial-article-header.is-condensed .editorial-article-header__inner {
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+}
 
-  .editorial-article-header.is-condensed .editorial-article-header__back,
-  .editorial-article-header.is-condensed .editorial-article-header__meta,
-  .editorial-article-header.is-condensed
-    .editorial-article-header__summary-row {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transform: translateY(-0.35rem);
-    visibility: hidden;
-  }
+.editorial-article-header.is-condensed .editorial-article-header__back,
+.editorial-article-header.is-condensed .editorial-article-header__meta,
+.editorial-article-header.is-condensed .editorial-article-header__summary-row {
+  margin-top: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-0.35rem);
+  visibility: hidden;
+}
 
-  .editorial-article-header.is-condensed .editorial-article-header__meta {
-    margin-top: 0;
-  }
+.editorial-article-header.is-condensed .editorial-article-header__title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-top: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  .editorial-article-header.is-condensed .editorial-article-header__title {
-    font-size: 1.125rem;
-    font-weight: 800;
-    line-height: 1.25;
-    margin-top: 0;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .editorial-article-header.is-condensed .editorial-article-header__summary {
-    max-height: 0;
-    opacity: 0;
-    transform: translateY(-0.25rem);
-    visibility: hidden;
-  }
-
-  .editorial-article-header.is-condensed .editorial-article-header__updated {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transform: translateY(-0.25rem);
-    visibility: hidden;
-  }
+.editorial-article-header.is-condensed .editorial-article-header__summary,
+.editorial-article-header.is-condensed .editorial-article-header__updated {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-0.25rem);
+  visibility: hidden;
 }
