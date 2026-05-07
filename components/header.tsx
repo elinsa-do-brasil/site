@@ -13,6 +13,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,12 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ui/theme-toggle";
 
 export function Header() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/mapas")) {
+    return null;
+  }
+
   return (
     <div className="fixed top-0 z-50 w-full p-4 flex justify-center pointer-events-none">
       <header className="pointer-events-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl border border-border bg-card/80 backdrop-blur-md px-4 shadow-sm">
