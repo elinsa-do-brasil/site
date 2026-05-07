@@ -9,8 +9,9 @@ import {
   MapPin,
   Navigation,
 } from "lucide-react";
+import type { ExpressionSpecification } from "maplibre-gl";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,21 +59,6 @@ type Regional = {
   bases: OperationalBase[];
 };
 
-type ActiveMunicipality = Municipality & {
-  id: string;
-  url: string;
-  color: string;
-  baseName: string;
-  regionalName: string;
-};
-
-type ActiveMunicipalityGroup = {
-  id: string;
-  baseName: string;
-  color: string;
-  municipalities: ActiveMunicipality[];
-};
-
 type MunicipalityFeature = GeoJSON.Feature<
   GeoJSON.Geometry,
   Record<string, unknown>
@@ -82,6 +68,40 @@ type MunicipalityFeatureCollection = GeoJSON.FeatureCollection<
   GeoJSON.Geometry,
   Record<string, unknown>
 >;
+
+type AggregatedMunicipality = {
+  slug: string;
+  name: string;
+  features: MunicipalityFeature[];
+};
+
+type AggregatedBase = {
+  slug: string;
+  name: string;
+  color: string;
+  municipalities: AggregatedMunicipality[];
+};
+
+type AggregatedRegional = {
+  slug: RegionalSlug;
+  name: string;
+  bases: AggregatedBase[];
+};
+
+const EMPTY_MUNICIPALITY_COLLECTION: MunicipalityFeatureCollection = {
+  type: "FeatureCollection",
+  features: [],
+};
+
+const ACTIVE_SOURCE_ID = "mapas-active-source";
+const ACTIVE_FILL_LAYER_ID = "mapas-active-fill";
+const ACTIVE_LINE_LAYER_ID = "mapas-active-line";
+const DEFAULT_LAYER_COLOR = "#0ea5e9";
+const BASE_COLOR_EXPRESSION: ExpressionSpecification = [
+  "coalesce",
+  ["get", "baseColor"],
+  DEFAULT_LAYER_COLOR,
+];
 
 const CLEAN_MAP_STYLES = {
   light:
@@ -258,61 +278,6 @@ export function MapasExplorer() {
     selectedBase.municipalities.find(
       (municipality) => municipality.slug === selectedMunicipalitySlug,
     ) ?? selectedBase.municipalities[0];
-
-  const activeMunicipalities = useMemo(() => {
-    if (viewMode === "municipio") {
-      return [
-        toActiveMunicipality(
-          selectedRegional,
-          selectedBase,
-          selectedMunicipality,
-        ),
-      ];
-    }
-
-    if (viewMode === "base") {
-      return selectedBase.municipalities.map((municipality) =>
-        toActiveMunicipality(selectedRegional, selectedBase, municipality),
-      );
-    }
-
-    return selectedRegional.bases.flatMap((base) =>
-      base.municipalities.map((municipality) =>
-        toActiveMunicipality(selectedRegional, base, municipality),
-      ),
-    );
-  }, [selectedBase, selectedMunicipality, selectedRegional, viewMode]);
-
-  const activeMunicipalityUrls = useMemo(
-    () => activeMunicipalities.map((municipality) => municipality.url),
-    [activeMunicipalities],
-  );
-
-  const activeMunicipalityGroups = useMemo(() => {
-    if (viewMode === "municipio") {
-      return [
-        toActiveMunicipalityGroup(
-          "municipio",
-          selectedBase,
-          activeMunicipalities,
-        ),
-      ];
-    }
-
-    if (viewMode === "base") {
-      return [
-        toActiveMunicipalityGroup("base", selectedBase, activeMunicipalities),
-      ];
-    }
-
-    return selectedRegional.bases.map((base) => {
-      const municipalities = base.municipalities.map((municipality) =>
-        toActiveMunicipality(selectedRegional, base, municipality),
-      );
-
-      return toActiveMunicipalityGroup("regional", base, municipalities);
-    });
-  }, [activeMunicipalities, selectedBase, selectedRegional, viewMode]);
 
   const visibleBases =
     viewMode === "regional" ? selectedRegional.bases : [selectedBase];
@@ -552,14 +517,14 @@ export function MapasExplorer() {
             styles={CLEAN_MAP_STYLES}
             zoom={5.8}
           >
-            <FitBounds urls={activeMunicipalityUrls} viewMode={viewMode} />
-            {activeMunicipalityGroups.map((group) => (
-              <MunicipalityGroupLayer
-                group={group}
-                key={group.id}
-                viewMode={viewMode}
-              />
-            ))}
+            <RegionalSelectionLayer
+              regionalSlug={selectedRegional.slug}
+              selectedBaseSlug={selectedBase.slug}
+              selectedMunicipalitySlug={
+                viewMode === "municipio" ? selectedMunicipality.slug : null
+              }
+              viewMode={viewMode}
+            />
             {visibleBases.map((base) => (
               <BaseMarker
                 key={base.slug}
@@ -646,14 +611,86 @@ function BaseMarker({
   );
 }
 
-function MunicipalityGroupLayer({
-  group,
+function RegionalSelectionLayer({
+  regionalSlug,
+  selectedBaseSlug,
+  selectedMunicipalitySlug,
   viewMode,
 }: {
-  group: ActiveMunicipalityGroup;
+  regionalSlug: RegionalSlug;
+  selectedBaseSlug: string;
+  selectedMunicipalitySlug: string | null;
   viewMode: ViewMode;
 }) {
   const { map, isLoaded } = useMap();
+  const [regionalMap, setRegionalMap] = useState<AggregatedRegional | null>(
+    null,
+  );
+  const collection = useMemo(
+    () =>
+      regionalMap?.slug === regionalSlug
+        ? buildSelectionCollection(regionalMap, {
+            selectedBaseSlug,
+            selectedMunicipalitySlug,
+            viewMode,
+          })
+        : EMPTY_MUNICIPALITY_COLLECTION,
+    [
+      regionalMap,
+      regionalSlug,
+      selectedBaseSlug,
+      selectedMunicipalitySlug,
+      viewMode,
+    ],
+  );
+  const collectionRef = useRef<MunicipalityFeatureCollection>(
+    EMPTY_MUNICIPALITY_COLLECTION,
+  );
+  const viewModeRef = useRef<ViewMode>(viewMode);
+  const syncLayerRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadRegionalMap() {
+      setRegionalMap(null);
+
+      try {
+        const response = await fetch(
+          `/regionais/agregados/${regionalSlug}.json`,
+          {
+            signal: controller.signal,
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Regional indisponível: ${regionalSlug}`);
+        }
+
+        const data = (await response.json()) as unknown;
+
+        if (!controller.signal.aborted && isAggregatedRegional(data)) {
+          setRegionalMap(data);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error(error);
+        }
+      }
+    }
+
+    loadRegionalMap();
+
+    return () => {
+      controller.abort();
+    };
+  }, [regionalSlug]);
+
+  useEffect(() => {
+    collectionRef.current = collection;
+    viewModeRef.current = viewMode;
+    syncLayerRef.current?.();
+  }, [collection, viewMode]);
 
   useEffect(() => {
     if (!map || !isLoaded) {
@@ -661,203 +698,145 @@ function MunicipalityGroupLayer({
     }
 
     const mapInstance = map;
-    const controller = new AbortController();
-    const sourceId = `mapas-source-${group.id}`;
-    const fillLayerId = `mapas-fill-${group.id}`;
-    const lineLayerId = `mapas-line-${group.id}`;
-    let collection: MunicipalityFeatureCollection | null = null;
 
-    function addLayer() {
-      if (!collection || !mapInstance.isStyleLoaded()) {
+    function syncLayer() {
+      if (!mapInstance.isStyleLoaded()) {
         return;
       }
 
-      const source = mapInstance.getSource(sourceId) as
+      const source = mapInstance.getSource(ACTIVE_SOURCE_ID) as
         | { setData: (data: MunicipalityFeatureCollection) => void }
         | undefined;
 
       if (source) {
-        source.setData(collection);
+        source.setData(collectionRef.current);
       } else {
-        mapInstance.addSource(sourceId, {
+        mapInstance.addSource(ACTIVE_SOURCE_ID, {
           type: "geojson",
-          data: collection,
+          data: collectionRef.current,
         });
       }
 
-      if (!mapInstance.getLayer(fillLayerId)) {
+      if (!mapInstance.getLayer(ACTIVE_FILL_LAYER_ID)) {
         mapInstance.addLayer({
-          id: fillLayerId,
+          id: ACTIVE_FILL_LAYER_ID,
           type: "fill",
-          source: sourceId,
+          source: ACTIVE_SOURCE_ID,
           paint: {
-            "fill-color": group.color,
-            "fill-opacity": viewMode === "municipio" ? 0.34 : 0.24,
+            "fill-color": BASE_COLOR_EXPRESSION,
+            "fill-opacity": getFillOpacity(viewModeRef.current),
           },
         });
+      } else {
+        mapInstance.setPaintProperty(
+          ACTIVE_FILL_LAYER_ID,
+          "fill-opacity",
+          getFillOpacity(viewModeRef.current),
+        );
       }
 
-      if (!mapInstance.getLayer(lineLayerId)) {
+      if (!mapInstance.getLayer(ACTIVE_LINE_LAYER_ID)) {
         mapInstance.addLayer({
-          id: lineLayerId,
+          id: ACTIVE_LINE_LAYER_ID,
           type: "line",
-          source: sourceId,
+          source: ACTIVE_SOURCE_ID,
           paint: {
-            "line-color": group.color,
+            "line-color": BASE_COLOR_EXPRESSION,
             "line-opacity": 0.95,
-            "line-width": viewMode === "municipio" ? 3 : 2.4,
+            "line-width": getLineWidth(viewModeRef.current),
           },
         });
+      } else {
+        mapInstance.setPaintProperty(
+          ACTIVE_LINE_LAYER_ID,
+          "line-width",
+          getLineWidth(viewModeRef.current),
+        );
       }
     }
 
-    async function loadGroupLayer() {
-      try {
-        collection = await loadMunicipalityCollection(group, controller.signal);
-
-        if (!controller.signal.aborted) {
-          addLayer();
-        }
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error(error);
-        }
-      }
-    }
-
-    loadGroupLayer();
-    mapInstance.on("styledata", addLayer);
+    syncLayerRef.current = syncLayer;
+    syncLayer();
+    mapInstance.on("styledata", syncLayer);
 
     return () => {
-      controller.abort();
-      mapInstance.off("styledata", addLayer);
+      syncLayerRef.current = null;
+      mapInstance.off("styledata", syncLayer);
 
       try {
-        if (mapInstance.getLayer(lineLayerId)) {
-          mapInstance.removeLayer(lineLayerId);
+        if (mapInstance.getLayer(ACTIVE_LINE_LAYER_ID)) {
+          mapInstance.removeLayer(ACTIVE_LINE_LAYER_ID);
         }
-        if (mapInstance.getLayer(fillLayerId)) {
-          mapInstance.removeLayer(fillLayerId);
+        if (mapInstance.getLayer(ACTIVE_FILL_LAYER_ID)) {
+          mapInstance.removeLayer(ACTIVE_FILL_LAYER_ID);
         }
-        if (mapInstance.getSource(sourceId)) {
-          mapInstance.removeSource(sourceId);
+        if (mapInstance.getSource(ACTIVE_SOURCE_ID)) {
+          mapInstance.removeSource(ACTIVE_SOURCE_ID);
         }
       } catch {
         // MapLibre may clear layers while switching styles.
       }
     };
-  }, [map, isLoaded, group, viewMode]);
-
-  return null;
-}
-
-function FitBounds({ urls, viewMode }: { urls: string[]; viewMode: ViewMode }) {
-  const { map, isLoaded } = useMap();
+  }, [map, isLoaded]);
 
   useEffect(() => {
-    if (!map || !isLoaded || urls.length === 0) {
+    if (!map || !isLoaded || collection.features.length === 0) {
       return;
     }
 
-    const mapInstance = map;
-    const controller = new AbortController();
+    const bounds = getGeoJsonBounds([collection]);
 
-    async function fitSelection() {
-      try {
-        const geoJsons = await Promise.all(
-          urls.map(async (url) => {
-            const response = await fetch(url, { signal: controller.signal });
-
-            if (!response.ok) {
-              throw new Error(`GeoJSON indisponível: ${url}`);
-            }
-
-            return response.json() as Promise<unknown>;
-          }),
-        );
-        const bounds = getGeoJsonBounds(geoJsons);
-
-        if (!bounds || controller.signal.aborted) {
-          return;
-        }
-
-        mapInstance.fitBounds(bounds, {
-          duration: 700,
-          maxZoom:
-            viewMode === "municipio" ? 9.4 : viewMode === "base" ? 8.3 : 6.4,
-          padding:
-            window.innerWidth < 768
-              ? 36
-              : { top: 88, right: 88, bottom: 72, left: 88 },
-        });
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error(error);
-        }
-      }
+    if (!bounds) {
+      return;
     }
 
-    fitSelection();
-
-    return () => {
-      controller.abort();
-    };
-  }, [map, isLoaded, urls, viewMode]);
+    map.fitBounds(bounds, {
+      duration: 700,
+      maxZoom: viewMode === "municipio" ? 9.4 : viewMode === "base" ? 8.3 : 6.4,
+      padding:
+        window.innerWidth < 768
+          ? 36
+          : { top: 88, right: 88, bottom: 72, left: 88 },
+    });
+  }, [map, isLoaded, collection, viewMode]);
 
   return null;
 }
 
-function toActiveMunicipality(
-  regional: Regional,
-  base: OperationalBase,
-  municipality: Municipality,
-): ActiveMunicipality {
-  return {
-    ...municipality,
-    id: `${regional.slug}-${base.slug}-${municipality.slug}`,
-    url: `/regionais/${regional.slug}/${base.slug}/${municipality.slug}.json`,
-    color: base.color,
-    baseName: base.name,
-    regionalName: regional.name,
-  };
-}
-
-function toActiveMunicipalityGroup(
-  viewMode: ViewMode,
-  base: OperationalBase,
-  municipalities: ActiveMunicipality[],
-): ActiveMunicipalityGroup {
-  return {
-    id: `${viewMode}-${municipalities[0]?.regionalName ?? "regional"}-${base.slug}-${municipalities.length}`,
-    baseName: base.name,
-    color: base.color,
-    municipalities,
-  };
-}
-
-async function loadMunicipalityCollection(
-  group: ActiveMunicipalityGroup,
-  signal: AbortSignal,
-): Promise<MunicipalityFeatureCollection> {
-  const collections = await Promise.all(
-    group.municipalities.map(async (municipality) => {
-      const response = await fetch(municipality.url, { signal });
-
-      if (!response.ok) {
-        throw new Error(`GeoJSON indisponível: ${municipality.url}`);
+function buildSelectionCollection(
+  regionalMap: AggregatedRegional,
+  selection: {
+    selectedBaseSlug: string;
+    selectedMunicipalitySlug: string | null;
+    viewMode: ViewMode;
+  },
+): MunicipalityFeatureCollection {
+  const bases =
+    selection.viewMode === "regional"
+      ? regionalMap.bases
+      : regionalMap.bases.filter(
+          (base) => base.slug === selection.selectedBaseSlug,
+        );
+  const features = bases.flatMap((base) =>
+    base.municipalities.flatMap((municipality) => {
+      if (
+        selection.viewMode === "municipio" &&
+        municipality.slug !== selection.selectedMunicipalitySlug
+      ) {
+        return [];
       }
 
-      const geoJson = (await response.json()) as unknown;
-      const features = extractMunicipalityFeatures(geoJson);
-
-      return features.map((feature) => ({
+      return municipality.features.map((feature) => ({
         ...feature,
         properties: {
-          ...getFeatureProperties(feature.properties),
-          baseName: group.baseName,
-          color: group.color,
+          ...feature.properties,
+          baseColor: base.color,
+          baseName: base.name,
+          baseSlug: base.slug,
           municipalityName: municipality.name,
-          regionalName: municipality.regionalName,
+          municipalitySlug: municipality.slug,
+          regionalName: regionalMap.name,
+          regionalSlug: regionalMap.slug,
         },
       }));
     }),
@@ -865,34 +844,11 @@ async function loadMunicipalityCollection(
 
   return {
     type: "FeatureCollection",
-    features: collections.flat(),
+    features,
   };
 }
 
-function extractMunicipalityFeatures(geoJson: unknown): MunicipalityFeature[] {
-  if (isFeatureCollection(geoJson)) {
-    return geoJson.features.filter(isFeature);
-  }
-
-  if (isFeature(geoJson)) {
-    return [geoJson];
-  }
-
-  return [];
-}
-
-function isFeatureCollection(
-  value: unknown,
-): value is { type: "FeatureCollection"; features: unknown[] } {
-  return (
-    Boolean(value) &&
-    typeof value === "object" &&
-    (value as Record<string, unknown>).type === "FeatureCollection" &&
-    Array.isArray((value as Record<string, unknown>).features)
-  );
-}
-
-function isFeature(value: unknown): value is MunicipalityFeature {
+function isAggregatedRegional(value: unknown): value is AggregatedRegional {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -900,19 +856,18 @@ function isFeature(value: unknown): value is MunicipalityFeature {
   const record = value as Record<string, unknown>;
 
   return (
-    record.type === "Feature" &&
-    "geometry" in record &&
-    Boolean(record.geometry) &&
-    typeof record.geometry === "object"
+    typeof record.slug === "string" &&
+    typeof record.name === "string" &&
+    Array.isArray(record.bases)
   );
 }
 
-function getFeatureProperties(properties: unknown): Record<string, unknown> {
-  if (!properties || typeof properties !== "object") {
-    return {};
-  }
+function getFillOpacity(viewMode: ViewMode) {
+  return viewMode === "municipio" ? 0.34 : 0.24;
+}
 
-  return properties as Record<string, unknown>;
+function getLineWidth(viewMode: ViewMode) {
+  return viewMode === "municipio" ? 3 : 2.4;
 }
 
 function getModeLabel(viewMode: ViewMode) {
