@@ -1,27 +1,27 @@
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-import Link from 'next/link'
-import Image from 'next/image'
+import configPromise from "@payload-config";
+import Image from "next/image";
+import Link from "next/link";
+import { getPayload } from "payload";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 function formatDate(dateString: string): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(dateString))
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(dateString));
 }
 
 export default async function PostsListingPage() {
-  const payload = await getPayload({ config: configPromise })
+  const payload = await getPayload({ config: configPromise });
 
   const { docs: posts } = await payload.find({
-    collection: 'posts',
+    collection: "posts",
     draft: false,
     limit: 12,
-    sort: '-createdAt', // Mais recentes primeiro
-  })
+    sort: "-createdAt", // Mais recentes primeiro
+  });
 
   return (
     <main className="min-h-screen bg-background">
@@ -32,8 +32,8 @@ export default async function PostsListingPage() {
           className="absolute inset-0 opacity-[0.07]"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '32px 32px',
+              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "32px 32px",
           }}
         />
         <div className="relative mx-auto max-w-5xl text-center">
@@ -44,7 +44,8 @@ export default async function PostsListingPage() {
             Notícias
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-elinsa-light/70">
-            Acompanhe as últimas novidades, comunicados e atualizações da Elinsa.
+            Acompanhe as últimas novidades, comunicados e atualizações da
+            Elinsa.
           </p>
         </div>
       </header>
@@ -55,6 +56,7 @@ export default async function PostsListingPage() {
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-elinsa-primary/20 bg-elinsa-light/30 px-8 py-20 text-center">
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-elinsa-primary/10">
               <svg
+                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
@@ -83,8 +85,14 @@ export default async function PostsListingPage() {
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => {
-              const coverImage = post.coverImage as Record<string, unknown> | null | undefined
-              const hasImage = coverImage && typeof coverImage === 'object' && typeof coverImage.url === 'string'
+              const coverImage = post.coverImage as
+                | Record<string, unknown>
+                | null
+                | undefined;
+              const hasImage =
+                coverImage &&
+                typeof coverImage === "object" &&
+                typeof coverImage.url === "string";
 
               return (
                 <Link
@@ -105,6 +113,7 @@ export default async function PostsListingPage() {
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-elinsa-light to-elinsa-sky/20">
                         <svg
+                          aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           width="40"
                           height="40"
@@ -116,7 +125,14 @@ export default async function PostsListingPage() {
                           strokeLinejoin="round"
                           className="text-elinsa-primary/30"
                         >
-                          <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                          <rect
+                            width="18"
+                            height="18"
+                            x="3"
+                            y="3"
+                            rx="2"
+                            ry="2"
+                          />
                           <circle cx="9" cy="9" r="2" />
                           <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                         </svg>
@@ -142,6 +158,7 @@ export default async function PostsListingPage() {
                       <span className="flex items-center gap-1 text-xs font-semibold text-elinsa-primary transition-transform duration-200 group-hover:translate-x-0.5">
                         Ler
                         <svg
+                          aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           width="14"
                           height="14"
@@ -159,11 +176,11 @@ export default async function PostsListingPage() {
                     </div>
                   </div>
                 </Link>
-              )
+              );
             })}
           </div>
         )}
       </section>
     </main>
-  )
+  );
 }

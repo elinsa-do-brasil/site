@@ -10,7 +10,6 @@ import { Media } from "./collections/Media";
 import { Posts } from "./collections/Posts";
 import { Users } from "./collections/Users";
 
-
 export default buildConfig({
   // Idioma do painel administrativo
   i18n: {

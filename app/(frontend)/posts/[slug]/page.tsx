@@ -1,43 +1,55 @@
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-import { draftMode } from 'next/headers'
-import { notFound } from 'next/navigation'
-import { RichText } from '@payloadcms/richtext-lexical/react'
-import Image from 'next/image'
-import Link from 'next/link'
+import configPromise from "@payload-config";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+import { draftMode } from "next/headers";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getPayload } from "payload";
+
+type RichTextData = Parameters<typeof RichText>[0]["data"];
 
 function formatDate(dateString: string): string {
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(dateString))
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(dateString));
 }
 
-export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const payload = await getPayload({ config: configPromise })
-  const { isEnabled: isDraftMode } = await draftMode()
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const payload = await getPayload({ config: configPromise });
+  const { isEnabled: isDraftMode } = await draftMode();
 
   // Busca o post no Payload
   const { docs } = await payload.find({
-    collection: 'posts',
+    collection: "posts",
     draft: isDraftMode, // Se estiver no Live Preview, busca também os rascunhos
     where: {
       slug: {
         equals: slug,
       },
     },
-  })
+  });
 
-  const post = docs[0]
+  const post = docs[0];
 
   if (!post) {
-    return notFound()
+    return notFound();
   }
 
-  const coverImage = post.coverImage as Record<string, unknown> | null | undefined
-  const hasImage = coverImage && typeof coverImage === 'object' && typeof coverImage.url === 'string'
+  const coverImage = post.coverImage as
+    | Record<string, unknown>
+    | null
+    | undefined;
+  const hasImage =
+    coverImage &&
+    typeof coverImage === "object" &&
+    typeof coverImage.url === "string";
 
   return (
     <main className="min-h-screen bg-background">
@@ -55,6 +67,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-elinsa-primary"
         >
           <svg
+            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
@@ -108,7 +121,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         {/* Rich text content */}
         <div className="prose prose-lg mx-auto max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-elinsa-dark prose-p:leading-relaxed prose-p:text-foreground/85 prose-a:font-medium prose-a:text-elinsa-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-elinsa-primary/40 prose-blockquote:text-foreground/70 prose-strong:text-foreground prose-img:rounded-lg">
-          {post.content && <RichText data={post.content as any} />}
+          {post.content && <RichText data={post.content as RichTextData} />}
         </div>
 
         {/* Footer separator */}
@@ -121,6 +134,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             className="inline-flex items-center gap-2 rounded-full border border-elinsa-primary/20 bg-elinsa-light/40 px-6 py-2.5 text-sm font-semibold text-elinsa-dark transition-all duration-200 hover:border-elinsa-primary/40 hover:bg-elinsa-light hover:shadow-sm"
           >
             <svg
+              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
@@ -139,5 +153,5 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </div>
       </article>
     </main>
-  )
+  );
 }
