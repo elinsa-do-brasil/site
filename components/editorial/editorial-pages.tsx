@@ -21,82 +21,100 @@ import {
   getEditorialPost,
   getEditorialPosts,
   getHeadingsFromRichText,
+  getPostSubjectValue,
   getReadingMinutes,
+  getSubjectCounts,
   type HeadingItem,
 } from "@/lib/editorial";
+import {
+  type EditorialSubjectValue,
+  getEditorialSubjectLabel,
+} from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
 
 export async function EditorialIndex({
   collection,
+  subject,
 }: {
   collection: EditorialCollectionSlug;
+  subject?: EditorialSubjectValue | null;
 }) {
   const config = editorialConfigs[collection];
-  const posts = await getEditorialPosts(collection);
+  const allPosts = await getEditorialPosts(collection);
+  const posts = subject
+    ? allPosts.filter((post) => getPostSubjectValue(post) === subject)
+    : allPosts;
+  const subjectCounts = getSubjectCounts(allPosts);
   const [featuredPost, ...remainingPosts] = posts;
 
   return (
-    <div className="min-h-screen bg-background pt-28 text-foreground">
-      <EditorialStickyHeader config={config} count={posts.length} />
-
+    <div className="min-h-screen bg-background pt-32 text-foreground">
       <section className="mx-auto max-w-6xl px-6 py-10 md:px-8 md:py-14">
-        <div className="mb-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold uppercase tracking-normal text-elinsa-primary">
-              {config.eyebrow}
-            </p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-6xl dark:text-elinsa-sky">
-              {config.title}
-            </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
-              {config.description}
-            </p>
-          </div>
-
-          <div className="border-l border-border pl-5">
-            <p className="text-sm font-semibold text-foreground">
-              Conteúdo do Payload
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              A listagem usa a data cadastrada no campo Data e mostra a
-              atualização automática do Payload quando a notícia é alterada.
-            </p>
-          </div>
+        <div className="mb-10 min-w-0">
+          <p className="text-sm font-semibold uppercase tracking-normal text-elinsa-primary">
+            {config.eyebrow}
+          </p>
+          <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-6xl dark:text-elinsa-sky">
+            {config.title}
+          </h1>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
+            {config.description}
+          </p>
         </div>
 
-        {posts.length === 0 ? (
+        {allPosts.length === 0 ? (
           <EmptyState config={config} />
         ) : (
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
             <div className="min-w-0 space-y-5">
-              {featuredPost && (
-                <PostCard config={config} featured post={featuredPost} />
-              )}
+              {posts.length === 0 ? (
+                <EmptyState config={config} />
+              ) : (
+                <>
+                  {featuredPost && (
+                    <PostCard config={config} featured post={featuredPost} />
+                  )}
 
-              {remainingPosts.map((post) => (
-                <PostCard config={config} key={post.id} post={post} />
-              ))}
+                  {remainingPosts.map((post) => (
+                    <PostCard config={config} key={post.id} post={post} />
+                  ))}
+                </>
+              )}
             </div>
 
             <aside className="hidden lg:block">
-              <div className="sticky top-40 space-y-6 border-l border-border pl-6">
+              <div className="sticky top-32 space-y-6 border-l border-border pl-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-                    Navegação
+                    Assuntos
                   </p>
                   <nav className="mt-3 grid gap-2">
-                    {Object.values(editorialConfigs).map((item) => (
+                    <Link
+                      className={cn(
+                        "flex items-center justify-between rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted hover:text-elinsa-primary",
+                        !subject
+                          ? "bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
+                          : "text-muted-foreground",
+                      )}
+                      href={config.href}
+                    >
+                      <span>Todos</span>
+                      <span className="text-xs">{allPosts.length}</span>
+                    </Link>
+
+                    {subjectCounts.map((item) => (
                       <Link
                         className={cn(
-                          "rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted hover:text-elinsa-primary",
-                          item.collection === collection
+                          "flex items-center justify-between rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted hover:text-elinsa-primary",
+                          item.value === subject
                             ? "bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
                             : "text-muted-foreground",
                         )}
-                        href={item.href}
-                        key={item.collection}
+                        href={`${config.href}?assunto=${item.value}`}
+                        key={item.value}
                       >
-                        {item.navLabel}
+                        <span>{item.label}</span>
+                        <span className="text-xs">{item.count}</span>
                       </Link>
                     ))}
                   </nav>
@@ -107,9 +125,11 @@ export async function EditorialIndex({
                     {posts.length}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {posts.length === 1
-                      ? "notícia publicada"
-                      : "notícias publicadas"}
+                    {subject
+                      ? getEditorialSubjectLabel(subject)
+                      : posts.length === 1
+                        ? "notícia publicada"
+                        : "notícias publicadas"}
                   </p>
                 </div>
               </div>
@@ -153,22 +173,20 @@ export async function EditorialArticlePage({
         </div>
       )}
 
-      <EditorialStickyHeader config={config} />
+      <header className="sticky top-24 z-30 border-b border-border bg-background/95 backdrop-blur-md">
+        <div className="mx-auto max-w-6xl px-6 py-5 md:px-8">
+          <Link
+            className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-elinsa-primary"
+            href={config.href}
+          >
+            <ArrowLeft className="size-4" />
+            Voltar para {config.navLabel}
+          </Link>
 
-      <section className="mx-auto max-w-6xl px-6 py-8 md:px-8">
-        <Link
-          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-elinsa-primary"
-          href={config.href}
-        >
-          <ArrowLeft className="size-4" />
-          Voltar para {config.navLabel}
-        </Link>
-
-        <header className="mt-7 border-b border-border pb-8">
-          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 font-semibold text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
               <FileText className="size-4" />
-              {config.badge}
+              {getEditorialSubjectLabel(getPostSubjectValue(post))}
             </span>
             <span className="inline-flex items-center gap-2">
               <CalendarDays className="size-4 text-elinsa-primary" />
@@ -184,26 +202,28 @@ export async function EditorialArticlePage({
             </span>
           </div>
 
-          <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-6xl dark:text-elinsa-sky">
+          <h1 className="mt-4 max-w-4xl text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
             {post.title}
           </h1>
 
-          {post.summary && (
-            <p className="mt-5 max-w-3xl text-xl leading-8 text-muted-foreground">
-              {post.summary}
-            </p>
-          )}
+          <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            {post.summary && (
+              <p className="max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+                {post.summary}
+              </p>
+            )}
 
-          {updatedDate && (
-            <p className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground">
-              <RefreshCw className="size-4 text-elinsa-primary" />
-              Atualizado em {updatedDate}
-            </p>
-          )}
-        </header>
-      </section>
+            {updatedDate && (
+              <p className="inline-flex shrink-0 items-center gap-2 text-sm text-muted-foreground">
+                <RefreshCw className="size-4 text-elinsa-primary" />
+                Atualizado em {updatedDate}
+              </p>
+            )}
+          </div>
+        </div>
+      </header>
 
-      <section className="mx-auto max-w-6xl px-6 pb-14 md:px-8 lg:h-[calc(100dvh-18rem)] lg:min-h-[36rem]">
+      <section className="mx-auto max-w-6xl px-6 py-8 md:px-8 lg:h-[calc(100dvh-23rem)] lg:min-h-[34rem]">
         <div className="grid h-full min-h-0 gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <article className="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:pr-8 lg:pb-12">
             <MobileTopics headings={headings} />
@@ -223,53 +243,6 @@ export async function EditorialArticlePage({
           <TopicsAside headings={headings} />
         </div>
       </section>
-    </div>
-  );
-}
-
-function EditorialStickyHeader({
-  config,
-  count,
-}: {
-  config: EditorialConfig;
-  count?: number;
-}) {
-  return (
-    <div className="sticky top-20 z-40 border-y border-border bg-background/92 backdrop-blur-md md:top-24">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-3 md:flex-row md:items-center md:justify-between md:px-8">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-normal text-elinsa-primary">
-            {config.eyebrow}
-          </p>
-          <div className="flex items-center gap-3">
-            <h2 className="truncate text-base font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
-              {config.title}
-            </h2>
-            {typeof count === "number" && (
-              <span className="rounded-md bg-muted px-2 py-1 text-xs font-semibold text-muted-foreground">
-                {count}
-              </span>
-            )}
-          </div>
-        </div>
-
-        <nav className="flex gap-2 overflow-x-auto">
-          {Object.values(editorialConfigs).map((item) => (
-            <Link
-              className={cn(
-                "shrink-0 rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted hover:text-elinsa-primary",
-                item.collection === config.collection
-                  ? "bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
-                  : "text-muted-foreground",
-              )}
-              href={item.href}
-              key={item.collection}
-            >
-              {item.navLabel}
-            </Link>
-          ))}
-        </nav>
-      </div>
     </div>
   );
 }
@@ -302,6 +275,9 @@ function PostCard({
               Destaque
             </span>
           )}
+          <span className="rounded-md bg-muted px-2 py-1 font-semibold text-foreground">
+            {getEditorialSubjectLabel(getPostSubjectValue(post))}
+          </span>
           <span className="inline-flex items-center gap-1.5">
             <CalendarDays className="size-3.5 text-elinsa-primary" />
             {publishedDate}

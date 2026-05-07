@@ -1,5 +1,10 @@
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
+import {
+  defaultEditorialSubject,
+  type EditorialSubjectValue,
+  editorialSubjects,
+} from "@/lib/editorial-subjects";
 
 export type EditorialCollectionSlug = "blog" | "imprensa";
 
@@ -30,6 +35,7 @@ export type EditorialPost = {
   author?: EditorialAuthor | null;
   publishedAt?: null | string;
   slug?: null | string;
+  subject?: EditorialSubjectValue | null;
   summary?: null | string;
   title: string;
   updatedAt?: string;
@@ -89,7 +95,7 @@ export async function getEditorialPosts(
     collection,
     depth: 1,
     draft: false,
-    limit: 24,
+    limit: 100,
     sort: "-publishedAt",
   });
 
@@ -131,7 +137,31 @@ export function getAuthorName(author: EditorialAuthor | null | undefined) {
     return "Elinsa do Brasil";
   }
 
-  return author.name || author.email || "Elinsa do Brasil";
+  return author.name || formatNameFromEmail(author.email) || "Elinsa do Brasil";
+}
+
+export function getValidEditorialSubject(value: string | string[] | undefined) {
+  const subject = Array.isArray(value) ? value[0] : value;
+
+  if (!subject) {
+    return null;
+  }
+
+  return editorialSubjects.some((item) => item.value === subject)
+    ? (subject as EditorialSubjectValue)
+    : null;
+}
+
+export function getSubjectCounts(posts: EditorialPost[]) {
+  return editorialSubjects.map((subject) => ({
+    ...subject,
+    count: posts.filter((post) => getPostSubjectValue(post) === subject.value)
+      .length,
+  }));
+}
+
+export function getPostSubjectValue(post: EditorialPost) {
+  return post.subject ?? defaultEditorialSubject;
 }
 
 export function formatEditorialDate(dateString: null | string | undefined) {
@@ -246,6 +276,20 @@ function isLexicalNode(value: unknown): value is LexicalNode {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function formatNameFromEmail(email: null | string | undefined) {
+  const localPart = email?.split("@")[0];
+
+  if (!localPart) {
+    return "";
+  }
+
+  return localPart
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
 }
 
 function slugifyHeading(value: string) {

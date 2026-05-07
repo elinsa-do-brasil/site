@@ -1,4 +1,8 @@
 import type { CollectionConfig, FieldHook } from "payload";
+import {
+  defaultEditorialSubject,
+  editorialSubjects,
+} from "@/lib/editorial-subjects";
 
 const format = (val: string): string =>
   val
@@ -43,7 +47,7 @@ const createEditorialCollection = ({
   admin: {
     useAsTitle: "title",
     group,
-    defaultColumns: ["title", "author", "publishedAt", "updatedAt"],
+    defaultColumns: ["title", "subject", "author", "publishedAt", "updatedAt"],
     listSearchableFields: ["title", "summary"],
     livePreview: {
       url: ({ data }) => {
@@ -77,17 +81,6 @@ const createEditorialCollection = ({
       },
     },
     {
-      name: "author",
-      type: "relationship",
-      relationTo: "users",
-      label: "Autor",
-      required: true,
-      hasMany: false,
-      admin: {
-        position: "sidebar",
-      },
-    },
-    {
       name: "publishedAt",
       type: "date",
       label: "Data",
@@ -98,6 +91,28 @@ const createEditorialCollection = ({
           pickerAppearance: "dayOnly",
           displayFormat: "dd/MM/yyyy",
         },
+      },
+    },
+    {
+      name: "subject",
+      type: "select",
+      label: "Assunto geral",
+      required: true,
+      defaultValue: defaultEditorialSubject,
+      options: [...editorialSubjects],
+      admin: {
+        position: "sidebar",
+      },
+    },
+    {
+      name: "author",
+      type: "relationship",
+      relationTo: "users",
+      label: "Autor",
+      required: true,
+      hasMany: false,
+      admin: {
+        position: "sidebar",
       },
     },
     {
