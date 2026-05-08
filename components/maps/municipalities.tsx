@@ -68,7 +68,7 @@ export function MapBelem({
     <BaseMapCard
       title="Belém"
       description="Centro corporativo e base administrativa"
-      geoJsonUrl={mapAsset("belem.json")}
+      geoJsonUrl={mapAsset("/regionais/belem.json")}
       center={[-48.4902, -1.455]}
       zoom={16}
       baseLocation={{
