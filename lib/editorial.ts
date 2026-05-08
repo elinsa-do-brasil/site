@@ -82,7 +82,7 @@ export const editorialConfigs: Record<
     description:
       "Comunicados, notícias institucionais e atualizações públicas da Elinsa do Brasil.",
     emptyDescription:
-      "As próximas notícias públicas cadastradas no Payload aparecerão aqui.",
+      "As próximas notícias públicas cadastradas aparecerão aqui.",
     emptyTitle: "Nenhuma notícia publicada",
     eyebrow: "Comunicação pública",
     href: "/imprensa",
@@ -95,7 +95,7 @@ export const editorialConfigs: Record<
     description:
       "Eventos internos, recrutamento, comunicados para equipes e novidades da operação.",
     emptyDescription:
-      "As próximas notícias internas cadastradas no Payload aparecerão aqui.",
+      "As próximas notícias internas cadastradas aparecerão aqui.",
     emptyTitle: "Nenhuma notícia interna publicada",
     eyebrow: "Comunicação interna",
     href: "/blog",

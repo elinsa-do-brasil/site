@@ -115,7 +115,7 @@ export async function VagaPage({ slug }: { slug: string }) {
               <CardHeader>
                 <CardTitle>Resumo da vaga</CardTitle>
                 <CardDescription>
-                  Informações principais cadastradas no Payload.
+                  Informações principais cadastradas.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -209,7 +209,7 @@ function EmptyJobs() {
           Nenhuma vaga aberta
         </h2>
         <p className="mt-3 max-w-md text-muted-foreground">
-          As próximas oportunidades publicadas no Payload aparecerão aqui.
+          As próximas oportunidades publicadas aparecerão aqui.
         </p>
       </CardContent>
     </Card>
