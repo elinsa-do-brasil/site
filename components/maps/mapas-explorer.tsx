@@ -557,14 +557,16 @@ export function MapasExplorer() {
                 <span>Downloads</span>
                 <span className="font-normal text-muted-foreground text-xs leading-tight">
                   Dados geoespaciais para uso em SIG/GIS ou outras aplicações.
+
+                  Os dados são disponibilizados vetorializados e georreferenciados, segundo os arquivos públicos do IBGE.
                 </span>
               </span>
             </SidebarGroupLabel>
             <SidebarGroupContent className="flex justify-between items-center">
               <Button size={"lg"} asChild>
                 <a
-                  href={mapAsset("downloads/regionais.7z")}
-                  download="regionais.7z"
+                  href={mapAsset("downloads/geojsons.7z")}
+                  download="geojsons.7z"
                 >
                   <Code /> GeoJSON
                 </a>
