@@ -253,7 +253,7 @@ function PostCard({
 
   return (
     <Link className="group block min-w-0" href={href}>
-      <Card className="relative h-full min-h-[30rem] gap-0 overflow-hidden rounded-md border-border/80 bg-elinsa-dark py-0 shadow-sm transition-all hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-lg">
+      <Card className="relative h-full min-h-[30rem] gap-0 overflow-hidden border-border/80 bg-elinsa-dark py-0 shadow-sm transition-all hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-lg">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(145deg,#145061,#061a22_58%,#0c2b36)]" />
           {coverImage ? (
