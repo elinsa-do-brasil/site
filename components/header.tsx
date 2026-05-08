@@ -88,7 +88,7 @@ export function Header() {
                             description="Histórico, missão, visão e valores"
                           />
                           <DropdownItem
-                            href="/trabalhe-conosco"
+                            href="/vagas"
                             icon={AiUserIcon}
                             title="Carreiras"
                             description="Oportunidades de trabalho e vagas"
