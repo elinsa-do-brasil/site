@@ -36,7 +36,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ui/theme-toggle";
 import Image from "next/image";
-import LogoIcon from "@/public/images/logo-icon.avif";
+import LogoIcon from "@/public/images/logo-icon.webp";
 
 export function Header() {
   const pathname = usePathname();

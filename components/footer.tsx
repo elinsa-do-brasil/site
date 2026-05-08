@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
-import Logo from "@/public/images/logo.avif";
+import Logo from "@/public/images/logo.webp";
 
 const sitemapLinks = [
   { href: "/", label: "Início" },
   { href: "/quem-somos", label: "Quem somos" },
+  { href: "/vagas", label: "Vagas" },
   { href: "/mapas", label: "Mapas regionais" },
   { href: "/blog", label: "Blog" },
   { href: "/imprensa", label: "Imprensa" },
