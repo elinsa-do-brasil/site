@@ -6,6 +6,7 @@ import {
   Check,
   CircleDot,
   Code,
+  FileImage,
   Layers3,
   MapPin,
   Navigation,
@@ -14,7 +15,6 @@ import {
 import type { ExpressionSpecification } from "maplibre-gl";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SiPenpot } from "react-icons/si";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -569,11 +569,14 @@ export function MapasExplorer() {
                   <Code /> GeoJSON
                 </a>
               </Button>
-              <Button size={"lg"} disabled>
-                <VectorSquare /> Shapefile
+              <Button size={"lg"} asChild>
+                <a
+                  href={mapAsset("downloads/geopackages.7z")}
+                  download="geopackages.7z"
+                ><VectorSquare /> GeoPackage</a>
               </Button>
               <Button size={"lg"} disabled>
-                <SiPenpot /> Penpot
+                <FileImage /> SVG
               </Button>
             </SidebarGroupContent>
           </SidebarGroup>
