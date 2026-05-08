@@ -37,6 +37,10 @@ export default buildConfig({
 
   editor: lexicalEditor(),
 
+  routes: {
+    admin: "/payload",
+  },
+
   admin: {
     user: Users.slug,
   },
