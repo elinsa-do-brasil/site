@@ -148,8 +148,8 @@ export function MapItaituba({
       color="#8b5cf6"
       fillColor="#8b5cf6"
       baseLocation={{
-        lng: -55.9831,
-        lat: -4.2761,
+        lng: -55.9885283,
+        lat: -4.2733788,
         tooltip: "Base de Itaituba",
       }}
       href="https://www.google.com/maps/search/?api=1&query=-4.2761,-55.9831"
