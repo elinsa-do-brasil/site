@@ -13,7 +13,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EditorialRichText } from "@/components/editorial/editorial-rich-text";
 import { Badge } from "@/components/ui/badge";
-import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
+import { BentoGrid } from "@/components/ui/bento-grid";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   type EditorialCollectionSlug,
   type EditorialConfig,
@@ -128,13 +131,16 @@ export async function EditorialArticlePage({
       )}
 
       <section className="mx-auto max-w-6xl px-6 py-6 md:px-8 md:py-8">
-        <Link
-          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-elinsa-primary"
-          href={config.href}
+        <Button
+          asChild
+          className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"
+          variant="ghost"
         >
-          <ArrowLeft className="size-4" />
-          Voltar para {config.navLabel}
-        </Link>
+          <Link href={config.href}>
+            <ArrowLeft className="size-4" />
+            Voltar para {config.navLabel}
+          </Link>
+        </Button>
 
         <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="min-w-0">
@@ -159,44 +165,48 @@ export async function EditorialArticlePage({
                 {readingMinutes} min de leitura
               </p>
 
-              <div className="mt-5 space-y-2 border-y border-border py-4 text-sm text-muted-foreground">
-                <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                  <span className="inline-flex items-center gap-2">
-                    <CalendarDays className="size-4 text-elinsa-primary" />
-                    Publicado em{" "}
-                    <time className="font-semibold text-foreground">
-                      {publishedDate}
-                    </time>
-                  </span>
-
-                  {updatedDate && (
+              <div className="mt-5 text-sm text-muted-foreground">
+                <Separator />
+                <div className="space-y-2 py-4">
+                  <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
                     <span className="inline-flex items-center gap-2">
-                      <RefreshCw className="size-4 text-elinsa-primary" />
-                      Atualizado em{" "}
+                      <CalendarDays className="size-4 text-elinsa-primary" />
+                      Publicado em{" "}
                       <time className="font-semibold text-foreground">
-                        {updatedDate}
+                        {publishedDate}
                       </time>
                     </span>
-                  )}
-                </p>
 
-                <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                  <span className="inline-flex items-center gap-2">
-                    <FileText className="size-4 text-elinsa-primary" />
-                    Assunto{" "}
-                    <span className="font-semibold text-foreground">
-                      {getEditorialSubjectLabel(getPostSubjectValue(post))}
-                    </span>
-                  </span>
+                    {updatedDate && (
+                      <span className="inline-flex items-center gap-2">
+                        <RefreshCw className="size-4 text-elinsa-primary" />
+                        Atualizado em{" "}
+                        <time className="font-semibold text-foreground">
+                          {updatedDate}
+                        </time>
+                      </span>
+                    )}
+                  </p>
 
-                  <span className="inline-flex items-center gap-2">
-                    <UserRound className="size-4 text-elinsa-primary" />
-                    Por{" "}
-                    <span className="font-semibold text-foreground">
-                      {getAuthorName(post.author)}
+                  <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <span className="inline-flex items-center gap-2">
+                      <FileText className="size-4 text-elinsa-primary" />
+                      Assunto{" "}
+                      <span className="font-semibold text-foreground">
+                        {getEditorialSubjectLabel(getPostSubjectValue(post))}
+                      </span>
                     </span>
-                  </span>
-                </p>
+
+                    <span className="inline-flex items-center gap-2">
+                      <UserRound className="size-4 text-elinsa-primary" />
+                      Por{" "}
+                      <span className="font-semibold text-foreground">
+                        {getAuthorName(post.author)}
+                      </span>
+                    </span>
+                  </p>
+                </div>
+                <Separator />
               </div>
             </div>
 
@@ -205,13 +215,16 @@ export async function EditorialArticlePage({
               <EditorialRichText data={post.content} />
 
               <div className="mt-14 border-t border-border pt-6">
-                <Link
-                  className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-elinsa-primary hover:text-elinsa-primary"
-                  href={config.href}
+                <Button
+                  asChild
+                  className="gap-2 text-sm font-semibold hover:border-elinsa-primary hover:text-elinsa-primary"
+                  variant="outline"
                 >
-                  Ver todas
-                  <ArrowRight className="size-4" />
-                </Link>
+                  <Link href={config.href}>
+                    Ver todas
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
               </div>
             </article>
           </div>
@@ -240,7 +253,7 @@ function PostCard({
 
   return (
     <Link className="group block min-w-0" href={href}>
-      <BentoGridItem className="relative h-full min-h-[30rem] space-y-0 overflow-hidden rounded-md border-border/80 bg-elinsa-dark p-0 shadow-sm hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-lg">
+      <Card className="relative h-full min-h-[30rem] gap-0 overflow-hidden rounded-md border-border/80 bg-elinsa-dark py-0 shadow-sm transition-all hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-lg">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(145deg,#145061,#061a22_58%,#0c2b36)]" />
           {coverImage ? (
@@ -257,7 +270,7 @@ function PostCard({
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,81,103,0.06)_0%,rgba(4,18,25,0.18)_38%,rgba(4,18,25,0.9)_100%)]" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-col justify-between p-5">
+        <CardContent className="relative z-10 flex h-full flex-col justify-between p-5">
           <Badge className="w-fit rounded-md bg-white/90 px-2.5 py-1 text-elinsa-dark shadow-sm backdrop-blur-md">
             {subjectLabel}
           </Badge>
@@ -282,8 +295,8 @@ function PostCard({
               </p>
             )}
           </div>
-        </div>
-      </BentoGridItem>
+        </CardContent>
+      </Card>
     </Link>
   );
 }
@@ -303,31 +316,35 @@ function SubjectsAside({
         Assuntos
       </p>
       <nav className="mt-3 flex flex-wrap gap-2 lg:grid">
-        <Link
+        <Button
+          asChild
           className={cn(
-            "rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted hover:text-elinsa-primary",
+            "h-auto justify-start rounded-md px-3 py-2 text-sm font-semibold lg:w-full",
             !subject
-              ? "bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
-              : "text-muted-foreground",
+              ? "bg-elinsa-light text-elinsa-dark hover:bg-elinsa-light dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
+              : "text-muted-foreground hover:text-elinsa-primary",
           )}
-          href={config.href}
+          variant="ghost"
         >
-          Todos
-        </Link>
+          <Link href={config.href}>Todos</Link>
+        </Button>
 
         {subjectCounts.map((item) => (
-          <Link
+          <Button
+            asChild
             className={cn(
-              "rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted hover:text-elinsa-primary",
+              "h-auto justify-start rounded-md px-3 py-2 text-sm font-semibold lg:w-full",
               item.value === subject
-                ? "bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
-                : "text-muted-foreground",
+                ? "bg-elinsa-light text-elinsa-dark hover:bg-elinsa-light dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
+                : "text-muted-foreground hover:text-elinsa-primary",
             )}
-            href={`${config.href}?assunto=${item.value}`}
             key={item.value}
+            variant="ghost"
           >
-            {item.label}
-          </Link>
+            <Link href={`${config.href}?assunto=${item.value}`}>
+              {item.label}
+            </Link>
+          </Button>
         ))}
       </nav>
     </aside>
@@ -364,17 +381,19 @@ function LightningSvg() {
 
 function EmptyState({ config }: { config: EditorialConfig }) {
   return (
-    <div className="flex min-h-80 flex-col items-center justify-center rounded-md border border-dashed border-border bg-muted/35 px-6 py-14 text-center">
-      <div className="mb-5 flex size-12 items-center justify-center rounded-md bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
-        <FileText className="size-6" />
-      </div>
-      <h2 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
-        {config.emptyTitle}
-      </h2>
-      <p className="mt-3 max-w-md text-muted-foreground">
-        {config.emptyDescription}
-      </p>
-    </div>
+    <Card className="min-h-80 justify-center rounded-md border-dashed bg-muted/35 py-14 text-center">
+      <CardContent className="flex flex-col items-center px-6">
+        <div className="mb-5 flex size-12 items-center justify-center rounded-md bg-elinsa-light text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
+          <FileText className="size-6" />
+        </div>
+        <h2 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
+          {config.emptyTitle}
+        </h2>
+        <p className="mt-3 max-w-md text-muted-foreground">
+          {config.emptyDescription}
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -397,12 +416,14 @@ function MobileTopics({ headings }: { headings: HeadingItem[] }) {
   }
 
   return (
-    <div className="mb-8 rounded-md border border-border bg-muted/35 p-4 lg:hidden">
-      <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-        Tópicos
-      </p>
-      <TopicsNav headings={headings} />
-    </div>
+    <Card className="mb-8 rounded-md bg-muted/35 py-4 lg:hidden">
+      <CardContent>
+        <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+          Tópicos
+        </p>
+        <TopicsNav headings={headings} />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -418,17 +439,18 @@ function TopicsNav({ headings }: { headings: HeadingItem[] }) {
   return (
     <nav className="mt-3 grid gap-1">
       {headings.map((heading) => (
-        <a
+        <Button
+          asChild
           className={cn(
-            "rounded-md px-3 py-2 text-sm leading-5 text-muted-foreground transition-colors hover:bg-muted hover:text-elinsa-primary",
+            "h-auto justify-start rounded-md px-3 py-2 text-left text-sm leading-5 text-muted-foreground hover:text-elinsa-primary",
             heading.level === 3 && "ml-3 text-xs",
             heading.level === 4 && "ml-6 text-xs",
           )}
-          href={`#${heading.id}`}
           key={heading.id}
+          variant="ghost"
         >
-          {heading.title}
-        </a>
+          <a href={`#${heading.id}`}>{heading.title}</a>
+        </Button>
       ))}
     </nav>
   );
