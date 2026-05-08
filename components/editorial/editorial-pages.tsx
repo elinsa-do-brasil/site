@@ -56,14 +56,32 @@ export async function EditorialIndex({
   return (
     <div className="min-h-screen bg-background pt-24 text-foreground">
       <section className="mx-auto max-w-6xl px-6 py-8 md:px-8 md:py-10">
-        <div className="mb-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
           <div className="min-w-0">
-            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
-              {config.title}
-            </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
-              {config.description}
-            </p>
+            <div className="mb-5 md:mb-6">
+              <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
+                {config.title}
+              </h1>
+              <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+                {config.description}
+              </p>
+            </div>
+
+            {allPosts.length === 0 ? (
+              <EmptyState config={config} />
+            ) : (
+              <div className="min-w-0">
+                {posts.length === 0 ? (
+                  <EmptyState config={config} />
+                ) : (
+                  <BentoGrid className="mx-0 max-w-none gap-4 md:auto-rows-[30rem] md:grid-cols-2">
+                    {posts.map((post) => (
+                      <PostCard config={config} key={post.id} post={post} />
+                    ))}
+                  </BentoGrid>
+                )}
+              </div>
+            )}
           </div>
 
           <SubjectsAside
@@ -72,22 +90,6 @@ export async function EditorialIndex({
             subjectCounts={subjectCounts}
           />
         </div>
-
-        {allPosts.length === 0 ? (
-          <EmptyState config={config} />
-        ) : (
-          <div className="min-w-0">
-            {posts.length === 0 ? (
-              <EmptyState config={config} />
-            ) : (
-              <BentoGrid className="mx-0 max-w-none gap-4 md:auto-rows-[30rem] md:grid-cols-2 xl:grid-cols-3">
-                {posts.map((post) => (
-                  <PostCard config={config} key={post.id} post={post} />
-                ))}
-              </BentoGrid>
-            )}
-          </div>
-        )}
       </section>
     </div>
   );
@@ -296,7 +298,7 @@ function SubjectsAside({
   subjectCounts: SubjectCount[];
 }) {
   return (
-    <aside className="border-border lg:border-l lg:pl-6">
+    <aside className="border-border lg:sticky lg:top-28 lg:self-start lg:border-l lg:pl-6">
       <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
         Assuntos
       </p>
