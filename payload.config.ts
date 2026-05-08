@@ -10,6 +10,7 @@ import sharp from "sharp";
 import { Blog, Imprensa } from "./collections/Editorial.ts";
 import { Galeria } from "./collections/Galeria.ts";
 import { Users } from "./collections/Users.ts";
+import { Vagas } from "./collections/Vagas.ts";
 
 const s3Bucket = process.env.S3_BUCKET || process.env.AWS_S3_BUCKET;
 const s3AccessKeyId =
@@ -40,7 +41,7 @@ export default buildConfig({
     user: Users.slug,
   },
 
-  collections: [Users, Imprensa, Blog, Galeria],
+  collections: [Users, Imprensa, Blog, Vagas, Galeria],
 
   plugins: [
     s3Storage({
@@ -88,6 +89,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL,
     },
+    migrationDir: "./migrations",
     push: process.env.PAYLOAD_DB_PUSH === "true",
   }),
 

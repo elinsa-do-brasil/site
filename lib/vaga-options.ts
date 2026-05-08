@@ -1,0 +1,62 @@
+export const vagaCidadeOptions = [
+  { label: "Abaetetuba", value: "abaetetuba" },
+  { label: "Acará", value: "acara" },
+  { label: "Alenquer", value: "alenquer" },
+  { label: "Almeirim", value: "almeirim" },
+  { label: "Altamira", value: "altamira" },
+  { label: "Anapu", value: "anapu" },
+  { label: "Aurora do Pará", value: "aurora-do-para" },
+  { label: "Aveiro", value: "aveiro" },
+  { label: "Baião", value: "baiao" },
+  { label: "Barcarena", value: "barcarena" },
+  { label: "Belém", value: "belem" },
+  { label: "Belterra", value: "belterra" },
+  { label: "Brasil Novo", value: "brasil-novo" },
+  { label: "Bujaru", value: "bujaru" },
+  { label: "Cametá", value: "cameta" },
+  { label: "Concórdia do Pará", value: "concordia-do-para" },
+  { label: "Curuá", value: "curua" },
+  { label: "Faro", value: "faro" },
+  { label: "Gurupá", value: "gurupa" },
+  { label: "Igarapé-Miri", value: "igarape-miri" },
+  { label: "Ipixuna do Pará", value: "ipixuna-do-para" },
+  { label: "Itaituba", value: "itaituba" },
+  { label: "Jacareacanga", value: "jacareacanga" },
+  { label: "Juruti", value: "juruti" },
+  { label: "Limoeiro do Ajuru", value: "limoreiro-do-ajuru" },
+  { label: "Mãe do Rio", value: "mae-do-rio" },
+  { label: "Medicilândia", value: "medicilandia" },
+  { label: "Mocajuba", value: "mocajuba" },
+  { label: "Moju", value: "moju" },
+  { label: "Mojuí dos Campos", value: "mojui-dos-campos" },
+  { label: "Monte Alegre", value: "monte-alegre" },
+  { label: "Novo Progresso", value: "novo-progresso" },
+  { label: "Óbidos", value: "obidos" },
+  { label: "Oriximiná", value: "oriximina" },
+  { label: "Pacajá", value: "pacaja" },
+  { label: "Paragominas", value: "paragominas" },
+  { label: "Placas", value: "placas" },
+  { label: "Porto de Moz", value: "porto-de-moz" },
+  { label: "Prainha", value: "prainha" },
+  { label: "Rurópolis", value: "ruropolis" },
+  { label: "Santarém", value: "santarem" },
+  { label: "São Domingos do Capim", value: "sao-domingos-do-capim" },
+  { label: "São Miguel do Guamá", value: "sao-miguel-do-guama" },
+  { label: "Senador José Porfírio", value: "senador-jose-porfirio" },
+  { label: "Tailândia", value: "tailandia" },
+  { label: "Terra Santa", value: "terra-santa" },
+  { label: "Tomé-Açu", value: "tome-acu" },
+  { label: "Trairão", value: "trairao" },
+  { label: "Ulianópolis", value: "ulianopolis" },
+  { label: "Uruará", value: "uruara" },
+  { label: "Vitória do Xingu", value: "vitoria-do-xingu" },
+] as const;
+
+export type VagaCidadeValue = (typeof vagaCidadeOptions)[number]["value"];
+
+export function getVagaCidadeLabel(value: null | string | undefined) {
+  return (
+    vagaCidadeOptions.find((cidade) => cidade.value === value)?.label ??
+    "Cidade não informada"
+  );
+}
