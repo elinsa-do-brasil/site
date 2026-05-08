@@ -20,10 +20,12 @@ const s3Region =
   process.env.S3_REGION ||
   process.env.AWS_REGION ||
   process.env.AWS_DEFAULT_REGION;
-const s3Endpoint = process.env.S3_ENDPOINT;
+const s3Endpoint = process.env.S3_ENDPOINT || process.env.AWS_ENDPOINT_URL_S3;
 const s3PublicUrl = process.env.S3_PUBLIC_URL;
 const s3Prefix = process.env.S3_PREFIX || "galeria";
 const isS3Configured = Boolean(s3Bucket && s3AccessKeyId && s3SecretAccessKey);
+const shouldForceS3PathStyle =
+  process.env.S3_FORCE_PATH_STYLE === "false" ? false : Boolean(s3Endpoint);
 
 export default buildConfig({
   // Idioma do painel administrativo
@@ -74,7 +76,7 @@ export default buildConfig({
               }
             : undefined,
         endpoint: s3Endpoint,
-        forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
+        forcePathStyle: shouldForceS3PathStyle,
         region: s3Region || (s3Endpoint ? "auto" : "us-east-1"),
       },
     }),
