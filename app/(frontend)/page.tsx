@@ -29,13 +29,13 @@ import {
   MapParagominas,
   MapSantarem,
 } from "@/components/maps/municipalities";
-import { Card as AppleCard, Carousel } from "@/components/ui/apple-cards-carousel";
 import {
-  Card as ShadcnCard,
-  CardContent,
-} from "@/components/ui/card";
+  Card as AppleCard,
+  Carousel,
+} from "@/components/ui/apple-cards-carousel";
 import { BentoGrid } from "@/components/ui/bento-grid";
 import { Button } from "@/components/ui/button";
+import { CardContent, Card as ShadcnCard } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Eletricista from "@/public/images/eletricistas.png";
 import Lampada from "@/public/images/lampada.webp";
@@ -510,7 +510,7 @@ export default async function Home() {
                 className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
                 asChild
               >
-                <Link href="/posts">Ver publicações</Link>
+                <Link href="/imprensa">Ver notícias</Link>
               </Button>
             </div>
           </div>
@@ -709,9 +709,7 @@ export default async function Home() {
                 key={value.id}
                 className={cn(
                   "group relative overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-elinsa-primary/30 hover:shadow-lg",
-                  index < 2
-                    ? "lg:col-span-3"
-                    : "lg:col-span-2",
+                  index < 2 ? "lg:col-span-3" : "lg:col-span-2",
                 )}
               >
                 <value.icon

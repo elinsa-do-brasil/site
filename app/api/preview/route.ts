@@ -15,10 +15,6 @@ export async function GET(req: Request): Promise<Response> {
   const draft = await draftMode();
   draft.enable();
 
-  if (collection === "posts") {
-    redirect(`/posts/${slug}`);
-  }
-
   if (collection === "blog" || collection === "imprensa") {
     redirect(`/${collection}/${slug}`);
   }

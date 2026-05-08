@@ -1,8 +1,9 @@
+import { lexicalEditor, UploadFeature } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig, FieldHook } from "payload";
 import {
   defaultEditorialSubject,
   editorialSubjects,
-} from "@/lib/editorial-subjects";
+} from "../lib/editorial-subjects.ts";
 
 const format = (val: string): string =>
   val
@@ -116,6 +117,15 @@ const createEditorialCollection = ({
       },
     },
     {
+      name: "coverImage",
+      type: "upload",
+      relationTo: "galeria",
+      label: "Imagem de capa",
+      admin: {
+        position: "sidebar",
+      },
+    },
+    {
       name: "slug",
       type: "text",
       label: "Slug (URL)",
@@ -134,6 +144,46 @@ const createEditorialCollection = ({
       name: "content",
       type: "richText",
       label: "Conteúdo",
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [
+          ...defaultFeatures,
+          UploadFeature({
+            collections: {
+              galeria: {
+                fields: [
+                  {
+                    name: "size",
+                    type: "select",
+                    label: "Tamanho da imagem",
+                    defaultValue: "normal",
+                    options: [
+                      { label: "Pequena", value: "small" },
+                      { label: "Normal", value: "normal" },
+                      { label: "Grande", value: "large" },
+                    ],
+                  },
+                  {
+                    name: "alignment",
+                    type: "select",
+                    label: "Alinhamento",
+                    defaultValue: "center",
+                    options: [
+                      { label: "Esquerda", value: "left" },
+                      { label: "Centro", value: "center" },
+                      { label: "Direita", value: "right" },
+                    ],
+                  },
+                  {
+                    name: "caption",
+                    type: "text",
+                    label: "Legenda",
+                  },
+                ],
+              },
+            },
+          }),
+        ],
+      }),
     },
   ],
 });

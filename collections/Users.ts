@@ -14,7 +14,7 @@ export const Users: CollectionConfig = {
       type: "text",
       label: "Nome",
       admin: {
-        description: "Nome exibido publicamente nos posts.",
+        description: "Nome exibido publicamente nas notícias.",
       },
     },
   ],

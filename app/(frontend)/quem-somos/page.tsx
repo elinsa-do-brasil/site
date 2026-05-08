@@ -190,10 +190,10 @@ export default function QuemSomos() {
                 <ArrowRight className="size-4" />
               </a>
               <Link
-                href="/posts"
+                href="/imprensa"
                 className="inline-flex h-12 items-center justify-center rounded-md border border-border bg-background/80 px-5 text-sm font-bold text-foreground backdrop-blur transition-colors hover:border-elinsa-primary hover:text-elinsa-primary"
               >
-                Publicações
+                Notícias
               </Link>
             </div>
           </div>
