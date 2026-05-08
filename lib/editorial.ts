@@ -28,8 +28,26 @@ export type EditorialAuthor =
       name?: null | string;
     };
 
+export type EditorialImage = {
+  alt?: null | string;
+  filename?: null | string;
+  height?: null | number;
+  id?: number | string;
+  sizes?: null | Record<
+    string,
+    {
+      height?: null | number;
+      url?: null | string;
+      width?: null | number;
+    }
+  >;
+  url?: null | string;
+  width?: null | number;
+};
+
 export type EditorialPost = {
   content?: null | unknown;
+  coverImage?: EditorialImage | null | number | string;
   createdAt?: string;
   id: number | string;
   author?: EditorialAuthor | null;
@@ -175,6 +193,43 @@ export function formatEditorialDate(dateString: null | string | undefined) {
     timeZone: "America/Sao_Paulo",
     year: "numeric",
   }).format(new Date(dateString));
+}
+
+export function formatEditorialShortDate(
+  dateString: null | string | undefined,
+) {
+  if (!dateString) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(dateString));
+}
+
+export function getEditorialCoverImage(
+  post: EditorialPost,
+  size: "card" | "hero" | "thumbnail" = "card",
+) {
+  if (!post.coverImage || typeof post.coverImage !== "object") {
+    return null;
+  }
+
+  const sizedImage = post.coverImage.sizes?.[size];
+  const url = sizedImage?.url || post.coverImage.url;
+
+  if (!url) {
+    return null;
+  }
+
+  return {
+    alt: post.coverImage.alt || post.title,
+    height: sizedImage?.height || post.coverImage.height,
+    url,
+    width: sizedImage?.width || post.coverImage.width,
+  };
 }
 
 export function getRichTextNodeText(node: unknown): string {
