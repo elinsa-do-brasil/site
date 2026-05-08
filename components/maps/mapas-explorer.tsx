@@ -263,7 +263,6 @@ const REGIONALS: Regional[] = [
         marker: [-54.7010172, -2.4329974],
         municipalities: [
           { slug: "belterra", name: "Belterra" },
-          { slug: "curua", name: "Curuá" },
           { slug: "mojui-dos-campos", name: "Mojuí dos Campos" },
           { slug: "santarem", name: "Santarém" },
         ],
