@@ -318,7 +318,7 @@ function RegionalIntroCard({
   return (
     <article
       className={cn(
-        "relative flex h-full min-h-[15rem] flex-col justify-between overflow-hidden rounded-3xl border border-border/70 bg-card p-6 shadow-sm",
+        "relative flex h-full min-h-60 flex-col justify-between overflow-hidden rounded-3xl border border-border/70 bg-card p-6 shadow-sm",
         regional.surfaceClassName,
         className,
       )}
@@ -369,7 +369,7 @@ function CoverageMapCard({ className }: { className?: string }) {
     <Link
       href="/mapas"
       className={cn(
-        "group relative flex h-full min-h-[13rem] overflow-hidden rounded-3xl border border-elinsa-primary/25 bg-elinsa-dark p-6 text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-elinsa-primary hover:shadow-xl",
+        "group relative flex h-full min-h-52 overflow-hidden rounded-3xl border border-elinsa-primary/25 bg-elinsa-dark p-6 text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-elinsa-primary hover:shadow-xl",
         className,
       )}
     >
@@ -485,12 +485,8 @@ export default async function Home() {
             </h1>
             <p className="mt-6 max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
               Obras, manutenção, planejamento e suporte operacional para o Grupo
-              Equatorial Energia, com bases estratégicas no Pará e atuação
+              Equatorial, com bases estratégicas no Pará e atuação
               orientada a segurança, previsibilidade e execução técnica.
-            </p>
-            <p className="mt-4 text-sm font-medium text-muted-foreground">
-              Atuação exclusiva empresarial. Não atendemos diretamente ao
-              público consumidor.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -563,27 +559,27 @@ export default async function Home() {
         </div>
 
         <BentoGrid className="max-w-none grid-cols-1 gap-4 md:auto-rows-[12rem] md:grid-cols-6 lg:auto-rows-[11rem] lg:grid-cols-12">
-          <MapBelem className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-4" />
+          <MapBelem className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-4" />
           <RegionalIntroCard
             regional={regionalBentoCards.centro}
             className="md:col-span-3 md:row-span-2 lg:col-span-3"
           />
-          <MapAltamira className="h-full min-h-[19rem] md:col-span-6 md:row-span-2 md:min-h-0 lg:col-span-5" />
+          <MapAltamira className="h-full min-h-76 md:col-span-6 md:row-span-2 md:min-h-0 lg:col-span-5" />
 
           <RegionalIntroCard
             regional={regionalBentoCards.nordeste}
             className="md:col-span-2 md:row-span-2 lg:col-span-3"
           />
-          <MapAbaetetuba className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-4" />
-          <MapParagominas className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-5" />
+          <MapAbaetetuba className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-4" />
+          <MapParagominas className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-5" />
 
           <RegionalIntroCard
             regional={regionalBentoCards.oeste}
             className="md:col-span-2 md:row-span-2 lg:col-span-3"
           />
-          <MapSantarem className="h-full min-h-[19rem] md:col-span-4 md:row-span-2 md:min-h-0 lg:col-span-3" />
-          <MapItaituba className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
-          <MapMonteAlegre className="h-full min-h-[19rem] md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
+          <MapSantarem className="h-full min-h-76 md:col-span-4 md:row-span-2 md:min-h-0 lg:col-span-3" />
+          <MapItaituba className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
+          <MapMonteAlegre className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
 
           <CoverageMapCard className="md:col-span-6 md:row-span-1 lg:col-span-12" />
         </BentoGrid>
@@ -591,7 +587,7 @@ export default async function Home() {
 
       <section className="overflow-hidden bg-muted/25 px-6 py-14 md:px-8 lg:h-[min(44rem,calc(100dvh-5rem))] lg:py-8">
         <div className="mx-auto grid h-full max-w-6xl gap-5 lg:grid-cols-[0.88fr_1.12fr] lg:items-stretch">
-          <div className="relative min-h-[22rem] overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark p-6 text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0">
+          <div className="relative min-h-88 overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark p-6 text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0">
             <Image
               src={Lampada}
               alt="Lâmpada acesa em uma composição conceitual de operação elétrica"
@@ -654,7 +650,7 @@ export default async function Home() {
                     "group relative overflow-hidden border-border bg-background shadow-sm transition-colors hover:border-elinsa-primary/45",
                     index === 0
                       ? "md:col-span-2"
-                      : "flex flex-col md:min-h-[13rem]",
+                      : "flex flex-col md:min-h-52",
                   )}
                 >
                   <service.icon
@@ -713,7 +709,7 @@ export default async function Home() {
                 )}
               >
                 <value.icon
-                  className="pointer-events-none absolute -right-6 -top-6 size-28 text-foreground/[0.04] transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground/[0.07]"
+                  className="pointer-events-none absolute -right-6 -top-6 size-28 text-foreground/4 transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground/[0.07]"
                   strokeWidth={1.2}
                 />
                 <CardContent className="relative z-10">

@@ -361,7 +361,7 @@ export function MapasExplorer() {
             >
               <Link href="/">
                 <ArrowLeft className="size-4" />
-                Home
+                Início
               </Link>
             </Button>
             <ThemeToggle />
