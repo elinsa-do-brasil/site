@@ -577,7 +577,7 @@ export function MapasExplorer() {
                   download="geopackages.7z"
                 ><VectorSquare /> GeoPackage</a>
               </Button>
-              <Button size={"lg"}>
+              <Button size={"lg"} asChild>
                 <a
                   href={mapAsset("downloads/svgs.7z")}
                   download="svgs.7z"
