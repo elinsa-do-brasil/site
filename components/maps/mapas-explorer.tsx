@@ -577,8 +577,11 @@ export function MapasExplorer() {
                   download="geopackages.7z"
                 ><VectorSquare /> GeoPackage</a>
               </Button>
-              <Button size={"lg"} disabled>
-                <FileImage /> SVG
+              <Button size={"lg"}>
+                <a
+                  href={mapAsset("downloads/svgs.7z")}
+                  download="svgs.7z"
+                ><FileImage /> SVG</a>
               </Button>
             </SidebarGroupContent>
           </SidebarGroup>
