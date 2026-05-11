@@ -2,6 +2,8 @@ import { ArrowRight02Icon, Building01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity,
+  CalendarDays,
+  Clock3,
   Factory,
   HardHat,
   Heart,
@@ -11,7 +13,6 @@ import {
   Map as MapIcon,
   MapPin,
   Scale,
-  ShieldCheck,
   Users,
   Wrench,
   Zap,
@@ -19,7 +20,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
-import type { ReactNode } from "react";
 import {
   MapAbaetetuba,
   MapAltamira,
@@ -29,13 +29,26 @@ import {
   MapParagominas,
   MapSantarem,
 } from "@/components/maps/municipalities";
-import {
-  Card as AppleCard,
-  Carousel,
-} from "@/components/ui/apple-cards-carousel";
+import { Badge } from "@/components/ui/badge";
 import { BentoGrid } from "@/components/ui/bento-grid";
 import { Button } from "@/components/ui/button";
-import { CardContent, Card as ShadcnCard } from "@/components/ui/card";
+import {
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Card as ShadcnCard,
+} from "@/components/ui/card";
+import {
+  type EditorialPost,
+  formatEditorialDate,
+  getEditorialCoverImage,
+  getEditorialPosts,
+  getPostSubjectValue,
+  getReadingMinutes,
+} from "@/lib/editorial";
+import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
 import Eletricista from "@/public/images/eletricistas.png";
 import Lampada from "@/public/images/lampada.webp";
@@ -53,13 +66,6 @@ type ImpactMetric = {
   value: string;
   label: string;
   description: string;
-};
-
-type FeatureItem = {
-  category: string;
-  title: string;
-  src: string;
-  content: ReactNode;
 };
 
 type RegionalBentoCard = {
@@ -283,31 +289,6 @@ const regionalBentoCards: Record<string, RegionalBentoCard> = {
   },
 };
 
-function NewsContent({
-  children,
-  points,
-}: {
-  children: ReactNode;
-  points: string[];
-}) {
-  return (
-    <div className="mx-auto max-w-3xl space-y-8 text-base leading-7 text-muted-foreground md:text-lg">
-      <p>{children}</p>
-      <ul className="grid gap-3 text-sm text-foreground md:grid-cols-3">
-        {points.map((point) => (
-          <li
-            key={point}
-            className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2"
-          >
-            <ShieldCheck className="size-4 shrink-0 text-elinsa-primary" />
-            <span>{point}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function RegionalIntroCard({
   regional,
   className,
@@ -400,63 +381,70 @@ function CoverageMapCard({ className }: { className?: string }) {
   );
 }
 
-const featureItems: FeatureItem[] = [
-  {
-    category: "Blog",
-    title: "Operação focada no Grupo Equatorial Energia",
-    src: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=2400&auto=format&fit=crop",
-    content: (
-      <NewsContent points={["Obras", "Manutenção", "Suporte"]}>
-        No Brasil, a Elinsa concentra suas frentes de obras, manutenção,
-        planejamento e suporte operacional em atendimento ao Grupo Equatorial
-        Energia.
-      </NewsContent>
-    ),
-  },
-  {
-    category: "Segurança",
-    title: "369 dias sem acidentes de trabalho",
-    src: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2400&auto=format&fit=crop",
-    content: (
-      <NewsContent points={["Prevenção", "Rotina", "Cuidado"]}>
-        A marca de 369 dias e contando reflete disciplina operacional, presença
-        de liderança em campo e atenção permanente aos procedimentos de
-        segurança.
-      </NewsContent>
-    ),
-  },
-  {
-    category: "Pessoas",
-    title: "Mais de 2.500 colaboradores estimados",
-    src: "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2400&auto=format&fit=crop",
-    content: (
-      <NewsContent points={["Paragominas", "Abaetetuba", "Outros eixos"]}>
-        A estimativa parte dos 1.938 colaboradores ativos registrados nos eixos
-        Paragominas e Abaetetuba em novembro de 2025, somando uma projeção
-        conservadora para Santarém e Altamira.
-      </NewsContent>
-    ),
-  },
-  {
-    category: "Bases",
-    title: "Seis bases regionais em operação no Pará",
-    src: "https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2400&auto=format&fit=crop",
-    content: (
-      <NewsContent points={["Centro", "Nordeste", "Oeste"]}>
-        A operação regional conta com seis bases, mantendo equipes e estrutura
-        mais próximas das frentes atendidas em diferentes áreas do Pará.
-      </NewsContent>
-    ),
-  },
-];
+function PressNewsCard({ post }: { post: EditorialPost }) {
+  const href = post.slug ? `/imprensa/${post.slug}` : "/imprensa";
+  const coverImage = getEditorialCoverImage(post, "card");
+  const publishedDate = formatEditorialDate(post.publishedAt ?? post.createdAt);
+  const readingMinutes = getReadingMinutes(post.content);
+  const subjectLabel = getEditorialSubjectLabel(getPostSubjectValue(post));
+
+  return (
+    <Link className="group block h-full" href={href}>
+      <ShadcnCard className="h-full overflow-hidden rounded-md border-border/70 py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10">
+        <div className="relative aspect-16/10 overflow-hidden bg-elinsa-dark">
+          <Image
+            src={coverImage?.url ?? Lampada}
+            alt={coverImage?.alt ?? post.title}
+            fill
+            className="object-cover object-center transition duration-500 group-hover:scale-105"
+            sizes="(min-width: 1024px) 22rem, (min-width: 768px) 50vw, 100vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.78)_100%)]" />
+          <Badge className="absolute left-4 top-4 bg-white/92 text-elinsa-dark shadow-sm backdrop-blur hover:bg-white">
+            {subjectLabel}
+          </Badge>
+        </div>
+
+        <CardHeader className="gap-3 p-5 pb-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-muted-foreground">
+            {publishedDate && (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="size-3.5 text-elinsa-primary" />
+                {publishedDate}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <Clock3 className="size-3.5 text-elinsa-primary" />
+              {readingMinutes} min de leitura
+            </span>
+          </div>
+          <CardTitle className="line-clamp-2 text-2xl font-black leading-tight tracking-normal text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+            {post.title}
+          </CardTitle>
+          <CardDescription className="line-clamp-3 text-base leading-7">
+            {post.summary}
+          </CardDescription>
+        </CardHeader>
+
+        <CardFooter className="px-5 pb-5 pt-0">
+          <span className="inline-flex items-center gap-2 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+            Ler notícia
+            <HugeiconsIcon
+              icon={ArrowRight02Icon}
+              className="size-4 transition-transform group-hover:translate-x-1"
+            />
+          </span>
+        </CardFooter>
+      </ShadcnCard>
+    </Link>
+  );
+}
 
 export default async function Home() {
   await connection();
 
   const impactMetrics = getImpactMetrics();
-  const carouselCards = featureItems.map((card, index) => (
-    <AppleCard key={card.src} card={card} index={index} layout />
-  ));
+  const latestPressPosts = (await getEditorialPosts("imprensa")).slice(0, 3);
 
   return (
     <div className="bg-background text-foreground">
@@ -485,8 +473,8 @@ export default async function Home() {
             </h1>
             <p className="mt-6 max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
               Obras, manutenção, planejamento e suporte operacional para o Grupo
-              Equatorial, com bases estratégicas no Pará e atuação
-              orientada a segurança, previsibilidade e execução técnica.
+              Equatorial, com bases estratégicas no Pará e atuação orientada a
+              segurança, previsibilidade e execução técnica.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -648,9 +636,7 @@ export default async function Home() {
                   key={service.id}
                   className={cn(
                     "group relative overflow-hidden border-border bg-background shadow-sm transition-colors hover:border-elinsa-primary/45",
-                    index === 0
-                      ? "md:col-span-2"
-                      : "flex flex-col md:min-h-52",
+                    index === 0 ? "md:col-span-2" : "flex flex-col md:min-h-52",
                   )}
                 >
                   <service.icon
@@ -734,21 +720,51 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="w-full overflow-hidden bg-background py-20">
-        <div className="mx-auto mb-2 max-w-6xl px-6 md:px-8">
-          <div className="mb-2 inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold text-muted-foreground">
-            <Activity className="size-4 text-elinsa-primary" />
-            Notícias
+      <section className="w-full bg-background px-6 py-20 md:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold text-muted-foreground">
+                <Activity className="size-4 text-elinsa-primary" />
+                Notícias
+              </div>
+              <h2 className="text-4xl font-extrabold tracking-normal md:text-5xl">
+                Últimas da imprensa
+              </h2>
+              <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
+                Comunicados, notícias institucionais e atualizações públicas da
+                Elinsa do Brasil.
+              </p>
+            </div>
+            <Button asChild className="gap-2 rounded-md" variant="outline">
+              <Link href="/imprensa">
+                Ver imprensa
+                <HugeiconsIcon icon={ArrowRight02Icon} className="size-4" />
+              </Link>
+            </Button>
           </div>
-          <h2 className="text-4xl font-extrabold tracking-normal md:text-5xl">
-            Últimas do blog
-          </h2>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
-            Notícias institucionais, segurança, operação e comunicados da Elinsa
-            do Brasil.
-          </p>
         </div>
-        <Carousel items={carouselCards} />
+
+        {latestPressPosts.length > 0 ? (
+          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {latestPressPosts.map((post) => (
+              <PressNewsCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <div className="mx-auto max-w-6xl">
+            <ShadcnCard className="rounded-md border-dashed bg-muted/35">
+              <CardContent className="py-12">
+                <h3 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
+                  Nenhuma notícia publicada
+                </h3>
+                <p className="mt-3 max-w-xl text-muted-foreground">
+                  As próximas notícias públicas aparecerão aqui automaticamente.
+                </p>
+              </CardContent>
+            </ShadcnCard>
+          </div>
+        )}
       </section>
 
       {/* <section className="border-y border-border bg-elinsa-dark px-6 py-16 text-white md:px-8">
