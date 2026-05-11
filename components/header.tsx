@@ -191,7 +191,7 @@ export function Header() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/denuncias" className="cursor-pointer w-full">
+                <Link href="/denunciar" className="cursor-pointer w-full">
                   <HugeiconsIcon icon={Alert01Icon} /> Canal de denúncias
                 </Link>
               </DropdownMenuItem>

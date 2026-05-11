@@ -134,6 +134,7 @@
   }
   html {
     @apply font-sans;
+    scrollbar-gutter: stable;
   }
   .maplibregl-popup-content {
     @apply bg-transparent! shadow-none! p-0! rounded-none!;
