@@ -16,7 +16,7 @@ const sitemapLinks = [
   { href: "/licencas", label: "Licenças" },
 ];
 
-const internalLinks = [{ href: "/admin", label: "Portal interno" }];
+const internalLinks = [{ href: "/payload", label: "Payload CMS" }];
 
 const socialLinks = [
   {

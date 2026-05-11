@@ -197,7 +197,7 @@ export function Header() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/admin" className="cursor-pointer w-full">
+                <Link href="/payload" className="cursor-pointer w-full">
                   <HugeiconsIcon icon={DashboardSquareEditIcon} />
                   Painel de controle
                 </Link>
