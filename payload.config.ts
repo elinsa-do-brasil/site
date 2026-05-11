@@ -1,4 +1,5 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { en } from "@payloadcms/translations/languages/en";
@@ -44,6 +45,12 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
+
+  email: resendAdapter({
+    defaultFromAddress: "payload@amperelinsa.com.br",
+    defaultFromName: "CMS - Elinsa",
+    apiKey: process.env.RESEND_API_KEY || "",
+  }),
 
   collections: [Users, Imprensa, Blog, Vagas, Galeria],
 
