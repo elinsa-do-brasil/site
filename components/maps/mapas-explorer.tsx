@@ -557,8 +557,8 @@ export function MapasExplorer() {
                 <span>Downloads</span>
                 <span className="font-normal text-muted-foreground text-xs leading-tight">
                   Dados geoespaciais para uso em SIG/GIS ou outras aplicações.
-
-                  Os dados são disponibilizados vetorializados e georreferenciados, segundo os arquivos públicos do IBGE.
+                  Os dados são disponibilizados vetorializados e
+                  georreferenciados, segundo os arquivos públicos do IBGE.
                 </span>
               </span>
             </SidebarGroupLabel>
@@ -575,13 +575,14 @@ export function MapasExplorer() {
                 <a
                   href={mapAsset("downloads/geopackages.7z")}
                   download="geopackages.7z"
-                ><VectorSquare /> GeoPackage</a>
+                >
+                  <VectorSquare /> GeoPackage
+                </a>
               </Button>
               <Button size={"lg"} asChild>
-                <a
-                  href={mapAsset("downloads/svgs.7z")}
-                  download="svgs.7z"
-                ><FileImage /> SVG</a>
+                <a href={mapAsset("downloads/svgs.7z")} download="svgs.7z">
+                  <FileImage /> SVG
+                </a>
               </Button>
             </SidebarGroupContent>
           </SidebarGroup>

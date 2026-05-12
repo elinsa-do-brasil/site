@@ -1,4 +1,6 @@
 export type AnonymousReportFormValues = {
+  identify: "yes" | "no";
+  reporterName?: string;
   category: string;
   title: string;
   description: string;
@@ -22,6 +24,7 @@ export type AnonymousReportContent = {
   previousAttempts: string | null;
   contactPreference: "no_contact" | "email" | "phone" | "whatsapp" | "other";
   contactInfo: string | null;
+  reporterName: string | null;
 };
 
 export type SubmitReportResult = {

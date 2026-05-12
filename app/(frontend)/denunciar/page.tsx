@@ -22,13 +22,11 @@ export default function DenunciarPage() {
         <div className="flex flex-col gap-8">
           {/* Heading */}
           <section className="space-y-3">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Canal de Denúncias
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Canal de denúncias
             </h1>
             <p className="text-base leading-relaxed text-muted-foreground">
               Use este formulário para enviar uma denúncia ao Comitê de Ética.
-              Não solicitamos nome, matrícula, CPF ou e-mail. Suas informações
-              sensíveis são criptografadas antes de serem armazenadas.
             </p>
           </section>
 

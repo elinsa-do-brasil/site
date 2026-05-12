@@ -27,15 +27,14 @@ export function ReportWritingHelp() {
         </div>
 
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Disponibilizamos um{" "}
-          <strong className="text-foreground">guia de instrução para IA</strong>{" "}
-          — um arquivo que você pode carregar em qualquer assistente de IA (como
-          ChatGPT, Claude ou Gemini) para que ele saiba exatamente como te
-          ajudar a redigir uma denúncia.
+          Disponibilizamos um <strong>guia de instrução para IA</strong> — um
+          arquivo que você pode carregar em qualquer assistente de IA (como
+          ChatGPT, Claude ou Gemini) para que ele saiba como te ajudar a redigir
+          uma denúncia.
         </p>
 
         {/* Como usar */}
-        <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2.5 text-sm">
+        <div className="rounded-md border border-border/60 bg-violet-100 dark:bg-violet-900/30 px-3 py-2.5 text-sm">
           <p className="mb-1.5 flex items-center gap-1.5 font-medium text-foreground">
             <HugeiconsIcon
               icon={InformationCircleIcon}

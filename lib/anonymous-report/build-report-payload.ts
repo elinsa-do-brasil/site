@@ -11,6 +11,8 @@ function nullableText(value: string | undefined): string | null {
 export function buildReportPayload(
   values: AnonymousReportFormValues,
 ): AnonymousReportContent {
+  const isIdentified = values.identify === "yes";
+
   return {
     category: values.category,
     title: values.title.trim(),
@@ -20,10 +22,8 @@ export function buildReportPayload(
     involvedPeople: nullableText(values.involvedPeople),
     witnesses: nullableText(values.witnesses),
     previousAttempts: nullableText(values.previousAttempts),
-    contactPreference: values.contactPreference,
-    contactInfo:
-      values.contactPreference !== "no_contact"
-        ? nullableText(values.contactInfo)
-        : null,
+    contactPreference: isIdentified ? "other" : "no_contact",
+    contactInfo: isIdentified ? nullableText(values.contactInfo) : null,
+    reporterName: isIdentified ? nullableText(values.reporterName) : null,
   };
 }

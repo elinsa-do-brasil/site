@@ -98,6 +98,14 @@ export default async function ReportDetailPage({
           </CardHeader>
           <CardContent>
             <dl className="space-y-3 text-sm">
+              <DetailItem
+                label="Identificação"
+                value={
+                  "reporterName" in payload && payload.reporterName
+                    ? `Identificado (${payload.reporterName})`
+                    : "Anônimo"
+                }
+              />
               <DetailItem label="Quando ocorreu" value={payload.occurredAt} />
               <DetailItem label="Onde ocorreu" value={payload.location} />
               <DetailItem

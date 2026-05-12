@@ -1,11 +1,7 @@
 "use client";
 
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  Alert02Icon,
-  Loading03Icon,
-  LockKeyIcon,
-} from "@hugeicons/core-free-icons";
+import { Alert02Icon, Loading03Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -57,6 +53,8 @@ export function AnonymousReportForm() {
   const form = useForm<AnonymousReportSchema>({
     resolver: standardSchemaResolver(anonymousReportSchema),
     defaultValues: {
+      identify: "no",
+      reporterName: "",
       category: "",
       title: "",
       description: "",
@@ -70,17 +68,22 @@ export function AnonymousReportForm() {
     },
   });
 
-  const contactPreference = form.watch("contactPreference");
+  const identify = form.watch("identify");
 
   async function onSubmit(values: AnonymousReportSchema) {
-    if (
-      values.contactPreference !== "no_contact" &&
-      !values.contactInfo?.trim()
-    ) {
-      form.setError("contactInfo", {
-        message: "Informe um meio de contato ou selecione a opção sem contato.",
-      });
-      return;
+    if (values.identify === "yes") {
+      if (!values.reporterName?.trim()) {
+        form.setError("reporterName", {
+          message: "Informe seu nome para se identificar.",
+        });
+        return;
+      }
+      if (!values.contactInfo?.trim()) {
+        form.setError("contactInfo", {
+          message: "Informe um meio de contato.",
+        });
+        return;
+      }
     }
 
     try {
@@ -116,6 +119,115 @@ export function AnonymousReportForm() {
       className="[&_[data-slot=field-label]]:text-sm [&_[data-slot=field-description]]:text-sm [&_[data-slot=field-error]]:text-sm [&_[data-slot=textarea]]:text-sm [&_[data-slot=input]]:text-sm [&_[data-slot=select-trigger]]:text-sm"
     >
       <FieldGroup className="gap-6">
+        {/* ── Identificação ── */}
+        <div
+          className={`p-5 rounded-xl border transition-all duration-300 ${
+            identify === "yes"
+              ? "bg-sky-50/90 border-sky-300 dark:bg-sky-950/30 dark:border-sky-600"
+              : "bg-emerald-50/90 border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-600"
+          }`}
+        >
+          <Controller
+            name="identify"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid || undefined}>
+                <FieldLabel className="text-base font-semibold mb-2 block">
+                  Deseja identificar-se?
+                </FieldLabel>
+                <FieldDescription>
+                  Se escolher não se identificar, seu relato será totalmente
+                  anônimo e seguro. Se escolher se identificar, apenas o Comitê
+                  de Ética terá acesso aos seus dados de contato.
+                </FieldDescription>
+                <RadioGroup
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  className="flex flex-col gap-3 mt-4 sm:flex-row sm:gap-6"
+                >
+                  <Field
+                    orientation="horizontal"
+                    className="flex items-center gap-2"
+                  >
+                    <RadioGroupItem value="no" id="identify-no" />
+                    <FieldLabel
+                      htmlFor="identify-no"
+                      className="font-normal cursor-pointer text-sm"
+                    >
+                      Não, prefiro fazer um relato anônimo
+                    </FieldLabel>
+                  </Field>
+
+                  <Field
+                    orientation="horizontal"
+                    className="flex items-center gap-2"
+                  >
+                    <RadioGroupItem value="yes" id="identify-yes" />
+                    <FieldLabel
+                      htmlFor="identify-yes"
+                      className="font-normal cursor-pointer text-sm"
+                    >
+                      Sim, desejo me identificar
+                    </FieldLabel>
+                  </Field>
+                </RadioGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          {/* ── Nome e Contato (Condicionais se identificado) ── */}
+          {identify === "yes" && (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-5 pt-5 border-t border-sky-300/60 dark:border-sky-500/30 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Controller
+                name="reporterName"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid || undefined}>
+                    <FieldLabel htmlFor="report-reporter-name">
+                      Nome *
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="report-reporter-name"
+                      placeholder="Seu nome completo"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="contactInfo"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid || undefined}>
+                    <FieldLabel htmlFor="report-contact-info">
+                      Contato *
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="report-contact-info"
+                      placeholder="E-mail, telefone ou WhatsApp"
+                      aria-invalid={fieldState.invalid}
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
+          )}
+        </div>
+
         {/* ── Categoria ── */}
         <Controller
           name="category"
@@ -179,10 +291,6 @@ export function AnonymousReportForm() {
                 autoComplete="off"
                 className="min-h-36 resize-y"
               />
-              <FieldDescription>
-                Evite informar seu nome, matrícula ou dados pessoais, a menos
-                que isso seja essencial para o relato.
-              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -300,98 +408,6 @@ export function AnonymousReportForm() {
           )}
         />
 
-        {/* ── Preferência de contato ── */}
-        <Controller
-          name="contactPreference"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid || undefined}>
-              <FieldLabel>Deseja ser contatado?</FieldLabel>
-              <RadioGroup value={field.value} onValueChange={field.onChange}>
-                <Field orientation="horizontal">
-                  <RadioGroupItem value="no_contact" id="report-no-contact" />
-                  <FieldLabel
-                    htmlFor="report-no-contact"
-                    className="font-normal"
-                  >
-                    Não, prefiro não informar contato
-                  </FieldLabel>
-                </Field>
-
-                <Field orientation="horizontal">
-                  <RadioGroupItem value="email" id="report-contact-email" />
-                  <FieldLabel
-                    htmlFor="report-contact-email"
-                    className="font-normal"
-                  >
-                    Sim, por e-mail
-                  </FieldLabel>
-                </Field>
-
-                <Field orientation="horizontal">
-                  <RadioGroupItem value="phone" id="report-contact-phone" />
-                  <FieldLabel
-                    htmlFor="report-contact-phone"
-                    className="font-normal"
-                  >
-                    Sim, por telefone
-                  </FieldLabel>
-                </Field>
-
-                <Field orientation="horizontal">
-                  <RadioGroupItem
-                    value="whatsapp"
-                    id="report-contact-whatsapp"
-                  />
-                  <FieldLabel
-                    htmlFor="report-contact-whatsapp"
-                    className="font-normal"
-                  >
-                    Sim, por WhatsApp
-                  </FieldLabel>
-                </Field>
-
-                <Field orientation="horizontal">
-                  <RadioGroupItem value="other" id="report-contact-other" />
-                  <FieldLabel
-                    htmlFor="report-contact-other"
-                    className="font-normal"
-                  >
-                    Sim, por outro canal
-                  </FieldLabel>
-                </Field>
-              </RadioGroup>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        {/* ── Contato opcional (condicional) ── */}
-        {contactPreference !== "no_contact" && (
-          <Controller
-            name="contactInfo"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid || undefined}>
-                <FieldLabel htmlFor="report-contact-info">Contato *</FieldLabel>
-                <Input
-                  {...field}
-                  id="report-contact-info"
-                  placeholder="E-mail, telefone ou outra forma de contato"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="off"
-                />
-                <FieldDescription>
-                  Só o Comitê de Ética terá acesso a esta informação.
-                </FieldDescription>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-        )}
-
         {/* ── Erro genérico ── */}
         {status === "error" && (
           <div className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
@@ -424,14 +440,7 @@ export function AnonymousReportForm() {
               Enviando...
             </>
           ) : (
-            <>
-              <HugeiconsIcon
-                icon={LockKeyIcon}
-                className="size-4"
-                strokeWidth={2}
-              />
-              Enviar denúncia
-            </>
+            <>Enviar denúncia</>
           )}
         </Button>
       </FieldGroup>

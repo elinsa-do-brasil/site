@@ -13,7 +13,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  secret: process.env.BETTER_AUTH_SECRET || process.env.PAYLOAD_SECRET,
+  secret: process.env.BETTER_AUTH_SECRET,
   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS
     ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",").map((origin) =>
         origin.trim(),

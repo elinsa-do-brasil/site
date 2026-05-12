@@ -31,6 +31,7 @@ export const createReportSchema = z
       "other",
     ]),
     contactInfo: optionalNullableText(500),
+    reporterName: optionalNullableText(500),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -59,5 +60,6 @@ export function toEncryptedPayload(
     contactPreference: input.contactPreference,
     contactInfo:
       input.contactPreference === "no_contact" ? null : input.contactInfo,
+    reporterName: input.reporterName ?? null,
   };
 }

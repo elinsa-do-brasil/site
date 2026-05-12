@@ -1,5 +1,5 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { resendAdapter } from '@payloadcms/email-resend'
+import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { en } from "@payloadcms/translations/languages/en";

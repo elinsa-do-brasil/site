@@ -22,7 +22,8 @@ import { cn } from "@/lib/utils";
 
 const defaultStyles = {
   dark: "https://api.maptiler.com/maps/base-v4-dark/style.json?key=7VhWIxgYriUJMk5Om7Pj",
-  light: "https://api.maptiler.com/maps/base-v4/style.json?key=7VhWIxgYriUJMk5Om7Pj",
+  light:
+    "https://api.maptiler.com/maps/base-v4/style.json?key=7VhWIxgYriUJMk5Om7Pj",
 };
 
 type Theme = "light" | "dark";

@@ -20,6 +20,7 @@ export type ReportEncryptedPayload = {
   previousAttempts: string | null;
   contactPreference: "no_contact" | "email" | "phone" | "whatsapp" | "other";
   contactInfo: string | null;
+  reporterName?: string | null;
 };
 
 export function getReportsMasterKey(): Buffer {
