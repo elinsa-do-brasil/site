@@ -5,7 +5,13 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
-export function ReportSuccessMessage({ onReset }: { onReset: () => void }) {
+export function ReportSuccessMessage({
+  onReset,
+  protocol,
+}: {
+  onReset: () => void;
+  protocol: string | null;
+}) {
   return (
     <div className="flex flex-col items-center gap-6 py-12">
       <div className="flex size-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
@@ -22,9 +28,14 @@ export function ReportSuccessMessage({ onReset }: { onReset: () => void }) {
         </AlertTitle>
         <AlertDescription className="mt-2 space-y-2 text-emerald-700 dark:text-emerald-400/80">
           <p>
-            Sua denúncia foi criptografada e enviada ao Comitê de Ética com
-            sucesso. Nenhum dado identificável foi armazenado neste dispositivo.
+            Sua denúncia foi recebida e criptografada para análise do Comitê de
+            Ética. Nenhum dado identificável foi armazenado neste dispositivo.
           </p>
+          {protocol && (
+            <p className="font-mono text-sm font-semibold">
+              Protocolo: {protocol}
+            </p>
+          )}
           <p className="text-xs">
             Se você informou um contato, o Comitê poderá entrar em contato por
             esse canal. Caso contrário, a denúncia será tratada de forma

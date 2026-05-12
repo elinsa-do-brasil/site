@@ -28,7 +28,7 @@ export default function DenunciarPage() {
             <p className="text-base leading-relaxed text-muted-foreground">
               Use este formulário para enviar uma denúncia ao Comitê de Ética.
               Não solicitamos nome, matrícula, CPF ou e-mail. Suas informações
-              são protegidas antes do envio.
+              sensíveis são criptografadas antes de serem armazenadas.
             </p>
           </section>
 

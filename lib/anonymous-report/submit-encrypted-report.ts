@@ -1,22 +1,13 @@
-import type { AnonymousReportEncryptedEnvelope } from "./types";
+import type { AnonymousReportContent, SubmitReportResult } from "./types";
 
 export type SubmitEncryptedReportParams = {
-  webhookUrl: string;
-  encryptedPayload: string;
+  report: AnonymousReportContent;
 };
 
 export async function submitEncryptedReport({
-  webhookUrl,
-  encryptedPayload,
-}: SubmitEncryptedReportParams): Promise<void> {
-  const envelope: AnonymousReportEncryptedEnvelope = {
-    version: "1.0",
-    formVersion: "anonymous-report-v1",
-    sentAt: new Date().toISOString(),
-    encryptedPayload,
-  };
-
-  const response = await fetch(webhookUrl, {
+  report,
+}: SubmitEncryptedReportParams): Promise<SubmitReportResult> {
+  const response = await fetch("/api/reports", {
     method: "POST",
     credentials: "omit",
     cache: "no-store",
@@ -24,10 +15,18 @@ export async function submitEncryptedReport({
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(envelope),
+    body: JSON.stringify(report),
   });
 
   if (!response.ok) {
     throw new Error("REPORT_SUBMIT_FAILED");
   }
+
+  const result = (await response.json()) as Partial<SubmitReportResult>;
+
+  if (!result.protocol) {
+    throw new Error("REPORT_PROTOCOL_MISSING");
+  }
+
+  return { protocol: result.protocol };
 }

@@ -29,8 +29,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { buildReportPayload } from "@/lib/anonymous-report/build-report-payload";
-import { encryptReport } from "@/lib/anonymous-report/encrypt-report";
-import { ETHICS_COMMITTEE_PUBLIC_KEY } from "@/lib/anonymous-report/public-key";
 import {
   type AnonymousReportSchema,
   anonymousReportSchema,
@@ -50,12 +48,11 @@ const REPORT_CATEGORIES = [
   "Outro",
 ] as const;
 
-const webhookUrl = process.env.NEXT_PUBLIC_N8N_ANONYMOUS_REPORT_WEBHOOK_URL;
-
 export function AnonymousReportForm() {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+  const [protocol, setProtocol] = useState<string | null>(null);
 
   const form = useForm<AnonymousReportSchema>({
     resolver: standardSchemaResolver(anonymousReportSchema),
@@ -77,7 +74,7 @@ export function AnonymousReportForm() {
 
   async function onSubmit(values: AnonymousReportSchema) {
     if (
-      values.contactPreference === "anonymous_contact" &&
+      values.contactPreference !== "no_contact" &&
       !values.contactInfo?.trim()
     ) {
       form.setError("contactInfo", {
@@ -86,26 +83,14 @@ export function AnonymousReportForm() {
       return;
     }
 
-    if (!webhookUrl) {
-      setStatus("error");
-      return;
-    }
-
     try {
       setStatus("submitting");
 
       const payload = buildReportPayload(values);
-      const encryptedPayload = await encryptReport({
-        publicKeyArmored: ETHICS_COMMITTEE_PUBLIC_KEY,
-        payload,
-      });
-
-      await submitEncryptedReport({
-        webhookUrl,
-        encryptedPayload,
-      });
+      const result = await submitEncryptedReport({ report: payload });
 
       form.reset();
+      setProtocol(result.protocol);
       setStatus("success");
     } catch {
       setStatus("error");
@@ -113,7 +98,15 @@ export function AnonymousReportForm() {
   }
 
   if (status === "success") {
-    return <ReportSuccessMessage onReset={() => setStatus("idle")} />;
+    return (
+      <ReportSuccessMessage
+        protocol={protocol}
+        onReset={() => {
+          setProtocol(null);
+          setStatus("idle");
+        }}
+      />
+    );
   }
 
   return (
@@ -326,15 +319,45 @@ export function AnonymousReportForm() {
                 </Field>
 
                 <Field orientation="horizontal">
-                  <RadioGroupItem
-                    value="anonymous_contact"
-                    id="report-anonymous-contact"
-                  />
+                  <RadioGroupItem value="email" id="report-contact-email" />
                   <FieldLabel
-                    htmlFor="report-anonymous-contact"
+                    htmlFor="report-contact-email"
                     className="font-normal"
                   >
-                    Sim, quero informar um contato
+                    Sim, por e-mail
+                  </FieldLabel>
+                </Field>
+
+                <Field orientation="horizontal">
+                  <RadioGroupItem value="phone" id="report-contact-phone" />
+                  <FieldLabel
+                    htmlFor="report-contact-phone"
+                    className="font-normal"
+                  >
+                    Sim, por telefone
+                  </FieldLabel>
+                </Field>
+
+                <Field orientation="horizontal">
+                  <RadioGroupItem
+                    value="whatsapp"
+                    id="report-contact-whatsapp"
+                  />
+                  <FieldLabel
+                    htmlFor="report-contact-whatsapp"
+                    className="font-normal"
+                  >
+                    Sim, por WhatsApp
+                  </FieldLabel>
+                </Field>
+
+                <Field orientation="horizontal">
+                  <RadioGroupItem value="other" id="report-contact-other" />
+                  <FieldLabel
+                    htmlFor="report-contact-other"
+                    className="font-normal"
+                  >
+                    Sim, por outro canal
                   </FieldLabel>
                 </Field>
               </RadioGroup>
@@ -344,7 +367,7 @@ export function AnonymousReportForm() {
         />
 
         {/* ── Contato opcional (condicional) ── */}
-        {contactPreference === "anonymous_contact" && (
+        {contactPreference !== "no_contact" && (
           <Controller
             name="contactInfo"
             control={form.control}

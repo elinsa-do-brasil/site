@@ -23,20 +23,18 @@ export function ReportPrivacyNotice() {
           <li className="flex gap-2">
             <span className="mt-1 text-elinsa-sky">•</span>
             <span>
-              Não pedimos nome, matrícula, CPF ou e-mail institucional.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-1 text-elinsa-sky">•</span>
-            <span>
-              Suas informações são protegidas antes de sair do navegador.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-1 text-elinsa-sky">•</span>
-            <span>
               Evite incluir dados que possam identificar você, a menos que
               deseje ser contatado.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="mt-1 text-elinsa-sky">•</span>
+            <span>Não solicitamos seus dados para registrar sua denúncia.</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="mt-1 text-elinsa-sky">•</span>
+            <span>
+              O conteúdo sensível é criptografado antes de ser armazenado.
             </span>
           </li>
           <li className="flex gap-2">

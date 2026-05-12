@@ -39,7 +39,13 @@ export const anonymousReportSchema = z.object({
       "O campo de tentativas anteriores deve ter no máximo 2.000 caracteres.",
     )
     .optional(),
-  contactPreference: z.enum(["no_contact", "anonymous_contact"]),
+  contactPreference: z.enum([
+    "no_contact",
+    "email",
+    "phone",
+    "whatsapp",
+    "other",
+  ]),
   contactInfo: z
     .string()
     .trim()

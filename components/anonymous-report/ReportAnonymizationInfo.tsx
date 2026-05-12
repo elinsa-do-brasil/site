@@ -25,33 +25,16 @@ export function ReportAnonymizationInfo() {
           <li className="flex gap-2">
             <span className="mt-0.5 text-emerald-500">✓</span>
             <span>
-              Não registramos IP, navegador ou qualquer dado do dispositivo.
+              Não registramos IP, navegador, cookies ou dados do dispositivo de
+              quem envia a denúncia.
             </span>
           </li>
           <li className="flex gap-2">
             <span className="mt-0.5 text-emerald-500">✓</span>
             <span>
-              Suas informações são protegidas antes de deixar o navegador — nem
-              mesmo nossos servidores conseguem ler o conteúdo.
+              O conteúdo sensível é criptografado antes de ser armazenado, e a
+              listagem interna usa apenas protocolo, categoria, status e datas.
             </span>
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-0.5 text-emerald-500">✓</span>
-            <span>
-              A denúncia é enviada diretamente ao Comitê de Ética, sem passar
-              por sistemas internos.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-0.5 text-emerald-500">✓</span>
-            <span>
-              Não usamos cookies, rastreadores ou ferramentas de monitoramento
-              nesta página.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-0.5 text-emerald-500">✓</span>
-            <span>A página não aparece em buscadores e não é indexada.</span>
           </li>
         </ul>
       </CardContent>

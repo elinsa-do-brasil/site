@@ -1,5 +1,5 @@
 import type {
-  AnonymousReportEncryptedContent,
+  AnonymousReportContent,
   AnonymousReportFormValues,
 } from "./types";
 
@@ -10,7 +10,7 @@ function nullableText(value: string | undefined): string | null {
 
 export function buildReportPayload(
   values: AnonymousReportFormValues,
-): AnonymousReportEncryptedContent {
+): AnonymousReportContent {
   return {
     category: values.category,
     title: values.title.trim(),
@@ -22,9 +22,8 @@ export function buildReportPayload(
     previousAttempts: nullableText(values.previousAttempts),
     contactPreference: values.contactPreference,
     contactInfo:
-      values.contactPreference === "anonymous_contact"
+      values.contactPreference !== "no_contact"
         ? nullableText(values.contactInfo)
         : null,
-    createdAt: new Date().toISOString(),
   };
 }
