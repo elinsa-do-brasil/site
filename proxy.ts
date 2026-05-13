@@ -9,13 +9,18 @@ const SESSION_COOKIE_NAMES = [
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/comite")) {
+  const isProtectedPath =
+    pathname.startsWith("/interno") ||
+    pathname.startsWith("/comite") ||
+    pathname.startsWith("/ti");
+
+  if (isProtectedPath) {
     const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
       request.cookies.has(name),
     );
 
     if (!hasSessionCookie) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = new URL("/entrar", request.url);
       loginUrl.searchParams.set("redirectTo", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -25,5 +30,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/comite/:path*"],
+  matcher: ["/interno/:path*", "/comite/:path*", "/ti/:path*"],
 };
