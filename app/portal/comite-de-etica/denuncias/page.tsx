@@ -25,7 +25,7 @@ export default async function CommitteeReportsPage() {
   const reports = await listReportSummaries(50);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
+    <div className="mx-auto w-full max-w-6xl px-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Denúncias</h1>
@@ -83,7 +83,7 @@ export default async function CommitteeReportsPage() {
           </div>
         </CardContent>
       </Card>
-    </main>
+    </div>
   );
 }
 

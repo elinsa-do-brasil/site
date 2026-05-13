@@ -18,7 +18,7 @@ export default async function InternoDashboardPage() {
   const availableTools = getAvailableInternalTools(context);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-12">
+    <div className="mx-auto w-full max-w-5xl px-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Portal interno</h1>
@@ -76,6 +76,6 @@ export default async function InternoDashboardPage() {
           </Card>
         )}
       </div>
-    </main>
+    </div>
   );
 }

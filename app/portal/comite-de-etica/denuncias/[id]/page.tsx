@@ -56,7 +56,7 @@ export default async function ReportDetailPage({
   });
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
+    <div className="mx-auto w-full max-w-6xl px-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -156,7 +156,7 @@ export default async function ReportDetailPage({
           </CardContent>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -35,7 +35,7 @@ export default async function AdminConvitesPage() {
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12">
+    <div className="mx-auto w-full max-w-6xl px-4">
       <div className="mb-8 flex items-center justify-between border-b pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -51,6 +51,6 @@ export default async function AdminConvitesPage() {
       </div>
 
       <GerenciarConvites teams={teams} pendingInvitations={pendingInvites} />
-    </main>
+    </div>
   );
 }

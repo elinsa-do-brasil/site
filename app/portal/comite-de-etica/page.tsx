@@ -25,7 +25,7 @@ export default async function ComitePage() {
       (context.isCommitteeMember || context.isConsultant));
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
+    <div className="mx-auto w-full max-w-6xl px-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Comitê de Ética</h1>
@@ -93,7 +93,7 @@ export default async function ComitePage() {
           </CardContent>
         </Card>
       </section>
-    </main>
+    </div>
   );
 }
 

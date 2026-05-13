@@ -56,7 +56,7 @@ export default function InternoLayout({
           disableTransitionOnChange
         >
           <InternalHeader />
-          <main className="pt-20">{children}</main>
+          <main className="pt-24">{children}</main>
           <Toaster />
         </ThemeProvider>
       </body>

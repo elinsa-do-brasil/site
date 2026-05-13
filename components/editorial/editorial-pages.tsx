@@ -50,6 +50,7 @@ export async function EditorialIndex({
   subject?: EditorialSubjectValue | null;
 }) {
   const config = editorialConfigs[collection];
+  const isPortalCollection = collection === "blog";
   const allPosts = await getEditorialPosts(collection);
   const posts = subject
     ? allPosts.filter((post) => getPostSubjectValue(post) === subject)
@@ -57,8 +58,18 @@ export async function EditorialIndex({
   const subjectCounts = getSubjectCounts(allPosts);
 
   return (
-    <div className="min-h-screen bg-background pt-24 text-foreground">
-      <section className="mx-auto max-w-6xl px-6 py-8 md:px-8 md:py-10">
+    <div
+      className={cn(
+        "min-h-screen bg-background text-foreground",
+        !isPortalCollection && "pt-24",
+      )}
+    >
+      <section
+        className={cn(
+          "mx-auto max-w-6xl px-6 md:px-8",
+          !isPortalCollection && "py-8 md:py-10",
+        )}
+      >
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
           <div className="min-w-0">
             <div className="mb-5 md:mb-6">
@@ -106,6 +117,7 @@ export async function EditorialArticlePage({
   slug: string;
 }) {
   const config = editorialConfigs[collection];
+  const isPortalCollection = collection === "blog";
   const { isEnabled: isDraftMode } = await draftMode();
   const post = await getEditorialPost({
     collection,
@@ -123,14 +135,24 @@ export async function EditorialArticlePage({
   const updatedDate = formatEditorialDate(post.updatedAt);
 
   return (
-    <div className="min-h-screen bg-background pt-24 text-foreground">
+    <div
+      className={cn(
+        "min-h-screen bg-background text-foreground",
+        !isPortalCollection && "pt-24",
+      )}
+    >
       {isDraftMode && (
         <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
           Pré-visualização ativa
         </div>
       )}
 
-      <section className="mx-auto max-w-6xl px-6 py-6 md:px-8 md:py-8">
+      <section
+        className={cn(
+          "mx-auto max-w-6xl px-6 md:px-8",
+          !isPortalCollection && "py-6 md:py-8",
+        )}
+      >
         <Button
           asChild
           className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"

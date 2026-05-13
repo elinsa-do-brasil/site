@@ -13,7 +13,7 @@ export default async function CommitteeSettingsPage() {
   const context = await requireCommitteeAccess(userId);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
+    <div className="mx-auto w-full max-w-6xl px-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -65,7 +65,7 @@ export default async function CommitteeSettingsPage() {
           </dl>
         </CardContent>
       </Card>
-    </main>
+    </div>
   );
 }
 
