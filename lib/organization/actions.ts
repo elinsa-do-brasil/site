@@ -2,10 +2,10 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { requireOrgAdmin } from "@/lib/organization/access";
 import { db } from "@/lib/db";
 import { invitation, organization, team } from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
+import { requireOrgAdmin } from "@/lib/organization/access";
 
 export async function enviarConviteAdmin(formData: FormData) {
   const context = await requireOrgAdmin();
@@ -75,7 +75,9 @@ export async function enviarConviteAdmin(formData: FormData) {
     ``,
     `Você foi convidado(a) para acessar o Portal Interno da organização ${org.name}.`,
     `Nível de acesso concedido: ${role.toUpperCase()}`,
-    selectedTeamName ? `Time inicial alocado: ${selectedTeamName.replace("_", " ")}` : "",
+    selectedTeamName
+      ? `Time inicial alocado: ${selectedTeamName.replace("_", " ")}`
+      : "",
     mensagem ? `` : "",
     mensagem ? `Mensagem do administrador:` : "",
     mensagem ? `"${mensagem}"` : "",
@@ -95,7 +97,7 @@ export async function enviarConviteAdmin(formData: FormData) {
     idempotencyKey: `invite-admin/${inviteId}/${Date.now()}`,
   });
 
-  revalidatePath("/interno/admin/convites");
+  revalidatePath("/portal/gestao/convites");
   return { success: true };
 }
 
@@ -107,6 +109,6 @@ export async function cancelarConviteAdmin(invitationId: string) {
     .set({ status: "canceled" })
     .where(eq(invitation.id, invitationId));
 
-  revalidatePath("/interno/admin/convites");
+  revalidatePath("/portal/gestao/convites");
   return { success: true };
 }

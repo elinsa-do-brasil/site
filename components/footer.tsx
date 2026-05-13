@@ -11,12 +11,15 @@ const sitemapLinks = [
   { href: "/quem-somos", label: "Quem somos" },
   { href: "/vagas", label: "Vagas" },
   { href: "/mapas", label: "Mapas regionais" },
-  { href: "/blog", label: "Blog" },
+  { href: "/portal/blog", label: "Blog interno" },
   { href: "/imprensa", label: "Imprensa" },
   { href: "/licencas", label: "Licenças" },
 ];
 
-const internalLinks = [{ href: "/payload", label: "Payload CMS" }];
+const internalLinks = [
+  { href: "/portal", label: "Portal Interno" },
+  { href: "/payload", label: "Payload CMS" },
+];
 
 const socialLinks = [
   {

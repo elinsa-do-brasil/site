@@ -15,7 +15,11 @@ export async function GET(req: Request): Promise<Response> {
   const draft = await draftMode();
   draft.enable();
 
-  if (collection === "blog" || collection === "imprensa") {
+  if (collection === "blog") {
+    redirect(`/portal/blog/${slug}`);
+  }
+
+  if (collection === "imprensa") {
     redirect(`/${collection}/${slug}`);
   }
 

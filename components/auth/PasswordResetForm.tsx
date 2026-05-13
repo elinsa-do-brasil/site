@@ -25,7 +25,7 @@ export function RecuperarSenhaForm() {
 
     const result = await authClient.requestPasswordReset({
       email,
-      redirectTo: "/entrar",
+      redirectTo: "/redefinir-senha",
     });
 
     setIsSubmitting(false);

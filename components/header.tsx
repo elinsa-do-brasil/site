@@ -63,7 +63,7 @@ export function Header() {
           <div className="hidden md:block">
             <NavigationMenu>
               <NavigationMenuList className="gap-1">
-                <NavigationMenuItem className="">
+                <NavigationMenuItem>
                   <NavigationMenuTrigger className="bg-transparent">
                     Conteúdo
                   </NavigationMenuTrigger>
@@ -175,12 +175,12 @@ export function Header() {
               <DropdownMenuLabel>Ferramentas internas</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/ferramentas" className="cursor-pointer w-full">
-                  <HugeiconsIcon icon={Globe02Icon} /> Ferramentas
+                <Link href="/portal" className="cursor-pointer w-full">
+                  <HugeiconsIcon icon={Globe02Icon} /> Portal
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/blog" className="cursor-pointer w-full">
+                <Link href="/portal/blog" className="cursor-pointer w-full">
                   <HugeiconsIcon icon={News01Icon} /> Blog interno
                 </Link>
               </DropdownMenuItem>

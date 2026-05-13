@@ -15,7 +15,7 @@ export type EditorialConfig = {
   emptyDescription: string;
   emptyTitle: string;
   eyebrow: string;
-  href: `/${EditorialCollectionSlug}`;
+  href: string;
   navLabel: string;
   title: string;
 };
@@ -98,7 +98,7 @@ export const editorialConfigs: Record<
       "As próximas notícias internas cadastradas aparecerão aqui.",
     emptyTitle: "Nenhuma notícia interna publicada",
     eyebrow: "Comunicação interna",
-    href: "/blog",
+    href: "/portal/blog",
     navLabel: "Blog interno",
     title: "Blog",
   },

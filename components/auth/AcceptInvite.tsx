@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { authClient } from "@/lib/auth-client";
@@ -42,7 +42,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
     } else {
       setAccepted(true);
       setTimeout(() => {
-        router.push("/comite");
+        router.push("/portal");
       }, 2000);
     }
   }
@@ -63,9 +63,12 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
 
   return (
     <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
-      <h2 className="text-2xl font-bold tracking-tight">Convite Organizacional</h2>
+      <h2 className="text-2xl font-bold tracking-tight">
+        Convite Organizacional
+      </h2>
       <p className="mt-2 text-xs text-muted-foreground">
-        Você foi convidado(a) para integrar a organização institucional da Elinsa.
+        Você foi convidado(a) para integrar a organização institucional da
+        Elinsa.
       </p>
 
       <div className="my-6 space-y-3 text-left bg-muted/50 p-4 rounded-md text-xs text-muted-foreground">
@@ -73,7 +76,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
         <ul className="list-disc list-inside space-y-1">
           <li>É necessário ter verificado seu e-mail.</li>
           <li>A sessão atual deve corresponder ao e-mail convidado.</li>
-          <li>Após aceitar, os acessos acumulados dos times serão liberados.</li>
+          <li>Após aceitar, seus acessos internos serão liberados.</li>
         </ul>
       </div>
 

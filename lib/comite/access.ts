@@ -123,7 +123,7 @@ export async function canUpdateReport(input: {
 
 export function requireUserId(userId?: string) {
   if (!userId) {
-    redirect("/login?redirectTo=/comite");
+    redirect("/entrar?redirectTo=/portal/comite-de-etica");
   }
 
   return userId;

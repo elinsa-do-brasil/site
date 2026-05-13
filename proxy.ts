@@ -9,10 +9,7 @@ const SESSION_COOKIE_NAMES = [
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isProtectedPath =
-    pathname.startsWith("/interno") ||
-    pathname.startsWith("/comite") ||
-    pathname.startsWith("/ti");
+  const isProtectedPath = pathname.startsWith("/portal");
 
   if (isProtectedPath) {
     const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
@@ -30,5 +27,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/interno/:path*", "/comite/:path*", "/ti/:path*"],
+  matcher: ["/portal/:path*"],
 };

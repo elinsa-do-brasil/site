@@ -112,8 +112,10 @@ export async function getInternalAccessContext(
 export type InternalTool = {
   id: string;
   label: string;
+  description: string;
   href: string;
   requiredTeams: string[];
+  adminOnly?: boolean;
 };
 
 export function getAvailableInternalTools(context: InternalAccessContext) {
@@ -121,27 +123,55 @@ export function getAvailableInternalTools(context: InternalAccessContext) {
     {
       id: "comite",
       label: "Comitê de Ética",
-      href: "/comite",
+      description: "Triagem, acompanhamento e histórico do canal de denúncias.",
+      href: "/portal/comite-de-etica",
       requiredTeams: ["comite_etica"],
     },
     {
       id: "ti",
       label: "Ferramentas de TI",
-      href: "/ti",
+      description: "Atalhos e rotinas de apoio técnico disponíveis no portal.",
+      href: "/portal",
       requiredTeams: ["ti"],
+    },
+    {
+      id: "blog",
+      label: "Blog interno",
+      description: "Comunicados, eventos internos e novidades para as equipes.",
+      href: "/portal/blog",
+      requiredTeams: [],
+    },
+    {
+      id: "convites",
+      label: "Gestão de convites",
+      description: "Envie, acompanhe e cancele convites de acesso interno.",
+      href: "/portal/gestao/convites",
+      requiredTeams: [],
+      adminOnly: true,
     },
   ];
 
   const userTeamSet = new Set(context.teams);
-  return internalTools.filter((tool) =>
-    tool.requiredTeams.some((reqTeam) => userTeamSet.has(reqTeam)),
-  );
+  return internalTools.filter((tool) => {
+    if (tool.adminOnly) {
+      return context.isOrgAdmin;
+    }
+
+    if (tool.requiredTeams.length === 0) {
+      return true;
+    }
+
+    return (
+      context.isOrgAdmin ||
+      tool.requiredTeams.some((reqTeam) => userTeamSet.has(reqTeam))
+    );
+  });
 }
 
 export async function requireInternalAccess() {
   const context = await getInternalAccessContext();
   if (!context) {
-    redirect("/login");
+    redirect("/entrar");
   }
   return context;
 }

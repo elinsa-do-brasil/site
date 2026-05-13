@@ -42,7 +42,7 @@ export async function createReport(input: CreateReportInput) {
         await tx.insert(reportEvents).values({
           reportId: report.id,
           type: "report.created",
-          message: "Denuncia recebida pelo canal publico.",
+          message: "Denúncia recebida pelo canal público.",
         });
 
         return report;
