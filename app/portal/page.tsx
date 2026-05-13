@@ -14,10 +14,6 @@ import {
   requireInternalAccess,
 } from "@/lib/organization/access";
 
-export const metadata: Metadata = {
-  title: "Portal Interno - Elinsa",
-};
-
 export default async function InternoDashboardPage() {
   const context = await requireInternalAccess();
   const availableTools = getAvailableInternalTools(context);
@@ -26,7 +22,7 @@ export default async function InternoDashboardPage() {
     <main className="mx-auto w-full max-w-5xl px-4 py-12">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Portal Interno</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Portal interno</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Escolha uma ferramenta para continuar.
           </p>

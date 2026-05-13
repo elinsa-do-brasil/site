@@ -8,7 +8,7 @@ import { invitation, organization, team } from "@/lib/db/schema";
 import { getAllElinsaTeams, requireOrgAdmin } from "@/lib/organization/access";
 
 export const metadata: Metadata = {
-  title: "Gerenciar Convites - Portal Interno Elinsa",
+  title: "Gerenciar convites",
 };
 
 export default async function AdminConvitesPage() {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Verificação de E-mail - Portal Interno Elinsa",
+  title: "Verificar e-mail",
 };
 
 export default function VerificarEmailPage() {

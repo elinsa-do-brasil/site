@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { RecuperarSenhaForm } from "@/components/auth/PasswordResetForm";
 
 export const metadata: Metadata = {
-  title: "Recuperar Senha - Portal Interno Elinsa",
+  title: "Recuperar senha",
 };
 
 export default function RecuperarSenhaPage() {

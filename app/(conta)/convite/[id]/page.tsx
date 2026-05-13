@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AceitarConvite } from "@/components/auth/AcceptInvite";
 
 export const metadata: Metadata = {
-  title: "Aceitar Convite - Portal Interno Elinsa",
+  title: "Aceitar convite",
 };
 
 type ConvitePageProps = {

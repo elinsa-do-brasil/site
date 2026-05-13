@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CriarContaForm } from "@/components/auth/SignUpForm";
 
 export const metadata: Metadata = {
-  title: "Criar Conta - Portal Interno Elinsa",
+  title: "Criar conta",
 };
 
 export default function CriarContaPage() {

@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth";
 import { getInternalAccessContext } from "@/lib/organization/access";
 
 export const metadata: Metadata = {
-  title: "Entrar - Portal Interno Elinsa",
+  title: "Entrar",
 };
 
 type EntrarPageProps = {

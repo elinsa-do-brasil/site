@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { RedefinirSenhaForm } from "@/components/auth/RedefinirSenhaForm";
 
 export const metadata: Metadata = {
-  title: "Redefinir Senha - Portal Interno Elinsa",
+  title: "Redefinir senha",
 };
 
 export default function RedefinirSenhaPage() {

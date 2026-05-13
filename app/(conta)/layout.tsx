@@ -18,7 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portal Interno - Elinsa",
+  title: {
+    default: "Elinsa - Acesso interno",
+    template: "%s | Elinsa - Acesso interno",
+  },
   description: "Acesso interno às ferramentas da Elinsa",
   robots: {
     index: false,
