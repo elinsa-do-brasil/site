@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { BotaoSair } from "@/components/auth/LogoutButton";
 import { Button } from "@/components/ui/button";
