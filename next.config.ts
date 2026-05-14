@@ -26,6 +26,7 @@ const s3RemotePatterns = [
   createRemotePattern(process.env.AWS_ENDPOINT_URL_S3),
 ].filter((pattern) => pattern !== null);
 const s3Prefix = process.env.S3_PREFIX || "galeria";
+const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -54,6 +55,34 @@ const nextConfig: NextConfig = {
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
           { key: "Cache-Control", value: "no-store" },
         ],
+      },
+      {
+        source: "/portal/:path*",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/entrar",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/criar",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/convite/:path*",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/recuperar-senha",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/redefinir-senha",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/verificar-email",
+        headers: noIndexHeaders,
       },
     ];
   },

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../globals.css";
-import { Footer } from "@/components/footer";
-import { Header } from "@/components/header";
+import { FrontendShell } from "@/components/frontend-shell";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { cn } from "@/lib/utils";
 
@@ -41,16 +40,14 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body>
+      <body className="min-h-screen">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <FrontendShell>{children}</FrontendShell>
         </ThemeProvider>
       </body>
     </html>
