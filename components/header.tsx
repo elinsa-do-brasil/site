@@ -2,13 +2,9 @@
 
 import {
   AiUserIcon,
-  Alert01Icon,
   Building01Icon,
-  DashboardSquareEditIcon,
-  Globe02Icon,
   LayoutGridIcon,
   Megaphone01Icon,
-  News01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
@@ -16,14 +12,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -115,39 +104,6 @@ export function Header() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent">
-                    Social
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-4 w-64 grid-cols-1 p-4">
-                      <div>
-                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
-                          Social
-                        </h4>
-                        <ul className="flex flex-col gap-2">
-                          <DropdownItem
-                            href="https://www.instagram.com/elinsadobrasil/"
-                            icon={FaInstagram}
-                            title="Instagram"
-                            description="Acompanhe as novidades"
-                            isExternal
-                            isReactIcon
-                          />
-                          <DropdownItem
-                            href="https://www.linkedin.com/in/elinsadobrasil/"
-                            icon={FaLinkedin}
-                            title="LinkedIn"
-                            description="Conecte-se conosco"
-                            isExternal
-                            isReactIcon
-                          />
-                        </ul>
-                      </div>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
                   <NavigationMenuLink
                     href="/contato"
                     className={cn(
@@ -163,41 +119,41 @@ export function Header() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div>
+            <Button variant={"ghost"} size={"icon"}>
+              <a
+                href="https://www.instagram.com/elinsadobrasil/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaInstagram />
+              </a>
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            <Button variant={"ghost"} size={"icon"}>
+              <a
+                href="https://www.linkedin.com/in/elinsadobrasil/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaLinkedin />
+              </a>
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </div>
+
           <ThemeToggle />
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button className="hidden h-9 rounded-md px-4 font-medium sm:inline-flex">
-                Portal Interno
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Ferramentas internas</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/portal" className="cursor-pointer w-full">
-                  <HugeiconsIcon icon={Globe02Icon} /> Portal
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/portal/blog" className="cursor-pointer w-full">
-                  <HugeiconsIcon icon={News01Icon} /> Blog interno
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/denunciar" className="cursor-pointer w-full">
-                  <HugeiconsIcon icon={Alert01Icon} /> Canal de denúncias
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/payload" className="cursor-pointer w-full">
-                  <HugeiconsIcon icon={DashboardSquareEditIcon} />
-                  Painel de controle
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+          <Button asChild>
+            <Link
+              href="/entrar"
+              className="hidden h-9 px-4 font-medium sm:inline-flex"
+            >
+              Entrar
+            </Link>
+          </Button>
         </div>
       </header>
     </div>
