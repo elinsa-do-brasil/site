@@ -27,9 +27,13 @@ export function FrontendShell({ children }: { children: ReactNode }) {
 
   if (pathname === "/portal" || pathname.startsWith("/portal/")) {
     return (
-      <div className="min-h-screen bg-muted/30">
-        <InternalHeader />
-        <main className="pt-24">{children}</main>
+      <div className="min-h-screen bg-muted/30" data-frontend-shell="portal">
+        <div data-frontend-shell-header>
+          <InternalHeader />
+        </div>
+        <main className="pt-24" data-frontend-shell-main>
+          {children}
+        </main>
         <Toaster />
       </div>
     );
@@ -46,9 +50,13 @@ export function FrontendShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
+      <div data-frontend-shell-header>
+        <Header />
+      </div>
+      <main data-frontend-shell-main>{children}</main>
+      <div data-frontend-shell-footer>
+        <Footer />
+      </div>
       <Toaster />
     </>
   );

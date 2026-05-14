@@ -1,16 +1,11 @@
-// importações de dependências:
 import type { Metadata } from "next";
-
-// importações de fontes:
-import { Geist, Geist_Mono } from "next/font/google";
-
-// importações de estilos:
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-
-import { MoveRightIcon } from "lucide-react";
+import { NotFoundView } from "@/components/not-found-view";
 import { Toaster } from "@/components/ui/sonner";
-// importações de componentes:
 import { ThemeProvider } from "@/components/ui/theme-provider";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,39 +18,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "404 · Ampere",
+  title: "404 | Elinsa",
   description: "A página que você está procurando não foi encontrada.",
 };
 
-export default function Page() {
+export default function GlobalNotFound() {
   return (
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className="no-scrollbar select-none"
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} overflow-x-hidden font-sans antialiased`}
     >
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
-      >
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <main className="flex min-h-dvh min-w-dvw items-center justify-center gap-4">
-            <h1 className="text-5xl font-mono border-r border-black dark:border-white pr-4">
-              404
-            </h1>
-            <div>
-              <p>Hum... Não temos esta página.</p>
-              {/* Utiliza a tag <a> para forçar o recarregamento da página e garantir a troca correta de layout ao sair da página 404. */}
-              <a href="/" className="underline flex items-center gap-2">
-                <p>Voltar à página inicial</p>
-                <MoveRightIcon size={18} />
-              </a>
-            </div>
-          </main>
+          <NotFoundView />
           <Toaster visibleToasts={1} />
         </ThemeProvider>
       </body>
