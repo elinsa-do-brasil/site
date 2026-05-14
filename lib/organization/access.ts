@@ -3,7 +3,14 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { member, organization, team, teamMember } from "@/lib/db/schema";
+import {
+  member,
+  organization,
+  portalTool,
+  team,
+  teamMember,
+} from "@/lib/db/schema";
+import { TEAM_LEADER_ROLE } from "@/lib/organization/constants";
 
 export const ELINSA_ORGANIZATION_SLUG = "elinsa";
 
@@ -51,11 +58,6 @@ export async function getUserTeamsInElinsa(userId: string) {
     );
 }
 
-export async function userHasTeam(userId: string, teamSlug: string) {
-  const teams = await getUserTeamsInElinsa(userId);
-  return teams.some((item) => item.name === teamSlug);
-}
-
 export async function getAllElinsaTeams() {
   return db
     .select({
@@ -72,8 +74,10 @@ export type InternalAccessContext = {
   organizationId: string;
   organizationSlug: "elinsa";
   role: string | string[];
+  roles: string[];
   teams: string[];
   isOrgAdmin: boolean;
+  isTeamLeader: boolean;
 };
 
 export async function getInternalAccessContext(
@@ -104,8 +108,10 @@ export async function getInternalAccessContext(
     organizationId: membership.organizationId,
     organizationSlug: "elinsa",
     role: membership.role,
+    roles,
     teams: teamNames,
     isOrgAdmin,
+    isTeamLeader: roles.includes(TEAM_LEADER_ROLE),
   };
 }
 
@@ -114,58 +120,84 @@ export type InternalTool = {
   label: string;
   description: string;
   href: string;
-  requiredTeams: string[];
-  adminOnly?: boolean;
+  teamName?: string;
 };
 
-export function getAvailableInternalTools(context: InternalAccessContext) {
-  const internalTools: InternalTool[] = [
-    {
-      id: "comite",
-      label: "Comitê de Ética",
-      description: "Triagem, acompanhamento e histórico do canal de denúncias.",
-      href: "/portal/comite-de-etica",
-      requiredTeams: ["comite_etica"],
-    },
-    {
-      id: "ti",
-      label: "Ferramentas de TI",
-      description: "Atalhos e rotinas de apoio técnico disponíveis no portal.",
-      href: "/portal",
-      requiredTeams: ["ti"],
-    },
-    {
-      id: "blog",
-      label: "Blog interno",
-      description: "Comunicados, eventos internos e novidades para as equipes.",
-      href: "/portal/blog",
-      requiredTeams: [],
-    },
-    {
-      id: "convites",
-      label: "Gestão de convites",
-      description: "Envie, acompanhe e cancele convites de acesso interno.",
-      href: "/portal/gestao/convites",
-      requiredTeams: [],
-      adminOnly: true,
-    },
-  ];
-
+export async function getAvailableInternalTools(
+  context: InternalAccessContext,
+) {
   const userTeamSet = new Set(context.teams);
-  return internalTools.filter((tool) => {
-    if (tool.adminOnly) {
-      return context.isOrgAdmin;
+  const configuredTools = await listConfiguredPortalTools();
+
+  return configuredTools
+    .filter((tool) => context.isOrgAdmin || userTeamSet.has(tool.teamName))
+    .map<InternalTool>((tool) => ({
+      id: tool.id,
+      label: tool.label,
+      description: tool.description,
+      href: tool.href,
+      teamName: tool.teamName,
+    }));
+}
+
+async function listConfiguredPortalTools() {
+  try {
+    return await db
+      .select({
+        id: portalTool.id,
+        label: portalTool.label,
+        description: portalTool.description,
+        href: portalTool.href,
+        teamName: team.name,
+      })
+      .from(portalTool)
+      .innerJoin(team, eq(portalTool.teamId, team.id))
+      .innerJoin(organization, eq(portalTool.organizationId, organization.id))
+      .where(
+        and(
+          eq(organization.slug, ELINSA_ORGANIZATION_SLUG),
+          eq(portalTool.isActive, true),
+        ),
+      );
+  } catch (error) {
+    if (isMissingRelationError(error)) {
+      return [];
     }
 
-    if (tool.requiredTeams.length === 0) {
-      return true;
-    }
+    throw error;
+  }
+}
 
-    return (
-      context.isOrgAdmin ||
-      tool.requiredTeams.some((reqTeam) => userTeamSet.has(reqTeam))
-    );
-  });
+function isMissingRelationError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+
+  const cause = "cause" in error ? error.cause : undefined;
+  if (
+    cause &&
+    typeof cause === "object" &&
+    "code" in cause &&
+    cause.code === "42P01"
+  ) {
+    return true;
+  }
+
+  return error.message.includes('relation "portal_tool" does not exist');
+}
+
+export function canManageTeam(
+  context: InternalAccessContext,
+  teamName: string,
+) {
+  return (
+    context.isOrgAdmin ||
+    (context.isTeamLeader && context.teams.includes(teamName))
+  );
+}
+
+export function canManageAnyTeam(context: InternalAccessContext) {
+  return (
+    context.isOrgAdmin || (context.isTeamLeader && context.teams.length > 0)
+  );
 }
 
 export async function requireInternalAccess() {
@@ -187,6 +219,14 @@ export async function requireTeam(teamSlug: string) {
 export async function requireOrgAdmin() {
   const context = await requireInternalAccess();
   if (!context.isOrgAdmin) {
+    notFound();
+  }
+  return context;
+}
+
+export async function requireOrgAdminOrTeamLeader() {
+  const context = await requireInternalAccess();
+  if (!canManageAnyTeam(context)) {
     notFound();
   }
   return context;

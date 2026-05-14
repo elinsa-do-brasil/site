@@ -230,6 +230,58 @@ export const organizationRole = pgTable(
   ],
 );
 
+export const teamPermission = pgTable(
+  "team_permission",
+  {
+    id: text("id").primaryKey(),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => team.id, { onDelete: "cascade" }),
+    permission: text("permission").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("team_permission_team_id_idx").on(table.teamId),
+    uniqueIndex("team_permission_team_permission_idx").on(
+      table.teamId,
+      table.permission,
+    ),
+  ],
+);
+
+export const portalTool = pgTable(
+  "portal_tool",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    teamId: text("team_id")
+      .notNull()
+      .references(() => team.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    label: text("label").notNull(),
+    description: text("description").notNull(),
+    href: text("href").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("portal_tool_organization_id_idx").on(table.organizationId),
+    index("portal_tool_team_id_idx").on(table.teamId),
+    uniqueIndex("portal_tool_team_slug_idx").on(table.teamId, table.slug),
+  ],
+);
+
 export type AuthUser = typeof user.$inferSelect;
 export type AuthMember = typeof member.$inferSelect;
 export type AuthTeam = typeof team.$inferSelect;
+export type TeamPermission = typeof teamPermission.$inferSelect;
+export type PortalTool = typeof portalTool.$inferSelect;
