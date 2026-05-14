@@ -86,10 +86,10 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
     <Card className="min-w-[24rem] max-w-108">
       <CardHeader className="px-6">
         <CardTitle className="mt-6 mb-3">
-          <Logo />
+          <Logo className="mx-auto" />
         </CardTitle>
-        <CardDescription>
-          Faça login para acessar as ferramentas internas da Elinsa
+        <CardDescription className="text-center">
+          Faça login para acessar nossas ferramentas internas.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 px-6">

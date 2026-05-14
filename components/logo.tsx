@@ -8,7 +8,7 @@ export function Logo({ className }: { className?: string }) {
       <img
         src="/svg/logo.svg"
         alt="Elinsa"
-        className={cn("h-18 w-auto mx-auto", className)}
+        className={cn("h-18 w-auto", className)}
       />
     </Link>
   );

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { LoginForm } from "@/components/auth/InternalLoginForm";
+import { LoginForm } from "@/components/auth/login-form";
 import { auth } from "@/lib/auth";
 import { getInternalAccessContext } from "@/lib/organization/access";
 
