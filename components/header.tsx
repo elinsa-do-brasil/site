@@ -7,7 +7,6 @@ import {
   Megaphone01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
@@ -23,7 +22,6 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import LogoIcon from "@/public/images/logo-icon.webp";
 import { ThemeToggle } from "./ui/theme-toggle";
 
 export function Header() {
@@ -42,7 +40,8 @@ export function Header() {
             className="flex items-center gap-2 text-foreground transition-opacity hover:opacity-80"
           >
             <div className="flex size-7 items-center justify-center rounded-lg bg-muted">
-              <Image src={LogoIcon} alt="Logo" width={18} height={18} />
+              {/** biome-ignore lint/performance/noImgElement: <usado para renderizar o svg do logo diretamente> */}
+              <img src="/svg/e.svg" alt="Logo" width={18} height={18} />
             </div>
             <span className="font-semibold text-foreground tracking-tight hover:text-elinsa-dark">
               Elinsa do Brasil
