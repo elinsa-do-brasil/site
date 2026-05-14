@@ -18,8 +18,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Elinsa",
-  description: "Site Institucional e Blog da Elinsa",
+  title: "Elinsa do Brasil",
+  description: "Site Institucional da Elinsa do Brasil",
+   icons: {
+    icon: [
+      {
+        url: '/favicon/e.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        url: '/favicon/e.png',
+        type: 'image/png',
+        sizes: '32x32',
+      },
+      {
+        url: '/favicon/e.ico',
+      },
+    ],
+    shortcut: '/favicon/e.ico',
+    apple: '/favicon/e.png',
+  },
 };
 
 export default function RootLayout({
