@@ -23,8 +23,15 @@ export function AccountLogged() {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src={session.user.image || undefined} />
+          <AvatarFallback>
+            {session.user.name
+              ? session.user.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+              : "E"}
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
 
