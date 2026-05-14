@@ -176,7 +176,7 @@ const baseImpactMetrics: ImpactMetric[] = [
   },
   {
     id: "equipes",
-    value: "+2.500",
+    value: "+2.000",
     label: "colaboradores",
     description: "estimados em operação",
   },
@@ -510,14 +510,15 @@ export default async function Home() {
                 className="relative overflow-hidden rounded-2xl border border-border/60 bg-muted/30 px-5 py-5 transition-colors hover:border-elinsa-primary/40 hover:bg-elinsa-light/45 dark:hover:bg-elinsa-primary/10"
               >
                 <div className="absolute right-4 top-4 size-14 rounded-full bg-elinsa-primary/8" />
-                <p className="text-xs font-bold uppercase tracking-normal text-muted-foreground">
-                  {metric.label}
-                </p>
-                <div className="mt-2 flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-black leading-none text-elinsa-primary md:text-5xl">
                     {metric.value}
                   </span>
                 </div>
+                <p className="mt-2 text-xs font-bold uppercase tracking-normal text-muted-foreground">
+                  {metric.label}
+                </p>
+                
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                   {metric.description}
                 </p>
