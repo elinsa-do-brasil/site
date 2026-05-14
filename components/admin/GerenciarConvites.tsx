@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { cancelarConviteAdmin, enviarConviteAdmin } from "@/lib/organization/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +25,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  cancelarConviteAdmin,
+  enviarConviteAdmin,
+} from "@/lib/organization/actions";
+import { formatOrganizationRole } from "@/lib/organization/constants";
 
 type TeamOption = {
   id: string;
@@ -88,7 +92,7 @@ export function GerenciarConvites({
         <CardHeader>
           <CardTitle>Novo Convite</CardTitle>
           <CardDescription>
-            Conceder acesso restrito ao portal e alocar times
+            Conceder acesso restrito ao portal e alocar equipes
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -101,7 +105,9 @@ export function GerenciarConvites({
           <form onSubmit={onSubmit}>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="invite-email">E-mail do destinatário</FieldLabel>
+                <FieldLabel htmlFor="invite-email">
+                  E-mail do destinatário
+                </FieldLabel>
                 <Input
                   id="invite-email"
                   name="email"
@@ -112,27 +118,37 @@ export function GerenciarConvites({
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="invite-role">Nível de Permissão</FieldLabel>
+                <FieldLabel htmlFor="invite-role">Função</FieldLabel>
                 <Select name="role" defaultValue="member">
                   <SelectTrigger id="invite-role" className="w-full">
                     <SelectValue placeholder="Selecione a função" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="member">Membro (Padrão)</SelectItem>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="owner">Proprietário</SelectItem>
+                    <SelectItem value="member">
+                      {formatOrganizationRole("member")}
+                    </SelectItem>
+                    <SelectItem value="admin">
+                      {formatOrganizationRole("admin")}
+                    </SelectItem>
+                    <SelectItem value="owner">
+                      {formatOrganizationRole("owner")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="invite-team">Time Inicial (Opcional)</FieldLabel>
+                <FieldLabel htmlFor="invite-team">
+                  Equipe inicial (opcional)
+                </FieldLabel>
                 <Select name="teamId" defaultValue="none">
                   <SelectTrigger id="invite-team" className="w-full">
-                    <SelectValue placeholder="Nenhum time específico" />
+                    <SelectValue placeholder="Nenhuma equipe específica" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Nenhum time específico</SelectItem>
+                    <SelectItem value="none">
+                      Nenhuma equipe específica
+                    </SelectItem>
 
                     {teams.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
@@ -144,7 +160,9 @@ export function GerenciarConvites({
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="invite-msg">Mensagem (Opcional)</FieldLabel>
+                <FieldLabel htmlFor="invite-msg">
+                  Mensagem (Opcional)
+                </FieldLabel>
                 <Textarea
                   id="invite-msg"
                   name="mensagem"
@@ -155,7 +173,11 @@ export function GerenciarConvites({
 
               {error && <FieldError>{error}</FieldError>}
 
-              <Button type="submit" className="w-full mt-2" disabled={isPending}>
+              <Button
+                type="submit"
+                className="w-full mt-2"
+                disabled={isPending}
+              >
                 {isPending ? "Processando..." : "Enviar Convite"}
               </Button>
             </FieldGroup>
@@ -178,7 +200,7 @@ export function GerenciarConvites({
                   <tr>
                     <th className="py-2 pr-2 font-medium">E-mail</th>
                     <th className="py-2 pr-2 font-medium">Função</th>
-                    <th className="py-2 pr-2 font-medium">Time</th>
+                    <th className="py-2 pr-2 font-medium">Equipe</th>
                     <th className="py-2 pr-2 font-medium">Expira em</th>
                     <th className="py-2 text-right font-medium">Ações</th>
                   </tr>
@@ -194,8 +216,12 @@ export function GerenciarConvites({
                           {inv.email}
                         </td>
                         <td className="py-3 pr-2 capitalize">
-                          <Badge variant={inv.role === "admin" ? "default" : "outline"}>
-                            {inv.role}
+                          <Badge
+                            variant={
+                              inv.role === "admin" ? "default" : "outline"
+                            }
+                          >
+                            {formatOrganizationRole(inv.role)}
                           </Badge>
                         </td>
                         <td className="py-3 pr-2 capitalize text-muted-foreground">
@@ -203,7 +229,11 @@ export function GerenciarConvites({
                         </td>
                         <td className="py-3 pr-2">
                           {inv.expiresAt ? (
-                            <span className={isExpired ? "text-destructive font-medium" : ""}>
+                            <span
+                              className={
+                                isExpired ? "text-destructive font-medium" : ""
+                              }
+                            >
                               {new Intl.DateTimeFormat("pt-BR", {
                                 dateStyle: "short",
                               }).format(new Date(inv.expiresAt))}

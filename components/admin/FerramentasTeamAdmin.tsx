@@ -91,7 +91,7 @@ export function FerramentasTeamAdmin({ teams }: FerramentasTeamAdminProps) {
             <CardTitle>{team.name}</CardTitle>
             <CardDescription>
               Ferramentas adicionadas aqui aparecem nos cards do portal para
-              membros deste time.
+              membros desta equipe.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
@@ -263,7 +263,7 @@ export function FerramentasTeamAdmin({ teams }: FerramentasTeamAdminProps) {
 
               {team.tools.length === 0 && (
                 <div className="rounded-md border border-dashed py-10 text-center text-sm text-muted-foreground">
-                  Nenhuma ferramenta configurada para este time.
+                  Nenhuma ferramenta configurada para esta equipe.
                 </div>
               )}
             </div>
@@ -274,7 +274,7 @@ export function FerramentasTeamAdmin({ teams }: FerramentasTeamAdminProps) {
       {teams.length === 0 && (
         <Card>
           <CardContent className="py-10 text-center text-muted-foreground">
-            Nenhum time disponível para administração de ferramentas.
+            Nenhuma equipe disponível para administração de ferramentas.
           </CardContent>
         </Card>
       )}

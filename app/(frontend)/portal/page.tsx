@@ -64,7 +64,7 @@ export default async function InternoDashboardPage() {
                 Ferramentas internas
               </h2>
               <p className="text-xs text-muted-foreground">
-                Atalhos disponíveis para seus times e funções.
+                Atalhos disponíveis para suas equipes e funções.
               </p>
             </div>
             <Badge variant="outline">{availableTools.length} ativa(s)</Badge>
@@ -118,7 +118,7 @@ function ToolCard({ tool }: { tool: InternalTool }) {
       </CardHeader>
       <CardContent className="mt-auto flex items-center justify-between gap-3 border-t py-3">
         <span className="truncate text-xs text-muted-foreground">
-          {tool.teamName ? `Time ${tool.teamName}` : "Portal interno"}
+          {tool.teamName ? `Equipe ${tool.teamName}` : "Portal interno"}
         </span>
         <Button size="sm" asChild>
           <Link href={tool.href}>
@@ -339,9 +339,9 @@ function getAdminLinks(context: {
   if (context.isOrgAdmin || context.isTeamLeader) {
     links.push(
       {
-        href: "/portal/gestao/times",
+        href: "/portal/gestao/equipes",
         icon: <UsersRound className="size-3.5" />,
-        label: "Dos times",
+        label: "Das equipes",
       },
       {
         href: "/portal/gestao/ferramentas",

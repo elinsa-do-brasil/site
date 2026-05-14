@@ -11,7 +11,6 @@ import {
   portalTool,
   team,
   teamMember,
-  teamPermission,
   user,
 } from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
@@ -26,10 +25,10 @@ import {
 } from "@/lib/organization/access";
 import {
   BUILTIN_ORG_ROLES,
+  formatOrganizationRole,
   INVITATION_STATUS_OPTIONS,
   type InvitationStatus,
   TEAM_LEADER_ROLE,
-  TEAM_PERMISSION_OPTIONS,
 } from "@/lib/organization/constants";
 
 type ActionResult = {
@@ -39,12 +38,16 @@ type ActionResult = {
 
 const DEFAULT_INVITATION_DAYS = 7;
 
-function revalidateAdminPortal() {
+function revalidateAdminPortal(teamName?: string) {
   revalidatePath("/portal");
   revalidatePath("/portal/gestao/convites");
   revalidatePath("/portal/gestao/organizacao");
-  revalidatePath("/portal/gestao/times");
+  revalidatePath("/portal/gestao/equipes");
   revalidatePath("/portal/gestao/ferramentas");
+
+  if (teamName) {
+    revalidatePath(`/portal/gestao/equipes/${teamName}`);
+  }
 }
 
 function normalizeSlug(value: string) {
@@ -157,11 +160,11 @@ export async function enviarConviteAdmin(
     : undefined;
 
   if (teamId && !selectedTeam) {
-    return { error: "Você não pode convidar membros para este time." };
+    return { error: "Você não pode convidar membros para esta equipe." };
   }
 
   if (!context.isOrgAdmin && !selectedTeam) {
-    return { error: "Líderes precisam selecionar um de seus times." };
+    return { error: "Líderes precisam selecionar uma de suas equipes." };
   }
 
   const role = context.isOrgAdmin ? requestedRole : "member";
@@ -202,9 +205,9 @@ export async function enviarConviteAdmin(
     "Olá,",
     "",
     `Você foi convidado(a) para acessar o Portal Interno da organização ${org.name}.`,
-    `Nível de acesso concedido: ${role.toUpperCase()}`,
+    `Função concedida: ${formatOrganizationRole(role)}`,
     selectedTeam
-      ? `Time inicial alocado: ${selectedTeam.name.replace("_", " ")}`
+      ? `Equipe inicial alocada: ${selectedTeam.name.replace("_", " ")}`
       : "",
     mensagem ? "" : "",
     mensagem ? "Mensagem do administrador:" : "",
@@ -225,7 +228,7 @@ export async function enviarConviteAdmin(
     idempotencyKey: `invite-admin/${inviteId}/${Date.now()}`,
   });
 
-  revalidateAdminPortal();
+  revalidateAdminPortal(selectedTeam?.name);
   return { success: true };
 }
 
@@ -265,7 +268,11 @@ export async function cancelarConviteAdmin(
     .set({ status: "canceled" })
     .where(eq(invitation.id, invitationId));
 
-  revalidateAdminPortal();
+  const selectedTeam = teams.find(
+    (team) => team.id === existingInvitation.teamId,
+  );
+
+  revalidateAdminPortal(selectedTeam?.name);
   return { success: true };
 }
 
@@ -325,11 +332,11 @@ export async function adicionarMembroExistente(
     : undefined;
 
   if (teamId && !selectedTeam) {
-    return { error: "Você não pode vincular usuários a este time." };
+    return { error: "Você não pode vincular usuários a esta equipe." };
   }
 
   if (!context.isOrgAdmin && !selectedTeam) {
-    return { error: "Líderes precisam selecionar um de seus times." };
+    return { error: "Líderes precisam selecionar uma de suas equipes." };
   }
 
   const role = context.isOrgAdmin ? requestedRole : "member";
@@ -360,7 +367,7 @@ export async function adicionarMembroExistente(
       .onConflictDoNothing();
   }
 
-  revalidateAdminPortal();
+  revalidateAdminPortal(selectedTeam?.name);
   return { success: true };
 }
 
@@ -396,7 +403,9 @@ export async function atualizarFuncaoMembro(
       memberId: targetMember.id,
     }))
   ) {
-    return { error: "Não é possível remover o último owner da organização." };
+    return {
+      error: "Não é possível remover o último proprietário da organização.",
+    };
   }
 
   await db.update(member).set({ role }).where(eq(member.id, memberId));
@@ -429,7 +438,9 @@ export async function removerMembroDaOrganizacao(
       memberId: targetMember.id,
     }))
   ) {
-    return { error: "Não é possível remover o último owner da organização." };
+    return {
+      error: "Não é possível remover o último proprietário da organização.",
+    };
   }
 
   const orgTeams = await db
@@ -463,11 +474,11 @@ export async function salvarRoleOrganizacao(
   const permission = formData.get("permission")?.toString().trim() || "{}";
 
   if (!role) {
-    return { error: "Informe um identificador para a role." };
+    return { error: "Informe um identificador para a função." };
   }
 
   if (BUILTIN_ORG_ROLES.includes(role as (typeof BUILTIN_ORG_ROLES)[number])) {
-    return { error: "Roles padrão não precisam ser recriadas." };
+    return { error: "Funções padrão não precisam ser recriadas." };
   }
 
   const [existingRole] = await db
@@ -513,7 +524,7 @@ export async function excluirRoleOrganizacao(
     );
 
   if (!targetRole) {
-    return { error: "Role não encontrada." };
+    return { error: "Função não encontrada." };
   }
 
   if (
@@ -521,7 +532,7 @@ export async function excluirRoleOrganizacao(
       targetRole.role as (typeof BUILTIN_ORG_ROLES)[number],
     )
   ) {
-    return { error: "Roles padrão não podem ser excluídas." };
+    return { error: "Funções padrão não podem ser excluídas." };
   }
 
   const orgMembers = await db
@@ -533,7 +544,7 @@ export async function excluirRoleOrganizacao(
   );
 
   if (isAssigned) {
-    return { error: "A role ainda está atribuída a membros." };
+    return { error: "A função ainda está atribuída a membros." };
   }
 
   await db.delete(organizationRole).where(eq(organizationRole.id, roleId));
@@ -549,7 +560,7 @@ export async function criarTimeOrganizacao(
   const name = normalizeSlug(formData.get("name")?.toString() ?? "");
 
   if (!name) {
-    return { error: "Informe o nome do time." };
+    return { error: "Informe o nome da equipe." };
   }
 
   await db
@@ -565,6 +576,43 @@ export async function criarTimeOrganizacao(
   return { success: true };
 }
 
+export async function atualizarTimeOrganizacao(
+  formData: FormData,
+): Promise<ActionResult> {
+  const context = await requireOrgAdmin();
+  const teamId = formData.get("teamId")?.toString().trim();
+  const name = normalizeSlug(formData.get("name")?.toString() ?? "");
+
+  if (!teamId || !name) {
+    return { error: "Informe a equipe e o novo nome." };
+  }
+
+  const selectedTeam = await getElinsaTeam(teamId);
+  if (!selectedTeam || selectedTeam.organizationId !== context.organizationId) {
+    return { error: "Equipe não encontrada." };
+  }
+
+  const [existingTeam] = await db
+    .select({ id: team.id })
+    .from(team)
+    .where(
+      and(eq(team.organizationId, context.organizationId), eq(team.name, name)),
+    );
+
+  if (existingTeam && existingTeam.id !== teamId) {
+    return { error: "Já existe uma equipe com esse nome." };
+  }
+
+  await db
+    .update(team)
+    .set({ name, updatedAt: new Date() })
+    .where(eq(team.id, teamId));
+
+  revalidateAdminPortal(selectedTeam.name);
+  revalidatePath(`/portal/gestao/equipes/${name}`);
+  return { success: true };
+}
+
 export async function removerTimeOrganizacao(
   teamId: string,
 ): Promise<ActionResult> {
@@ -572,17 +620,17 @@ export async function removerTimeOrganizacao(
   const selectedTeam = await getElinsaTeam(teamId);
 
   if (!selectedTeam || selectedTeam.organizationId !== context.organizationId) {
-    return { error: "Time não encontrado." };
+    return { error: "Equipe não encontrada." };
   }
 
   const teams = await getAllElinsaTeams();
   if (teams.length <= 1) {
-    return { error: "A organização precisa manter pelo menos um time." };
+    return { error: "A organização precisa manter pelo menos uma equipe." };
   }
 
   await db.delete(team).where(eq(team.id, teamId));
 
-  revalidateAdminPortal();
+  revalidateAdminPortal(selectedTeam.name);
   return { success: true };
 }
 
@@ -593,12 +641,12 @@ export async function adicionarMembroAoTime(
   const userId = formData.get("userId")?.toString().trim();
 
   if (!teamId || !userId) {
-    return { error: "Selecione o time e o membro." };
+    return { error: "Selecione a equipe e o membro." };
   }
 
   const { selectedTeam } = await canManageTeamId(teamId);
   if (!selectedTeam) {
-    return { error: "Você não pode gerenciar este time." };
+    return { error: "Você não pode gerenciar esta equipe." };
   }
 
   const org = await getElinsaOrganization();
@@ -620,7 +668,7 @@ export async function adicionarMembroAoTime(
     .values({ id: crypto.randomUUID(), teamId, userId })
     .onConflictDoNothing();
 
-  revalidateAdminPortal();
+  revalidateAdminPortal(selectedTeam.name);
   return { success: true };
 }
 
@@ -631,16 +679,16 @@ export async function removerMembroDoTime(
   const userId = formData.get("userId")?.toString().trim();
 
   if (!teamId || !userId) {
-    return { error: "Selecione o time e o membro." };
+    return { error: "Selecione a equipe e o membro." };
   }
 
   const { context, selectedTeam } = await canManageTeamId(teamId);
   if (!selectedTeam) {
-    return { error: "Você não pode gerenciar este time." };
+    return { error: "Você não pode gerenciar esta equipe." };
   }
 
   if (!context.isOrgAdmin && userId === context.userId) {
-    return { error: "Líderes não podem remover o próprio vínculo do time." };
+    return { error: "Líderes não podem remover o próprio vínculo da equipe." };
   }
 
   const [targetMembership] = await db
@@ -658,44 +706,16 @@ export async function removerMembroDoTime(
     targetMembership &&
     parseRoleList(targetMembership.role).includes(TEAM_LEADER_ROLE)
   ) {
-    return { error: "Apenas admins da organização removem líderes de time." };
+    return {
+      error: "Apenas administradores da organização removem líderes de equipe.",
+    };
   }
 
   await db
     .delete(teamMember)
     .where(and(eq(teamMember.teamId, teamId), eq(teamMember.userId, userId)));
 
-  revalidateAdminPortal();
-  return { success: true };
-}
-
-export async function salvarPermissoesTime(
-  formData: FormData,
-): Promise<ActionResult> {
-  await requireOrgAdmin();
-  const teamId = formData.get("teamId")?.toString().trim();
-  if (!teamId || !(await getElinsaTeam(teamId))) {
-    return { error: "Time inválido." };
-  }
-
-  const permissions = TEAM_PERMISSION_OPTIONS.map(
-    (option) => option.key,
-  ).filter((key) => formData.get(key) === "on");
-
-  await db.delete(teamPermission).where(eq(teamPermission.teamId, teamId));
-
-  if (permissions.length > 0) {
-    await db.insert(teamPermission).values(
-      permissions.map((permission) => ({
-        id: crypto.randomUUID(),
-        teamId,
-        permission,
-        enabled: true,
-      })),
-    );
-  }
-
-  revalidateAdminPortal();
+  revalidateAdminPortal(selectedTeam.name);
   return { success: true };
 }
 
@@ -721,7 +741,7 @@ export async function salvarFerramentaTime(
 
   const { context, selectedTeam } = await canManageTeamId(teamId);
   if (!selectedTeam) {
-    return { error: "Você não pode gerenciar ferramentas deste time." };
+    return { error: "Você não pode gerenciar ferramentas desta equipe." };
   }
 
   if (toolId) {

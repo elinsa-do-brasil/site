@@ -39,7 +39,10 @@ import {
   removerMembroDaOrganizacao,
   salvarRoleOrganizacao,
 } from "@/lib/organization/actions";
-import { INVITATION_STATUS_OPTIONS } from "@/lib/organization/constants";
+import {
+  formatOrganizationRole,
+  INVITATION_STATUS_OPTIONS,
+} from "@/lib/organization/constants";
 
 type TeamOption = {
   id: string;
@@ -141,7 +144,7 @@ export function OrganizacaoAdmin({
           <CardHeader>
             <CardTitle>Novo convite</CardTitle>
             <CardDescription>
-              Convide alguém para a organização e opcionalmente para um time.
+              Convide alguém para a organização e opcionalmente para uma equipe.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -179,7 +182,7 @@ export function OrganizacaoAdmin({
           <CardHeader>
             <CardTitle>Adicionar existente</CardTitle>
             <CardDescription>
-              Vincule uma conta já criada à organização ou a um time.
+              Vincule uma conta já criada à organização ou a uma equipe.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -213,20 +216,20 @@ export function OrganizacaoAdmin({
 
         <Card>
           <CardHeader>
-            <CardTitle>Times e roles</CardTitle>
+            <CardTitle>Equipes e funções</CardTitle>
             <CardDescription>
-              Crie novos times e funções reutilizáveis no portal.
+              Crie novas equipes e funções reutilizáveis no portal.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <form
-              onSubmit={submitForm(criarTimeOrganizacao, "Time criado.", {
+              onSubmit={submitForm(criarTimeOrganizacao, "Equipe criada.", {
                 reset: true,
               })}
             >
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="team-name">Novo time</FieldLabel>
+                  <FieldLabel htmlFor="team-name">Nova equipe</FieldLabel>
                   <Input
                     id="team-name"
                     name="name"
@@ -235,19 +238,19 @@ export function OrganizacaoAdmin({
                   />
                 </Field>
                 <Button type="submit" variant="secondary" disabled={isPending}>
-                  Criar time
+                  Criar equipe
                 </Button>
               </FieldGroup>
             </form>
 
             <form
-              onSubmit={submitForm(salvarRoleOrganizacao, "Role salva.", {
+              onSubmit={submitForm(salvarRoleOrganizacao, "Função salva.", {
                 reset: true,
               })}
             >
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="role-name">Nova role</FieldLabel>
+                  <FieldLabel htmlFor="role-name">Nova função</FieldLabel>
                   <Input
                     id="role-name"
                     name="role"
@@ -257,17 +260,17 @@ export function OrganizacaoAdmin({
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="role-permission">
-                    Permissões ou descrição
+                    Descrição da função
                   </FieldLabel>
                   <Textarea
                     id="role-permission"
                     name="permission"
-                    placeholder='{"member":["read"]}'
+                    placeholder="Descreva quando esta função deve ser usada."
                     rows={3}
                   />
                 </Field>
                 <Button type="submit" variant="secondary" disabled={isPending}>
-                  Salvar role
+                  Salvar função
                 </Button>
               </FieldGroup>
             </form>
@@ -279,7 +282,8 @@ export function OrganizacaoAdmin({
         <CardHeader>
           <CardTitle>Membros da organização</CardTitle>
           <CardDescription>
-            Atualize funções, confira times e remova vínculos quando necessário.
+            Atualize funções, confira equipes e remova vínculos quando
+            necessário.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -288,7 +292,7 @@ export function OrganizacaoAdmin({
               <TableRow>
                 <TableHead>Usuário</TableHead>
                 <TableHead>Funções</TableHead>
-                <TableHead>Times</TableHead>
+                <TableHead>Equipes</TableHead>
                 <TableHead>Entrada</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -309,11 +313,12 @@ export function OrganizacaoAdmin({
                       )}
                     >
                       <input name="memberId" type="hidden" value={item.id} />
-                      <Input
-                        aria-label={`Funções de ${item.email}`}
-                        name="role"
-                        defaultValue={item.role}
-                        className="h-8"
+                      <RoleSelect
+                        currentRole={item.role}
+                        hideLabel
+                        id={`member-role-${item.id}`}
+                        label={`Função de ${item.email}`}
+                        roles={roleOptions}
                       />
                       <Button
                         type="submit"
@@ -326,7 +331,7 @@ export function OrganizacaoAdmin({
                     </form>
                   </TableCell>
                   <TableCell className="max-w-64 whitespace-normal">
-                    <BadgeList values={item.teams} empty="Sem time" />
+                    <BadgeList values={item.teams} empty="Sem equipe" />
                   </TableCell>
                   <TableCell>{formatDate(item.createdAt)}</TableCell>
                   <TableCell className="text-right">
@@ -368,7 +373,7 @@ export function OrganizacaoAdmin({
                   <TableHead>E-mail</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Função</TableHead>
-                  <TableHead>Time</TableHead>
+                  <TableHead>Equipe</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -411,7 +416,7 @@ export function OrganizacaoAdmin({
                         </Button>
                       </form>
                     </TableCell>
-                    <TableCell>{item.role}</TableCell>
+                    <TableCell>{formatOrganizationRole(item.role)}</TableCell>
                     <TableCell>{item.teamName ?? "-"}</TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -449,16 +454,16 @@ export function OrganizacaoAdmin({
 
         <Card>
           <CardHeader>
-            <CardTitle>Roles customizadas</CardTitle>
+            <CardTitle>Funções customizadas</CardTitle>
             <CardDescription>
-              Roles criadas pela organização para compor permissões internas.
+              Funções criadas pela organização para compor permissões internas.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Role</TableHead>
+                  <TableHead>Função</TableHead>
                   <TableHead>Permissões</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -466,7 +471,14 @@ export function OrganizacaoAdmin({
               <TableBody>
                 {roles.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-mono">{item.role}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">
+                        {formatOrganizationRole(item.role)}
+                      </div>
+                      <div className="font-mono text-xs text-muted-foreground">
+                        {item.role}
+                      </div>
+                    </TableCell>
                     <TableCell className="max-w-96 whitespace-normal">
                       {item.permission}
                     </TableCell>
@@ -480,7 +492,7 @@ export function OrganizacaoAdmin({
                         onClick={() =>
                           runAction(
                             () => excluirRoleOrganizacao(item.id),
-                            "Role excluída.",
+                            "Função excluída.",
                           )
                         }
                       >
@@ -495,7 +507,7 @@ export function OrganizacaoAdmin({
                       colSpan={3}
                       className="py-8 text-center text-muted-foreground"
                     >
-                      Nenhuma role customizada criada.
+                      Nenhuma função customizada criada.
                     </TableCell>
                   </TableRow>
                 )}
@@ -508,18 +520,34 @@ export function OrganizacaoAdmin({
   );
 }
 
-function RoleSelect({ id, roles }: { id: string; roles: string[] }) {
+function RoleSelect({
+  currentRole = "member",
+  hideLabel = false,
+  id,
+  label = "Função",
+  roles,
+}: {
+  currentRole?: string;
+  hideLabel?: boolean;
+  id: string;
+  label?: string;
+  roles: string[];
+}) {
+  const options = Array.from(new Set([currentRole, ...roles]));
+
   return (
     <Field>
-      <FieldLabel htmlFor={id}>Função</FieldLabel>
-      <Select name="role" defaultValue="member">
+      <FieldLabel className={hideLabel ? "sr-only" : undefined} htmlFor={id}>
+        {label}
+      </FieldLabel>
+      <Select name="role" defaultValue={currentRole}>
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {roles.map((role) => (
+          {options.map((role) => (
             <SelectItem key={role} value={role}>
-              {role}
+              {formatOrganizationRole(role)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -531,13 +559,13 @@ function RoleSelect({ id, roles }: { id: string; roles: string[] }) {
 function TeamSelect({ id, teams }: { id: string; teams: TeamOption[] }) {
   return (
     <Field>
-      <FieldLabel htmlFor={id}>Time</FieldLabel>
+      <FieldLabel htmlFor={id}>Equipe</FieldLabel>
       <Select name="teamId" defaultValue="none">
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="none">Nenhum time inicial</SelectItem>
+          <SelectItem value="none">Nenhuma equipe inicial</SelectItem>
           {teams.map((team) => (
             <SelectItem key={team.id} value={team.id}>
               {team.name}

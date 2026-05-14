@@ -95,7 +95,7 @@ export default async function OrganizacaoAdminPage() {
             Administração da organização
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Membros, funções, convites, status, times e roles da Elinsa.
+            Membros, funções, convites, status e equipes da Elinsa.
           </p>
         </div>
         <Button variant="outline" size="sm" asChild>

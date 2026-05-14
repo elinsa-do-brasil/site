@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ferramentas dos times",
+  title: "Ferramentas das equipes",
 };
 
 export default async function FerramentasTeamAdminPage() {
@@ -52,7 +52,7 @@ export default async function FerramentasTeamAdminPage() {
       <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Ferramentas dos times
+            Ferramentas das equipes
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Configure os cards de ferramentas exibidos no portal interno.
