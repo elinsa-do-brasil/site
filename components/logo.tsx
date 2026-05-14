@@ -1,15 +1,15 @@
-import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import LogoImage from "@/public/images/logo.webp"
 
-export function Logo() {
+export function Logo({ className }: { className?: string }) {
   return (
-    <div>
-      <Image 
-        src={LogoImage} 
-        alt="Elinsa" 
-        className={cn("h-18 w-auto", "mx-auto")}
+    <Link href="/">
+      {/* biome-ignore lint/performance/noImgElement: <usado para renderizar o svg do logo diretamente> */}
+      <img
+        src="/svg/logo.svg"
+        alt="Elinsa"
+        className={cn("h-18 w-auto mx-auto", className)}
       />
-    </div>
+    </Link>
   );
 }
