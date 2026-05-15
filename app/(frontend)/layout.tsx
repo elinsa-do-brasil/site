@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../globals.css";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { FrontendShell } from "@/components/frontend-shell";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { cn } from "@/lib/utils";
@@ -79,6 +80,7 @@ export default function RootLayout({
         >
           <FrontendShell>{children}</FrontendShell>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
