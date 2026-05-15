@@ -353,7 +353,7 @@ export function MapasExplorer() {
         className="m-3 max-h-[calc(100dvh-1.5rem)] w-auto lg:sticky lg:top-3 lg:h-[calc(100dvh-1.5rem)]"
       >
         <SidebarHeader className="gap-5">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center">
             <Button
               asChild
               variant="ghost"
@@ -364,7 +364,6 @@ export function MapasExplorer() {
                 Início
               </Link>
             </Button>
-            <ThemeToggle />
           </div>
 
           <div className="space-y-2">
