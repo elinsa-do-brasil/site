@@ -1,8 +1,6 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import LogoIcon from "@/public/images/logo-icon.webp";
 import { AccountLogged } from "../account-logged";
 import { NavigationMenu, NavigationMenuList } from "../ui/navigation-menu";
 import { ThemeToggle } from "../ui/theme-toggle";
@@ -18,7 +16,8 @@ export function InternalHeader() {
             className="flex items-center gap-2 text-foreground transition-opacity hover:opacity-80"
           >
             <div className="flex size-7 items-center justify-center rounded-lg bg-muted">
-              <Image src={LogoIcon} alt="Logo" width={18} height={18} />
+              {/** biome-ignore lint/performance/noImgElement: <usado para renderizar o svg do logo diretamente> */}
+              <img src="/svg/e.svg" alt="Logo" width={18} height={18} />
             </div>
             <span className="font-semibold text-foreground tracking-tight hover:text-elinsa-dark">
               Elinsa do Brasil

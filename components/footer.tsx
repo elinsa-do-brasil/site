@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
-import Logo from "@/public/images/logo.webp";
+import { Logo } from "./logo";
 
 const sitemapLinks = [
   { href: "/", label: "Início" },
@@ -45,16 +45,7 @@ export function Footer() {
     <footer className="border-t border-border bg-background px-6 py-12 md:px-8">
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.25fr_0.75fr_0.75fr_0.8fr]">
         <div>
-          <Link
-            href="/"
-            className="inline-flex w-fit items-center transition-opacity hover:opacity-85"
-          >
-            <Image
-              src={Logo}
-              alt="Elinsa do Brasil"
-              className="h-18 w-auto object-contain"
-            />
-          </Link>
+          <Logo />
           <p className="mt-5 max-w-md leading-7 text-muted-foreground">
             Infraestrutura elétrica, manutenção e obras complexas para frentes
             do Grupo Equatorial Energia.
