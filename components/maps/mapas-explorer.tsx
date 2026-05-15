@@ -46,7 +46,6 @@ import {
   SidebarProvider,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { mapAsset } from "@/lib/map-assets";
 import { cn } from "@/lib/utils";
 
