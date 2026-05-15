@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   Download,
   FileImage,
+  FolderOpenDot,
   Palette,
   SwatchBook,
 } from "lucide-react";
@@ -41,7 +42,6 @@ type AssetFormat = "svg" | "png" | "webp" | "avif";
 type BrandAssetFile = {
   format: AssetFormat;
   href: string;
-  size: number;
 };
 
 type BrandAsset = {
@@ -53,6 +53,8 @@ type BrandAsset = {
   imageClassName: string;
   files: BrandAssetFile[];
 };
+
+const assetFormats: AssetFormat[] = ["svg", "png", "webp", "avif"];
 
 const brandColors: BrandColor[] = [
   {
@@ -91,25 +93,13 @@ const brandAssets: BrandAsset[] = [
     fileName: "logo-colorido",
     previewClassName: "bg-white",
     imageClassName: "max-h-32 w-full max-w-lg",
-    sizes: {
-      avif: 558528,
-      png: 431564,
-      svg: 15485,
-      webp: 923902,
-    },
   }),
   createAsset({
     name: "Logo branco",
-    description: "Assinatura para fundos escuros, fotos e áreas de cor sólida.",
+    description: "Assinatura para fundos escuros.",
     fileName: "logo-branco",
-    previewClassName: "bg-elinsa-dark",
+    previewClassName: "bg-brand-logo-white",
     imageClassName: "max-h-32 w-full max-w-lg",
-    sizes: {
-      avif: 500024,
-      png: 341092,
-      svg: 15313,
-      webp: 918050,
-    },
   }),
   createAsset({
     name: "Logo preto",
@@ -117,12 +107,6 @@ const brandAssets: BrandAsset[] = [
     fileName: "logo-preto",
     previewClassName: "bg-white",
     imageClassName: "max-h-32 w-full max-w-lg",
-    sizes: {
-      avif: 278505,
-      png: 319007,
-      svg: 15323,
-      webp: 918030,
-    },
   }),
   createAsset({
     name: "Símbolo azul",
@@ -130,25 +114,13 @@ const brandAssets: BrandAsset[] = [
     fileName: "e-azul",
     previewClassName: "bg-white",
     imageClassName: "max-h-28 w-28",
-    sizes: {
-      avif: 80978,
-      png: 57693,
-      svg: 1222,
-      webp: 173060,
-    },
   }),
   createAsset({
     name: "Símbolo branco",
     description: "Símbolo compacto para fundos escuros.",
     fileName: "e-branco",
-    previewClassName: "bg-elinsa-dark",
+    previewClassName: "bg-brand-logo-white",
     imageClassName: "max-h-28 w-28",
-    sizes: {
-      avif: 69796,
-      png: 47928,
-      svg: 1219,
-      webp: 172822,
-    },
   }),
   createAsset({
     name: "Símbolo preto",
@@ -156,12 +128,6 @@ const brandAssets: BrandAsset[] = [
     fileName: "e-preto",
     previewClassName: "bg-white",
     imageClassName: "max-h-28 w-28",
-    sizes: {
-      avif: 38313,
-      png: 46293,
-      svg: 1218,
-      webp: 172818,
-    },
   }),
 ];
 
@@ -171,17 +137,13 @@ function createAsset({
   fileName,
   previewClassName,
   imageClassName,
-  sizes,
 }: {
   name: string;
   description: string;
   fileName: string;
   previewClassName: string;
   imageClassName: string;
-  sizes: Record<AssetFormat, number>;
 }): BrandAsset {
-  const formatOrder: AssetFormat[] = ["svg", "png", "webp", "avif"];
-
   return {
     name,
     description,
@@ -189,24 +151,11 @@ function createAsset({
     previewAlt: `${name} da Elinsa`,
     previewClassName,
     imageClassName,
-    files: formatOrder.map((format) => ({
+    files: assetFormats.map((format) => ({
       format,
       href: `/kit-de-marca/${format}/${fileName}.${format}`,
-      size: sizes[format],
     })),
   };
-}
-
-function formatBytes(bytes: number) {
-  const kilobytes = bytes / 1024;
-
-  if (kilobytes >= 1024) {
-    return `${(kilobytes / 1024).toLocaleString("pt-BR", {
-      maximumFractionDigits: 1,
-    })} MB`;
-  }
-
-  return `${Math.round(kilobytes).toLocaleString("pt-BR")} KB`;
 }
 
 function BrandImage({
@@ -285,20 +234,15 @@ function DownloadButton({
     <Button
       asChild
       variant="outline"
-      className="h-auto min-h-12 justify-start gap-2 px-3 py-2"
+      className="h-10 justify-center gap-1.5 px-2"
     >
       <a
         href={file.href}
         download
         aria-label={`Baixar ${asset.name} em ${file.format.toUpperCase()}`}
       >
-        <Download className="size-4 text-elinsa-primary" />
-        <span className="grid min-w-0 text-left">
-          <span className="font-bold uppercase">{file.format}</span>
-          <span className="text-[0.7rem] text-muted-foreground">
-            {formatBytes(file.size)}
-          </span>
-        </span>
+        <Download className="size-3.5 text-elinsa-primary" />
+        <span className="font-bold uppercase">{file.format}</span>
       </a>
     </Button>
   );
@@ -322,24 +266,22 @@ function AssetCard({ asset }: { asset: BrandAsset }) {
 
       <Separator />
 
-      <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3 p-5 pb-0">
-        <div>
-          <CardTitle className="text-xl font-black tracking-normal">
-            {asset.name}
-          </CardTitle>
-          <CardDescription className="mt-2 text-sm leading-6">
-            {asset.description}
-          </CardDescription>
-        </div>
+      <CardHeader className="grid gap-3 p-5 pb-0">
+        <CardTitle className="text-xl font-black tracking-normal">
+          {asset.name}
+        </CardTitle>
+        <CardDescription className="text-sm leading-6">
+          {asset.description}
+        </CardDescription>
         <Badge
           variant="outline"
-          className="rounded-md border-elinsa-primary/25 bg-elinsa-light px-2.5 py-1 text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
+          className="w-fit rounded-md border-elinsa-primary/25 bg-elinsa-light px-2.5 py-1 text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
         >
           4 formatos
         </Badge>
       </CardHeader>
 
-      <CardFooter className="grid gap-2 p-5 sm:grid-cols-2">
+      <CardFooter className="grid grid-cols-2 gap-1.5 p-4 sm:grid-cols-4">
         {asset.files.map((file) => (
           <DownloadButton
             key={`${asset.name}-${file.format}`}
@@ -357,7 +299,7 @@ export default function MarcaPage() {
 
   return (
     <div className="bg-background text-foreground">
-      <section className="border-b border-border bg-background px-6 pb-14 pt-28 md:px-8 md:pb-16 md:pt-32">
+      <section className="border-b border-border bg-background px-6 pb-14 pt-28 md:px-8 md:pb-16 md:pt-32 min-h-dvh">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
@@ -404,20 +346,16 @@ export default function MarcaPage() {
                   organizadas abaixo.
                 </CardDescription>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col">
-                  <Button
-                    size="xl"
-                    className="bg-elinsa-primary text-white"
-                    asChild
-                  >
+                  <Button size="lg" asChild className="h-9">
                     <a href="#logos">
-                      Ver logos
-                      <ArrowDownToLine className="size-4" />
+                      <FolderOpenDot />
+                      Ver arquivos
                     </a>
                   </Button>
-                  <Button variant="outline" size="xl" asChild>
-                    <a href={featuredAsset.files[0]?.href} download>
-                      Baixar logo colorido
-                      <Download className="size-4" />
+                  <Button variant="outline" size="lg" asChild className="h-9">
+                    <a href="/kit-de-marca/kit.7z" download>
+                      <Download />
+                      Baixar kit
                     </a>
                   </Button>
                 </div>
@@ -474,7 +412,7 @@ export default function MarcaPage() {
             </p>
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {brandAssets.map((asset) => (
               <AssetCard key={asset.name} asset={asset} />
             ))}
