@@ -91,10 +91,10 @@ export function Header() {
                             description="Comunicados sobre a empresa"
                           />
                           <DropdownItem
-                            href="/kit-de-marca"
+                            href="/marca"
                             icon={LayoutGridIcon}
                             title="Kit de marca"
-                            description="Logo, cores, fontes e mais"
+                            description="Cores e logos oficiais"
                           />
                         </ul>
                       </div>
