@@ -19,11 +19,23 @@
       "skillPath": "security/SKILL.md",
       "computedHash": "ed38caef4b297cc399d717258d6ea4e6ecb8894c453c83450064c7e7c6e5cc02"
     },
+    "brand-storytelling": {
+      "source": "refoundai/lenny-skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-storytelling/SKILL.md",
+      "computedHash": "a7fdb8eee04388e74341421c5e7ed88758820b420a144a8a4f565e3c102c55c4"
+    },
     "create-auth-skill": {
       "source": "better-auth/skills",
       "sourceType": "github",
       "skillPath": "better-auth/create-auth/SKILL.md",
       "computedHash": "393e8d2d795fa5797c9a4e0665f29183ea2e140233db59746d510340a10456e6"
+    },
+    "data-storytelling": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/business-analytics/skills/data-storytelling/SKILL.md",
+      "computedHash": "100085a4212149ea6b1a1691e5e845a7ae184ecb2d4cee561b435e7ba5f5a6a2"
     },
     "drizzle-orm": {
       "source": "pedronauck/skills",
@@ -54,6 +66,12 @@
       "sourceType": "github",
       "skillPath": "skills/email-best-practices/SKILL.md",
       "computedHash": "d0d264878e1201196115a47106e0def3282e6be1a5a2b231e2ef39a4641203da"
+    },
+    "nextjs-performance": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-typescript/skills/nextjs-performance/SKILL.md",
+      "computedHash": "e7aacb7a0f57077fd7494a5c3b633cbc6a351463142acb1101a7f85570e20ace"
     },
     "organization-best-practices": {
       "source": "better-auth/skills",
