@@ -5,6 +5,7 @@ import {
   Clock3,
   FileText,
   RefreshCw,
+  TextAlignStart,
   UserRound,
 } from "lucide-react";
 import { draftMode } from "next/headers";
@@ -423,8 +424,8 @@ function TopicsAside({ headings }: { headings: HeadingItem[] }) {
   return (
     <aside className="hidden border-l border-border pl-6 lg:sticky lg:top-28 lg:block lg:self-start">
       <div className="pb-6">
-        <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
-          Tópicos
+        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+          <TextAlignStart size="14" /> Nesta página
         </p>
         <TopicsNav headings={headings} />
       </div>
