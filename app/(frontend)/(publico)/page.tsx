@@ -17,6 +17,7 @@ import {
   Wrench,
   Zap,
 } from "lucide-react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -50,7 +51,7 @@ import {
 } from "@/lib/editorial";
 import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
-import Eletricista from "@/public/images/eletricistas.png";
+import Eletricista from "@/public/images/eletricistas.webp";
 import Lampada from "@/public/images/lampada.webp";
 
 type ServiceCard = {
@@ -82,6 +83,49 @@ type RegionalBentoCard = {
 const LAST_ACCIDENT_DATE_FALLBACK = "2025-05-03";
 const SAFETY_TIME_ZONE = "America/Sao_Paulo";
 const MS_PER_DAY = 86_400_000;
+const HOME_TITLE =
+  "Elinsa do Brasil | Infraestrutura elétrica empresarial no Pará";
+const HOME_DESCRIPTION =
+  "Obras, manutenção e suporte operacional em infraestrutura elétrica para o Grupo Equatorial Energia, com bases regionais no Pará.";
+const HOME_OG_IMAGE = {
+  alt: "Equipe técnica da Elinsa em operação de infraestrutura elétrica",
+  height: 941,
+  url: "/images/eletricistas.webp",
+  width: 1672,
+};
+const siteUrl = getPublicSiteUrl();
+
+export const metadata: Metadata = {
+  title: HOME_TITLE,
+  description: HOME_DESCRIPTION,
+  ...(siteUrl
+    ? {
+        alternates: {
+          canonical: "/",
+        },
+        metadataBase: siteUrl,
+      }
+    : {}),
+  openGraph: {
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    locale: "pt_BR",
+    siteName: "Elinsa do Brasil",
+    type: "website",
+    ...(siteUrl
+      ? {
+          images: [HOME_OG_IMAGE],
+          url: "/",
+        }
+      : {}),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    ...(siteUrl ? { images: [HOME_OG_IMAGE.url] } : {}),
+  },
+};
 
 type ValueCard = {
   id: string;
@@ -120,7 +164,7 @@ const companyValues: ValueCard[] = [
     id: "integridade",
     title: "Integridade",
     description:
-      "Éticas e transparentes em todas as nossas relações. A confiança se constrói com coerência entre discurso e prática.",
+      "Agimos com ética e transparência em todas as relações. A confiança se constrói com coerência entre discurso e prática.",
     icon: Scale,
     accentClassName: "text-violet-500 bg-violet-500/10",
   },
@@ -166,21 +210,43 @@ const baseImpactMetrics: ImpactMetric[] = [
     id: "experiencia",
     value: "14",
     label: "anos",
-    description: "fundada em 2012",
+    description: "de atuação desde 2012",
   },
   {
     id: "bases",
     value: "6",
     label: "bases",
-    description: "regionais no Pará",
+    description: "operacionais no Pará",
   },
   {
     id: "equipes",
     value: "+2.000",
     label: "colaboradores",
-    description: "estimados em operação",
+    description: "mobilizados em operação",
   },
 ];
+
+function getPublicSiteUrl() {
+  const vercelUrl =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  const candidate =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (vercelUrl ? `https://${vercelUrl}` : "");
+
+  if (!candidate) {
+    return undefined;
+  }
+
+  const normalized = /^[a-z][a-z\d+\-.]*:\/\//i.test(candidate)
+    ? candidate
+    : `https://${candidate}`;
+
+  try {
+    return new URL(normalized);
+  } catch {
+    return undefined;
+  }
+}
 
 function getImpactMetrics(): ImpactMetric[] {
   return [
@@ -422,7 +488,8 @@ function PressNewsCard({ post }: { post: EditorialPost }) {
             {post.title}
           </CardTitle>
           <CardDescription className="line-clamp-3 text-base leading-7">
-            {post.summary}
+            {post.summary ??
+              "Leia a notícia pública completa da Elinsa do Brasil."}
           </CardDescription>
         </CardHeader>
 
@@ -444,7 +511,7 @@ export default async function Home() {
   await connection();
 
   const impactMetrics = getImpactMetrics();
-  const latestPressPosts = (await getEditorialPosts("imprensa")).slice(0, 3);
+  const latestPressPosts = await getEditorialPosts("imprensa", { limit: 3 });
 
   return (
     <div className="bg-background text-foreground">
@@ -455,7 +522,7 @@ export default async function Home() {
             alt="Equipe técnica da Elinsa em operação de infraestrutura elétrica"
             fill
             className="object-cover object-center"
-            priority
+            preload
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.82)_42%,rgba(255,255,255,0.28)_72%,rgba(255,255,255,0.06)_100%)] dark:bg-[linear-gradient(90deg,rgba(8,16,24,0.92)_0%,rgba(8,16,24,0.76)_44%,rgba(8,16,24,0.28)_74%,rgba(8,16,24,0.08)_100%)]" />
@@ -473,8 +540,8 @@ export default async function Home() {
             </h1>
             <p className="mt-6 max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
               Obras, manutenção, planejamento e suporte operacional para o Grupo
-              Equatorial, com bases estratégicas no Pará e atuação orientada a
-              segurança, previsibilidade e execução técnica.
+              Equatorial Energia no Pará, combinando bases regionais, segurança
+              de campo e previsibilidade técnica.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -518,7 +585,7 @@ export default async function Home() {
                 <p className="mt-2 text-xs font-bold uppercase tracking-normal text-muted-foreground">
                   {metric.label}
                 </p>
-                
+
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                   {metric.description}
                 </p>
@@ -541,9 +608,9 @@ export default async function Home() {
             </h2>
           </div>
           <p className="text-lg text-muted-foreground">
-            A partir desses polos, a Elinsa mobiliza pessoas, equipamentos e
-            liderança operacional para apoiar projetos elétricos em diferentes
-            regiões do estado.
+            A partir desses polos, a Elinsa mobiliza equipes, frota e liderança
+            operacional para apoiar projetos elétricos em diferentes regiões do
+            estado.
           </p>
         </div>
 
@@ -625,8 +692,8 @@ export default async function Home() {
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
                 Uma frente só funciona quando escopo, deslocamento, equipe,
-                material e retorno de campo chegam juntos. Essa cadência
-                organiza obras, manutenção e suporte técnico nas bases
+                material e retorno de campo chegam juntos. Essa cadência mantém
+                obras, manutenção e suporte técnico alinhados nas bases
                 atendidas.
               </p>
             </div>
@@ -733,8 +800,8 @@ export default async function Home() {
                 Últimas da imprensa
               </h2>
               <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
-                Comunicados, notícias institucionais e atualizações públicas da
-                Elinsa do Brasil.
+                Comunicados e notícias institucionais sobre atuação, equipes e
+                atualizações públicas da Elinsa do Brasil.
               </p>
             </div>
             <Button asChild className="gap-2 rounded-md" variant="outline">

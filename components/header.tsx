@@ -120,26 +120,26 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <div>
-            <Button variant={"ghost"} size={"icon"}>
+            <Button variant="ghost" size="icon" asChild>
               <a
                 href="https://www.instagram.com/elinsadobrasil/"
+                aria-label="Instagram da Elinsa do Brasil"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaInstagram />
               </a>
-              <span className="sr-only">Toggle theme</span>
             </Button>
 
-            <Button variant={"ghost"} size={"icon"}>
+            <Button variant="ghost" size="icon" asChild>
               <a
                 href="https://www.linkedin.com/in/elinsadobrasil/"
+                aria-label="LinkedIn da Elinsa do Brasil"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FaLinkedin />
               </a>
-              <span className="sr-only">Toggle theme</span>
             </Button>
           </div>
 

@@ -65,6 +65,10 @@ export type HeadingItem = {
   title: string;
 };
 
+type EditorialPostsOptions = {
+  limit?: number;
+};
+
 type LexicalNode = {
   children?: LexicalNode[];
   tag?: string;
@@ -106,6 +110,7 @@ export const editorialConfigs: Record<
 
 export async function getEditorialPosts(
   collection: EditorialCollectionSlug,
+  options: EditorialPostsOptions = {},
 ): Promise<EditorialPost[]> {
   const payload = await getPayload({ config: configPromise });
 
@@ -113,7 +118,7 @@ export async function getEditorialPosts(
     collection,
     depth: 1,
     draft: false,
-    limit: 100,
+    limit: options.limit ?? 100,
     sort: "-publishedAt",
   });
 
