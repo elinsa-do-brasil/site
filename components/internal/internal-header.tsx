@@ -19,7 +19,7 @@ export function InternalHeader() {
               {/** biome-ignore lint/performance/noImgElement: <usado para renderizar o svg do logo diretamente> */}
               <img src="/svg/e.svg" alt="Logo" width={18} height={18} />
             </div>
-            <span className="font-semibold text-foreground tracking-tight hover:text-elinsa-dark">
+            <span className="font-semibold text-foreground tracking-tight hover:text-elinsa-primary">
               Elinsa do Brasil
             </span>
           </Link>
