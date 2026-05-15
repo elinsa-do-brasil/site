@@ -1,5 +1,7 @@
 "use client";
 
+import { Settings } from "lucide-react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -38,7 +40,12 @@ export function AccountLogged() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Olá, {session?.user?.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Meu perfil</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/configuracoes">
+            <Settings />
+            Configurações
+          </Link>
+        </DropdownMenuItem>
         <SignOutDropdown />
       </DropdownMenuContent>
     </DropdownMenu>

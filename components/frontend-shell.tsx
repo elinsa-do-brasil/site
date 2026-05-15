@@ -8,6 +8,7 @@ import { InternalHeader } from "@/components/internal/internal-header";
 import { Toaster } from "@/components/ui/sonner";
 
 const accountRoutes = [
+  "/configuracoes",
   "/convite",
   "/criar",
   "/entrar",
