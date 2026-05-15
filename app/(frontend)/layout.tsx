@@ -19,11 +19,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Elinsa do Brasil",
+  title: {
+    default: "Elinsa do Brasil",
+    template: "%s | Elinsa",
+  },
   description:
     "Infraestrutura elétrica, manutenção e obras para operações do Grupo Equatorial Energia.",
   applicationName: "Elinsa do Brasil",
-  creator: "Elinsa do Brasil",
+  creator: "Raave Aires",
   publisher: "Elinsa do Brasil",
   openGraph: {
     title: "Elinsa do Brasil",
