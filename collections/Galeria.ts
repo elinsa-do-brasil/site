@@ -38,7 +38,14 @@ export const Galeria: CollectionConfig = {
       },
     ],
     adminThumbnail: "thumbnail",
-    mimeTypes: ["image/*"],
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    formatOptions: {
+      format: 'webp',
+      options: {
+        quality: 100,
+        effort: 4,
+      },
+    },
     crop: true,
     focalPoint: true,
   },
