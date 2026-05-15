@@ -15,6 +15,7 @@
     "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.6.11",
     "@hookform/resolvers": "^5.2.2",
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/react": "^1.1.6",

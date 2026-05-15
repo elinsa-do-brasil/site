@@ -8,6 +8,7 @@ export default defineConfig({
   schema: "./lib/db/schema/index.ts",
   out: "./lib/db/migrations",
   dialect: "postgresql",
+  schemaFilter: ["public"],
   dbCredentials: {
     url: process.env.AUTH_DATABASE_URL,
   },

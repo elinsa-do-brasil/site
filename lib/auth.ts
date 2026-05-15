@@ -1,3 +1,4 @@
+import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins/organization";
@@ -68,9 +69,7 @@ export const auth = betterAuth({
       },
       requireEmailVerificationOnInvitation: true,
       sendInvitationEmail: async (data) => {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_URL ||
-          "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
         const inviteLink = `${baseUrl}/convite/${data.id}`;
 
         await sendInternalAuthEmail({
@@ -87,6 +86,7 @@ export const auth = betterAuth({
         });
       },
     }),
+    passkey(),
   ],
 });
 

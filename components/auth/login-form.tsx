@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { MicrosoftOauthButton } from "./buttons/oauth-buttons";
+import { PasskeySignInButton } from "./buttons/passkey-signin";
 import { Or } from "./or";
 
 // esquema do zod:
@@ -177,6 +178,7 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
             <Button type="submit" disabled={isPending} size="lg">
               {isPending ? <Spinner /> : "Entrar"}
             </Button>
+            <PasskeySignInButton />
           </div>
         </form>
       </CardContent>
