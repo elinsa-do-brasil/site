@@ -69,7 +69,6 @@ export const auth = betterAuth({
       requireEmailVerificationOnInvitation: true,
       sendInvitationEmail: async (data) => {
         const baseUrl =
-          process.env.BETTER_AUTH_URL ||
           process.env.NEXT_PUBLIC_URL ||
           "http://localhost:3000";
         const inviteLink = `${baseUrl}/convite/${data.id}`;
