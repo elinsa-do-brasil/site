@@ -792,11 +792,11 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold text-muted-foreground">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold text-muted-foreground">
                 <Activity className="size-4 text-elinsa-primary" />
                 Notícias
               </div>
-              <h2 className="text-4xl font-extrabold tracking-normal md:text-5xl">
+              <h2 className="text-3xl font-extrabold tracking-normal md:text-3xl">
                 Últimas da imprensa
               </h2>
               <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
