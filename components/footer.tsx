@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Logo } from "./logo";
+import { Separator } from "./ui/separator";
+import { HeroImageCopyright } from "./hero-image-copyright";
 
 const sitemapLinks = [
   { href: "/", label: "Início" },
@@ -46,7 +48,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="border-t border-border bg-background px-6 py-12 md:px-8">
+    <footer className="border-t border-border bg-background px-6 pt-12 md:px-8 flex flex-col gap-y-6">
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.25fr_0.75fr_0.75fr_0.75fr_0.8fr]">
         <div>
           <Logo />
@@ -134,6 +136,12 @@ export function Footer() {
           </ul>
         </div>
       </div>
+      <HeroImageCopyright />
+      <Separator />
+      <p className="text-center text-sm text-muted-foreground pb-6">
+        &copy; {new Date().getFullYear()} Elinsa - Eletrotécnica Industrial e
+        Naval do Brasil. Conteúdo institucional e identidade visual protegidos.
+      </p>
     </footer>
   );
 }
