@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { ArrowRight, TextAlignStart } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Termos de Uso - Elinsa",
+  title: "Termos de uso",
   description:
     "Condições gerais para uso do site, canais públicos e portal interno da Elinsa do Brasil.",
 };
