@@ -24,9 +24,22 @@ type LicenseItem = {
 
 const runtimeDependencies: LicenseItem[] = [
   {
+    name: "@better-auth/passkey",
+    version: "1.6.11",
+    license: "MIT",
+    url: "https://www.better-auth.com/docs/plugins/passkey",
+  },
+  {
+    name: "@hookform/resolvers",
+    version: "5.2.2",
+    license: "MIT",
+    url: "https://react-hook-form.com",
+  },
+  {
     name: "@hugeicons/core-free-icons",
     version: "4.1.1",
     license: "MIT",
+    url: "https://hugeicons.com",
   },
   {
     name: "@hugeicons/react",
@@ -50,10 +63,16 @@ const runtimeDependencies: LicenseItem[] = [
     name: "@next/mdx",
     version: "16.2.4",
     license: "MIT",
-    url: "https://github.com/vercel/next.js",
+    url: "https://nextjs.org/docs/app/guides/mdx",
   },
   {
     name: "@payloadcms/db-postgres",
+    version: "3.84.1",
+    license: "MIT",
+    url: "https://payloadcms.com",
+  },
+  {
+    name: "@payloadcms/email-resend",
     version: "3.84.1",
     license: "MIT",
     url: "https://payloadcms.com",
@@ -66,6 +85,12 @@ const runtimeDependencies: LicenseItem[] = [
   },
   {
     name: "@payloadcms/richtext-lexical",
+    version: "3.84.1",
+    license: "MIT",
+    url: "https://payloadcms.com",
+  },
+  {
+    name: "@payloadcms/storage-s3",
     version: "3.84.1",
     license: "MIT",
     url: "https://payloadcms.com",
@@ -89,6 +114,18 @@ const runtimeDependencies: LicenseItem[] = [
     url: "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mdx",
   },
   {
+    name: "@vercel/speed-insights",
+    version: "2.0.0",
+    license: "Apache-2.0",
+    url: "https://vercel.com/docs/speed-insights",
+  },
+  {
+    name: "better-auth",
+    version: "1.6.10",
+    license: "MIT",
+    url: "https://better-auth.com",
+  },
+  {
     name: "class-variance-authority",
     version: "0.7.1",
     license: "Apache-2.0",
@@ -105,6 +142,12 @@ const runtimeDependencies: LicenseItem[] = [
     version: "3.1.0",
     license: "MIT",
     url: "https://github.com/NTag/dotted-map",
+  },
+  {
+    name: "drizzle-orm",
+    version: "0.45.2",
+    license: "Apache-2.0",
+    url: "https://orm.drizzle.team",
   },
   {
     name: "lucide-react",
@@ -143,6 +186,12 @@ const runtimeDependencies: LicenseItem[] = [
     url: "https://payloadcms.com",
   },
   {
+    name: "pg",
+    version: "8.20.0",
+    license: "MIT",
+    url: "https://node-postgres.com",
+  },
+  {
     name: "radix-ui",
     version: "1.4.3",
     license: "MIT",
@@ -161,10 +210,22 @@ const runtimeDependencies: LicenseItem[] = [
     url: "https://react.dev/",
   },
   {
+    name: "react-hook-form",
+    version: "7.75.0",
+    license: "MIT",
+    url: "https://react-hook-form.com",
+  },
+  {
     name: "react-icons",
     version: "5.6.0",
     license: "MIT",
     url: "https://github.com/react-icons/react-icons#readme",
+  },
+  {
+    name: "resend",
+    version: "6.12.3",
+    license: "MIT",
+    url: "https://resend.com",
   },
   {
     name: "shadcn",
@@ -179,6 +240,12 @@ const runtimeDependencies: LicenseItem[] = [
     url: "https://sharp.pixelplumbing.com",
   },
   {
+    name: "sonner",
+    version: "2.0.7",
+    license: "MIT",
+    url: "https://sonner.emilkowal.ski",
+  },
+  {
     name: "tailwind-merge",
     version: "3.5.0",
     license: "MIT",
@@ -190,13 +257,19 @@ const runtimeDependencies: LicenseItem[] = [
     license: "MIT",
     url: "https://github.com/Wombosvideo/tw-animate-css#readme",
   },
+  {
+    name: "zod",
+    version: "4.4.3",
+    license: "MIT",
+    url: "https://zod.dev",
+  },
 ];
 
 const developmentDependencies: LicenseItem[] = [
   {
     name: "@biomejs/biome",
     version: "2.4.14",
-    license: "MIT OR Apache-2.0",
+    license: "MIT/Apache-2.0",
     url: "https://biomejs.dev",
   },
   {
@@ -210,6 +283,12 @@ const developmentDependencies: LicenseItem[] = [
     version: "25.6.0",
     license: "MIT",
     url: "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node",
+  },
+  {
+    name: "@types/pg",
+    version: "8.20.0",
+    license: "MIT",
+    url: "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pg",
   },
   {
     name: "@types/react",
@@ -230,10 +309,22 @@ const developmentDependencies: LicenseItem[] = [
     url: "https://github.com/facebook/react.git",
   },
   {
+    name: "drizzle-kit",
+    version: "0.31.10",
+    license: "MIT",
+    url: "https://orm.drizzle.team",
+  },
+  {
     name: "tailwindcss",
     version: "4.2.4",
     license: "MIT",
     url: "https://tailwindcss.com",
+  },
+  {
+    name: "tsx",
+    version: "4.21.0",
+    license: "MIT",
+    url: "https://tsx.is",
   },
   {
     name: "typescript",
@@ -332,11 +423,11 @@ export default function LicencasPage() {
               Licenças do site
             </div>
             <h1 className="flex flex-wrap items-center gap-x-4 gap-y-2 text-4xl font-black leading-[0.98] tracking-normal text-elinsa-dark sm:text-5xl md:text-7xl dark:text-white">
-              <span>nós</span>
+              <span>Nós</span>
               <span aria-label="coração azul" role="img">
                 💙
               </span>
-              <span>o código aberto</span>
+              <span>código aberto</span>
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-7 text-foreground/80 md:text-xl md:leading-8">
               Este site é construído sobre bibliotecas, ferramentas e
@@ -346,7 +437,7 @@ export default function LicencasPage() {
           </div>
 
           <div className="mt-12 grid gap-4 md:grid-cols-3">
-            <Card className="gap-0 rounded-md border border-border bg-card p-5 text-foreground shadow-sm ring-0">
+            <Card className="gap-0 border border-border bg-card p-5 text-foreground shadow-sm ring-0">
               <div className="mb-5 flex size-11 items-center justify-center rounded-md bg-elinsa-light text-elinsa-dark">
                 <PackageOpen className="size-5" />
               </div>
@@ -359,25 +450,25 @@ export default function LicencasPage() {
               </p>
             </Card>
 
-            <Card className="gap-0 rounded-md border border-border bg-card p-5 text-foreground shadow-sm ring-0">
+            <Card className="gap-0 border border-border bg-card p-5 text-foreground shadow-sm ring-0">
               <div className="mb-5 flex size-11 items-center justify-center rounded-md bg-elinsa-light text-elinsa-dark">
                 <ShieldCheck className="size-5" />
               </div>
               <p className="text-3xl font-black text-elinsa-primary">
                 {licenseFamilies.length}
               </p>
-              <h2 className="mt-2 font-bold">famílias de licença</h2>
+              <h2 className="mt-2 font-bold">Famílias de licença</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {licenseFamilies.join(", ")}.
               </p>
             </Card>
 
-            <Card className="gap-0 rounded-md border border-border bg-card p-5 text-foreground shadow-sm ring-0">
+            <Card className="gap-0 border border-border bg-card p-5 text-foreground shadow-sm ring-0">
               <div className="mb-5 flex size-11 items-center justify-center rounded-md bg-elinsa-light text-elinsa-dark">
                 <Heart className="size-5 fill-current" />
               </div>
               <p className="text-3xl font-black text-elinsa-primary">
-                obrigado
+                Obrigado
               </p>
               <h2 className="mt-2 font-bold">à comunidade</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -390,7 +481,8 @@ export default function LicencasPage() {
 
       <section className="border-b border-border bg-muted/35 px-6 py-12 md:px-8">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-[0.75fr_1.25fr] md:items-center">
-          <div className="inline-flex w-fit items-center gap-2 rounded-md bg-background px-3 py-2 text-sm font-semibold text-muted-foreground">
+          {/* <div className="inline-flex w-fit items-center gap-2 rounded-md bg-background px-3 py-2 text-sm font-semibold text-muted-foreground"> */}
+          <div className="mb-4 w-fit inline-flex items-center gap-2 rounded-md border border-border bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-primary">
             <Code2 className="size-4 text-elinsa-primary" />
             Transparência
           </div>
