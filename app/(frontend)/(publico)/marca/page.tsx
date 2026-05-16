@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { downloadAsset } from "@/lib/download-asset";
 
 export const metadata: Metadata = {
   title: "Kit de marca",
@@ -153,7 +154,7 @@ function createAsset({
     imageClassName,
     files: assetFormats.map((format) => ({
       format,
-      href: `/kit-de-marca/${format}/${fileName}.${format}`,
+      href: downloadAsset(`kit-de-marca/${format}/${fileName}.${format}`),
     })),
   };
 }
@@ -353,7 +354,7 @@ export default function MarcaPage() {
                     </a>
                   </Button>
                   <Button variant="outline" size="lg" asChild className="h-9">
-                    <a href="/kit-de-marca/kit.7z" download>
+                    <a href={downloadAsset("kit-de-marca/kit.7z")} download>
                       <Download />
                       Baixar kit
                     </a>
