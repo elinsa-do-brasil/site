@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
@@ -19,6 +18,11 @@ const sitemapLinks = [
 const internalLinks = [
   { href: "/portal", label: "Portal Interno" },
   { href: "/payload", label: "Payload CMS" },
+];
+
+const legalLinks = [
+  { href: "/privacidade", label: "Política de Privacidade" },
+  { href: "/termos", label: "Termos de Uso" },
 ];
 
 const socialLinks = [
@@ -43,7 +47,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-background px-6 py-12 md:px-8">
-      <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.25fr_0.75fr_0.75fr_0.8fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.25fr_0.75fr_0.75fr_0.75fr_0.8fr]">
         <div>
           <Logo />
           <p className="mt-5 max-w-md leading-7 text-muted-foreground">
@@ -86,6 +90,22 @@ export function Footer() {
           <h2 className="font-bold">Acesso interno</h2>
           <ul className="mt-4 space-y-3 text-muted-foreground">
             {internalLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="transition-colors hover:text-elinsa-primary"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <nav aria-label="Informações legais">
+          <h2 className="font-bold">Legal</h2>
+          <ul className="mt-4 space-y-3 text-muted-foreground">
+            {legalLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
