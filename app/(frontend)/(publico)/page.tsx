@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity,
   CalendarDays,
+  ChartNoAxesCombined,
   Clock3,
   Factory,
   HardHat,
@@ -12,9 +13,9 @@ import {
   type LucideIcon,
   Map as MapIcon,
   MapPin,
+  NotebookText,
   Scale,
   Users,
-  Wrench,
   Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
@@ -53,6 +54,7 @@ import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
 import Eletricista from "@/public/images/eletricistas.webp";
 import Lampada from "@/public/images/lampada.webp";
+import { AdaptativeLogo } from "@/components/adaptative-logo";
 
 type ServiceCard = {
   id: string;
@@ -180,28 +182,28 @@ const companyValues: ValueCard[] = [
 
 const services: ServiceCard[] = [
   {
-    id: "postes",
-    title: "Obras de distribuição",
-    description:
-      "Ampliação, recondutoramento e correções de rede saem com escopo, equipe, materiais e janela de atendimento alinhados antes da mobilização.",
-    detail: "Planejamento técnico, frota e execução na mesma cadência.",
-    icon: Zap,
-  },
-  {
-    id: "manutencao",
-    title: "Manutenção operacional",
-    description:
-      "Preventivas e corretivas entram por criticidade, risco e impacto no ativo, com retorno de campo para orientar a próxima decisão.",
-    detail: "Menos retrabalho entre chamado, rota e encerramento.",
-    icon: Wrench,
-  },
-  {
     id: "planejamento",
-    title: "Planejamento e suporte",
+    title: "Planejamento e programação",
     description:
-      "Acompanhamento de frentes, produtividade, suprimentos e documentação para manter a operação dedicada previsível.",
-    detail: "Base administrativa conectada às equipes em campo.",
+      "Escopo, equipe, materiais, rota e janela de atendimento são definidos antes da mobilização.",
+    detail: "Tudo começa antes da equipe sair",
+    icon: NotebookText,
+  },
+  {
+    id: "execucao",
+    title: "Mobilização e execução",
+    description:
+      "Obras e manutenções seguem programação técnica, deslocamento e materiais previstos para reduzir interrupções.",
+    detail: "Equipe, frota e execução no mesmo ritmo.",
     icon: HardHat,
+  },
+  {
+    id: "retorno",
+    title: "Retorno e acompanhamento",
+    description:
+      "Retornos operacionais, produtividade e ocorrências alimentam novas frentes, ajustes e suporte técnico.",
+    detail: "O campo orienta a próxima decisão.",
+    icon: ChartNoAxesCombined,
   },
 ];
 
@@ -209,8 +211,8 @@ const baseImpactMetrics: ImpactMetric[] = [
   {
     id: "experiencia",
     value: "14",
-    label: "anos",
-    description: "de atuação desde 2012",
+    label: "anos de atuação",
+    description: "Desde 2012",
   },
   {
     id: "bases",
@@ -515,6 +517,7 @@ export default async function Home() {
 
   return (
     <div className="bg-background text-foreground">
+      {/* hero */}
       <section className="relative flex min-h-[calc(100dvh-12rem)] items-end overflow-visible px-6 pb-10 pt-28 md:min-h-[calc(100dvh-10rem)] md:items-center md:px-8 md:pb-14">
         <div className="absolute inset-x-0 top-0 -bottom-28 overflow-hidden">
           <Image
@@ -533,16 +536,19 @@ export default async function Home() {
           <div className="w-full max-w-72 min-w-0 sm:max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-white/80 px-3 py-2 text-sm font-semibold text-elinsa-dark shadow-sm backdrop-blur dark:bg-background/70 dark:text-elinsa-sky">
               <HugeiconsIcon icon={Building01Icon} className="size-4" />
-              Infraestrutura elétrica empresarial
+              Infraestrutura e operação elétrica
             </div>
-            <h1 className="max-w-3xl text-4xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-5xl md:text-7xl dark:text-white">
-              Elinsa do Brasil
-            </h1>
-            <p className="mt-6 max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
-              Obras, manutenção, planejamento e suporte operacional para o Grupo
-              Equatorial Energia no Pará, combinando bases regionais, segurança
-              de campo e previsibilidade técnica.
-            </p>
+
+            <div className="flex flex-col gap-6">
+              <AdaptativeLogo />
+              <h2 className="max-w-3xl text-4xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-3xl md:text-4xl dark:text-white">
+                Operação forte. Energia contínua.
+                </h2>
+              <p className="max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
+                Planejamento, suporte operacional e execução técnica para manter a infraestrutura elétrica em movimento.
+              </p>
+
+            </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Button
@@ -555,19 +561,19 @@ export default async function Home() {
                   <HugeiconsIcon icon={ArrowRight02Icon} />
                 </Link>
               </Button>
-              <Button
-                variant="secondary"
+              <Button            
                 size="xl"
                 className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
                 asChild
               >
-                <Link href="/imprensa">Ver notícias</Link>
+                <Link href="/imprensa">Conheça nossa atuação</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
+      {/* métricas */}
       <section className="relative z-20 -mt-10 px-6 pb-12 md:-mt-12 md:px-8">
         <div className="mx-auto max-w-6xl rounded-3xl border border-border/70 bg-background/95 p-3 shadow-xl shadow-elinsa-dark/5 backdrop-blur">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -595,6 +601,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* sessão de mapas */}
       <section id="bases" className="mx-auto max-w-6xl py-20">
         <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
           <div>
@@ -604,13 +611,11 @@ export default async function Home() {
             </div>
             <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
               Operação distribuída <br />
-              no Pará
+              pelo Pará
             </h2>
           </div>
-          <p className="text-lg text-muted-foreground">
-            A partir desses polos, a Elinsa mobiliza equipes, frota e liderança
-            operacional para apoiar projetos elétricos em diferentes regiões do
-            estado.
+          <p className="text-lg text-muted-foreground border-l-3 border-elinsa-primary pl-6 md:pl-12">
+            Com bases estrategicamente distribuídas, a Elinsa coorden equipes, frota e suporte operacional para garantir presença técnica em todo o estado.
           </p>
         </div>
 
@@ -641,6 +646,7 @@ export default async function Home() {
         </BentoGrid>
       </section>
 
+      {/* sessão de Como a operação acontece */}
       <section className="overflow-hidden bg-muted/25 px-6 py-14 md:px-8 lg:h-[min(44rem,calc(100dvh-5rem))] lg:py-8">
         <div className="mx-auto grid h-full max-w-6xl gap-5 lg:grid-cols-[0.88fr_1.12fr] lg:items-stretch">
           <div className="relative min-h-88 overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark p-6 text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0">
@@ -685,16 +691,13 @@ export default async function Home() {
             <div>
               <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm font-semibold text-muted-foreground">
                 <Factory className="size-4 text-elinsa-primary" />
-                Fluxo de execução
+                Como a operação acontece
               </div>
               <h2 className="max-w-3xl text-3xl font-extrabold tracking-normal md:text-4xl">
-                Engenharia, campo e manutenção no mesmo ritmo
+                Planejamento, mobilização e execução alinhados
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-                Uma frente só funciona quando escopo, deslocamento, equipe,
-                material e retorno de campo chegam juntos. Essa cadência mantém
-                obras, manutenção e suporte técnico alinhados nas bases
-                atendidas.
+                Cada frente mobilizada sai com escopo definido, equipe alinhada, materiais previstos e janela de atendimento organizada. O retorno de campo alimenta as próximas decisões operacionais.
               </p>
             </div>
 
@@ -709,7 +712,7 @@ export default async function Home() {
                 >
                   <service.icon
                     className={cn(
-                      "pointer-events-none absolute -right-7 -top-9 size-32 text-elinsa-primary/8 transition duration-300 group-hover:scale-105 group-hover:text-elinsa-primary/12",
+                      "pointer-events-none absolute -right-7 -top-9 size-32 text-elinsa-primary/10 transition duration-300 group-hover:scale-105 group-hover:text-elinsa-primary/12",
                       index === 0 && "md:-right-9 md:-top-12 md:size-40",
                     )}
                     strokeWidth={1.5}
@@ -737,6 +740,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* sessão de valores */}
       <section id="valores" className="bg-background px-6 py-20 md:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 max-w-2xl">
@@ -788,6 +792,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* sessão de notícias */}
       <section className="w-full bg-background px-6 py-20 md:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
