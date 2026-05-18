@@ -31,7 +31,7 @@ import {
   MapParagominas,
   MapSantarem,
 } from "@/components/maps/municipalities";
-import { Badge } from "@/components/ui/badge";
+import { Badge as ShadcnBadge } from "@/components/ui/badge";
 import { BentoGrid } from "@/components/ui/bento-grid";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +56,9 @@ import Eletricista from "@/public/images/eletricistas.webp";
 import Lampada from "@/public/images/lampada.webp";
 import { AdaptativeLogo } from "@/components/adaptative-logo";
 import { Separator } from "@/components/ui/separator";
+import { GalleryCard } from "@/components/gallery-card";
+
+import { Badge } from "@/components/badge";
 
 type ServiceCard = {
   id: string;
@@ -136,6 +139,7 @@ type ValueCard = {
   description: string;
   icon: LucideIcon;
   accentClassName: string;
+  iconColor: string;
 };
 
 const companyValues: ValueCard[] = [
@@ -146,6 +150,7 @@ const companyValues: ValueCard[] = [
       "Nenhuma entrega é mais importante que a segurança das pessoas. Antes de prazo, produtividade ou meta, cada frente operacional é planejada para proteger quem está no campo.",
     icon: Heart,
     accentClassName: "text-rose-500 bg-rose-500/10",
+    iconColor: "group-hover:text-rose-500/20"
   },
   {
     id: "gente",
@@ -154,6 +159,7 @@ const companyValues: ValueCard[] = [
       "Operação forte começa com pessoas preparadas. Investimos no desenvolvimento de equipes porque segurança, execução e resultado dependem de quem está no campo e na base.",
     icon: Users,
     accentClassName: "text-amber-500 bg-amber-500/10",
+    iconColor: "group-hover:text-amber-500/20"
   },
   {
     id: "inovacao",
@@ -163,6 +169,7 @@ const companyValues: ValueCard[] = [
       "Inovamos em busca da excelência e da rentabilidade para clientes, colaboradores, fornecedores e acionistas.",
     icon: Lightbulb,
     accentClassName: "text-sky-500 bg-sky-500/10",
+    iconColor: "group-hover:text-sky-500/20"
   },
   {
     id: "integridade",
@@ -171,6 +178,7 @@ const companyValues: ValueCard[] = [
       "Confiança se constrói na prática. Agimos com transparência nas relações, coerência nas decisões e responsabilidade em cada entrega.",
     icon: Scale,
     accentClassName: "text-violet-500 bg-violet-500/10",
+    iconColor: "group-hover:text-violet-500/20"
   },
   {
     id: "sustentabilidade",
@@ -179,6 +187,7 @@ const companyValues: ValueCard[] = [
       "Atuamos com responsabilidade ambiental e compromisso com o desenvolvimento das regiões onde operamos.",
     icon: Leaf,
     accentClassName: "text-emerald-500 bg-emerald-500/10",
+    iconColor: "group-hover:text-emerald-500/20"
   },
 ];
 
@@ -434,9 +443,9 @@ function PressNewsCard({ post }: { post: EditorialPost }) {
             sizes="(min-width: 1024px) 22rem, (min-width: 768px) 50vw, 100vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.78)_100%)]" />
-          <Badge className="absolute left-4 top-4 bg-white/92 text-elinsa-dark shadow-sm backdrop-blur hover:bg-white">
+          <ShadcnBadge className="absolute left-4 top-4 bg-white/92 text-elinsa-dark shadow-sm backdrop-blur hover:bg-white">
             {subjectLabel}
-          </Badge>
+          </ShadcnBadge>
         </div>
 
         <CardHeader className="gap-3 p-5 pb-3">
@@ -571,10 +580,7 @@ export default async function Home() {
       <section id="bases" className="mx-auto max-w-6xl py-20">
         <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
           <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
-              <MapPin className="size-4" />
-              Bases estratégicas
-            </div>
+            <Badge text="Bases regionais" icon={MapPin}/>
             <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
               Operação distribuída <br />
               pelo Pará
@@ -616,50 +622,16 @@ export default async function Home() {
       <Separator />
       <section className="overflow-hidden bg-muted/25 px-6 py-14 md:px-8 lg:py-20 min-h-dvh">
         <div className="mx-auto grid h-full max-w-6xl gap-5 lg:grid-cols-[0.88fr_1.12fr] lg:items-stretch">
-          <div className="relative min-h-88 overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark p-6 text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0">
-            <Image
-              src={Lampada}
-              alt="Lâmpada acesa em uma composição conceitual de operação elétrica"
-              fill
-              className="object-cover object-center opacity-45"
-              sizes="(min-width: 1024px) 31vw, 100vw"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,16,24,0.96)_0%,rgba(8,16,24,0.82)_48%,rgba(8,16,24,0.54)_100%)]" />
-            <div className="relative flex h-full flex-col justify-between gap-8">
-              <div className="inline-flex w-fit items-center gap-2 rounded-md border border-white/18 bg-white/10 px-3 py-2 text-sm font-semibold backdrop-blur">
-                <Zap className="size-4 text-yellow-300" />
-                Programação em campo
-              </div>
+          {/* card de destaque com imagem de lâmpada e texto sobre programação em campo */}
+          <GalleryCard />
 
-              <div>
-                <p className="max-w-sm text-2xl font-black leading-tight tracking-normal md:text-3xl">
-                  Ordem, rota, equipe e material fechados antes da mobilização.
-                </p>
-                <p className="mt-4 max-w-sm text-sm leading-6 text-white/72">
-                  A execução fica mais clara quando cada frente sai com
-                  responsável, janela de atendimento e retorno esperado.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-sm">
-                {["Escopo", "Rota", "Retorno"].map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-md border border-white/14 bg-white/10 px-3 py-2 text-center font-semibold text-white/88 backdrop-blur"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
+          {/* etapas da operação */}
           <div className="flex flex-col justify-center gap-5 lg:min-h-0">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-2 text-sm font-semibold text-muted-foreground">
-                <Factory className="size-4 text-elinsa-primary" />
-                Como a operação acontece
-              </div>
+
+              <Badge text="Como a operação acontece" icon={Factory}/>
+
+
               <h2 className="max-w-3xl text-3xl font-extrabold tracking-normal md:text-4xl">
                 Planejamento, mobilização e execução alinhados
               </h2>
@@ -675,7 +647,7 @@ export default async function Home() {
                 <ShadcnCard
                   key={service.id}
                   className={cn(
-                    "group relative overflow-hidden border-border bg-background shadow-sm transition-colors hover:border-elinsa-primary/45",
+                    "group relative overflow-hidden border-border bg-card shadow-sm transition-colors hover:border-elinsa-primary/45",
                     index === 0 ? "md:col-span-2" : "flex flex-col md:min-h-52",
                   )}
                 >
@@ -715,10 +687,7 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
-                <Heart className="size-4 text-elinsa-primary" />
-                Cultura e identidade
-              </div>
+              <Badge text="Cultura e identidade" icon={Heart}/>
               <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
                 O que orienta <br />
                 nossa operação
@@ -740,7 +709,7 @@ export default async function Home() {
                 )}
               >
                 <value.icon
-                  className="pointer-events-none absolute -right-6 -top-6 size-28 text-foreground/4 transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground/[0.07]"
+                  className={cn("pointer-events-none absolute -right-6 -top-4 size-28 text-foreground/4 transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground/[0.07]", value.iconColor)}
                   strokeWidth={1.2}
                 />
                 <CardContent className="relative z-10">
@@ -771,10 +740,7 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
-                <Activity className="size-4 text-elinsa-primary" />
-                Notícias
-              </div>
+              <Badge text="Notícias" icon={Activity} />
               <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
                 Últimas atualizações
               </h2>
