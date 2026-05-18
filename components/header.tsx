@@ -2,8 +2,12 @@
 
 import {
   AiUserIcon,
+  Alert01Icon,
   Building01Icon,
+  GoogleDocIcon,
   LayoutGridIcon,
+  LegalDocument01Icon,
+  LighthouseIcon,
   Megaphone01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -95,6 +99,57 @@ export function Header() {
                             icon={LayoutGridIcon}
                             title="Kit de marca"
                             description="Cores e logos oficiais"
+                          />
+                        </ul>
+                      </div>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="bg-transparent">
+                    Apoio
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid gap-4 w-150 grid-cols-2 p-4">
+                      {/* Left Column */}
+                      <div>
+                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
+                          Documentação
+                        </h4>
+                        <ul className="flex flex-col gap-2">
+                          <DropdownItem
+                            href="/"
+                            icon={LighthouseIcon}
+                            title="Ajuda ao colaborador"
+                            description="Orientações e materiais úteis"
+                          />
+                          <DropdownItem
+                            href="/"
+                            icon={GoogleDocIcon}
+                            title="Documentação"
+                            description="Guias, políticas institucionais"
+                          />
+                        </ul>
+                      </div>
+
+                      {/* Right Column */}
+                      <div>
+                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
+                          Ética
+                        </h4>
+                        <ul className="flex flex-col gap-2">
+                          <DropdownItem
+                            href="/"
+                            icon={LegalDocument01Icon}
+                            title="Código de conduta"
+                            description="As diretrizes da nossa atuação"
+                          />
+                          <DropdownItem
+                            href="/denunciar"
+                            icon={Alert01Icon}
+                            title="Canal de denúncias"
+                            description="Denuncie de forma segura"
                           />
                         </ul>
                       </div>
