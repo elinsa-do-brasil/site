@@ -1,7 +1,8 @@
-import { ArrowRight02Icon, Building01Icon } from "@hugeicons/core-free-icons";
+import { Building01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity,
+  ArrowRight,
   CalendarDays,
   ChartNoAxesCombined,
   Clock3,
@@ -11,7 +12,6 @@ import {
   Leaf,
   Lightbulb,
   type LucideIcon,
-  Map as MapIcon,
   MapPin,
   NotebookText,
   Scale,
@@ -55,6 +55,7 @@ import { cn } from "@/lib/utils";
 import Eletricista from "@/public/images/eletricistas.webp";
 import Lampada from "@/public/images/lampada.webp";
 import { AdaptativeLogo } from "@/components/adaptative-logo";
+import { Separator } from "@/components/ui/separator";
 
 type ServiceCard = {
   id: string;
@@ -140,9 +141,9 @@ type ValueCard = {
 const companyValues: ValueCard[] = [
   {
     id: "respeito-vida",
-    title: "Respeito à Vida",
+    title: "Respeito à vida",
     description:
-      "Priorizamos a vida em primeiro lugar. Cada decisão operacional passa pela segurança das pessoas antes de qualquer meta ou prazo.",
+      "Nenhuma entrega é mais importante que a segurança das pessoas. Antes de prazo, produtividade ou meta, cada frente operacional é planejada para proteger quem está no campo.",
     icon: Heart,
     accentClassName: "text-rose-500 bg-rose-500/10",
   },
@@ -150,13 +151,14 @@ const companyValues: ValueCard[] = [
     id: "gente",
     title: "Gente",
     description:
-      "Nossas realizações são conquistas de cada pessoa do nosso time. O crescimento da empresa começa pelo desenvolvimento de quem faz parte dela.",
+      "Operação forte começa com pessoas preparadas. Investimos no desenvolvimento de equipes porque segurança, execução e resultado dependem de quem está no campo e na base.",
     icon: Users,
     accentClassName: "text-amber-500 bg-amber-500/10",
   },
   {
     id: "inovacao",
-    title: "Inovação e Geração de Valor",
+    title: "Eficiência e melhoria contínua",
+    // Porque empresa operacional geralmente não vende “inovação”, vende: eficiência, melhoria contínua, excelência operacional, rentabilidade. Inovação é o meio, não o fim.
     description:
       "Inovamos em busca da excelência e da rentabilidade para clientes, colaboradores, fornecedores e acionistas.",
     icon: Lightbulb,
@@ -166,15 +168,15 @@ const companyValues: ValueCard[] = [
     id: "integridade",
     title: "Integridade",
     description:
-      "Agimos com ética e transparência em todas as relações. A confiança se constrói com coerência entre discurso e prática.",
+      "Confiança se constrói na prática. Agimos com transparência nas relações, coerência nas decisões e responsabilidade em cada entrega.",
     icon: Scale,
     accentClassName: "text-violet-500 bg-violet-500/10",
   },
   {
     id: "sustentabilidade",
-    title: "Sustentabilidade e Responsabilidade Socioambiental",
+    title: "Sustentabilidade",
     description:
-      "Somos agentes ativos da preservação do meio ambiente, investindo para contribuir com o desenvolvimento social e ambiental.",
+      "Atuamos com responsabilidade ambiental e compromisso com o desenvolvimento das regiões onde operamos.",
     icon: Leaf,
     accentClassName: "text-emerald-500 bg-emerald-500/10",
   },
@@ -413,42 +415,6 @@ function RegionalIntroCard({
   );
 }
 
-function CoverageMapCard({ className }: { className?: string }) {
-  return (
-    <Link
-      href="/mapas"
-      className={cn(
-        "group relative flex h-full min-h-52 overflow-hidden rounded-3xl border border-elinsa-primary/25 bg-elinsa-dark p-6 text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:bg-elinsa-primary hover:shadow-xl",
-        className,
-      )}
-    >
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(36,163,221,0.28),rgba(255,255,255,0)_58%)]" />
-      <MapIcon className="absolute -right-8 -top-14 size-48 text-white/10 transition-transform duration-300 group-hover:scale-105" />
-      <div className="relative z-10 grid w-full gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-        <div className="max-w-2xl">
-          <div className="mb-5 flex size-11 items-center justify-center rounded-md bg-white/12">
-            <Factory className="size-5" />
-          </div>
-          <h3 className="text-2xl font-black tracking-normal md:text-3xl">
-            Mapa operacional completo
-          </h3>
-          <p className="mt-3 leading-7 text-white/80">
-            Explore as regionais, bases, municípios atendidos e arquivos de
-            download em uma visão dedicada.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 font-semibold">
-          <span>Ver mapas</span>
-          <HugeiconsIcon
-            icon={ArrowRight02Icon}
-            className="size-5 transition-transform group-hover:translate-x-1"
-          />
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 function PressNewsCard({ post }: { post: EditorialPost }) {
   const href = post.slug ? `/imprensa/${post.slug}` : "/imprensa";
   const coverImage = getEditorialCoverImage(post, "card");
@@ -495,12 +461,10 @@ function PressNewsCard({ post }: { post: EditorialPost }) {
           </CardDescription>
         </CardHeader>
 
-        <CardFooter className="px-5 pb-5 pt-0">
+        <CardFooter className="pb-5 pt-0">
           <span className="inline-flex items-center gap-2 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
             Ler notícia
-            <HugeiconsIcon
-              icon={ArrowRight02Icon}
-              className="size-4 transition-transform group-hover:translate-x-1"
+            <ArrowRight className="transition-transform group-hover:translate-x-1" size={16}
             />
           </span>
         </CardFooter>
@@ -534,20 +498,21 @@ export default async function Home() {
 
         <div className="relative z-10 mx-auto w-full max-w-72 sm:max-w-6xl">
           <div className="w-full max-w-72 min-w-0 sm:max-w-3xl">
+            <AdaptativeLogo className="mb-8"/>
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-white/80 px-3 py-2 text-sm font-semibold text-elinsa-dark shadow-sm backdrop-blur dark:bg-background/70 dark:text-elinsa-sky">
+            
               <HugeiconsIcon icon={Building01Icon} className="size-4" />
               Infraestrutura e operação elétrica
             </div>
 
             <div className="flex flex-col gap-6">
-              <AdaptativeLogo />
               <h2 className="max-w-3xl text-4xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-3xl md:text-4xl dark:text-white">
                 Operação forte. Energia contínua.
-                </h2>
+              </h2>
               <p className="max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
-                Planejamento, suporte operacional e execução técnica para manter a infraestrutura elétrica em movimento.
+                Planejamento, suporte operacional e execução técnica para manter
+                a infraestrutura elétrica em movimento.
               </p>
-
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -558,10 +523,10 @@ export default async function Home() {
               >
                 <Link href="/quem-somos">
                   Conheça a empresa
-                  <HugeiconsIcon icon={ArrowRight02Icon} />
+                  <ArrowRight />
                 </Link>
               </Button>
-              <Button            
+              <Button
                 size="xl"
                 className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
                 asChild
@@ -602,6 +567,7 @@ export default async function Home() {
       </section>
 
       {/* sessão de mapas */}
+      <Separator />
       <section id="bases" className="mx-auto max-w-6xl py-20">
         <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
           <div>
@@ -615,7 +581,9 @@ export default async function Home() {
             </h2>
           </div>
           <p className="text-lg text-muted-foreground border-l-3 border-elinsa-primary pl-6 md:pl-12">
-            Com bases estrategicamente distribuídas, a Elinsa coorden equipes, frota e suporte operacional para garantir presença técnica em todo o estado.
+            Com bases estrategicamente distribuídas, a Elinsa coorden equipes,
+            frota e suporte operacional para garantir presença técnica em todo o
+            estado.
           </p>
         </div>
 
@@ -641,13 +609,12 @@ export default async function Home() {
           <MapSantarem className="h-full min-h-76 md:col-span-4 md:row-span-2 md:min-h-0 lg:col-span-3" />
           <MapItaituba className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
           <MapMonteAlegre className="h-full min-h-76 md:col-span-3 md:row-span-2 md:min-h-0 lg:col-span-3" />
-
-          <CoverageMapCard className="md:col-span-6 md:row-span-1 lg:col-span-12" />
         </BentoGrid>
       </section>
 
       {/* sessão de Como a operação acontece */}
-      <section className="overflow-hidden bg-muted/25 px-6 py-14 md:px-8 lg:h-[min(44rem,calc(100dvh-5rem))] lg:py-8">
+      <Separator />
+      <section className="overflow-hidden bg-muted/25 px-6 py-14 md:px-8 lg:py-20 min-h-dvh">
         <div className="mx-auto grid h-full max-w-6xl gap-5 lg:grid-cols-[0.88fr_1.12fr] lg:items-stretch">
           <div className="relative min-h-88 overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark p-6 text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0">
             <Image
@@ -697,7 +664,9 @@ export default async function Home() {
                 Planejamento, mobilização e execução alinhados
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-                Cada frente mobilizada sai com escopo definido, equipe alinhada, materiais previstos e janela de atendimento organizada. O retorno de campo alimenta as próximas decisões operacionais.
+                Cada frente mobilizada sai com escopo definido, equipe alinhada,
+                materiais previstos e janela de atendimento organizada. O
+                retorno de campo alimenta as próximas decisões operacionais.
               </p>
             </div>
 
@@ -741,19 +710,23 @@ export default async function Home() {
       </section>
 
       {/* sessão de valores */}
+      <Separator />
       <section id="valores" className="bg-background px-6 py-20 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-12 max-w-2xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm font-semibold text-muted-foreground">
-              <Heart className="size-4 text-elinsa-primary" />
-              Cultura e identidade
+          <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
+                <Heart className="size-4 text-elinsa-primary" />
+                Cultura e identidade
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
+                O que orienta <br />
+                nossa operação
+              </h2>
             </div>
-            <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
-              Nossos valores
-            </h2>
-            <p className="mt-4 text-lg leading-8 text-muted-foreground">
-              Os princípios que orientam cada decisão, cada frente de trabalho e
-              cada relacionamento dentro da Elinsa do Brasil.
+            <p className="text-lg text-muted-foreground border-l-3 border-elinsa-primary pl-6 md:pl-12">
+              Mais do que diretrizes, são princípios que orientam como
+              planejamos, executamos e trabalhamos todos os dias.
             </p>
           </div>
 
@@ -793,28 +766,22 @@ export default async function Home() {
       </section>
 
       {/* sessão de notícias */}
+      <Separator />
       <section className="w-full bg-background px-6 py-20 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-10 grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+          <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold text-muted-foreground">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
                 <Activity className="size-4 text-elinsa-primary" />
                 Notícias
               </div>
-              <h2 className="text-3xl font-extrabold tracking-normal md:text-3xl">
-                Últimas da imprensa
+              <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
+                Últimas atualizações
               </h2>
-              <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
-                Comunicados e notícias institucionais sobre atuação, equipes e
-                atualizações públicas da Elinsa do Brasil.
-              </p>
             </div>
-            <Button asChild className="gap-2 rounded-md" variant="outline">
-              <Link href="/imprensa">
-                Ver imprensa
-                <HugeiconsIcon icon={ArrowRight02Icon} className="size-4" />
-              </Link>
-            </Button>
+            <p className="text-lg text-muted-foreground border-l-3 border-elinsa-primary pl-6 md:pl-12">
+              Acompanhe comunicados, novidades e atualizações sobre operações, equipes e iniciativas da Elinsa do Brasil.
+            </p>
           </div>
         </div>
 
@@ -838,31 +805,16 @@ export default async function Home() {
             </ShadcnCard>
           </div>
         )}
-      </section>
 
-      {/* <section className="border-y border-border bg-elinsa-dark px-6 py-16 text-white md:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1fr_auto] md:items-center">
-          <div>
-            <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
-              Operação dedicada ao Grupo Equatorial Energia
-            </h2>
-            <p className="mt-4 max-w-2xl leading-7 text-white/78">
-              A Elinsa do Brasil atua em obras, manutenção, planejamento e
-              suporte técnico para as frentes atendidas no Pará.
-            </p>
-          </div>
-          <Button
-            size="xl"
-            className="w-fit bg-white text-elinsa-dark hover:bg-elinsa-light"
-            asChild
-          >
-            <a href="mailto:comercial@elinsa.com.br">
-              Solicitar contato
-              <Cable className="size-4" />
-            </a>
-          </Button>
+        <div className="mx-auto mt-10 max-w-6xl text-center">
+          <Button variant={"ghost"} size={"lg"} asChild>
+          <Link href="/imprensa">
+            Ver todas as notícias
+            <ArrowRight />
+          </Link>
+        </Button>
         </div>
-      </section> */}
+      </section>
     </div>
   );
 }
