@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../globals.css";
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { FrontendShell } from "@/components/frontend-shell";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -81,7 +82,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <FrontendShell>{children}</FrontendShell>
+          <TooltipProvider>
+            <FrontendShell>{children}</FrontendShell>
+          </TooltipProvider>
         </ThemeProvider>
         <SpeedInsights />
       </body>
