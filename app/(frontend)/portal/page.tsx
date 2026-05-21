@@ -4,6 +4,7 @@ import {
   FileText,
   LayoutGrid,
   Link2,
+  Mail,
   Newspaper,
   QrCode,
   ShieldCheck,
@@ -310,6 +311,9 @@ function ToolIcon({ tool }: { tool: InternalTool }) {
 
   if (text.includes("qr")) return <QrCode className="size-5" />;
   if (text.includes("link")) return <Link2 className="size-5" />;
+  if (text.includes("assinatura") || text.includes("email")) {
+    return <Mail className="size-5" />;
+  }
   if (text.includes("comit")) return <ShieldCheck className="size-5" />;
   if (text.includes("ti")) return <Wrench className="size-5" />;
 

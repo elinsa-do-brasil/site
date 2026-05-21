@@ -123,14 +123,26 @@ export type InternalTool = {
   teamName?: string;
 };
 
+const BUILTIN_INTERNAL_TOOLS: InternalTool[] = [
+  {
+    id: "email-signature",
+    label: "Assinatura de e-mail",
+    description:
+      "Gere e copie a assinatura corporativa no padrão da marca Elinsa.",
+    href: "/portal/assinatura-de-email",
+  },
+];
+
 export async function getAvailableInternalTools(
   context: InternalAccessContext,
 ) {
   const userTeamSet = new Set(context.teams);
   const configuredTools = await listConfiguredPortalTools();
+  const builtinHrefs = new Set(BUILTIN_INTERNAL_TOOLS.map((tool) => tool.href));
 
-  return configuredTools
+  const teamTools = configuredTools
     .filter((tool) => context.isOrgAdmin || userTeamSet.has(tool.teamName))
+    .filter((tool) => !builtinHrefs.has(tool.href))
     .map<InternalTool>((tool) => ({
       id: tool.id,
       label: tool.label,
@@ -138,6 +150,8 @@ export async function getAvailableInternalTools(
       href: tool.href,
       teamName: tool.teamName,
     }));
+
+  return [...BUILTIN_INTERNAL_TOOLS, ...teamTools];
 }
 
 async function listConfiguredPortalTools() {
