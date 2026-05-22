@@ -172,7 +172,7 @@ Always prefer server-first patterns unless interactivity requires client compone
 ## Quality & Architecture
 
 Available skills:
-
+- `quality/diagnose`
 - `quality/site-architecture`
 - `quality/vercel-composition-patterns`
 - `quality/vercel-optimize`
@@ -218,6 +218,35 @@ Use when:
 Prefer technically correct SEO over keyword stuffing.
 
 ---
+
+## Styling & Design System
+
+Available skills:
+
+- `style/shadcn`
+- `style/tailwind-best-practices`
+- `style/tailwind-v4-shadcn`
+
+Use when:
+
+- styling interfaces
+- creating design systems
+- component composition
+- Tailwind CSS usage
+- shadcn/ui components
+- Tailwind v4 migration
+- design tokens
+- spacing systems
+- responsive styling
+- utility-first CSS architecture
+
+Rules:
+
+- Prefer consistent spacing and typography scales.
+- Reuse existing shadcn patterns before creating custom components.
+- Avoid unnecessary utility duplication.
+- Prefer composition over component overengineering.
+- Follow Tailwind v4 conventions when applicable.
 
 # Decision Rules
 
