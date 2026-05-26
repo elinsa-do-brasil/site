@@ -12,9 +12,11 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx --env-file=.env lib/db/seed.ts",
-    "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts"
+    "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
+    "reports:keys": "tsx scripts/generate-report-encryption-keys.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1053.0",
     "@better-auth/passkey": "^1.6.11",
     "@hookform/resolvers": "^5.2.2",
     "@hugeicons/core-free-icons": "^4.1.1",

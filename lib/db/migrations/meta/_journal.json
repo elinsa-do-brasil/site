@@ -8,6 +8,13 @@
       "when": 1778851965783,
       "tag": "0000_fancy_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779805555507,
+      "tag": "0001_faithful_true_believers",
+      "breakpoints": true
     }
   ]
 }

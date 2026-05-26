@@ -28,5 +28,7 @@ export type AnonymousReportContent = {
 };
 
 export type SubmitReportResult = {
+  reportId: string;
   protocol: string;
+  uploadToken: string;
 };

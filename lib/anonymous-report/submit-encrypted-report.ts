@@ -24,9 +24,13 @@ export async function submitEncryptedReport({
 
   const result = (await response.json()) as Partial<SubmitReportResult>;
 
-  if (!result.protocol) {
+  if (!result.protocol || !result.reportId || !result.uploadToken) {
     throw new Error("REPORT_PROTOCOL_MISSING");
   }
 
-  return { protocol: result.protocol };
+  return {
+    protocol: result.protocol,
+    reportId: result.reportId,
+    uploadToken: result.uploadToken,
+  };
 }

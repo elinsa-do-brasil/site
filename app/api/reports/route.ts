@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createReportUploadToken } from "@/lib/reports/attachment-token";
 import { createReport } from "@/lib/reports/repository";
 import { createReportSchema } from "@/lib/reports/validation";
 
@@ -9,7 +10,13 @@ const MAX_CONTENT_LENGTH = 64 * 1024;
 
 function jsonResponse(
   status: number,
-  body: { ok: boolean; message?: string; protocol?: string },
+  body: {
+    ok: boolean;
+    message?: string;
+    protocol?: string;
+    reportId?: string;
+    uploadToken?: string;
+  },
 ) {
   return NextResponse.json(body, {
     status,
@@ -45,6 +52,8 @@ export async function POST(request: NextRequest) {
     return jsonResponse(201, {
       ok: true,
       protocol: report.protocol,
+      reportId: report.id,
+      uploadToken: createReportUploadToken(report.id),
     });
   } catch {
     // Nao registrar body, IP, user-agent, cookies ou qualquer dado tecnico.

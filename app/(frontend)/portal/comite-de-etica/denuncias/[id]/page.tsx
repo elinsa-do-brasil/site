@@ -1,3 +1,9 @@
+import {
+  Download02Icon,
+  EyeIcon,
+  FileAttachmentIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,6 +16,9 @@ import {
   requireCommitteeAccess,
   requireUserId,
 } from "@/lib/comite/access";
+import { decryptAttachmentOriginalName } from "@/lib/reports/attachment-crypto";
+import { formatAttachmentSize } from "@/lib/reports/attachment-limits";
+import { listReportAttachments } from "@/lib/reports/attachments";
 import {
   decryptReportRow,
   getReportById,
@@ -47,6 +56,13 @@ export default async function ReportDetailPage({
   if (!payload) {
     notFound();
   }
+
+  const attachments = (await listReportAttachments(report.id)).map(
+    (attachment) => ({
+      ...attachment,
+      originalName: decryptAttachmentOriginalName(attachment),
+    }),
+  );
 
   await recordReportEvent({
     reportId: report.id,
@@ -147,6 +163,77 @@ export default async function ReportDetailPage({
 
         <Card className="lg:col-span-2">
           <CardHeader>
+            <CardTitle>Anexos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {attachments.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {attachments.map((attachment) => (
+                  <div
+                    key={attachment.id}
+                    className="flex flex-col gap-3 rounded-md border px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="flex min-w-0 items-start gap-3">
+                      <HugeiconsIcon
+                        icon={FileAttachmentIcon}
+                        className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                        strokeWidth={2}
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">
+                          {attachment.originalName}
+                        </p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <Badge variant="outline">
+                            {formatAttachmentMime(attachment.mimeType)}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {formatAttachmentSize(attachment.sizeBytes)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={`/api/committee/attachments/${attachment.id}/view`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <HugeiconsIcon
+                            icon={EyeIcon}
+                            data-icon="inline-start"
+                            strokeWidth={2}
+                          />
+                          Abrir
+                        </a>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={`/api/committee/attachments/${attachment.id}/download`}
+                        >
+                          <HugeiconsIcon
+                            icon={Download02Icon}
+                            data-icon="inline-start"
+                            strokeWidth={2}
+                          />
+                          Baixar
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Nenhum anexo foi enviado nesta denúncia.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
             <CardTitle>Tentativas anteriores</CardTitle>
           </CardHeader>
           <CardContent>
@@ -186,4 +273,12 @@ function contactPreferenceLabel(value: string) {
   };
 
   return labels[value] ?? value;
+}
+
+function formatAttachmentMime(mimeType: string) {
+  if (mimeType === "application/pdf") return "PDF";
+  if (mimeType.startsWith("image/")) return "Imagem";
+  if (mimeType.startsWith("audio/")) return "Áudio";
+  if (mimeType.startsWith("video/")) return "Vídeo";
+  return mimeType;
 }
