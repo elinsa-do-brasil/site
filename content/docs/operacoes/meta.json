@@ -1,0 +1,7 @@
+{
+  "root": true,
+  "title": "Operacoes",
+  "description": "Rotinas de campo, processos e padroes de execucao.",
+  "icon": "HardHat",
+  "pages": ["index", "rotinas"]
+}

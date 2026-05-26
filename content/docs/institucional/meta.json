@@ -1,0 +1,7 @@
+{
+  "root": true,
+  "title": "Institucional",
+  "description": "Identidade, responsabilidades e referencias da empresa.",
+  "icon": "Building2",
+  "pages": ["index", "identidade"]
+}

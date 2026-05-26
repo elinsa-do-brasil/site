@@ -21,6 +21,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
+      "collections/*": ["./.source/*"],
       "@payload-config": ["./payload.config.ts"]
     }
   },

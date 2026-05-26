@@ -125,7 +125,7 @@ export function Header() {
                             description="Orientações e materiais úteis"
                           />
                           <DropdownItem
-                            href="/"
+                            href="/docs"
                             icon={GoogleDocIcon}
                             title="Documentação"
                             description="Guias, políticas institucionais"

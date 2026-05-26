@@ -1,0 +1,7 @@
+{
+  "root": true,
+  "title": "TI",
+  "description": "Arquitetura, sistemas, dados e integracoes.",
+  "icon": "MonitorCog",
+  "pages": ["index", "arquitetura"]
+}

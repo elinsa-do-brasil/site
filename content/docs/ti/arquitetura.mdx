@@ -1,0 +1,26 @@
+---
+title: Arquitetura do site
+description: Mapa inicial das principais camadas da aplicacao.
+---
+
+## Camadas
+
+O site usa Next.js App Router, Payload CMS e componentes React compartilhados.
+
+### Frontend publico
+
+Rotas publicas ficam no grupo de frontend e usam o shell visual principal do site.
+
+### Documentacao
+
+A rota `/docs` fica em um root layout separado para preservar a estetica do Fumadocs.
+
+#### Conteudo MDX
+
+Os arquivos ficam em `content/docs` e sao carregados pela fonte do Fumadocs.
+
+## Convencoes
+
+### Server-first
+
+Mantenha paginas como Server Components sempre que a interatividade nao for necessaria.
