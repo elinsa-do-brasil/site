@@ -1,20 +1,12 @@
-import { and, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
-import { db } from "@/lib/db";
-import { reportAssignments } from "@/lib/db/schema";
 import {
   getElinsaMembership,
   getUserTeamsInElinsa,
   parseRoleList,
 } from "@/lib/organization/access";
+import { ETHICS_COMMITTEE_ROLE } from "@/lib/organization/constants";
 
 const COMMITTEE_TEAM = "comite_etica";
-const TECHNICAL_TEAM = "ti";
-
-const FULL_ACCESS_ROLES = new Set(["owner", "admin", "ethics_admin"]);
-const MEMBER_ROLES = new Set(["ethics_member"]);
-const CONSULTANT_ROLES = new Set(["ethics_consultant"]);
-const TECHNICAL_ROLES = new Set(["ethics_technical"]);
 
 export type CommitteeContext = {
   userId: string;
@@ -22,11 +14,8 @@ export type CommitteeContext = {
   roles: string[];
   teams: string[];
   isCommitteeTeamMember: boolean;
-  isTechnicalTeamMember: boolean;
-  hasFullAccess: boolean;
-  isCommitteeMember: boolean;
-  isConsultant: boolean;
-  isTechnical: boolean;
+  isCommitteeLawyer: boolean;
+  hasCommitteeAccess: boolean;
 };
 
 export async function getCommitteeContext(
@@ -42,7 +31,7 @@ export async function getCommitteeContext(
   const teamNames = teams.map((item) => item.name);
   const roles = parseRoleList(membership.role);
   const isCommitteeTeamMember = teamNames.includes(COMMITTEE_TEAM);
-  const isTechnicalTeamMember = teamNames.includes(TECHNICAL_TEAM);
+  const isCommitteeLawyer = roles.includes(ETHICS_COMMITTEE_ROLE);
 
   return {
     userId,
@@ -50,11 +39,8 @@ export async function getCommitteeContext(
     roles,
     teams: teamNames,
     isCommitteeTeamMember,
-    isTechnicalTeamMember,
-    hasFullAccess: roles.some((role) => FULL_ACCESS_ROLES.has(role)),
-    isCommitteeMember: roles.some((role) => MEMBER_ROLES.has(role)),
-    isConsultant: roles.some((role) => CONSULTANT_ROLES.has(role)),
-    isTechnical: roles.some((role) => TECHNICAL_ROLES.has(role)),
+    isCommitteeLawyer,
+    hasCommitteeAccess: isCommitteeTeamMember && isCommitteeLawyer,
   };
 }
 
@@ -65,11 +51,7 @@ export async function requireCommitteeAccess(userId: string) {
     notFound();
   }
 
-  if (
-    context.isCommitteeTeamMember ||
-    context.hasFullAccess ||
-    (context.isTechnicalTeamMember && context.isTechnical)
-  ) {
+  if (context.hasCommitteeAccess) {
     return context;
   }
 
@@ -81,11 +63,7 @@ export async function canListReports(userId: string) {
 
   if (!context) return false;
 
-  return (
-    context.hasFullAccess ||
-    (context.isCommitteeTeamMember &&
-      (context.isCommitteeMember || context.isConsultant))
-  );
+  return context.hasCommitteeAccess;
 }
 
 export async function canReadReport(input: {
@@ -96,22 +74,7 @@ export async function canReadReport(input: {
 
   if (!context) return false;
 
-  if (
-    context.hasFullAccess ||
-    (context.isCommitteeTeamMember && context.isCommitteeMember)
-  ) {
-    return true;
-  }
-
-  if (context.isCommitteeTeamMember && context.isConsultant) {
-    return isAssigned(input);
-  }
-
-  if (context.isTechnicalTeamMember && context.isTechnical) {
-    return isAssigned(input);
-  }
-
-  return false;
+  return context.hasCommitteeAccess;
 }
 
 export async function canUpdateReport(input: {
@@ -127,18 +90,4 @@ export function requireUserId(userId?: string) {
   }
 
   return userId;
-}
-
-async function isAssigned(input: { userId: string; reportId: string }) {
-  const [assignment] = await db
-    .select({ id: reportAssignments.id })
-    .from(reportAssignments)
-    .where(
-      and(
-        eq(reportAssignments.userId, input.userId),
-        eq(reportAssignments.reportId, input.reportId),
-      ),
-    );
-
-  return Boolean(assignment);
 }

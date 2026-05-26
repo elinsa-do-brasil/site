@@ -34,33 +34,22 @@ export default async function CommitteeSettingsPage() {
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 text-sm sm:grid-cols-2">
+            <InfoItem label="Área" value="Comitê de Ética" />
             <InfoItem
-              label="Área"
+              label="Função"
               value={
-                context.isCommitteeTeamMember
-                  ? "Comitê de Ética"
-                  : "Apoio técnico"
+                context.isCommitteeLawyer
+                  ? "Advogada externa"
+                  : "Não habilitada"
               }
             />
             <InfoItem
               label="Consulta de denúncias"
-              value={
-                context.hasFullAccess || context.isCommitteeMember
-                  ? "Liberada"
-                  : "Restrita"
-              }
+              value={context.hasCommitteeAccess ? "Liberada" : "Restrita"}
             />
             <InfoItem
-              label="Apoio em casos atribuídos"
-              value={
-                context.isConsultant || context.isTechnical
-                  ? "Liberado"
-                  : "Não habilitado"
-              }
-            />
-            <InfoItem
-              label="Administração"
-              value={context.hasFullAccess ? "Liberada" : "Restrita"}
+              label="Gestão dos casos"
+              value={context.hasCommitteeAccess ? "Liberada" : "Restrita"}
             />
           </dl>
         </CardContent>

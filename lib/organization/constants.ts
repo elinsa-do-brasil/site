@@ -1,14 +1,12 @@
 export const TEAM_LEADER_ROLE = "team_leader";
+export const ETHICS_COMMITTEE_ROLE = "ethics";
 
 export const ORGANIZATION_ROLE_LABELS = {
   member: "Membro",
   admin: "Administrador",
   owner: "Proprietário",
   [TEAM_LEADER_ROLE]: "Líder de equipe",
-  ethics_admin: "Administrador do Comitê de Ética",
-  ethics_member: "Membro do Comitê de Ética",
-  ethics_consultant: "Consultor do Comitê de Ética",
-  ethics_technical: "Técnico do Comitê de Ética",
+  [ETHICS_COMMITTEE_ROLE]: "Advogada externa do Comitê de Ética",
 } as const;
 
 export const BUILTIN_ORG_ROLES = [
@@ -16,10 +14,7 @@ export const BUILTIN_ORG_ROLES = [
   "admin",
   "owner",
   TEAM_LEADER_ROLE,
-  "ethics_admin",
-  "ethics_member",
-  "ethics_consultant",
-  "ethics_technical",
+  ETHICS_COMMITTEE_ROLE,
 ] as const;
 
 export const INVITATION_STATUS_OPTIONS = [

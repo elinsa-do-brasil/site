@@ -14,15 +14,11 @@ export const dynamic = "force-dynamic";
 export default async function ComitePage() {
   const session = await auth.api.getSession({ headers: await headers() });
   const userId = requireUserId(session?.user.id);
-  const context = await requireCommitteeAccess(userId);
+  await requireCommitteeAccess(userId);
   const [counts, latestReports] = await Promise.all([
     getReportCountsByStatus(),
     listReportSummaries(6),
   ]);
-  const canSeeList =
-    context.hasFullAccess ||
-    (context.isCommitteeTeamMember &&
-      (context.isCommitteeMember || context.isConsultant));
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4">
@@ -33,11 +29,9 @@ export default async function ComitePage() {
             Painel interno para triagem e acompanhamento de denúncias.
           </p>
         </div>
-        {canSeeList && (
-          <Button asChild>
-            <Link href="/portal/comite-de-etica/denuncias">Ver denúncias</Link>
-          </Button>
-        )}
+        <Button asChild>
+          <Link href="/portal/comite-de-etica/denuncias">Ver denúncias</Link>
+        </Button>
       </div>
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -52,44 +46,37 @@ export default async function ComitePage() {
             <CardTitle>Últimas denúncias</CardTitle>
           </CardHeader>
           <CardContent>
-            {canSeeList ? (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[680px] text-left text-sm">
-                  <thead className="border-b text-muted-foreground">
-                    <tr>
-                      <th className="py-2 pr-4 font-medium">Protocolo</th>
-                      <th className="py-2 pr-4 font-medium">Categoria</th>
-                      <th className="py-2 pr-4 font-medium">Status</th>
-                      <th className="py-2 pr-4 font-medium">Recebida</th>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[680px] text-left text-sm">
+                <thead className="border-b text-muted-foreground">
+                  <tr>
+                    <th className="py-2 pr-4 font-medium">Protocolo</th>
+                    <th className="py-2 pr-4 font-medium">Categoria</th>
+                    <th className="py-2 pr-4 font-medium">Status</th>
+                    <th className="py-2 pr-4 font-medium">Recebida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {latestReports.map((report) => (
+                    <tr key={report.id} className="border-b last:border-0">
+                      <td className="py-3 pr-4 font-mono">
+                        <Link
+                          href={`/portal/comite-de-etica/denuncias/${report.id}`}
+                          className="underline-offset-4 hover:underline"
+                        >
+                          {report.protocol}
+                        </Link>
+                      </td>
+                      <td className="py-3 pr-4">{report.category}</td>
+                      <td className="py-3 pr-4">{report.status}</td>
+                      <td className="py-3 pr-4">
+                        {formatDate(report.createdAt)}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {latestReports.map((report) => (
-                      <tr key={report.id} className="border-b last:border-0">
-                        <td className="py-3 pr-4 font-mono">
-                          <Link
-                            href={`/portal/comite-de-etica/denuncias/${report.id}`}
-                            className="underline-offset-4 hover:underline"
-                          >
-                            {report.protocol}
-                          </Link>
-                        </td>
-                        <td className="py-3 pr-4">{report.category}</td>
-                        <td className="py-3 pr-4">{report.status}</td>
-                        <td className="py-3 pr-4">
-                          {formatDate(report.createdAt)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Seu perfil tem acesso técnico ao canal, mas não ao acervo de
-                denúncias.
-              </p>
-            )}
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
       </section>
