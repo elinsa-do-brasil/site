@@ -1,5 +1,3 @@
-"use client";
-
 import {
   AiUserIcon,
   Alert01Icon,
