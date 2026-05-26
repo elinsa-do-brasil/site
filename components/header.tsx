@@ -9,6 +9,7 @@ import {
   LegalDocument01Icon,
   LighthouseIcon,
   Megaphone01Icon,
+  NotificationSquareIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
@@ -150,6 +151,12 @@ export function Header() {
                             icon={Alert01Icon}
                             title="Canal de denúncias"
                             description="Denuncie de forma segura"
+                          />
+                          <DropdownItem
+                            href="/acompanhar-denuncia"
+                            icon={NotificationSquareIcon}
+                            title="Acompanhar denúncia"
+                            description="Verifique o status de sua denúncia"
                           />
                         </ul>
                       </div>
