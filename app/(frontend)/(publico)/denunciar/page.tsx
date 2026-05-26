@@ -5,8 +5,9 @@ import { ReportPrivacyNotice } from "@/components/anonymous-report/ReportPrivacy
 import { ReportWritingHelp } from "@/components/anonymous-report/ReportWritingHelp";
 
 export const metadata: Metadata = {
-  title: "Canal de Denúncias — Elinsa do Brasil",
-  description: "Canal de denúncias com envio criptografado",
+  title: "Canal de denúncias",
+  description:
+    "Canal de denúncias da Elinsa disponível para colaboradores e público externo.",
   robots: {
     index: false,
     follow: false,
