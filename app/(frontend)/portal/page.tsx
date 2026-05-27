@@ -143,6 +143,18 @@ function PortalSidebar({
   latestBlogPosts: EditorialPost[];
   reportCounts: Record<string, number> | null;
 }) {
+  const inProgressReports =
+    (reportCounts?.opened ?? 0) +
+    (reportCounts?.triage ?? 0) +
+    (reportCounts?.review ?? 0) +
+    (reportCounts?.in_review ?? 0) +
+    (reportCounts?.investigation ?? 0) +
+    (reportCounts?.waiting_information ?? 0);
+  const finishedReports =
+    (reportCounts?.completed ?? 0) +
+    (reportCounts?.closed ?? 0) +
+    (reportCounts?.archived ?? 0);
+
   return (
     <aside className="rounded-md border bg-card p-4 shadow-sm lg:sticky lg:top-24 lg:self-start">
       {adminLinks.length > 0 && (
@@ -180,14 +192,8 @@ function PortalSidebar({
           >
             <div className="grid grid-cols-3 gap-2">
               <ReportMetric label="novas" value={reportCounts?.new ?? 0} />
-              <ReportMetric
-                label="em análise"
-                value={reportCounts?.in_review ?? 0}
-              />
-              <ReportMetric
-                label="encerradas"
-                value={reportCounts?.closed ?? 0}
-              />
+              <ReportMetric label="em andamento" value={inProgressReports} />
+              <ReportMetric label="finalizadas" value={finishedReports} />
             </div>
             <Button asChild className="mt-3 w-full justify-between" size="sm">
               <Link href="/portal/comite-de-etica/denuncias">

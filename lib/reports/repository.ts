@@ -1,12 +1,18 @@
-import { count, desc, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { reportEvents, reports } from "@/lib/db/schema";
+import { reportEvents, reports, user } from "@/lib/db/schema";
 import {
   decryptReportPayload,
   encryptReportPayload,
   type ReportEncryptedPayload,
 } from "./crypto";
 import { createReportProtocol } from "./protocol";
+import {
+  getReportStatusEventType,
+  getReportStatusLabel,
+  REPORT_PUBLIC_EVENT_TYPES,
+  type ReportStatus,
+} from "./status";
 import type { CreateReportInput } from "./validation";
 import { toEncryptedPayload } from "./validation";
 
@@ -92,16 +98,58 @@ export async function getReportById(id: string) {
   return report ?? null;
 }
 
+export async function getPublicReportTrackingByProtocol(protocol: string) {
+  const [report] = await db
+    .select({
+      id: reports.id,
+      protocol: reports.protocol,
+      status: reports.status,
+      createdAt: reports.createdAt,
+      updatedAt: reports.updatedAt,
+    })
+    .from(reports)
+    .where(eq(reports.protocol, protocol));
+
+  if (!report) {
+    return null;
+  }
+
+  const events = await db
+    .select({
+      id: reportEvents.id,
+      type: reportEvents.type,
+      createdAt: reportEvents.createdAt,
+    })
+    .from(reportEvents)
+    .where(
+      and(
+        eq(reportEvents.reportId, report.id),
+        inArray(reportEvents.type, [...REPORT_PUBLIC_EVENT_TYPES]),
+      ),
+    )
+    .orderBy(asc(reportEvents.createdAt));
+
+  return {
+    protocol: report.protocol,
+    status: report.status,
+    createdAt: report.createdAt,
+    updatedAt: report.updatedAt,
+    events,
+  };
+}
+
 export async function listReportEvents(reportId: string) {
   return db
     .select({
       id: reportEvents.id,
       actorUserId: reportEvents.actorUserId,
+      actorName: user.name,
       type: reportEvents.type,
       message: reportEvents.message,
       createdAt: reportEvents.createdAt,
     })
     .from(reportEvents)
+    .leftJoin(user, eq(reportEvents.actorUserId, user.id))
     .where(eq(reportEvents.reportId, reportId))
     .orderBy(desc(reportEvents.createdAt));
 }
@@ -136,6 +184,87 @@ export async function recordReportEvent(input: {
     actorUserId: input.actorUserId,
     type: input.type,
     message: input.message,
+  });
+}
+
+export async function updateReportStatus(input: {
+  reportId: string;
+  status: ReportStatus;
+  actorUserId: string;
+}) {
+  return db.transaction(async (tx) => {
+    const [current] = await tx
+      .select({
+        id: reports.id,
+        protocol: reports.protocol,
+        status: reports.status,
+        updatedAt: reports.updatedAt,
+      })
+      .from(reports)
+      .where(eq(reports.id, input.reportId));
+
+    if (!current) return null;
+
+    if (current.status === input.status) {
+      return current;
+    }
+
+    const [report] = await tx
+      .update(reports)
+      .set({
+        status: input.status,
+        updatedAt: new Date(),
+      })
+      .where(eq(reports.id, input.reportId))
+      .returning({
+        id: reports.id,
+        protocol: reports.protocol,
+        status: reports.status,
+        updatedAt: reports.updatedAt,
+      });
+
+    if (!report) return null;
+
+    await tx.insert(reportEvents).values({
+      reportId: report.id,
+      actorUserId: input.actorUserId,
+      type: getReportStatusEventType(input.status),
+      message: `Status alterado para ${getReportStatusLabel(input.status)}.`,
+    });
+
+    return report;
+  });
+}
+
+export async function openReportIfNew(input: {
+  reportId: string;
+  actorUserId: string;
+}) {
+  return db.transaction(async (tx) => {
+    const [report] = await tx
+      .update(reports)
+      .set({
+        status: "opened",
+        updatedAt: new Date(),
+      })
+      .where(and(eq(reports.id, input.reportId), eq(reports.status, "new")))
+      .returning({
+        id: reports.id,
+        protocol: reports.protocol,
+        status: reports.status,
+        updatedAt: reports.updatedAt,
+      });
+
+    if (!report) return null;
+
+    await tx.insert(reportEvents).values({
+      reportId: report.id,
+      actorUserId: input.actorUserId,
+      type: getReportStatusEventType("opened"),
+      message: "Denúncia aberta para acompanhamento do Comitê de Ética.",
+    });
+
+    return report;
   });
 }
 

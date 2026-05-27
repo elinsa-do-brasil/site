@@ -10,6 +10,7 @@ import {
   requireUserId,
 } from "@/lib/comite/access";
 import { getReportById, listReportEvents } from "@/lib/reports/repository";
+import { getPublicReportEventLabel } from "@/lib/reports/status";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,7 @@ export default async function ReportHistoryPage({
           <CardTitle>Movimentações registradas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {events.map((event) => (
               <div key={event.id} className="border-b pb-4 last:border-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -77,6 +78,9 @@ export default async function ReportHistoryPage({
                     {event.message}
                   </p>
                 )}
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {formatActor(event.actorUserId, event.actorName)}
+                </p>
               </div>
             ))}
           </div>
@@ -97,7 +101,14 @@ function formatEventType(type: string) {
   const labels: Record<string, string> = {
     "report.created": "Denúncia recebida",
     "report.viewed": "Denúncia consultada",
+    "report.attachment_uploaded": "Anexo recebido",
   };
 
-  return labels[type] ?? "Movimentação registrada";
+  return labels[type] ?? getPublicReportEventLabel(type);
+}
+
+function formatActor(actorUserId: string | null, actorName: string | null) {
+  if (!actorUserId) return "Origem: canal público";
+  if (actorName) return `Por ${actorName}`;
+  return "Por usuário autenticado";
 }

@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import Link from "next/link";
+import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
@@ -19,6 +20,15 @@ export default async function ComitePage() {
     getReportCountsByStatus(),
     listReportSummaries(6),
   ]);
+  const inProgressCount =
+    (counts.opened ?? 0) +
+    (counts.triage ?? 0) +
+    (counts.review ?? 0) +
+    (counts.in_review ?? 0) +
+    (counts.investigation ?? 0) +
+    (counts.waiting_information ?? 0);
+  const finishedCount =
+    (counts.completed ?? 0) + (counts.closed ?? 0) + (counts.archived ?? 0);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4">
@@ -36,8 +46,8 @@ export default async function ComitePage() {
 
       <section className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Novas" value={counts.new ?? 0} />
-        <MetricCard label="Em análise" value={counts.in_review ?? 0} />
-        <MetricCard label="Encerradas" value={counts.closed ?? 0} />
+        <MetricCard label="Em andamento" value={inProgressCount} />
+        <MetricCard label="Finalizadas" value={finishedCount} />
       </section>
 
       <section className="mt-8">
@@ -68,7 +78,9 @@ export default async function ComitePage() {
                         </Link>
                       </td>
                       <td className="py-3 pr-4">{report.category}</td>
-                      <td className="py-3 pr-4">{report.status}</td>
+                      <td className="py-3 pr-4">
+                        <ReportStatusBadge status={report.status} />
+                      </td>
                       <td className="py-3 pr-4">
                         {formatDate(report.createdAt)}
                       </td>

@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
@@ -60,7 +61,9 @@ export default async function CommitteeReportsPage() {
                   <tr key={report.id} className="border-b last:border-0">
                     <td className="py-3 pr-4 font-mono">{report.protocol}</td>
                     <td className="py-3 pr-4">{report.category}</td>
-                    <td className="py-3 pr-4">{report.status}</td>
+                    <td className="py-3 pr-4">
+                      <ReportStatusBadge status={report.status} />
+                    </td>
                     <td className="py-3 pr-4">
                       {formatDate(report.createdAt)}
                     </td>

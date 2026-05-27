@@ -7,6 +7,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
+import { ReportStatusSelect } from "@/components/reports/ReportStatusSelect";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +24,7 @@ import { listReportAttachments } from "@/lib/reports/attachments";
 import {
   decryptReportRow,
   getReportById,
+  openReportIfNew,
   recordReportEvent,
 } from "@/lib/reports/repository";
 
@@ -45,10 +48,26 @@ export default async function ReportDetailPage({
     notFound();
   }
 
-  const report = await getReportById(id);
+  let report = await getReportById(id);
 
   if (!report) {
     notFound();
+  }
+
+  const openedReport =
+    report.status === "new"
+      ? await openReportIfNew({ reportId: report.id, actorUserId: userId })
+      : null;
+
+  if (openedReport) {
+    report = (await getReportById(id)) ?? report;
+  } else {
+    await recordReportEvent({
+      reportId: report.id,
+      actorUserId: userId,
+      type: "report.viewed",
+      message: "Denúncia consultada por pessoa autorizada.",
+    });
   }
 
   const payload = decryptReportRow(report);
@@ -64,25 +83,21 @@ export default async function ReportDetailPage({
     }),
   );
 
-  await recordReportEvent({
-    reportId: report.id,
-    actorUserId: userId,
-    type: "report.viewed",
-    message: "Denúncia consultada por pessoa autorizada.",
-  });
-
   return (
     <div className="mx-auto w-full max-w-6xl px-4">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{report.status}</Badge>
+            <ReportStatusBadge status={report.status} />
             <span className="font-mono text-sm text-muted-foreground">
               {report.protocol}
             </span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight">{payload.title}</h1>
           <p className="mt-2 text-muted-foreground">{report.category}</p>
+          <div className="mt-4">
+            <ReportStatusSelect reportId={report.id} status={report.status} />
+          </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -115,7 +130,7 @@ export default async function ReportDetailPage({
             <CardTitle>Dados do caso</CardTitle>
           </CardHeader>
           <CardContent>
-            <dl className="space-y-3 text-sm">
+            <dl className="flex flex-col gap-3 text-sm">
               <DetailItem
                 label="Identificação"
                 value={
