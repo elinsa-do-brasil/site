@@ -16,12 +16,14 @@ import {
   NotebookText,
   Scale,
   Users,
-  Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
+import { AdaptativeLogo } from "@/components/adaptative-logo";
+import { Badge } from "@/components/badge";
+import { GalleryCard } from "@/components/gallery-card";
 import {
   MapAbaetetuba,
   MapAltamira,
@@ -42,6 +44,7 @@ import {
   CardTitle,
   Card as ShadcnCard,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   type EditorialPost,
   formatEditorialDate,
@@ -54,11 +57,7 @@ import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
 import Eletricista from "@/public/images/eletricistas.webp";
 import Lampada from "@/public/images/lampada.webp";
-import { AdaptativeLogo } from "@/components/adaptative-logo";
-import { Separator } from "@/components/ui/separator";
-import { GalleryCard } from "@/components/gallery-card";
-
-import { Badge } from "@/components/badge";
+import dadosAbertos from "@/scripts/estimates/result.json";
 
 type ServiceCard = {
   id: string;
@@ -73,6 +72,19 @@ type ImpactMetric = {
   value: string;
   label: string;
   description: string;
+  featured?: boolean;
+  highlights?: {
+    label: string;
+    prefix: string;
+    value: string;
+  }[];
+};
+
+type DadosAbertosHome = {
+  terras_indigenas: number;
+  terras_quilombolas: number;
+  populacao: number;
+  municipios: number;
 };
 
 type RegionalBentoCard = {
@@ -100,6 +112,13 @@ const HOME_OG_IMAGE = {
   width: 1672,
 };
 const siteUrl = getPublicSiteUrl();
+const homeDadosAbertos = dadosAbertos as DadosAbertosHome;
+const terrasTradicionais =
+  homeDadosAbertos.terras_indigenas + homeDadosAbertos.terras_quilombolas;
+const ptBrIntegerFormatter = new Intl.NumberFormat("pt-BR");
+const ptBrDecimalFormatter = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: 1,
+});
 
 export const metadata: Metadata = {
   title: HOME_TITLE,
@@ -226,10 +245,28 @@ const baseImpactMetrics: ImpactMetric[] = [
     description: "Desde 2012",
   },
   {
-    id: "bases",
-    value: "6",
-    label: "bases",
-    description: "operacionais no Pará",
+    id: "impacto-populacao",
+    value: formatPopulation(homeDadosAbertos.populacao),
+    label: "milhões",
+    description: "de pessoas atendidas",
+    featured: true,
+    highlights: [
+      {
+        value: formatInteger(homeDadosAbertos.municipios),
+        prefix: "em",
+        label: "municípios",
+      },
+      {
+        value: `+ ${formatInteger(terrasTradicionais)}`,
+        prefix: "e",
+        label: "comunidades",
+      },
+      {
+        value: "6",
+        prefix: "por",
+        label: "bases regionais",
+      },
+    ],
   },
   {
     id: "equipes",
@@ -271,6 +308,14 @@ function getImpactMetrics(): ImpactMetric[] {
       description: "sem acidentes e contando",
     },
   ];
+}
+
+function formatInteger(value: number) {
+  return ptBrIntegerFormatter.format(value);
+}
+
+function formatPopulation(value: number) {
+  return ptBrDecimalFormatter.format(value / 1_000_000);
 }
 
 function getDaysSinceLastAccident() {
@@ -491,8 +536,8 @@ export default async function Home() {
   return (
     <div className="bg-background text-foreground">
       {/* hero */}
-      <section className="relative flex min-h-[calc(100dvh-12rem)] items-end overflow-visible px-6 pb-10 pt-28 md:min-h-[calc(100dvh-10rem)] md:items-center md:px-8 md:pb-14">
-        <div className="absolute inset-x-0 top-0 -bottom-28 overflow-hidden">
+      <section className="relative min-h-dvh overflow-hidden px-6 pb-8 pt-28 md:px-8">
+        <div className="absolute inset-0 overflow-hidden">
           <Image
             src={Eletricista}
             alt="Equipe técnica da Elinsa em operação de infraestrutura elétrica"
@@ -505,7 +550,7 @@ export default async function Home() {
           <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-b from-transparent to-background" />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-72 sm:max-w-6xl">
+        <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-9rem)] w-full max-w-72 flex-col justify-end gap-10 sm:max-w-6xl lg:gap-12">
           <div className="w-full max-w-72 min-w-0 sm:max-w-3xl">
             <AdaptativeLogo className="mb-8"/>
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-white/80 px-3 py-2 text-sm font-semibold text-elinsa-dark shadow-sm backdrop-blur dark:bg-background/70 dark:text-elinsa-sky">
@@ -544,33 +589,55 @@ export default async function Home() {
               </Button>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* métricas */}
-      <section className="relative z-20 -mt-10 px-6 pb-12 md:-mt-12 md:px-8">
-        <div className="mx-auto max-w-6xl rounded-3xl border border-border/70 bg-background/95 p-3 shadow-xl shadow-elinsa-dark/5 backdrop-blur">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {impactMetrics.map((metric) => (
-              <article
-                key={metric.id}
-                className="relative overflow-hidden rounded-2xl border border-border/60 bg-muted/30 px-5 py-5 transition-colors hover:border-elinsa-primary/40 hover:bg-elinsa-light/45 dark:hover:bg-elinsa-primary/10"
-              >
-                <div className="absolute right-4 top-4 size-14 rounded-full bg-elinsa-primary/8" />
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black leading-none text-elinsa-primary md:text-5xl">
-                    {metric.value}
-                  </span>
-                </div>
-                <p className="mt-2 text-xs font-bold uppercase tracking-normal text-muted-foreground">
-                  {metric.label}
-                </p>
+          <div className="w-full rounded-3xl border border-border/70 bg-background/95 p-2 shadow-xl shadow-elinsa-dark/5 backdrop-blur mt-8">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {impactMetrics.map((metric, index) => (
+                <article
+                  key={metric.id}
+                  className={cn(
+                    "relative min-h-24 rounded-2xl border border-border/60 bg-muted/30 px-4 py-3 transition-colors hover:border-elinsa-primary/40 hover:bg-elinsa-light/45 dark:hover:bg-elinsa-primary/10",
+                    metric.featured &&
+                      "lg:col-span-2 lg:grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.35fr)] lg:items-center lg:gap-4",
+                  )}
+                >
+                  {index < impactMetrics.length - 1 ? (
+                    <div className="pointer-events-none absolute -right-3 top-12 hidden h-px w-3 bg-elinsa-primary/25 lg:block" />
+                  ) : null}
+                  <div className="absolute right-3 top-3 size-10 rounded-full bg-elinsa-primary/8" />
+                  <div className="relative z-10">
+                    <div>
+                      <span className="block text-[2.25rem] font-black leading-none text-elinsa-primary">
+                        {metric.value}
+                      </span>
+                      <p className="mt-1.5 text-[0.66rem] font-bold uppercase leading-4 tracking-normal text-muted-foreground">
+                        {metric.label}
+                      </p>
+                    </div>
 
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  {metric.description}
-                </p>
-              </article>
-            ))}
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                      {metric.description}
+                    </p>
+                  </div>
+                  {metric.highlights ? (
+                    <dl className="relative z-10 mt-3 space-y-1.5 border-t border-border/70 pt-2 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-4 lg:pt-0">
+                      {metric.highlights.map((highlight) => (
+                        <div
+                          key={highlight.label}
+                          className="flex items-baseline gap-1.5 text-[0.72rem] font-bold uppercase leading-4 tracking-normal text-muted-foreground lg:whitespace-nowrap"
+                        >
+                          <dt>{highlight.prefix}</dt>
+                          <dd className="text-xl font-black leading-none text-elinsa-primary">
+                            {highlight.value}
+                          </dd>
+                          <dt>{highlight.label}</dt>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </section>
