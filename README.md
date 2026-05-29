@@ -134,6 +134,7 @@ O editor de texto é compatível com **Markdown**, um formato de escrita simples
 elinsa/
 ├── app/
 │   ├── (frontend)/           # Páginas públicas do site
+│   │   ├── docs/             # Layout Fumadocs publicado em /docs
 │   │   ├── noticias/
 │   │   ├── trabalhe-conosco/
 │   │   └── ...
@@ -150,6 +151,30 @@ elinsa/
 ├── payload.config.ts         # Configuração do CMS
 └── next.config.ts            # Configuração do site
 ```
+
+---
+
+## Documentação
+
+A área `/docs` usa Fumadocs e lê o conteúdo versionado no submodule `docs/`.
+Depois de clonar o repositório, inicialize o submodule:
+
+```bash
+git submodule update --init --recursive
+```
+
+Para atualizar a documentação, atualize o submodule e commite o novo ponteiro no
+repo principal:
+
+```bash
+cd docs
+git pull origin main
+cd ..
+git add docs
+git commit -m "docs: atualiza documentação"
+```
+
+Em CI/deploy, o checkout precisa baixar submodules recursivamente.
 
 ---
 

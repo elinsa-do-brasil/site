@@ -1,5 +1,5 @@
-import createMDX from "@next/mdx";
 import { withPayload } from "@payloadcms/next/withPayload";
+import { createMDX } from "fumadocs-mdx/next";
 import type { NextConfig } from "next";
 
 function createRemotePattern(value: string | undefined) {
@@ -110,8 +110,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withMDX = createMDX({
-  extension: /\.(md|mdx)$/,
-});
+const withMDX = createMDX();
 
 export default withPayload(withMDX(nextConfig));
