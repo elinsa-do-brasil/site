@@ -42,10 +42,10 @@ yarn-error.log*
 next-env.d.ts
 
 /.docs
+/.source
 
 # secrets
 secrets/
 
 /.agent/memories
 /.agents/plans
-/docs
