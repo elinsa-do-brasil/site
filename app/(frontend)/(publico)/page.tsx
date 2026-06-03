@@ -3,19 +3,24 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Activity,
   ArrowRight,
+  BadgeCheck,
   CalendarDays,
   ChartNoAxesCombined,
+  ClipboardCheck,
   Clock3,
   Factory,
+  Gauge,
+  Handshake,
   HardHat,
   Heart,
-  Leaf,
   Lightbulb,
   type LucideIcon,
   MapPin,
   NotebookText,
-  Scale,
+  ShieldCheck,
+  UserRoundCheck,
   Users,
+  Zap,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -119,6 +124,15 @@ const ptBrIntegerFormatter = new Intl.NumberFormat("pt-BR");
 const ptBrDecimalFormatter = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
 });
+const energyAcronymLetters = [
+  { id: "energia-e-excelencia", letter: "E" },
+  { id: "energia-n-nossa-gente", letter: "N" },
+  { id: "energia-e-espirito", letter: "E" },
+  { id: "energia-r-respeito", letter: "R" },
+  { id: "energia-g-gestao", letter: "G" },
+  { id: "energia-i-inovacao", letter: "I" },
+  { id: "energia-a-atitude", letter: "A" },
+] as const;
 
 export const metadata: Metadata = {
   title: HOME_TITLE,
@@ -152,61 +166,149 @@ export const metadata: Metadata = {
   },
 };
 
-type ValueCard = {
+type CompanyValue = {
   id: string;
+  letter: string;
   title: string;
   description: string;
   icon: LucideIcon;
   accentClassName: string;
-  iconColor: string;
 };
 
-const companyValues: ValueCard[] = [
+type ValuesDeckProps = {
+  label: string;
+  kicker: string;
+  title: string;
+  description: string;
+  values: CompanyValue[];
+  variant: "primary" | "secondary";
+};
+
+const approvedValues: CompanyValue[] = [
   {
-    id: "respeito-vida",
-    title: "Respeito à vida",
+    id: "excelencia-execucao",
+    letter: "E",
+    title: "Excelência na execução",
     description:
-      "Nenhuma entrega é mais importante que a segurança das pessoas. Antes de prazo, produtividade ou meta, cada frente operacional é planejada para proteger quem está no campo.",
-    icon: Heart,
-    accentClassName: "text-rose-500 bg-rose-500/10",
-    iconColor: "group-hover:text-rose-500/20"
+      "Fazemos as coisas bem feitas, com qualidade, disciplina e profissionalismo.",
+    icon: BadgeCheck,
+    accentClassName: "border-sky-500/30 bg-sky-500/10 text-sky-600",
   },
   {
-    id: "gente",
-    title: "Gente",
+    id: "nossa-gente",
+    letter: "N",
+    title: "Nossa gente",
     description:
-      "Operação forte começa com pessoas preparadas. Investimos no desenvolvimento de equipes porque segurança, execução e resultado dependem de quem está no campo e na base.",
+      "Acreditamos que gente cuida de gente. Valorizamos as pessoas, desenvolvemos talentos e crescemos juntos.",
     icon: Users,
-    accentClassName: "text-amber-500 bg-amber-500/10",
-    iconColor: "group-hover:text-amber-500/20"
+    accentClassName: "border-amber-500/30 bg-amber-500/10 text-amber-600",
   },
   {
-    id: "inovacao",
-    title: "Eficiência e melhoria contínua",
-    // Porque empresa operacional geralmente não vende “inovação”, vende: eficiência, melhoria contínua, excelência operacional, rentabilidade. Inovação é o meio, não o fim.
+    id: "espirito-dono",
+    letter: "E",
+    title: "Espírito de dono",
     description:
-      "Inovamos em busca da excelência e da rentabilidade para clientes, colaboradores, fornecedores e acionistas.",
+      "Assumimos responsabilidades e cuidamos da empresa como nossa.",
+    icon: ClipboardCheck,
+    accentClassName: "border-emerald-500/30 bg-emerald-500/10 text-emerald-600",
+  },
+  {
+    id: "respeito",
+    letter: "R",
+    title: "Respeito",
+    description: "Respeitamos pessoas, comunidades, clientes e colegas.",
+    icon: Handshake,
+    accentClassName: "border-rose-500/30 bg-rose-500/10 text-rose-600",
+  },
+  {
+    id: "gestao-seguranca",
+    letter: "G",
+    title: "Gestão com segurança",
+    description: "A segurança vem sempre em primeiro lugar.",
+    icon: ShieldCheck,
+    accentClassName: "border-cyan-500/30 bg-cyan-500/10 text-cyan-600",
+  },
+  {
+    id: "inovacao-melhoria",
+    letter: "I",
+    title: "Inovação e melhoria contínua",
+    description: "Buscamos aprender, evoluir e melhorar continuamente.",
     icon: Lightbulb,
-    accentClassName: "text-sky-500 bg-sky-500/10",
-    iconColor: "group-hover:text-sky-500/20"
+    accentClassName: "border-violet-500/30 bg-violet-500/10 text-violet-600",
   },
   {
-    id: "integridade",
-    title: "Integridade",
+    id: "atitude",
+    letter: "A",
+    title: "Atitude",
+    description: "Transformamos compromisso em ação e resultados.",
+    icon: Zap,
+    accentClassName: "border-orange-500/30 bg-orange-500/10 text-orange-600",
+  },
+];
+
+const proposedValues: CompanyValue[] = [
+  {
+    id: "executamos-qualidade",
+    letter: "E",
+    title: "Executamos com qualidade",
     description:
-      "Confiança se constrói na prática. Agimos com transparência nas relações, coerência nas decisões e responsabilidade em cada entrega.",
-    icon: Scale,
-    accentClassName: "text-violet-500 bg-violet-500/10",
-    iconColor: "group-hover:text-violet-500/20"
+      "Fazemos o que precisa ser feito com planejamento, disciplina e atenção aos detalhes, buscando entregas bem feitas do início ao fim.",
+    icon: BadgeCheck,
+    accentClassName: "border-sky-500/30 bg-sky-500/10 text-sky-600",
   },
   {
-    id: "sustentabilidade",
-    title: "Sustentabilidade",
+    id: "nao-negociamos-seguranca",
+    letter: "N",
+    title: "Não negociamos segurança",
     description:
-      "Atuamos com responsabilidade ambiental e compromisso com o desenvolvimento das regiões onde operamos.",
-    icon: Leaf,
-    accentClassName: "text-emerald-500 bg-emerald-500/10",
-    iconColor: "group-hover:text-emerald-500/20"
+      "Nenhum prazo, meta ou resultado vale mais do que a vida. A segurança orienta nossas decisões e a forma como conduzimos cada atividade.",
+    icon: ShieldCheck,
+    accentClassName: "border-cyan-500/30 bg-cyan-500/10 text-cyan-600",
+  },
+  {
+    id: "entregamos-responsabilidade",
+    letter: "E",
+    title: "Entregamos com responsabilidade",
+    description:
+      "Assumimos nossos compromissos com clareza, cuidamos dos recursos da empresa e buscamos soluções com senso de consequência.",
+    icon: ClipboardCheck,
+    accentClassName: "border-emerald-500/30 bg-emerald-500/10 text-emerald-600",
+  },
+  {
+    id: "respeito-relacoes",
+    letter: "R",
+    title: "Respeito se pratica nas relações",
+    description:
+      "Agimos com ética, escuta e consideração no relacionamento com colegas, clientes, parceiros e comunidades.",
+    icon: Handshake,
+    accentClassName: "border-rose-500/30 bg-rose-500/10 text-rose-600",
+  },
+  {
+    id: "gente-preparada",
+    letter: "G",
+    title: "Gente preparada faz melhor",
+    description:
+      "Valorizamos o desenvolvimento, a colaboração e o preparo técnico de quem constrói nossa operação todos os dias.",
+    icon: UserRoundCheck,
+    accentClassName: "border-amber-500/30 bg-amber-500/10 text-amber-600",
+  },
+  {
+    id: "inovamos-melhorar",
+    letter: "I",
+    title: "Inovamos para melhorar",
+    description:
+      "Buscamos formas mais simples, eficientes e inteligentes de trabalhar, aprendendo com a prática e evoluindo continuamente.",
+    icon: Lightbulb,
+    accentClassName: "border-violet-500/30 bg-violet-500/10 text-violet-600",
+  },
+  {
+    id: "acordos-cumpridos",
+    letter: "A",
+    title: "Acordos assumidos são cumpridos",
+    description:
+      "Cumprimos o que combinamos com responsabilidade, clareza e respeito aos prazos, às pessoas e aos resultados esperados.",
+    icon: Gauge,
+    accentClassName: "border-orange-500/30 bg-orange-500/10 text-orange-600",
   },
 ];
 
@@ -413,6 +515,144 @@ const regionalBentoCards: Record<string, RegionalBentoCard> = {
   },
 };
 
+function Valores1() {
+  return (
+    <ValuesDeck
+      label="Valores1"
+      kicker="Versão aprovada"
+      title="ENERGIA como jeito de operar"
+      description="A leitura direta dos valores aprovados: simples, clara e pronta para virar referência no dia a dia."
+      values={approvedValues}
+      variant="primary"
+    />
+  );
+}
+
+function Valores2() {
+  return (
+    <ValuesDeck
+      label="Valores2"
+      kicker="Versão de teste"
+      title="ENERGIA com frases de ação"
+      description="A alternativa dá mais voz operacional a cada letra, transformando os valores em compromissos escritos como prática."
+      values={proposedValues}
+      variant="secondary"
+    />
+  );
+}
+
+function ValuesDeck({
+  label,
+  kicker,
+  title,
+  description,
+  values,
+  variant,
+}: ValuesDeckProps) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-md border bg-card p-4 shadow-sm md:p-6",
+        variant === "primary"
+          ? "border-elinsa-primary/25"
+          : "border-border/80 bg-muted/20",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-1",
+          variant === "primary"
+            ? "bg-[linear-gradient(90deg,#0ea5e9,#f59e0b,#10b981,#f43f5e,#06b6d4,#8b5cf6,#f97316)]"
+            : "bg-[linear-gradient(90deg,#0369a1,#0891b2,#059669,#be123c,#d97706,#7c3aed,#ea580c)]",
+        )}
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-end">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-md border border-elinsa-primary/25 bg-elinsa-primary/10 px-2.5 py-1 text-xs font-black uppercase tracking-normal text-elinsa-primary">
+              {label}
+            </span>
+            <span className="rounded-md border border-border bg-background px-2.5 py-1 text-xs font-bold text-muted-foreground">
+              {kicker}
+            </span>
+          </div>
+          <h3 className="mt-4 text-2xl font-black tracking-normal text-foreground md:text-3xl">
+            {title}
+          </h3>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base md:leading-7">
+            {description}
+          </p>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-6 right-6 top-7 hidden h-px bg-elinsa-primary/25 md:block" />
+          <div className="grid grid-cols-7 gap-1.5 md:gap-2">
+            {values.map((value, index) => (
+              <div
+                key={`${value.id}-letter`}
+                className="relative flex min-w-0 flex-col items-center"
+              >
+                <div
+                  className={cn(
+                    "relative z-10 flex size-10 items-center justify-center rounded-md border text-base font-black shadow-sm md:size-14 md:text-2xl",
+                    value.accentClassName,
+                  )}
+                >
+                  {value.letter}
+                </div>
+                <span className="mt-2 hidden text-center text-[0.62rem] font-black uppercase leading-3 tracking-normal text-muted-foreground md:block">
+                  0{index + 1}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-center text-[0.68rem] font-black uppercase tracking-normal text-elinsa-primary">
+            E N E R G I A
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-12">
+        {values.map((value, index) => (
+          <article
+            key={value.id}
+            className={cn(
+              "group relative flex min-h-48 flex-col overflow-hidden rounded-md border border-border/70 bg-background p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-elinsa-primary/35 hover:shadow-lg hover:shadow-elinsa-primary/10",
+              index < 3 ? "lg:col-span-4" : "lg:col-span-3",
+            )}
+          >
+            <span className="pointer-events-none absolute -right-2 -top-8 text-8xl font-black leading-none text-elinsa-primary opacity-[0.06] transition duration-300 group-hover:opacity-[0.12]">
+              {value.letter}
+            </span>
+            <div className="relative z-10 flex items-start gap-3">
+              <div
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-md border",
+                  value.accentClassName,
+                )}
+              >
+                <value.icon className="size-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[0.68rem] font-black uppercase tracking-normal text-muted-foreground">
+                  Letra {value.letter}
+                </p>
+                <h4 className="mt-1 text-lg font-black leading-tight tracking-normal text-foreground">
+                  {value.title}
+                </h4>
+              </div>
+            </div>
+            <p className="relative z-10 mt-4 text-sm leading-6 text-muted-foreground">
+              {value.description}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function RegionalIntroCard({
   regional,
   className,
@@ -518,7 +758,9 @@ function PressNewsCard({ post }: { post: EditorialPost }) {
         <CardFooter className="pb-5 pt-0">
           <span className="inline-flex items-center gap-2 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
             Ler notícia
-            <ArrowRight className="transition-transform group-hover:translate-x-1" size={16}
+            <ArrowRight
+              className="transition-transform group-hover:translate-x-1"
+              size={16}
             />
           </span>
         </CardFooter>
@@ -552,9 +794,8 @@ export default async function Home() {
 
         <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-9rem)] w-full max-w-72 flex-col justify-end gap-10 sm:max-w-6xl lg:gap-12">
           <div className="w-full max-w-72 min-w-0 sm:max-w-3xl">
-            <AdaptativeLogo className="mb-8"/>
+            <AdaptativeLogo className="mb-8" />
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-white/80 px-3 py-2 text-sm font-semibold text-elinsa-dark shadow-sm backdrop-blur dark:bg-background/70 dark:text-elinsa-sky">
-            
               <HugeiconsIcon icon={Building01Icon} className="size-4" />
               Infraestrutura e operação elétrica
             </div>
@@ -647,7 +888,7 @@ export default async function Home() {
       <section id="bases" className="mx-auto max-w-6xl py-20">
         <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
           <div>
-            <Badge text="Bases regionais" icon={MapPin}/>
+            <Badge text="Bases regionais" icon={MapPin} />
             <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
               Operação distribuída <br />
               pelo Pará
@@ -695,9 +936,7 @@ export default async function Home() {
           {/* etapas da operação */}
           <div className="flex flex-col justify-center gap-5 lg:min-h-0">
             <div>
-
-              <Badge text="Como a operação acontece" icon={Factory}/>
-
+              <Badge text="Como a operação acontece" icon={Factory} />
 
               <h2 className="max-w-3xl text-3xl font-extrabold tracking-normal md:text-4xl">
                 Planejamento, mobilização e execução alinhados
@@ -752,51 +991,35 @@ export default async function Home() {
       <Separator />
       <section id="valores" className="bg-background px-6 py-20 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
+          <div className="mb-10 grid gap-6 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:items-end">
             <div>
-              <Badge text="Cultura e identidade" icon={Heart}/>
+              <Badge text="Cultura e identidade" icon={Heart} />
               <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
-                O que orienta <br />
+                Valores que acendem <br />
                 nossa operação
               </h2>
             </div>
-            <p className="text-lg text-muted-foreground border-l-3 border-elinsa-primary pl-6 md:pl-12">
-              Mais do que diretrizes, são princípios que orientam como
-              planejamos, executamos e trabalhamos todos os dias.
-            </p>
+            <div className="border-l-3 border-elinsa-primary pl-6 md:pl-12">
+              <p className="text-lg leading-8 text-muted-foreground">
+                Duas formulações para a mesma ideia central: ENERGIA como
+                acrônimo, ritmo e compromisso de operação.
+              </p>
+              <div className="mt-5 grid grid-cols-7 gap-1.5">
+                {energyAcronymLetters.map((item) => (
+                  <span
+                    key={item.id}
+                    className="flex aspect-square items-center justify-center rounded-md border border-elinsa-primary/25 bg-elinsa-primary/10 text-lg font-black text-elinsa-primary shadow-sm shadow-elinsa-primary/5 md:text-2xl"
+                  >
+                    {item.letter}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-            {companyValues.map((value, index) => (
-              <ShadcnCard
-                key={value.id}
-                className={cn(
-                  "group relative overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-elinsa-primary/30 hover:shadow-lg",
-                  index < 2 ? "lg:col-span-3" : "lg:col-span-2",
-                )}
-              >
-                <value.icon
-                  className={cn("pointer-events-none absolute -right-6 -top-4 size-28 text-foreground/4 transition-transform duration-300 group-hover:scale-110 group-hover:text-foreground/[0.07]", value.iconColor)}
-                  strokeWidth={1.2}
-                />
-                <CardContent className="relative z-10">
-                  <div
-                    className={cn(
-                      "mb-4 flex size-11 items-center justify-center rounded-xl",
-                      value.accentClassName,
-                    )}
-                  >
-                    <value.icon className="size-5" />
-                  </div>
-                  <h3 className="text-lg font-bold tracking-normal">
-                    {value.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {value.description}
-                  </p>
-                </CardContent>
-              </ShadcnCard>
-            ))}
+          <div className="space-y-6">
+            <Valores1 />
+            <Valores2 />
           </div>
         </div>
       </section>
@@ -813,7 +1036,8 @@ export default async function Home() {
               </h2>
             </div>
             <p className="text-lg text-muted-foreground border-l-3 border-elinsa-primary pl-6 md:pl-12">
-              Acompanhe comunicados, novidades e atualizações sobre operações, equipes e iniciativas da Elinsa do Brasil.
+              Acompanhe comunicados, novidades e atualizações sobre operações,
+              equipes e iniciativas da Elinsa do Brasil.
             </p>
           </div>
         </div>
@@ -841,11 +1065,11 @@ export default async function Home() {
 
         <div className="mx-auto mt-10 max-w-6xl text-center">
           <Button variant={"ghost"} size={"lg"} asChild>
-          <Link href="/imprensa">
-            Ver todas as notícias
-            <ArrowRight />
-          </Link>
-        </Button>
+            <Link href="/imprensa">
+              Ver todas as notícias
+              <ArrowRight />
+            </Link>
+          </Button>
         </div>
       </section>
     </div>
