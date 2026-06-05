@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
-import { CompanyValuesSection } from "@/components/company-values-section";
+import { CompanyValuesSection } from "@/components/homepage/company-values-section";
 import { getImpactMetrics } from "@/components/homepage/home-data";
 import { HomeHeroSection } from "@/components/homepage/home-hero-section";
 import { OperationSection } from "@/components/homepage/operation-section";
