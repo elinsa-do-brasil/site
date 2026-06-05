@@ -150,207 +150,135 @@
 }
 
 @layer components {
-  .values-deck {
+  .values-system {
     --energy-active: var(--elinsa-primary);
   }
 
-  .values-board {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid
-      color-mix(in srgb, var(--elinsa-primary) 20%, var(--border));
-    border-radius: var(--radius-lg);
-    background:
-      radial-gradient(
-        circle at 11% 18%,
-        color-mix(in srgb, var(--elinsa-primary) 13%, transparent),
-        transparent 32%
-      ),
-      linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--elinsa-light) 72%, var(--card)) 0%,
-        var(--card) 42%,
-        color-mix(in srgb, var(--elinsa-light) 38%, var(--card)) 100%
-      ),
-      var(--card);
-    padding: clamp(1rem, 2.4vw, 1.65rem);
-    box-shadow:
-      0 1.3rem 3rem -2.6rem
-      color-mix(in srgb, var(--elinsa-dark) 26%, transparent),
-      inset 0 1px 0 color-mix(in srgb, white 76%, transparent);
-  }
-
-  .values-board::before {
-    position: absolute;
-    inset: 0;
-    content: "";
-    background-image:
-      linear-gradient(
-        color-mix(in srgb, var(--elinsa-primary) 8%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--elinsa-primary) 8%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 2rem 2rem;
-    mask-image: linear-gradient(135deg, black, transparent 70%);
-    -webkit-mask-image: linear-gradient(135deg, black, transparent 70%);
-    pointer-events: none;
-  }
-
-  .values-board > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .energy-wordmark {
+  .energy-ribbon {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: clamp(0.25rem, 1.2vw, 0.65rem);
-    overflow: hidden;
-    border: 1px solid color-mix(in srgb, var(--elinsa-primary) 24%, transparent);
+    gap: 0.45rem;
+    margin-bottom: 1rem;
     border-radius: var(--radius-md);
-    background:
-      linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--elinsa-primary) 16%, transparent),
-        transparent 18%,
-        transparent 82%,
-        color-mix(in srgb, var(--elinsa-primary) 10%, transparent)
-      ),
-      color-mix(in srgb, var(--card) 78%, var(--elinsa-light) 22%);
-    padding: clamp(0.7rem, 2vw, 1.1rem);
   }
 
-  .energy-wordmark::after {
-    position: absolute;
-    inset: 0;
-    content: "";
-    background: linear-gradient(
-      105deg,
-      transparent 0%,
-      transparent 36%,
-      color-mix(in srgb, white 82%, var(--energy-active) 18%) 47%,
-      color-mix(in srgb, var(--energy-active) 36%, transparent) 52%,
-      transparent 64%,
-      transparent 100%
-    );
-    opacity: 0.45;
-    transform: translateX(-100%);
-    animation: energy-wordmark-sweep 5.5s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  .energy-wordmark-letter {
+  .energy-ribbon-letter {
     position: relative;
     display: grid;
-    min-height: clamp(3.7rem, 8vw, 6.4rem);
+    min-height: 4rem;
     place-items: center;
-    border-radius: calc(var(--radius-md) * 0.85);
+    overflow: hidden;
+    border: 1px solid
+      color-mix(in srgb, var(--elinsa-primary) 22%, var(--border));
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--elinsa-light) 38%, var(--card));
     color: var(--elinsa-primary);
-    font-size: 4.75rem;
+    font-size: 2rem;
     font-weight: 950;
-    line-height: 0.85;
-    text-shadow: 0 0 1rem
-      color-mix(in srgb, var(--elinsa-primary) 18%, transparent);
+    line-height: 1;
     transition:
+      border-color 220ms ease,
       background-color 220ms ease,
       color 220ms ease,
-      text-shadow 220ms ease;
+      box-shadow 220ms ease;
   }
 
-  .energy-wordmark-letter::before {
+  .energy-ribbon-letter::before {
     position: absolute;
     inset: 0;
-    z-index: -1;
     content: "";
-    border-radius: inherit;
     background: radial-gradient(
       circle,
       color-mix(in srgb, var(--energy-active) 24%, transparent),
       transparent 70%
     );
     opacity: 0;
-    transform: scale(0.82);
-    transition:
-      opacity 220ms ease,
-      transform 220ms ease;
+    transition: opacity 220ms ease;
   }
 
-  .values-board ol {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    margin: clamp(0.8rem, 2vw, 1.2rem) 0 0;
-    list-style: none;
-    padding: 0;
-    border-top: 1px solid
-      color-mix(in srgb, var(--elinsa-primary) 18%, var(--border));
-  }
-
-  .value-manifest-row {
-    --row-active: var(--elinsa-primary);
-    position: relative;
-    display: grid;
-    grid-template-columns: 3.25rem minmax(0, 1fr);
-    gap: 0.9rem;
-    min-height: 7.25rem;
-    padding: 1rem 1rem 1.05rem 0;
-    border-bottom: 1px solid
-      color-mix(in srgb, var(--elinsa-primary) 15%, var(--border));
-    transition:
-      background-color 220ms ease,
-      box-shadow 220ms ease;
-  }
-
-  .value-manifest-row:nth-child(odd) {
-    border-right: 1px solid
-      color-mix(in srgb, var(--elinsa-primary) 15%, var(--border));
-  }
-
-  .value-manifest-row:nth-child(even) {
-    padding-left: 1rem;
-  }
-
-  .value-manifest-row:last-child {
-    grid-column: 1 / -1;
-    min-height: 6.25rem;
-    border-right: 0;
-  }
-
-  .value-manifest-row::before {
+  .energy-ribbon-letter::after {
     position: absolute;
     inset: 0;
     content: "";
     background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--row-active) 10%, transparent),
-      transparent 64%
+      110deg,
+      transparent 0%,
+      transparent 38%,
+      color-mix(in srgb, white 70%, var(--energy-active) 30%) 48%,
+      transparent 60%,
+      transparent 100%
+    );
+    opacity: 0;
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+
+  .values-card-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .value-home-card {
+    --row-active: var(--elinsa-primary);
+    position: relative;
+    min-height: 12.75rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    padding: 1.15rem;
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--foreground) 5%, transparent);
+    transition:
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      background-color 220ms ease;
+  }
+
+  .value-home-card::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--row-active) 9%, transparent),
+      transparent 54%
     );
     opacity: 0;
     transition: opacity 220ms ease;
     pointer-events: none;
   }
 
-  .value-manifest-marker {
-    position: relative;
-    display: grid;
-    place-items: start center;
-    padding-top: 0.12rem;
+  .value-home-card-ghost {
+    position: absolute;
+    top: -1.25rem;
+    right: -0.35rem;
+    color: var(--elinsa-primary);
+    font-size: 7.25rem;
+    font-weight: 950;
+    line-height: 1;
+    opacity: 0.06;
+    pointer-events: none;
+    transition:
+      color 220ms ease,
+      opacity 220ms ease;
   }
 
-  .value-manifest-marker span {
-    display: grid;
-    width: 2.2rem;
-    height: 2.2rem;
+  .value-home-card-marker {
+    position: relative;
+    z-index: 1;
+    display: inline-grid;
+    width: 2.55rem;
+    height: 2.55rem;
     place-items: center;
-    border: 1px solid color-mix(in srgb, var(--row-active) 32%, transparent);
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--row-active) 7%, var(--card));
-    color: color-mix(in srgb, var(--row-active) 78%, black 12%);
-    font-size: 1rem;
+    border: 1px solid color-mix(in srgb, var(--row-active) 28%, var(--border));
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--row-active) 9%, var(--card));
+    color: color-mix(in srgb, var(--row-active) 82%, black 8%);
+    font-size: 1.1rem;
     font-weight: 950;
     line-height: 1;
     transition:
@@ -359,108 +287,138 @@
       color 220ms ease;
   }
 
-  .value-manifest-copy {
+  .value-home-card-title {
     position: relative;
-    min-width: 0;
-  }
-
-  .value-manifest-title {
-    margin: 0;
+    z-index: 1;
+    margin: 1rem 0 0;
+    max-width: 21rem;
     color: var(--foreground);
-    font-size: 1.16rem;
+    font-size: 1.15rem;
     font-weight: 900;
-    line-height: 1.14;
+    line-height: 1.15;
     letter-spacing: 0;
+    transition: color 220ms ease;
   }
 
-  .value-manifest-description {
-    margin: 0.45rem 0 0;
+  .value-home-card-description {
+    position: relative;
+    z-index: 1;
+    margin: 0.65rem 0 0;
+    max-width: 27rem;
     color: var(--muted-foreground);
     font-size: 0.94rem;
-    line-height: 1.58;
+    line-height: 1.62;
   }
 
-  .value-manifest-row:is(:hover, :focus-within)::before {
+  .value-home-card:is(:hover, :focus-within) {
+    border-color: color-mix(in srgb, var(--row-active) 44%, var(--border));
+    box-shadow: 0 1rem 2.25rem -1.85rem
+      color-mix(in srgb, var(--row-active) 38%, transparent);
+  }
+
+  .value-home-card:is(:hover, :focus-within)::before {
     opacity: 1;
   }
 
-  .value-manifest-row:is(:hover, :focus-within) .value-manifest-marker span {
+  .value-home-card:is(:hover, :focus-within) .value-home-card-marker {
     background: color-mix(in srgb, var(--row-active) 15%, var(--card));
     color: var(--row-active);
     box-shadow:
-      0 0 0.75rem color-mix(in srgb, var(--row-active) 24%, transparent),
+      0 0 0.9rem color-mix(in srgb, var(--row-active) 22%, transparent),
       inset 0 0 0 1px color-mix(in srgb, white 70%, transparent);
   }
 
-  .value-manifest-row:is(:hover, :focus-within) .value-manifest-title {
-    color: color-mix(in srgb, var(--row-active) 72%, var(--foreground));
+  .value-home-card:is(:hover, :focus-within) .value-home-card-title {
+    color: color-mix(in srgb, var(--row-active) 70%, var(--foreground));
   }
 
-  .values-board:has([data-value-accent="amber"]:is(:hover, :focus-within)) {
+  .value-home-card:is(:hover, :focus-within) .value-home-card-ghost {
+    color: var(--row-active);
+    opacity: 0.11;
+  }
+
+  .values-system:has([data-value-accent="amber"]:is(:hover, :focus-within)) {
     --energy-active: #d97706;
   }
 
-  .values-board:has([data-value-accent="cyan"]:is(:hover, :focus-within)) {
+  .values-system:has([data-value-accent="cyan"]:is(:hover, :focus-within)) {
     --energy-active: #0891b2;
   }
 
-  .values-board:has([data-value-accent="emerald"]:is(:hover, :focus-within)) {
+  .values-system:has([data-value-accent="emerald"]:is(:hover, :focus-within)) {
     --energy-active: #059669;
   }
 
-  .values-board:has([data-value-accent="orange"]:is(:hover, :focus-within)) {
+  .values-system:has([data-value-accent="orange"]:is(:hover, :focus-within)) {
     --energy-active: #ea580c;
   }
 
-  .values-board:has([data-value-accent="rose"]:is(:hover, :focus-within)) {
+  .values-system:has([data-value-accent="rose"]:is(:hover, :focus-within)) {
     --energy-active: #e11d48;
   }
 
-  .values-board:has([data-value-accent="sky"]:is(:hover, :focus-within)) {
+  .values-system:has([data-value-accent="sky"]:is(:hover, :focus-within)) {
     --energy-active: var(--elinsa-primary);
   }
 
-  .values-board:has([data-value-accent="violet"]:is(:hover, :focus-within)) {
+  .values-system:has([data-value-accent="violet"]:is(:hover, :focus-within)) {
     --energy-active: #7c3aed;
   }
 
-  .values-board:has([data-value-index="0"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="0"]:is(:hover, :focus-within))
     [data-energy-index="0"],
-  .values-board:has([data-value-index="1"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="1"]:is(:hover, :focus-within))
     [data-energy-index="1"],
-  .values-board:has([data-value-index="2"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="2"]:is(:hover, :focus-within))
     [data-energy-index="2"],
-  .values-board:has([data-value-index="3"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="3"]:is(:hover, :focus-within))
     [data-energy-index="3"],
-  .values-board:has([data-value-index="4"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="4"]:is(:hover, :focus-within))
     [data-energy-index="4"],
-  .values-board:has([data-value-index="5"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="5"]:is(:hover, :focus-within))
     [data-energy-index="5"],
-  .values-board:has([data-value-index="6"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="6"]:is(:hover, :focus-within))
     [data-energy-index="6"] {
+    border-color: color-mix(in srgb, var(--energy-active) 46%, var(--border));
     background-color: color-mix(in srgb, var(--energy-active) 11%, var(--card));
     color: var(--energy-active);
-    text-shadow:
-      0 0 0.8rem color-mix(in srgb, var(--energy-active) 42%, transparent),
-      0 0 1.8rem color-mix(in srgb, var(--energy-active) 22%, transparent);
+    box-shadow: 0 0.8rem 1.8rem -1.4rem
+      color-mix(in srgb, var(--energy-active) 35%, transparent);
   }
 
-  .values-board:has([data-value-index="0"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="0"]:is(:hover, :focus-within))
     [data-energy-index="0"]::before,
-  .values-board:has([data-value-index="1"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="1"]:is(:hover, :focus-within))
     [data-energy-index="1"]::before,
-  .values-board:has([data-value-index="2"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="2"]:is(:hover, :focus-within))
     [data-energy-index="2"]::before,
-  .values-board:has([data-value-index="3"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="3"]:is(:hover, :focus-within))
     [data-energy-index="3"]::before,
-  .values-board:has([data-value-index="4"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="4"]:is(:hover, :focus-within))
     [data-energy-index="4"]::before,
-  .values-board:has([data-value-index="5"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="5"]:is(:hover, :focus-within))
     [data-energy-index="5"]::before,
-  .values-board:has([data-value-index="6"]:is(:hover, :focus-within))
+  .values-system:has([data-value-index="6"]:is(:hover, :focus-within))
     [data-energy-index="6"]::before {
     opacity: 1;
-    transform: scale(1);
+  }
+
+  .values-system:has([data-value-index="0"]:is(:hover, :focus-within))
+    [data-energy-index="0"]::after,
+  .values-system:has([data-value-index="1"]:is(:hover, :focus-within))
+    [data-energy-index="1"]::after,
+  .values-system:has([data-value-index="2"]:is(:hover, :focus-within))
+    [data-energy-index="2"]::after,
+  .values-system:has([data-value-index="3"]:is(:hover, :focus-within))
+    [data-energy-index="3"]::after,
+  .values-system:has([data-value-index="4"]:is(:hover, :focus-within))
+    [data-energy-index="4"]::after,
+  .values-system:has([data-value-index="5"]:is(:hover, :focus-within))
+    [data-energy-index="5"]::after,
+  .values-system:has([data-value-index="6"]:is(:hover, :focus-within))
+    [data-energy-index="6"]::after {
+    opacity: 0.6;
+    animation: energy-ribbon-sweep 1.25s ease-out;
   }
 
   [data-value-accent="amber"] {
@@ -491,53 +449,54 @@
     --row-active: #7c3aed;
   }
 
-  @keyframes energy-wordmark-sweep {
-    0% {
-      transform: translateX(-105%);
+  @keyframes energy-ribbon-sweep {
+    from {
+      transform: translateX(-100%);
     }
-    42%,
-    100% {
-      transform: translateX(105%);
+    to {
+      transform: translateX(100%);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .energy-wordmark::after {
+    .energy-ribbon-letter::after {
       animation: none;
       transform: none;
     }
   }
 
+  @media (min-width: 768px) {
+    .values-card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .values-card-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .value-home-card:nth-child(-n + 3) {
+      grid-column: span 4;
+    }
+
+    .value-home-card:nth-child(n + 4) {
+      grid-column: span 3;
+    }
+  }
+
   @media (max-width: 640px) {
-    .values-board {
-      padding: 0.8rem;
+    .energy-ribbon {
+      gap: 0.28rem;
     }
 
-    .energy-wordmark {
-      gap: 0.18rem;
-      padding: 0.45rem;
+    .energy-ribbon-letter {
+      min-height: 3.25rem;
+      font-size: 1.35rem;
     }
 
-    .energy-wordmark-letter {
-      min-height: 3.2rem;
-      font-size: 2.25rem;
-    }
-
-    .values-board ol {
-      grid-template-columns: 1fr;
-    }
-
-    .value-manifest-row,
-    .value-manifest-row:nth-child(even) {
-      grid-template-columns: 2.65rem minmax(0, 1fr);
+    .value-home-card {
       min-height: auto;
-      padding: 0.95rem 0;
-      border-right: 0;
-    }
-
-    .value-manifest-marker span {
-      width: 2rem;
-      height: 2rem;
     }
   }
 }

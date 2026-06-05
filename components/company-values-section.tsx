@@ -214,12 +214,16 @@ export function CompanyValuesSection() {
               </div>
             </header>
 
-            <div className="values-board">
-              <div className="energy-wordmark" aria-hidden="true">
+            <div className="values-system">
+              <div
+                className="energy-ribbon"
+                aria-label={`Acrônimo ENERGIA ${activeValuesVersion.complement}`}
+                role="img"
+              >
                 {energyWordmarkLetters.map((item, index) => (
                   <span
                     key={item.id}
-                    className="energy-wordmark-letter"
+                    className="energy-ribbon-letter"
                     data-energy-index={index}
                   >
                     {item.letter}
@@ -227,24 +231,29 @@ export function CompanyValuesSection() {
                 ))}
               </div>
 
-              <ol aria-label={`ENERGIA ${activeValuesVersion.complement}`}>
+              <ol
+                className="values-card-grid"
+                aria-label={`ENERGIA ${activeValuesVersion.complement}`}
+              >
                 {activeValuesVersion.values.map((value, index) => (
                   <li
                     key={value.id}
                     data-value-accent={value.accent}
                     data-value-index={index}
-                    className="value-manifest-row"
+                    className="value-home-card"
                   >
-                    <div className="value-manifest-marker" aria-hidden="true">
+                    <span className="value-home-card-ghost" aria-hidden="true">
+                      {value.letter}
+                    </span>
+
+                    <div className="value-home-card-marker" aria-hidden="true">
                       <span>{value.letter}</span>
                     </div>
 
-                    <div className="value-manifest-copy">
-                      <h3 className="value-manifest-title">{value.title}</h3>
-                      <p className="value-manifest-description">
-                        {value.description}
-                      </p>
-                    </div>
+                    <h3 className="value-home-card-title">{value.title}</h3>
+                    <p className="value-home-card-description">
+                      {value.description}
+                    </p>
                   </li>
                 ))}
               </ol>
