@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { CareChannelSection } from "@/components/homepage/care-channel-section";
 import { CompanyValuesSection } from "@/components/homepage/company-values-section";
 import { getImpactMetrics } from "@/components/homepage/home-data";
 import { HomeHeroSection } from "@/components/homepage/home-hero-section";
@@ -78,14 +79,17 @@ export default async function Home() {
   await connection();
 
   const latestPressPosts = await getEditorialPosts("imprensa", { limit: 3 });
+  const impactMetrics = getImpactMetrics();
 
   return (
     <div className="bg-background text-foreground">
-      <HomeHeroSection impactMetrics={getImpactMetrics()} />
+      <HomeHeroSection impactMetrics={impactMetrics} />
       <Separator />
       <OperationSection />
       <Separator />
       <CompanyValuesSection />
+      <Separator />
+      <CareChannelSection impactMetrics={impactMetrics} />
       <Separator />
       <PressNewsSection posts={latestPressPosts} />
     </div>
