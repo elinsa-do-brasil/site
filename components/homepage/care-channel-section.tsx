@@ -96,20 +96,24 @@ export function CareChannelSection({ impactMetrics }: CareChannelSectionProps) {
                   variant="outline"
                   size="xl"
                   className="w-full justify-between bg-card"
-                  disabled
+                  asChild
                 >
-                  O que denunciar
-                  <CircleHelp />
+                  <Link href="/docs/etica/o-que-pode-ser-denunciado">
+                    O que denunciar
+                    <CircleHelp />
+                  </Link>
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="xl"
                   className="w-full justify-between bg-card"
-                  disabled
+                  asChild
                 >
-                  Como denunciar
-                  <ListChecks />
+                  <Link href="/docs/etica/como-denunciar">
+                    Como denunciar
+                    <ListChecks />
+                  </Link>
                 </Button>
               </div>
 
