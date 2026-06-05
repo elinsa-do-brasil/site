@@ -3,12 +3,13 @@ import { Badge } from "@/components/badge";
 import { Separator } from "@/components/ui/separator";
 
 type ValueAccent =
-  | "amber"
-  | "cyan"
-  | "emerald"
+  | "blue"
+  | "gold"
+  | "green"
+  | "magenta"
   | "orange"
-  | "rose"
-  | "sky"
+  | "red"
+  | "steel"
   | "violet";
 
 type CompanyValue = {
@@ -24,6 +25,7 @@ type CompanyValuesVersionId = "valores1" | "valores2";
 type CompanyValuesVersion = {
   id: CompanyValuesVersionId;
   complement: string;
+  summaryTitle: string;
   description: string;
   values: CompanyValue[];
 };
@@ -31,6 +33,7 @@ type CompanyValuesVersion = {
 type CompanyValuesContent = {
   sectionLabel: string;
   heading: string;
+  description: string;
 };
 
 const ACTIVE_VALUES_VERSION: CompanyValuesVersionId = "valores2";
@@ -38,6 +41,8 @@ const ACTIVE_VALUES_VERSION: CompanyValuesVersionId = "valores2";
 const companyValuesContent = {
   sectionLabel: "Cultura e identidade",
   heading: "O que orienta nossa operação",
+  description:
+    "Os valores da Elinsa do Brasil orientam decisões de campo, relações de trabalho e a forma de entregar com segurança.",
 } satisfies CompanyValuesContent;
 
 const companyValuesVersions: Record<
@@ -47,8 +52,9 @@ const companyValuesVersions: Record<
   valores1: {
     id: "valores1",
     complement: "como jeito de operar",
+    summaryTitle: "ENERGIA: valores para a operação",
     description:
-      "A leitura direta dos valores aprovados: simples, clara e pronta para virar referência no dia a dia.",
+      "Sete letras organizam os princípios aprovados em uma leitura direta para equipes, lideranças e parceiros.",
     values: [
       {
         id: "excelencia-execucao",
@@ -56,7 +62,7 @@ const companyValuesVersions: Record<
         title: "Excelência na execução",
         description:
           "Fazemos as coisas bem feitas, com qualidade, disciplina e profissionalismo.",
-        accent: "sky",
+        accent: "blue",
       },
       {
         id: "nossa-gente",
@@ -64,7 +70,7 @@ const companyValuesVersions: Record<
         title: "Nossa gente",
         description:
           "Acreditamos que gente cuida de gente. Valorizamos as pessoas, desenvolvemos talentos e crescemos juntos.",
-        accent: "amber",
+        accent: "gold",
       },
       {
         id: "espirito-dono",
@@ -72,21 +78,21 @@ const companyValuesVersions: Record<
         title: "Espírito de dono",
         description:
           "Assumimos responsabilidades e cuidamos da empresa como nossa.",
-        accent: "emerald",
+        accent: "green",
       },
       {
         id: "respeito",
         letter: "R",
         title: "Respeito",
         description: "Respeitamos pessoas, comunidades, clientes e colegas.",
-        accent: "rose",
+        accent: "magenta",
       },
       {
         id: "gestao-seguranca",
         letter: "G",
         title: "Gestão com segurança",
         description: "A segurança vem sempre em primeiro lugar.",
-        accent: "cyan",
+        accent: "red",
       },
       {
         id: "inovacao-melhoria",
@@ -107,55 +113,56 @@ const companyValuesVersions: Record<
   valores2: {
     id: "valores2",
     complement: "com frases de ação",
+    summaryTitle: "ENERGIA: sete valores em ação",
     description:
-      "A alternativa dá mais voz operacional a cada letra, transformando os valores em compromissos escritos como prática.",
+      "O acrônimo ENERGIA reúne os valores da Elinsa em compromissos práticos para a operação elétrica: segurança, qualidade, responsabilidade, respeito, desenvolvimento, inovação e cumprimento do combinado.",
     values: [
       {
         id: "executamos-qualidade",
         letter: "E",
         title: "Executamos com qualidade",
         description:
-          "Fazemos o que precisa ser feito com planejamento, disciplina e atenção aos detalhes, buscando entregas bem feitas do início ao fim.",
-        accent: "sky",
+          "Planejamos antes de agir e entregamos com disciplina, atenção aos detalhes e padrão técnico em cada atividade de campo.",
+        accent: "blue",
       },
       {
         id: "nao-negociamos-seguranca",
         letter: "N",
         title: "Não negociamos segurança",
         description:
-          "Nenhum prazo, meta ou resultado vale mais do que a vida. A segurança orienta nossas decisões e a forma como conduzimos cada atividade.",
-        accent: "cyan",
+          "A vida vem antes de prazo, meta ou resultado. Toda decisão operacional começa pela proteção das pessoas e pelo controle dos riscos.",
+        accent: "red",
       },
       {
         id: "entregamos-responsabilidade",
         letter: "E",
         title: "Entregamos com responsabilidade",
         description:
-          "Assumimos nossos compromissos com clareza, cuidamos dos recursos da empresa e buscamos soluções com senso de consequência.",
-        accent: "emerald",
+          "Assumimos compromissos com clareza, cuidamos dos recursos da empresa e buscamos soluções responsáveis para clientes, equipes e comunidades.",
+        accent: "green",
       },
       {
         id: "respeito-relacoes",
         letter: "R",
         title: "Respeito se pratica nas relações",
         description:
-          "Agimos com ética, escuta e consideração no relacionamento com colegas, clientes, parceiros e comunidades.",
-        accent: "rose",
+          "Agimos com ética, escuta e consideração no relacionamento com colegas, clientes, parceiros e comunidades onde atuamos.",
+        accent: "magenta",
       },
       {
         id: "gente-preparada",
         letter: "G",
         title: "Gente preparada faz melhor",
         description:
-          "Valorizamos o desenvolvimento, a colaboração e o preparo técnico de quem constrói nossa operação todos os dias.",
-        accent: "amber",
+          "Valorizamos treinamento, colaboração e desenvolvimento técnico para que cada equipe trabalhe com segurança e confiança.",
+        accent: "gold",
       },
       {
         id: "inovamos-melhorar",
         letter: "I",
         title: "Inovamos para melhorar",
         description:
-          "Buscamos formas mais simples, eficientes e inteligentes de trabalhar, aprendendo com a prática e evoluindo continuamente.",
+          "Aprendemos com a prática e buscamos soluções mais simples, eficientes e inteligentes para evoluir a operação continuamente.",
         accent: "violet",
       },
       {
@@ -163,8 +170,8 @@ const companyValuesVersions: Record<
         letter: "A",
         title: "Acordos assumidos são cumpridos",
         description:
-          "Cumprimos o que combinamos com responsabilidade, clareza e respeito aos prazos, às pessoas e aos resultados esperados.",
-        accent: "orange",
+          "Cumprimos o combinado com clareza, responsabilidade e respeito aos prazos, às pessoas e aos resultados esperados.",
+        accent: "steel",
       },
     ],
   },
@@ -193,43 +200,56 @@ export function CompanyValuesSection() {
       >
         <div className="mx-auto max-w-6xl">
           <article className="values-deck relative">
-            <header className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
-              <div>
-                <Badge text={companyValuesContent.sectionLabel} icon={Heart} />
-                <h2
-                  id="valores-heading"
-                  className="max-w-2xl text-3xl font-extrabold tracking-normal md:text-4xl"
-                >
-                  {companyValuesContent.heading}
-                </h2>
-              </div>
-
-              <div className="border-l-3 border-elinsa-primary pl-6 md:pl-12">
-                <p className="text-lg font-black leading-7 text-foreground">
-                  ENERGIA {activeValuesVersion.complement}
-                </p>
-                <p className="mt-2 text-lg leading-8 text-muted-foreground">
-                  {activeValuesVersion.description}
-                </p>
-              </div>
-            </header>
-
             <div className="values-system">
-              <div
-                className="energy-ribbon"
-                aria-label={`Acrônimo ENERGIA ${activeValuesVersion.complement}`}
-                role="img"
-              >
-                {energyWordmarkLetters.map((item, index) => (
-                  <span
-                    key={item.id}
-                    className="energy-ribbon-letter"
-                    data-energy-index={index}
+              <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center">
+                <div className="max-w-xl">
+                  <Badge
+                    text={companyValuesContent.sectionLabel}
+                    icon={Heart}
+                  />
+                  <h2
+                    id="valores-heading"
+                    className="max-w-2xl text-3xl font-extrabold tracking-normal md:text-4xl"
                   >
-                    {item.letter}
-                  </span>
-                ))}
-              </div>
+                    {companyValuesContent.heading}
+                  </h2>
+                  <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+                    {companyValuesContent.description}
+                  </p>
+                </div>
+
+                <div className="border-t-3 border-elinsa-primary pt-6 md:border-l-3 md:border-t-0 md:py-2 md:pl-10">
+                  <p className="text-xs font-black uppercase leading-4 tracking-[0.18em] text-elinsa-primary">
+                    Acrônimo de valores
+                  </p>
+                  <div className="mt-3 flex flex-col gap-4">
+                    <div>
+                      <p className="text-xl font-black leading-7 text-foreground">
+                        {activeValuesVersion.summaryTitle}
+                      </p>
+                      <p className="mt-2 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+                        {activeValuesVersion.description}
+                      </p>
+                    </div>
+
+                    <div
+                      className="energy-ribbon"
+                      aria-label={`Acrônimo ENERGIA ${activeValuesVersion.complement}`}
+                      role="img"
+                    >
+                      {energyWordmarkLetters.map((item, index) => (
+                        <span
+                          key={item.id}
+                          className="energy-ribbon-letter"
+                          data-energy-index={index}
+                        >
+                          {item.letter}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </header>
 
               <ol
                 className="values-card-grid"
