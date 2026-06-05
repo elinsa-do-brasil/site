@@ -186,8 +186,6 @@ function getCareEvidence(impactMetrics: ImpactMetric[]): CareEvidence[] {
   const population = metricsById.get("impacto-populacao");
   const employees = metricsById.get("equipes");
   const safety = metricsById.get("seguranca");
-  const municipalities = getMetricHighlight(population, "municípios");
-  const communities = getMetricHighlight(population, "comunidades");
 
   return [
     {
@@ -197,12 +195,7 @@ function getCareEvidence(impactMetrics: ImpactMetric[]): CareEvidence[] {
       title: "Cuidado em escala",
       description:
         "Atender tantas pessoas exige planejamento, padrão técnico e respeito pelo território em cada frente de trabalho.",
-      detail: [
-        municipalities ? `${municipalities} municípios` : null,
-        communities ? `${communities} comunidades.` : null,
-      ]
-        .filter(Boolean)
-        .join(", "),
+      detail: "+ 700 mil lares atendidos",
     },
     {
       id: "seguranca",

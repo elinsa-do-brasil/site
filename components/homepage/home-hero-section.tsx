@@ -38,12 +38,13 @@ export function HomeHeroSection({ impactMetrics }: HomeHeroSectionProps) {
           </div>
 
           <div className="flex flex-col gap-6">
-            <h2 className="max-w-3xl text-4xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-3xl md:text-4xl dark:text-white">
-              Operação forte. Energia contínua.
-            </h2>
-            <p className="max-w-72 text-base leading-7 text-foreground/78 sm:max-w-2xl md:text-xl md:leading-8">
-              Planejamento, suporte operacional e execução técnica para manter a
-              infraestrutura elétrica em movimento.
+            <h1 className="max-w-3xl text-4xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-3xl md:text-4xl dark:text-white">
+              Construindo um futuro melhor
+            </h1>
+            <p className="max-w-72 text-base leading-7 text-foreground/78 sm:max-w-3xl md:text-xl md:leading-8">
+              Para a Elinsa, futuro melhor é energia chegando com segurança:
+              planejamento antes da mobilização, execução técnica em campo e
+              cuidado com as comunidades atendidas.
             </p>
           </div>
 
@@ -54,7 +55,7 @@ export function HomeHeroSection({ impactMetrics }: HomeHeroSectionProps) {
               asChild
             >
               <Link href="/quem-somos">
-                Conheça a empresa
+                Conheça a Elinsa
                 <ArrowRight />
               </Link>
             </Button>
@@ -63,7 +64,7 @@ export function HomeHeroSection({ impactMetrics }: HomeHeroSectionProps) {
               className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
               asChild
             >
-              <Link href="/imprensa">Conheça nossa atuação</Link>
+              <Link href="/imprensa">Veja nossa atuação</Link>
             </Button>
           </div>
         </div>
