@@ -25,11 +25,29 @@
       "skillPath": "security/SKILL.md",
       "computedHash": "ed38caef4b297cc399d717258d6ea4e6ecb8894c453c83450064c7e7c6e5cc02"
     },
+    "brand-color-psychology": {
+      "source": "mike-coulbourn/claude-vibes",
+      "sourceType": "github",
+      "skillPath": "plugins/vibes/skills/brand-color-psychology/SKILL.md",
+      "computedHash": "c1f02c1417e30a9ed2814657a48aae49dce828b2d865f9a2a8a0ed173d20f731"
+    },
     "brand-storytelling": {
       "source": "refoundai/lenny-skills",
       "sourceType": "github",
       "skillPath": "skills/brand-storytelling/SKILL.md",
       "computedHash": "a7fdb8eee04388e74341421c5e7ed88758820b420a144a8a4f565e3c102c55c4"
+    },
+    "color-expert": {
+      "source": "meodai/skill.color-expert",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "df2c0e9577d45f31e37f1dbb63943c1e8b53a84a26ebe3286008cf87a5268e76"
+    },
+    "color-theory-palette-harmony-expert": {
+      "source": "erichowens/some_claude_skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/color-theory-palette-harmony-expert/SKILL.md",
+      "computedHash": "2291395477ce9df4a0cc1b46a7fa5c762b73b72ae72c3d59880f0ff36935ee27"
     },
     "context7-cli": {
       "source": "upstash/context7",
