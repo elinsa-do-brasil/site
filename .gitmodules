@@ -1,3 +1,3 @@
 [submodule "docs"]
 	path = docs
-	url = https://github.com/elinsa-do-brasil/docs.git
+	url = git@github.com:elinsa-do-brasil/docs.git
