@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { OpenWithAIPopover } from "@/components/docs/open-with-ai-popover";
 import { DocsPageActions } from "@/components/docs/page-actions";
-import { source } from "@/lib/source";
+import { publicDocs } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 
 type PageProps = {
@@ -20,7 +20,7 @@ type PageProps = {
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params;
-  const page = source.getPage(slug);
+  const page = publicDocs.getPage(slug);
 
   if (!page) {
     notFound();
@@ -53,14 +53,14 @@ export default async function Page({ params }: PageProps) {
 }
 
 export function generateStaticParams() {
-  return source.generateParams();
+  return publicDocs.generateParams();
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const page = source.getPage(slug);
+  const page = publicDocs.getPage(slug);
 
   if (!page) {
     notFound();

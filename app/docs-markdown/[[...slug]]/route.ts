@@ -1,6 +1,13 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
+import {
+  isDirectSectionMarkdownSlug,
+  isInternalMarkdownSlug,
+  toDocsMarkdownContentSlug,
+} from "@/lib/source";
 
 type RouteProps = {
   params: Promise<{
@@ -32,7 +39,21 @@ function resolveDocsPath(docsRoot: string, candidate: string) {
 }
 
 export async function GET(_: Request, { params }: RouteProps) {
-  const { slug = [] } = await params;
+  const { slug: routeSlug = [] } = await params;
+
+  if (isDirectSectionMarkdownSlug(routeSlug)) {
+    notFound();
+  }
+
+  if (isInternalMarkdownSlug(routeSlug)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    if (!session?.user.id) {
+      return new Response("Não autorizado", { status: 401 });
+    }
+  }
+
+  const slug = toDocsMarkdownContentSlug(routeSlug);
 
   if (!isSafeSlug(slug)) {
     notFound();

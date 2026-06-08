@@ -12,7 +12,7 @@ import { useTranslations } from "fumadocs-ui/contexts/i18n";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { useMemo } from "react";
 import type { IconType } from "react-icons";
-import { RiClaudeFill, RiGeminiFill, RiOpenaiFill } from "react-icons/ri";
+import { RiClaudeFill, RiOpenaiFill } from "react-icons/ri";
 import { cn } from "@/lib/utils";
 
 type AIOption = {
@@ -26,11 +26,14 @@ export function OpenWithAIPopover({ className }: { className?: string }) {
   const t = useTranslations();
 
   const items = useMemo<AIOption[]>(() => {
-    const pageUrl =
+    const markdownPath = pathname.replace(/^\/docs(?=\/|$)/, "/docs-markdown");
+    const markdownUrl =
       typeof window === "undefined"
-        ? pathname
-        : String(new URL(pathname, window.location.origin));
-    const q = renderTranslation(t.pageActionsOpenInLLMPrompt, { url: pageUrl });
+        ? markdownPath
+        : String(new URL(markdownPath, window.location.origin));
+    const q = renderTranslation(t.pageActionsOpenInLLMPrompt, {
+      url: markdownUrl,
+    });
 
     return [
       {
@@ -45,11 +48,6 @@ export function OpenWithAIPopover({ className }: { className?: string }) {
         href: `https://claude.ai/new?${new URLSearchParams({ q })}`,
         icon: RiClaudeFill,
         title: t.pageActionsOpenClaude,
-      },
-      {
-        href: "https://gemini.google.com/app",
-        icon: RiGeminiFill,
-        title: "Abrir no Gemini",
       },
     ];
   }, [pathname, t]);
