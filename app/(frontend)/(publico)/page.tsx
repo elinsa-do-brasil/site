@@ -6,6 +6,7 @@ import { getImpactMetrics } from "@/components/homepage/home-data";
 import { HomeHeroSection } from "@/components/homepage/home-hero-section";
 import { OperationSection } from "@/components/homepage/operation-section";
 import { PressNewsSection } from "@/components/homepage/press-news-section";
+import { ProvidedServicesSection } from "@/components/homepage/provided-services-section";
 import { Separator } from "@/components/ui/separator";
 import { getEditorialPosts } from "@/lib/editorial";
 
@@ -86,6 +87,8 @@ export default async function Home() {
       <HomeHeroSection impactMetrics={impactMetrics} />
       <Separator />
       <OperationSection />
+      <Separator />
+      <ProvidedServicesSection />
       <Separator />
       <CompanyValuesSection />
       <Separator />
