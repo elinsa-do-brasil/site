@@ -3,12 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/badge";
 import { Badge as ShadcnBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   CardContent,
   CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
   Card as ShadcnCard,
 } from "@/components/ui/card";
@@ -20,6 +17,7 @@ import {
   getReadingMinutes,
 } from "@/lib/editorial";
 import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
+import { cn } from "@/lib/utils";
 import Lampada from "@/public/images/lampada.webp";
 
 type PressNewsSectionProps = {
@@ -27,112 +25,235 @@ type PressNewsSectionProps = {
 };
 
 export function PressNewsSection({ posts }: PressNewsSectionProps) {
+  const [featuredPost, ...secondaryPosts] = posts;
+
   return (
-    <section className="w-full bg-background px-6 py-20 md:px-8">
+    <section className="w-full overflow-hidden bg-background px-6 py-20 md:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12 grid gap-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-end">
-          <div>
-            <Badge text="Notícias" icon={Activity} />
-            <h2 className="text-3xl font-extrabold tracking-normal md:text-4xl">
-              Últimas atualizações
-            </h2>
+        <header className="mb-10 rounded-3xl border border-border/70 bg-muted/25 p-5 md:p-7">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <Badge text="Notícias" icon={Activity} />
+              <h2 className="text-3xl font-black tracking-normal md:text-4xl">
+                Histórias que movimentam a Elinsa
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+                Acompanhe as novidades, comunicados e iniciativas que mostram a
+                nossa energia em ação.
+              </p>
+            </div>
+
+            <Link
+              href="/imprensa"
+              className="group inline-flex w-fit items-center gap-2 rounded-full border border-border/70 bg-card px-4 py-2 text-sm font-bold text-elinsa-dark shadow-sm transition-colors hover:border-elinsa-primary/35 hover:text-elinsa-primary dark:text-elinsa-sky"
+            >
+              Ver imprensa
+              <ArrowRight
+                className="transition-transform group-hover:translate-x-1"
+                size={16}
+              />
+            </Link>
           </div>
-          <p className="border-l-3 border-elinsa-primary pl-6 text-lg text-muted-foreground md:pl-12">
-            Acompanhe comunicados, novidades e atualizações sobre operações,
-            equipes e iniciativas da Elinsa do Brasil.
-          </p>
-        </div>
+        </header>
       </div>
 
-      {posts.length > 0 ? (
-        <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <PressNewsCard key={post.id} post={post} />
-          ))}
+      {featuredPost ? (
+        <div
+          className={cn(
+            "mx-auto grid max-w-6xl gap-5",
+            secondaryPosts.length > 0 &&
+              "lg:grid-cols-[minmax(0,1.12fr)_minmax(20rem,0.88fr)]",
+          )}
+        >
+          <FeaturedPressNewsCard post={featuredPost} />
+
+          {secondaryPosts.length > 0 ? (
+            <div className="grid gap-5">
+              {secondaryPosts.map((post) => (
+                <CompactPressNewsCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : (
         <div className="mx-auto max-w-6xl">
-          <ShadcnCard className="rounded-md border-dashed bg-muted/35">
-            <CardContent className="py-12">
+          <ShadcnCard className="rounded-3xl border-dashed bg-muted/35 py-0">
+            <CardContent className="py-14 text-center">
               <h3 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
                 Nenhuma notícia publicada
               </h3>
-              <p className="mt-3 max-w-xl text-muted-foreground">
+              <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
                 As próximas notícias públicas aparecerão aqui automaticamente.
               </p>
             </CardContent>
           </ShadcnCard>
         </div>
       )}
-
-      <div className="mx-auto mt-10 max-w-6xl text-center">
-        <Button variant="ghost" size="lg" asChild>
-          <Link href="/imprensa">
-            Ver todas as notícias
-            <ArrowRight />
-          </Link>
-        </Button>
-      </div>
     </section>
   );
 }
 
-function PressNewsCard({ post }: { post: EditorialPost }) {
-  const href = post.slug ? `/imprensa/${post.slug}` : "/imprensa";
-  const coverImage = getEditorialCoverImage(post, "card");
-  const publishedDate = formatEditorialDate(post.publishedAt ?? post.createdAt);
-  const readingMinutes = getReadingMinutes(post.content);
-  const subjectLabel = getEditorialSubjectLabel(getPostSubjectValue(post));
+function FeaturedPressNewsCard({ post }: { post: EditorialPost }) {
+  const card = getPressNewsCardData(post);
 
   return (
-    <Link className="group block h-full" href={href}>
-      <ShadcnCard className="h-full overflow-hidden rounded-md border-border/70 py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10">
-        <div className="relative aspect-16/10 overflow-hidden bg-elinsa-dark">
-          <Image
-            src={coverImage?.url ?? Lampada}
-            alt={coverImage?.alt ?? post.title}
-            fill
-            className="object-cover object-center transition duration-500 group-hover:scale-105"
-            sizes="(min-width: 1024px) 22rem, (min-width: 768px) 50vw, 100vw"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.78)_100%)]" />
-          <ShadcnBadge className="absolute left-4 top-4 bg-white/92 text-elinsa-dark shadow-sm backdrop-blur hover:bg-white">
-            {subjectLabel}
-          </ShadcnBadge>
-        </div>
+    <Link className="group block h-full" href={card.href}>
+      <ShadcnCard className="relative h-full min-h-[32rem] overflow-hidden rounded-3xl border-border/70 bg-elinsa-dark py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10">
+        <Image
+          src={card.coverImage?.url ?? Lampada}
+          alt={card.coverImage?.alt ?? post.title}
+          fill
+          className="object-cover object-center transition duration-700 group-hover:scale-105"
+          sizes="(min-width: 1024px) 43rem, 100vw"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.48)_42%,rgba(4,14,22,0.92)_100%)]" />
 
-        <CardHeader className="gap-3 p-5 pb-3">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-muted-foreground">
-            {publishedDate && (
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="size-3.5 text-elinsa-primary" />
-                {publishedDate}
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5">
-              <Clock3 className="size-3.5 text-elinsa-primary" />
-              {readingMinutes} min de leitura
-            </span>
-          </div>
-          <CardTitle className="line-clamp-2 text-2xl font-black leading-tight tracking-normal text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+        <CardContent className="relative z-10 flex h-full min-h-[32rem] flex-col justify-end p-5 md:p-7">
+          <SubjectBadge label={card.subjectLabel} variant="light" />
+          <NewsMeta
+            publishedDate={card.publishedDate}
+            readingMinutes={card.readingMinutes}
+            variant="light"
+            className="mt-5"
+          />
+
+          <CardTitle className="mt-4 line-clamp-3 max-w-2xl text-3xl font-black leading-tight tracking-normal text-white transition-colors group-hover:text-elinsa-sky md:text-4xl">
             {post.title}
           </CardTitle>
-          <CardDescription className="line-clamp-3 text-base leading-7">
+          <CardDescription className="mt-3 line-clamp-3 max-w-xl text-base leading-7 text-white/78">
             {post.summary ??
               "Leia a notícia pública completa da Elinsa do Brasil."}
           </CardDescription>
-        </CardHeader>
 
-        <CardFooter className="pb-5 pt-0">
-          <span className="inline-flex items-center gap-2 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+          <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-bold text-white backdrop-blur transition-colors group-hover:border-elinsa-sky/50 group-hover:text-elinsa-sky">
             Ler notícia
             <ArrowRight
               className="transition-transform group-hover:translate-x-1"
               size={16}
             />
           </span>
-        </CardFooter>
+        </CardContent>
       </ShadcnCard>
     </Link>
   );
+}
+
+function CompactPressNewsCard({ post }: { post: EditorialPost }) {
+  const card = getPressNewsCardData(post);
+
+  return (
+    <Link className="group block h-full" href={card.href}>
+      <ShadcnCard className="grid h-full overflow-hidden rounded-3xl border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 md:grid-cols-[13rem_minmax(0,1fr)] lg:grid-cols-1 xl:grid-cols-[12.5rem_minmax(0,1fr)]">
+        <div className="relative min-h-48 overflow-hidden bg-elinsa-dark md:min-h-full lg:min-h-44 xl:min-h-full">
+          <Image
+            src={card.coverImage?.url ?? Lampada}
+            alt={card.coverImage?.alt ?? post.title}
+            fill
+            className="object-cover object-center transition duration-500 group-hover:scale-105"
+            sizes="(min-width: 1280px) 13rem, (min-width: 1024px) 35vw, (min-width: 768px) 13rem, 100vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.06)_0%,rgba(4,14,22,0.64)_100%)]" />
+        </div>
+
+        <CardContent className="flex min-h-full flex-col p-5">
+          <SubjectBadge label={card.subjectLabel} />
+          <NewsMeta
+            publishedDate={card.publishedDate}
+            readingMinutes={card.readingMinutes}
+            className="mt-4"
+          />
+
+          <CardTitle className="mt-3 line-clamp-2 text-2xl font-black leading-tight tracking-normal text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+            {post.title}
+          </CardTitle>
+          <CardDescription className="mt-2 line-clamp-2 text-base leading-7">
+            {post.summary ??
+              "Leia a notícia pública completa da Elinsa do Brasil."}
+          </CardDescription>
+
+          <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+            Ler notícia
+            <ArrowRight
+              className="transition-transform group-hover:translate-x-1"
+              size={16}
+            />
+          </span>
+        </CardContent>
+      </ShadcnCard>
+    </Link>
+  );
+}
+
+function SubjectBadge({
+  label,
+  variant = "default",
+}: {
+  label: string;
+  variant?: "default" | "light";
+}) {
+  return (
+    <ShadcnBadge
+      className={cn(
+        "w-fit rounded-full px-3 py-1 text-xs font-bold shadow-sm backdrop-blur",
+        variant === "light"
+          ? "bg-white/90 text-elinsa-dark hover:bg-white"
+          : "bg-elinsa-light/80 text-elinsa-dark hover:bg-elinsa-light dark:bg-elinsa-primary/15 dark:text-elinsa-sky",
+      )}
+    >
+      {label}
+    </ShadcnBadge>
+  );
+}
+
+function NewsMeta({
+  publishedDate,
+  readingMinutes,
+  variant = "default",
+  className,
+}: {
+  publishedDate: string | null;
+  readingMinutes: number;
+  variant?: "default" | "light";
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold",
+        variant === "light" ? "text-white/72" : "text-muted-foreground",
+        className,
+      )}
+    >
+      {publishedDate ? (
+        <span className="inline-flex items-center gap-1.5">
+          <CalendarDays
+            className={cn(
+              "size-3.5",
+              variant === "light" ? "text-elinsa-sky" : "text-elinsa-primary",
+            )}
+          />
+          {publishedDate}
+        </span>
+      ) : null}
+      <span className="inline-flex items-center gap-1.5">
+        <Clock3
+          className={cn(
+            "size-3.5",
+            variant === "light" ? "text-elinsa-sky" : "text-elinsa-primary",
+          )}
+        />
+        {readingMinutes} min de leitura
+      </span>
+    </div>
+  );
+}
+
+function getPressNewsCardData(post: EditorialPost) {
+  return {
+    coverImage: getEditorialCoverImage(post, "card"),
+    href: post.slug ? `/imprensa/${post.slug}` : "/imprensa",
+    publishedDate: formatEditorialDate(post.publishedAt ?? post.createdAt),
+    readingMinutes: getReadingMinutes(post.content),
+    subjectLabel: getEditorialSubjectLabel(getPostSubjectValue(post)),
+  };
 }
