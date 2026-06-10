@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { InternalHeader } from "@/components/internal/internal-header";
 import { Toaster } from "@/components/ui/sonner";
@@ -23,8 +22,15 @@ function isAccountRoute(pathname: string) {
   );
 }
 
-export function FrontendShell({ children }: { children: ReactNode }) {
+export function FrontendShell({
+  children,
+  footer,
+}: {
+  children: ReactNode;
+  footer?: ReactNode;
+}) {
   const pathname = usePathname() ?? "/";
+  const isMapRoute = pathname === "/mapas" || pathname.startsWith("/mapas/");
 
   if (pathname === "/portal" || pathname.startsWith("/portal/")) {
     return (
@@ -60,13 +66,13 @@ export function FrontendShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div data-frontend-shell-header>
-        <Header />
-      </div>
+      {!isMapRoute && (
+        <div data-frontend-shell-header>
+          <Header />
+        </div>
+      )}
       <main data-frontend-shell-main>{children}</main>
-      <div data-frontend-shell-footer>
-        <Footer />
-      </div>
+      {!isMapRoute && footer && <div data-frontend-shell-footer>{footer}</div>}
       <Toaster />
     </>
   );
