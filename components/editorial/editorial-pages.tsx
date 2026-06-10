@@ -14,9 +14,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EditorialRichText } from "@/components/editorial/editorial-rich-text";
 import { Badge } from "@/components/ui/badge";
-import { BentoGrid } from "@/components/ui/bento-grid";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   type EditorialCollectionSlug,
@@ -24,7 +28,6 @@ import {
   type EditorialPost,
   editorialConfigs,
   formatEditorialDate,
-  formatEditorialShortDate,
   getAuthorName,
   getEditorialCoverImage,
   getEditorialPost,
@@ -67,46 +70,60 @@ export async function EditorialIndex({
     >
       <section
         className={cn(
-          "mx-auto max-w-6xl px-6 md:px-8",
-          !isPortalCollection && "py-8 md:py-10",
+          "mx-auto max-w-6xl",
+          !isPortalCollection,
         )}
       >
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
-          <div className="min-w-0">
-            <div className="mb-5 md:mb-6">
-              <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
-                {config.title}
-              </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
-                {config.description}
-              </p>
-            </div>
+        <EditorialIndexHeader
+          config={config}
+          subject={subject}
+          subjectCounts={subjectCounts}
+        />
 
-            {allPosts.length === 0 ? (
+        {allPosts.length === 0 ? (
+          <EmptyState config={config} />
+        ) : (
+          <div className="min-w-0">
+            {posts.length === 0 ? (
               <EmptyState config={config} />
             ) : (
-              <div className="min-w-0">
-                {posts.length === 0 ? (
-                  <EmptyState config={config} />
-                ) : (
-                  <BentoGrid className="mx-0 max-w-none gap-4 md:auto-rows-[30rem] md:grid-cols-2">
-                    {posts.map((post) => (
-                      <PostCard config={config} key={post.id} post={post} />
-                    ))}
-                  </BentoGrid>
-                )}
-              </div>
+              <EditorialPostShowcase config={config} posts={posts} />
             )}
           </div>
-
-          <SubjectsAside
-            config={config}
-            subject={subject}
-            subjectCounts={subjectCounts}
-          />
-        </div>
+        )}
       </section>
     </div>
+  );
+}
+
+function EditorialIndexHeader({
+  config,
+  subject,
+  subjectCounts,
+}: {
+  config: EditorialConfig;
+  subject?: EditorialSubjectValue | null;
+  subjectCounts: SubjectCount[];
+}) {
+  return (
+    <header className="mb-5 border-b border-border pb-4 md:mb-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 lg:max-w-md">
+          <h1 className="max-w-2xl text-2xl font-black leading-tight tracking-normal text-elinsa-dark md:text-3xl dark:text-elinsa-sky">
+            {config.title}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
+            {config.description}
+          </p>
+        </div>
+
+        <SubjectFilterNav
+          config={config}
+          subject={subject}
+          subjectCounts={subjectCounts}
+        />
+      </div>
+    </header>
   );
 }
 
@@ -259,72 +276,226 @@ export async function EditorialArticlePage({
   );
 }
 
-function PostCard({
+function EditorialPostShowcase({
+  config,
+  posts,
+}: {
+  config: EditorialConfig;
+  posts: EditorialPost[];
+}) {
+  const [featuredPost, ...secondaryPosts] = posts;
+  const primarySecondaryPosts = secondaryPosts.slice(0, 3);
+  const additionalPosts = secondaryPosts.slice(3);
+
+  if (!featuredPost) {
+    return <EmptyState config={config} />;
+  }
+
+  const hasSecondaryPosts = primarySecondaryPosts.length > 0;
+
+  return (
+    <div className={cn("space-y-5", !hasSecondaryPosts && "max-w-5xl")}>
+      <div
+        className={cn(
+          "grid gap-5",
+          hasSecondaryPosts &&
+            "xl:grid-cols-[minmax(0,1.12fr)_minmax(24rem,0.88fr)]",
+        )}
+      >
+        <FeaturedPostCard config={config} post={featuredPost} />
+
+        {hasSecondaryPosts ? (
+          <div className="grid gap-5">
+            {primarySecondaryPosts.map((post) => (
+              <CompactPostCard config={config} key={post.id} post={post} />
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      {additionalPosts.length > 0 ? (
+        <div className="grid gap-5 md:grid-cols-2">
+          {additionalPosts.map((post) => (
+            <CompactPostCard config={config} key={post.id} post={post} />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function FeaturedPostCard({
   config,
   post,
 }: {
   config: EditorialConfig;
   post: EditorialPost;
 }) {
-  const publishedDate = formatEditorialShortDate(
-    post.publishedAt ?? post.createdAt,
-  );
-  const href = post.slug ? `${config.href}/${post.slug}` : config.href;
-  const coverImage = getEditorialCoverImage(post, "card");
-  const subjectLabel = getEditorialSubjectLabel(getPostSubjectValue(post));
-  const readingMinutes = getReadingMinutes(post.content);
+  const card = getPostCardData(config, post);
 
   return (
-    <Link className="group block min-w-0" href={href}>
-      <Card className="relative h-full min-h-[30rem] gap-0 overflow-hidden border-border/80 bg-elinsa-dark py-0 shadow-sm transition-all hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-lg">
+    <Link className="group block h-full min-w-0" href={card.href}>
+      <Card className="relative h-full min-h-[30rem] overflow-hidden rounded-3xl border-border/70 bg-elinsa-dark py-0 text-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/40 hover:shadow-xl hover:shadow-elinsa-primary/10 md:min-h-[34rem]">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(145deg,#145061,#061a22_58%,#0c2b36)]" />
-          {coverImage ? (
+          {card.coverImage ? (
             <Image
-              alt={coverImage.alt}
+              alt={card.coverImage.alt}
               className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
               fill
-              sizes="(min-width: 1280px) 22rem, (min-width: 768px) 50vw, 100vw"
-              src={coverImage.url}
+              sizes="(min-width: 1280px) 48rem, (min-width: 1024px) 62vw, 100vw"
+              src={card.coverImage.url}
             />
           ) : (
             <FallbackCover />
           )}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,81,103,0.06)_0%,rgba(4,18,25,0.18)_38%,rgba(4,18,25,0.9)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.44)_42%,rgba(4,14,22,0.94)_100%)]" />
         </div>
 
-        <CardContent className="relative z-10 flex h-full flex-col justify-between p-5">
-          <Badge className="w-fit rounded-md bg-white/90 px-2.5 py-1 text-elinsa-dark shadow-sm backdrop-blur-md">
-            {subjectLabel}
+        <CardContent className="relative z-10 flex h-full min-h-[30rem] flex-col justify-end p-5 md:min-h-[34rem] md:p-7 lg:p-8">
+          <Badge className="w-fit rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-elinsa-dark shadow-sm backdrop-blur-md hover:bg-white">
+            {card.subjectLabel}
           </Badge>
+          <PostMeta
+            publishedDate={card.publishedDate}
+            readingMinutes={card.readingMinutes}
+            variant="light"
+            className="mt-5"
+          />
 
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-white/78">
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="size-3.5 text-elinsa-primary" />
-                {publishedDate}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Clock3 className="size-3.5 text-elinsa-primary" />
-                {readingMinutes} min
-              </span>
-            </div>
-            <h2 className="line-clamp-2 text-2xl font-black leading-tight tracking-normal text-white transition-colors group-hover:text-elinsa-sky">
-              {post.title}
-            </h2>
-            {post.summary && (
-              <p className="line-clamp-2 text-sm leading-6 text-white/76">
-                {post.summary}
-              </p>
-            )}
-          </div>
+          <CardTitle className="mt-4 line-clamp-3 max-w-3xl text-3xl font-black leading-tight tracking-normal text-white transition-colors group-hover:text-elinsa-sky md:text-4xl lg:text-5xl">
+            {post.title}
+          </CardTitle>
+          <CardDescription className="mt-4 line-clamp-3 max-w-3xl text-base leading-7 text-white/80 md:text-lg md:leading-8">
+            {post.summary ?? "Leia a notícia completa da Elinsa do Brasil."}
+          </CardDescription>
+
+          <span className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-bold text-white backdrop-blur transition-colors group-hover:border-elinsa-sky/50 group-hover:text-elinsa-sky">
+            Ler notícia
+            <ArrowRight
+              aria-hidden="true"
+              className="transition-transform group-hover:translate-x-1"
+              size={16}
+            />
+          </span>
         </CardContent>
       </Card>
     </Link>
   );
 }
 
-function SubjectsAside({
+function CompactPostCard({
+  config,
+  post,
+}: {
+  config: EditorialConfig;
+  post: EditorialPost;
+}) {
+  const card = getPostCardData(config, post);
+
+  return (
+    <Link className="group block h-full min-w-0" href={card.href}>
+      <Card className="grid h-full overflow-hidden rounded-3xl border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 sm:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]">
+        <div className="relative min-h-48 overflow-hidden bg-elinsa-dark sm:min-h-full">
+          {card.coverImage ? (
+            <Image
+              alt={card.coverImage.alt}
+              className="absolute inset-0 size-full object-cover object-center transition duration-500 group-hover:scale-105"
+              fill
+              sizes="(min-width: 1280px) 13rem, (min-width: 640px) 12rem, 100vw"
+              src={card.coverImage.url}
+            />
+          ) : (
+            <FallbackCover />
+          )}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.06)_0%,rgba(4,14,22,0.64)_100%)]" />
+        </div>
+
+        <CardContent className="flex min-h-full flex-col p-5">
+          <Badge className="w-fit rounded-full bg-elinsa-light/80 px-3 py-1 text-xs font-bold text-elinsa-dark shadow-sm backdrop-blur hover:bg-elinsa-light dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
+            {card.subjectLabel}
+          </Badge>
+          <PostMeta
+            publishedDate={card.publishedDate}
+            readingMinutes={card.readingMinutes}
+            className="mt-4"
+          />
+
+          <CardTitle className="mt-3 line-clamp-2 text-2xl font-black leading-tight tracking-normal text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+            {post.title}
+          </CardTitle>
+          <CardDescription className="mt-2 line-clamp-2 text-base leading-7 text-muted-foreground">
+            {post.summary ?? "Leia a notícia completa da Elinsa do Brasil."}
+          </CardDescription>
+
+          <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
+            Ler notícia
+            <ArrowRight
+              aria-hidden="true"
+              className="transition-transform group-hover:translate-x-1"
+              size={16}
+            />
+          </span>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+function PostMeta({
+  className,
+  publishedDate,
+  readingMinutes,
+  variant = "default",
+}: {
+  className?: string;
+  publishedDate: string;
+  readingMinutes: number;
+  variant?: "default" | "light";
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold",
+        variant === "light" ? "text-white/78" : "text-muted-foreground",
+        className,
+      )}
+    >
+      <span className="inline-flex items-center gap-1.5">
+        <CalendarDays
+          aria-hidden="true"
+          className={cn(
+            "size-3.5",
+            variant === "light" ? "text-elinsa-sky" : "text-elinsa-primary",
+          )}
+        />
+        {publishedDate}
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <Clock3
+          aria-hidden="true"
+          className={cn(
+            "size-3.5",
+            variant === "light" ? "text-elinsa-sky" : "text-elinsa-primary",
+          )}
+        />
+        {readingMinutes} min de leitura
+      </span>
+    </div>
+  );
+}
+
+function getPostCardData(config: EditorialConfig, post: EditorialPost) {
+  return {
+    coverImage: getEditorialCoverImage(post, "card"),
+    href: post.slug ? `${config.href}/${post.slug}` : config.href,
+    publishedDate: formatEditorialDate(post.publishedAt ?? post.createdAt),
+    readingMinutes: getReadingMinutes(post.content),
+    subjectLabel: getEditorialSubjectLabel(getPostSubjectValue(post)),
+  };
+}
+
+function SubjectFilterNav({
   config,
   subject,
   subjectCounts,
@@ -334,18 +505,21 @@ function SubjectsAside({
   subjectCounts: SubjectCount[];
 }) {
   return (
-    <aside className="border-border lg:sticky lg:top-28 lg:self-start lg:border-l lg:pl-6">
-      <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+    <nav
+      aria-label="Filtrar por assunto"
+      className="min-w-0 lg:ml-auto lg:shrink-0"
+    >
+      <p className="mb-1.5 text-[0.65rem] font-semibold uppercase leading-4 tracking-normal text-muted-foreground">
         Assuntos
       </p>
-      <nav className="mt-3 flex flex-wrap gap-2 lg:grid">
+      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:grid md:w-fit md:grid-cols-[repeat(4,minmax(7.5rem,max-content))] md:gap-x-2 md:gap-y-1.5 md:overflow-visible">
         <Button
           asChild
           className={cn(
-            "h-auto justify-start rounded-md px-3 py-2 text-sm font-semibold lg:w-full",
+            "h-8 shrink-0 justify-center rounded-full px-2.5 text-xs font-semibold md:w-full",
             !subject
               ? "bg-elinsa-light text-elinsa-dark hover:bg-elinsa-light dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
-              : "text-muted-foreground hover:text-elinsa-primary",
+              : "text-muted-foreground hover:bg-muted/60 hover:text-elinsa-primary",
           )}
           variant="ghost"
         >
@@ -356,10 +530,10 @@ function SubjectsAside({
           <Button
             asChild
             className={cn(
-              "h-auto justify-start rounded-md px-3 py-2 text-sm font-semibold lg:w-full",
+              "h-8 shrink-0 justify-center rounded-full px-2.5 text-xs font-semibold md:w-full",
               item.value === subject
                 ? "bg-elinsa-light text-elinsa-dark hover:bg-elinsa-light dark:bg-elinsa-primary/15 dark:text-elinsa-sky"
-                : "text-muted-foreground hover:text-elinsa-primary",
+                : "text-muted-foreground hover:bg-muted/60 hover:text-elinsa-primary",
             )}
             key={item.value}
             variant="ghost"
@@ -369,8 +543,8 @@ function SubjectsAside({
             </Link>
           </Button>
         ))}
-      </nav>
-    </aside>
+      </div>
+    </nav>
   );
 }
 
