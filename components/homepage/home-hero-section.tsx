@@ -54,7 +54,7 @@ function HeroCopy() {
       <AdaptativeLogo className="mb-8" />
       <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-white/80 px-3 py-2 text-sm font-semibold text-elinsa-dark shadow-sm backdrop-blur dark:bg-background/70 dark:text-elinsa-sky">
         <Building2 aria-hidden="true" className="size-4" />
-        Operação elétrica no Pará
+        Infraestrutura e operação elétrica
       </div>
 
       <div className="flex flex-col gap-6">
@@ -78,7 +78,7 @@ function HeroCopy() {
           asChild
         >
           <Link href="/quem-somos">
-            Conheça nossa operação
+            Conheça a Elinsa
             <ArrowRight aria-hidden="true" data-icon="inline-end" />
           </Link>
         </Button>
@@ -88,7 +88,7 @@ function HeroCopy() {
           asChild
         >
           <Link href="/contato">
-            Fale com a Elinsa
+            Conheça nossa operação
             <MessageCircle aria-hidden="true" data-icon="inline-end" />
           </Link>
         </Button>
