@@ -36,7 +36,7 @@ type CompanyValuesContent = {
   description: string;
 };
 
-const ACTIVE_VALUES_VERSION: CompanyValuesVersionId = "valores2";
+const ACTIVE_VALUES_VERSION: CompanyValuesVersionId = "valores1";
 
 const companyValuesContent = {
   sectionLabel: "Cultura e identidade",
