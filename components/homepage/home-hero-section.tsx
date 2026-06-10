@@ -87,9 +87,8 @@ function HeroCopy() {
           className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
           asChild
         >
-          <Link href="/contato">
+          <Link href="/imprensa">
             Conheça nossa operação
-            <MessageCircle aria-hidden="true" data-icon="inline-end" />
           </Link>
         </Button>
       </div>
