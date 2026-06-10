@@ -30,9 +30,11 @@ export type EditorialAuthor =
 
 export type EditorialImage = {
   alt?: null | string;
+  blurDataUrl?: null | string;
   filename?: null | string;
   height?: null | number;
   id?: number | string;
+  mimeType?: null | string;
   sizes?: null | Record<
     string,
     {
@@ -222,6 +224,10 @@ export function getEditorialCoverImage(
     return null;
   }
 
+  if (!post.coverImage.mimeType?.startsWith("image/")) {
+    return null;
+  }
+
   const sizedImage = post.coverImage.sizes?.[size];
   const url = sizedImage?.url || post.coverImage.url;
 
@@ -231,6 +237,7 @@ export function getEditorialCoverImage(
 
   return {
     alt: post.coverImage.alt || post.title,
+    blurDataUrl: post.coverImage.blurDataUrl || undefined,
     height: sizedImage?.height || post.coverImage.height,
     url,
     width: sizedImage?.width || post.coverImage.width,

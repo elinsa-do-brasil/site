@@ -68,12 +68,7 @@ export async function EditorialIndex({
         !isPortalCollection && "pt-24",
       )}
     >
-      <section
-        className={cn(
-          "mx-auto max-w-6xl",
-          !isPortalCollection,
-        )}
-      >
+      <section className={cn("mx-auto max-w-6xl", !isPortalCollection)}>
         <EditorialIndexHeader
           config={config}
           subject={subject}
@@ -341,8 +336,10 @@ function FeaturedPostCard({
           {card.coverImage ? (
             <Image
               alt={card.coverImage.alt}
+              blurDataURL={card.coverImage.blurDataUrl}
               className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
               fill
+              placeholder={card.coverImage.blurDataUrl ? "blur" : "empty"}
               sizes="(min-width: 1280px) 48rem, (min-width: 1024px) 62vw, 100vw"
               src={card.coverImage.url}
             />
@@ -400,8 +397,10 @@ function CompactPostCard({
           {card.coverImage ? (
             <Image
               alt={card.coverImage.alt}
+              blurDataURL={card.coverImage.blurDataUrl}
               className="absolute inset-0 size-full object-cover object-center transition duration-500 group-hover:scale-105"
               fill
+              placeholder={card.coverImage.blurDataUrl ? "blur" : "empty"}
               sizes="(min-width: 1280px) 13rem, (min-width: 640px) 12rem, 100vw"
               src={card.coverImage.url}
             />

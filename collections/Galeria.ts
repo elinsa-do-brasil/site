@@ -4,7 +4,7 @@ export const Galeria: CollectionConfig = {
   slug: "galeria",
   dbName: "media",
   labels: {
-    singular: "Imagem da galeria",
+    singular: "Mídia da galeria",
     plural: "Galeria",
   },
   admin: {
@@ -38,9 +38,18 @@ export const Galeria: CollectionConfig = {
       },
     ],
     adminThumbnail: "thumbnail",
-    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    // Os plugins de blur ignoram MIME não-imagem, então vídeos podem viver na mesma coleção.
+    mimeTypes: [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "video/mp4",
+      "video/quicktime",
+      "video/webm",
+      "video/ogg",
+    ],
     formatOptions: {
-      format: 'webp',
+      format: "webp",
       options: {
         quality: 100,
         effort: 4,
@@ -55,13 +64,26 @@ export const Galeria: CollectionConfig = {
     {
       name: "alt",
       type: "text",
-      label: "Texto alternativo",
+      label: "Texto alternativo ou título",
       required: true,
+      admin: {
+        description:
+          "Para imagens, descreva o conteúdo. Para vídeos, use um título curto.",
+      },
     },
     {
       name: "caption",
       type: "text",
       label: "Legenda",
+    },
+    {
+      name: "captionsUrl",
+      type: "text",
+      label: "URL da legenda VTT",
+      admin: {
+        description:
+          "Opcional para vídeos. Use um arquivo .vtt público para habilitar legendas no player.",
+      },
     },
   ],
 };

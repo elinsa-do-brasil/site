@@ -1,9 +1,9 @@
-import { lexicalEditor, UploadFeature } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig, FieldHook } from "payload";
 import {
   defaultEditorialSubject,
   editorialSubjects,
 } from "../lib/editorial-subjects.ts";
+import { createContentEditor } from "./fields/contentEditor.ts";
 
 const format = (val: string): string =>
   val
@@ -54,7 +54,12 @@ const createEditorialCollection = ({
       url: ({ data }) => {
         const baseUrl =
           process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
-        return `${baseUrl}/${slug}/${data?.slug}`;
+        const path =
+          slug === "blog"
+            ? `/portal/blog/${data?.slug}`
+            : `/imprensa/${data?.slug}`;
+
+        return `${baseUrl}${path}`;
       },
     },
   },
@@ -121,6 +126,11 @@ const createEditorialCollection = ({
       type: "upload",
       relationTo: "galeria",
       label: "Imagem de capa",
+      filterOptions: {
+        mimeType: {
+          contains: "image/",
+        },
+      },
       admin: {
         position: "sidebar",
       },
@@ -144,46 +154,7 @@ const createEditorialCollection = ({
       name: "content",
       type: "richText",
       label: "Conteúdo",
-      editor: lexicalEditor({
-        features: ({ defaultFeatures }) => [
-          ...defaultFeatures,
-          UploadFeature({
-            collections: {
-              galeria: {
-                fields: [
-                  {
-                    name: "size",
-                    type: "select",
-                    label: "Tamanho da imagem",
-                    defaultValue: "normal",
-                    options: [
-                      { label: "Pequena", value: "small" },
-                      { label: "Normal", value: "normal" },
-                      { label: "Grande", value: "large" },
-                    ],
-                  },
-                  {
-                    name: "alignment",
-                    type: "select",
-                    label: "Alinhamento",
-                    defaultValue: "center",
-                    options: [
-                      { label: "Esquerda", value: "left" },
-                      { label: "Centro", value: "center" },
-                      { label: "Direita", value: "right" },
-                    ],
-                  },
-                  {
-                    name: "caption",
-                    type: "text",
-                    label: "Legenda",
-                  },
-                ],
-              },
-            },
-          }),
-        ],
-      }),
+      editor: createContentEditor(),
     },
   ],
 });

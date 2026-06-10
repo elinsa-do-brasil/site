@@ -1,6 +1,6 @@
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig, FieldHook } from "payload";
 import { vagaCidadeOptions } from "../lib/vaga-options.ts";
+import { createContentEditor } from "./fields/contentEditor.ts";
 
 const format = (val: string): string =>
   val
@@ -134,7 +134,7 @@ export const Vagas: CollectionConfig = {
       type: "richText",
       label: "Descrição da vaga",
       required: true,
-      editor: lexicalEditor(),
+      editor: createContentEditor(),
     },
   ],
 };

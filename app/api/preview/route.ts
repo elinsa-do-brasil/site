@@ -23,5 +23,9 @@ export async function GET(req: Request): Promise<Response> {
     redirect(`/${collection}/${slug}`);
   }
 
+  if (collection === "vagas") {
+    redirect(`/vagas/${slug}`);
+  }
+
   return new Response("Collection not supported", { status: 400 });
 }
