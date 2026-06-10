@@ -3,6 +3,16 @@ allowBuilds:
   esbuild: true
   msw: true
   sharp: true
+overrides:
+  '@sentry/nextjs': 10.57.0
+  '@sentry/types': 10.57.0
+peerDependencyRules:
+  allowedVersions:
+    next: 16.2.4
+    sharp: 0.34.5
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+patchedDependencies:
+  '@payload-bites/fullscreen-editor@1.7.2': patches/@payload-bites__fullscreen-editor@1.7.2.patch
+  '@payload-bites/image-search@3.4.2': patches/@payload-bites__image-search@3.4.2.patch

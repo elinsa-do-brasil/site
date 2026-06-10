@@ -1,0 +1,30 @@
+diff --git a/dist/components/PreviewImage/index.scss b/dist/components/PreviewImage/index.scss
+index 1d2d1c6fef1bc0a1d13faf7a8963b8cdfe10ff07..2fcbfbddf94b60a087760231b842653deef49027 100644
+--- a/dist/components/PreviewImage/index.scss
++++ b/dist/components/PreviewImage/index.scss
+@@ -1,4 +1,4 @@
+-@import "../../../node_modules/@payloadcms/ui/dist/scss/vars";
++@import "../../../../../@payloadcms/ui/dist/scss/vars";
+ 
+ $header-height: base(5);
+ 
+diff --git a/dist/components/SearchImages/index.scss b/dist/components/SearchImages/index.scss
+index a9871e708c678cc6c48eb8248abef97393f11d0f..018d59e70771067612082620f3febe244cd29c71 100644
+--- a/dist/components/SearchImages/index.scss
++++ b/dist/components/SearchImages/index.scss
+@@ -1,4 +1,4 @@
+-@import "../../../node_modules/@payloadcms/ui/dist/scss/vars";
++@import "../../../../../@payloadcms/ui/dist/scss/vars";
+ 
+ .drawer {
+   &__content {
+diff --git a/dist/components/ZoomIcon/index.scss b/dist/components/ZoomIcon/index.scss
+index 2f019ce954aa837fe61a53c7f0a3024df102729c..3754e3d54203d334468a1dec09216f56dc4a5e00 100644
+--- a/dist/components/ZoomIcon/index.scss
++++ b/dist/components/ZoomIcon/index.scss
+@@ -1,4 +1,4 @@
+-@import "../../../node_modules/@payloadcms/ui/dist/scss/vars";
++@import "../../../../../@payloadcms/ui/dist/scss/vars";
+ 
+ @layer payload-default {
+   .icon {

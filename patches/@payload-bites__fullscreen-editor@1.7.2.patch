@@ -1,0 +1,10 @@
+diff --git a/dist/components/FullscreenIcon/index.scss b/dist/components/FullscreenIcon/index.scss
+index 1dadad245c6583bc79efe32f0c697bada6bcb6d8..ecd5e49492bef087dc22ecd864e614d3916417f0 100644
+--- a/dist/components/FullscreenIcon/index.scss
++++ b/dist/components/FullscreenIcon/index.scss
+@@ -1,4 +1,4 @@
+-@import "../../../node_modules/@payloadcms/ui/dist/scss/vars";
++@import "../../../../../@payloadcms/ui/dist/scss/vars";
+ 
+ .icon {
+   &--fullscreen {
