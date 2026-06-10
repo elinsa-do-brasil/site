@@ -20,7 +20,7 @@ export function HomeHeroSection({ impactMetrics }: HomeHeroSectionProps) {
     >
       <HeroBackdrop />
 
-      <div className="relative z-10 mx-auto flex min-h-[34rem] w-full max-w-72 flex-col justify-end gap-10 sm:max-w-6xl md:min-h-[40rem] lg:gap-12">
+      <div className="relative z-10 mx-auto flex min-h-[34rem] w-full max-w-72 flex-col justify-end gap-10 sm:max-w-6xl md:min-h-168 lg:gap-12">
         <HeroCopy />
 
         <HeroMetrics metrics={impactMetrics} />
@@ -60,7 +60,7 @@ function HeroCopy() {
       <div className="flex flex-col gap-6">
         <h1
           id="home-hero-heading"
-          className="max-w-3xl text-4xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-5xl md:text-6xl dark:text-white"
+          className="max-w-3xl text-2xl font-extrabold leading-[0.98] tracking-normal text-elinsa-dark sm:text-3xl md:text-4xl dark:text-white"
         >
           Construindo um futuro melhor
         </h1>
