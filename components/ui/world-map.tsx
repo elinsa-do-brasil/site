@@ -43,7 +43,7 @@ export default function WorldMap({
     () =>
       map.getSVG({
         radius: 0.22,
-        color: isDark ? "#FFFFFF45" : "#0f172a82",
+        color: isDark ? "#FFFFFF68" : "#64748b82",
         shape: "circle",
         backgroundColor: "transparent",
       }),

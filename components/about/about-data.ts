@@ -115,7 +115,7 @@ export const aboutMilestones: AboutMilestone[] = [
     year: "2012",
     title: "Elinsa do Brasil",
     description:
-      "A filial brasileira é criada em Macapá e abre uma nova frente de atuação no mercado elétrico nacional.",
+      "A filial brasileira é criada em Macapá e abre uma nova frente de atuação no mercado elétrico brasileiro.",
   },
   {
     year: "2020",
@@ -127,26 +127,26 @@ export const aboutMilestones: AboutMilestone[] = [
 
 export const worldConnections = [
   {
-    start: { lat: 40.416775, lng: -3.70379, label: "Madrid" },
+    start: { lat: 43.3623, lng: -8.4115, label: "A Coruña" },
     end: { lat: -2.9916131, lng: -47.3835003, label: "Macapá" },
   },
 ];
 
 export const highlightedCountries = [
   {
-    lat: 40.4168,
-    lng: -3.7038,
+    lat: 43.3623,
+    lng: -8.4115,
     label: "Espanha",
-    detail: "origem técnica",
+    detail: "origem na Galícia",
     radius: 4,
     labelPosition: "top" as const,
   },
   {
-    lat: -10.3333,
-    lng: -53.2,
+    lat: -1.4558,
+    lng: -48.4902,
     label: "Brasil",
-    detail: "operação nacional",
-    radius: 8,
-    labelPosition: "bottom" as const,
+    detail: "operação no Pará",
+    radius: 5,
+    labelPosition: "right" as const,
   },
 ];

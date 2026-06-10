@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import WorldMap from "@/components/ui/world-map";
 import { aboutIcons, highlightedCountries } from "./about-data";
 import { AboutSection, AboutSectionIntro } from "./about-section";
@@ -25,13 +25,8 @@ export function AboutPresenceSection() {
         className="lg:grid-cols-1"
       />
 
-      <Card className="rounded-xl border-border bg-card py-0 text-foreground shadow-sm ring-0">
-        <CardHeader className="pb-0">
-          <CardTitle className="text-sm font-black uppercase tracking-[0.14em] text-elinsa-primary">
-            Conexão técnica
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 pt-2">
+      <Card className="rounded-xl border border-border/70 bg-card py-0 text-foreground shadow-sm shadow-elinsa-dark/5 ring-1 ring-border/60 dark:bg-card/80 dark:ring-border/40">
+        <CardContent className="p-3 md:p-4">
           <WorldMap
             fadeEdges={false}
             highlights={highlightedCountries}

@@ -33,8 +33,9 @@ export function AboutTimelineSection() {
 
 function MilestoneCard({ milestone }: { milestone: AboutMilestone }) {
   return (
-    <Card className="h-full rounded-xl border-border bg-card py-0 text-foreground shadow-sm ring-0">
-      <CardHeader className="p-6 pb-0">
+    <Card className="relative h-full rounded-xl border border-border/70 bg-card py-0 text-foreground shadow-sm shadow-elinsa-dark/5 ring-1 ring-border/60 transition-colors hover:border-elinsa-primary/45 hover:bg-elinsa-light/45 dark:bg-card/80 dark:ring-border/40 dark:hover:bg-elinsa-primary/10">
+      <div className="pointer-events-none absolute right-4 top-4 size-12 rounded-full bg-elinsa-primary/8 dark:bg-elinsa-primary/10" />
+      <CardHeader className="relative z-10 p-6 pb-0">
         <p className="text-sm font-black text-elinsa-primary">
           {milestone.year}
         </p>
@@ -42,7 +43,7 @@ function MilestoneCard({ milestone }: { milestone: AboutMilestone }) {
           {milestone.title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 pt-3">
+      <CardContent className="relative z-10 p-6 pt-3">
         <p className="leading-7 text-muted-foreground">
           {milestone.description}
         </p>
