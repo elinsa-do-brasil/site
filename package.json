@@ -30,6 +30,7 @@
     "@payloadcms/richtext-lexical": "^3.84.1",
     "@payloadcms/storage-s3": "^3.84.1",
     "@payloadcms/translations": "^3.84.1",
+    "@sentry/nextjs": "^10.57.0",
     "@tabler/icons-react": "^3.42.0",
     "@types/mdx": "^2.0.13",
     "@vercel/speed-insights": "^2.0.0",
