@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/.pytest_cache/
 
 # next.js
 /.next/
@@ -41,6 +42,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# python
+__pycache__/
+*.py[cod]
+
 /.docs
 /.source
 
@@ -49,3 +54,5 @@ secrets/
 
 /.agent/memories
 /.agents/plans
+
+/.venv

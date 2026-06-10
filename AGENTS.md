@@ -260,4 +260,15 @@ Before implementing:
 6. Prefer server-side solutions in Next.js when possible.
 7. Avoid deprecated APIs.
 
+## Search tools
+
+Use `rg` for text search and `rg --files` for file discovery.
+Do not use `grep` or `find` unless `rg` is unavailable.
+
+## Browser testing
+
+Use Python Playwright for browser verification when testing UI flows.
+Activate `.venv` first, then run `pytest`.
+Prefer Chromium unless another browser is explicitly needed.
+
 <!-- END:nextjs-agent-rules -->
