@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { CareChannelSection } from "@/components/homepage/care-channel-section";
 import { CompanyValuesSection } from "@/components/homepage/company-values-section";
 import { getImpactMetrics } from "@/components/homepage/home-data";
+import { HomeFinalCtaSection } from "@/components/homepage/home-final-cta-section";
 import { HomeHeroSection } from "@/components/homepage/home-hero-section";
 import { OperationSection } from "@/components/homepage/operation-section";
 import { PressNewsSection } from "@/components/homepage/press-news-section";
@@ -95,6 +96,8 @@ export default async function Home() {
       <CareChannelSection impactMetrics={impactMetrics} />
       <Separator />
       <PressNewsSection posts={latestPressPosts} />
+      <Separator />
+      <HomeFinalCtaSection />
     </div>
   );
 }

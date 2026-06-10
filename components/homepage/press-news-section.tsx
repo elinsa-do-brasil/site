@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/badge";
 import { Badge as ShadcnBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   CardContent,
   CardDescription,
@@ -19,6 +20,7 @@ import {
 import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
 import Lampada from "@/public/images/lampada.webp";
+import { HomeSection } from "./home-section";
 
 type PressNewsSectionProps = {
   posts: EditorialPost[];
@@ -28,34 +30,26 @@ export function PressNewsSection({ posts }: PressNewsSectionProps) {
   const [featuredPost, ...secondaryPosts] = posts;
 
   return (
-    <section className="w-full overflow-hidden bg-background px-6 py-20 md:px-8">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-10 rounded-3xl border border-border/70 bg-muted/25 p-5 md:p-7">
-          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <Badge text="Notícias" icon={Activity} />
-              <h2 className="text-3xl font-black tracking-normal md:text-4xl">
-                Histórias que movimentam a Elinsa
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
-                Acompanhe as novidades, comunicados e iniciativas que mostram a
-                nossa energia em ação.
-              </p>
-            </div>
-
-            <Link
-              href="/imprensa"
-              className="group inline-flex w-fit items-center gap-2 rounded-full border border-border/70 bg-card px-4 py-2 text-sm font-bold text-elinsa-dark shadow-sm transition-colors hover:border-elinsa-primary/35 hover:text-elinsa-primary dark:text-elinsa-sky"
-            >
-              Ver imprensa
-              <ArrowRight
-                className="transition-transform group-hover:translate-x-1"
-                size={16}
-              />
-            </Link>
-          </div>
-        </header>
-      </div>
+    <HomeSection headingId="imprensa-heading" tone="default">
+      <header className="mb-10 max-w-3xl">
+        <Badge text="Notícias" icon={Activity} />
+        <h2
+          id="imprensa-heading"
+          className="text-3xl font-black leading-tight tracking-normal md:text-4xl"
+        >
+          Histórias que mostram a Elinsa em movimento.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+          Acompanhe novidades, comunicados e iniciativas que dão contexto ao
+          trabalho em campo e às decisões que sustentam a operação.
+        </p>
+        <Button variant="outline" size="xl" className="mt-6 bg-card" asChild>
+          <Link href="/imprensa">
+            Ver imprensa
+            <ArrowRight aria-hidden="true" data-icon="inline-end" />
+          </Link>
+        </Button>
+      </header>
 
       {featuredPost ? (
         <div
@@ -76,20 +70,25 @@ export function PressNewsSection({ posts }: PressNewsSectionProps) {
           ) : null}
         </div>
       ) : (
-        <div className="mx-auto max-w-6xl">
-          <ShadcnCard className="rounded-3xl border-dashed bg-muted/35 py-0">
-            <CardContent className="py-14 text-center">
-              <h3 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
-                Nenhuma notícia publicada
-              </h3>
-              <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-                As próximas notícias públicas aparecerão aqui automaticamente.
-              </p>
-            </CardContent>
-          </ShadcnCard>
-        </div>
+        <EmptyPressNewsCard />
       )}
-    </section>
+    </HomeSection>
+  );
+}
+
+/** Keeps the news section useful even before public posts are available. */
+function EmptyPressNewsCard() {
+  return (
+    <ShadcnCard className="rounded-xl border-dashed bg-muted/35 py-0">
+      <CardContent className="py-14 text-center">
+        <h3 className="text-2xl font-black tracking-normal text-elinsa-dark dark:text-elinsa-sky">
+          Nenhuma notícia publicada
+        </h3>
+        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+          As próximas notícias públicas aparecerão aqui automaticamente.
+        </p>
+      </CardContent>
+    </ShadcnCard>
   );
 }
 
@@ -128,6 +127,7 @@ function FeaturedPressNewsCard({ post }: { post: EditorialPost }) {
           <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-sm font-bold text-white backdrop-blur transition-colors group-hover:border-elinsa-sky/50 group-hover:text-elinsa-sky">
             Ler notícia
             <ArrowRight
+              aria-hidden="true"
               className="transition-transform group-hover:translate-x-1"
               size={16}
             />
@@ -174,6 +174,7 @@ function CompactPressNewsCard({ post }: { post: EditorialPost }) {
           <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-elinsa-dark transition-colors group-hover:text-elinsa-primary dark:text-elinsa-sky">
             Ler notícia
             <ArrowRight
+              aria-hidden="true"
               className="transition-transform group-hover:translate-x-1"
               size={16}
             />
@@ -227,6 +228,7 @@ function NewsMeta({
       {publishedDate ? (
         <span className="inline-flex items-center gap-1.5">
           <CalendarDays
+            aria-hidden="true"
             className={cn(
               "size-3.5",
               variant === "light" ? "text-elinsa-sky" : "text-elinsa-primary",
@@ -237,6 +239,7 @@ function NewsMeta({
       ) : null}
       <span className="inline-flex items-center gap-1.5">
         <Clock3
+          aria-hidden="true"
           className={cn(
             "size-3.5",
             variant === "light" ? "text-elinsa-sky" : "text-elinsa-primary",

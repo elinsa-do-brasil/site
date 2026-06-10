@@ -1,14 +1,13 @@
+import { ArrowUpRight, Images } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Images } from "lucide-react";
 import GalleryImage from "@/public/images/eletricista.webp";
-{
-  /* card de destaque para galeria */
-}
+
+/** Highlights field imagery and sends visitors to published company updates. */
 export function GalleryCard() {
   return (
     <Link
-      href="/galeria"
+      href="/imprensa"
       className="group relative min-h-88 overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0"
     >
       <Image
@@ -28,7 +27,7 @@ export function GalleryCard() {
 
       <div className="relative flex h-full min-h-88 flex-col justify-between p-6">
         <div className="inline-flex w-fit items-center gap-2 rounded-md border border-white/18 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur-xs">
-          <Images className="size-4" />
+          <Images aria-hidden="true" className="size-4" />
           Operação em campo
         </div>
 
@@ -38,13 +37,16 @@ export function GalleryCard() {
           </p>
 
           <p className="mt-4 text-sm leading-6 text-white/76">
-            Registros de equipes, estruturas e frentes de trabalho da Elinsa em
-            diferentes regiões do Pará.
+            Registros, comunicados e iniciativas mostram como as equipes atuam
+            em diferentes regiões do Pará.
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white">
-            Explorar galeria
-            <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            Ver imprensa
+            <ArrowUpRight
+              aria-hidden="true"
+              className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
           </div>
         </div>
       </div>

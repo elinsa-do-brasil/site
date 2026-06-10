@@ -1,6 +1,6 @@
 import { Heart } from "lucide-react";
 import { Badge } from "@/components/badge";
-import { Separator } from "@/components/ui/separator";
+import { HomeSection } from "./home-section";
 
 type ValueAccent =
   | "blue"
@@ -191,96 +191,111 @@ const energyWordmarkLetters = [
 
 export function CompanyValuesSection() {
   return (
-    <>
-      <Separator />
-      <section
-        id="valores"
-        aria-labelledby="valores-heading"
-        className="bg-background px-6 py-20 md:px-8"
-      >
-        <div className="mx-auto max-w-6xl">
-          <article className="values-deck relative">
-            <div className="values-system">
-              <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center">
-                <div className="max-w-xl">
-                  <Badge
-                    text={companyValuesContent.sectionLabel}
-                    icon={Heart}
-                  />
-                  <h2
-                    id="valores-heading"
-                    className="max-w-2xl text-3xl font-extrabold tracking-normal md:text-4xl"
-                  >
-                    {companyValuesContent.heading}
-                  </h2>
-                  <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
-                    {companyValuesContent.description}
-                  </p>
-                </div>
-
-                <div className="border-t-3 border-elinsa-primary pt-6 md:border-l-3 md:border-t-0 md:py-2 md:pl-10">
-                  <p className="text-xs font-black uppercase leading-4 tracking-[0.18em] text-elinsa-primary">
-                    Acrônimo de valores
-                  </p>
-                  <div className="mt-3 flex flex-col gap-4">
-                    <div>
-                      <p className="text-xl font-black leading-7 text-foreground">
-                        {activeValuesVersion.summaryTitle}
-                      </p>
-                      <p className="mt-2 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
-                        {activeValuesVersion.description}
-                      </p>
-                    </div>
-
-                    <div
-                      className="energy-ribbon"
-                      aria-label={`Acrônimo ENERGIA ${activeValuesVersion.complement}`}
-                      role="img"
-                    >
-                      {energyWordmarkLetters.map((item, index) => (
-                        <span
-                          key={item.id}
-                          className="energy-ribbon-letter"
-                          data-energy-index={index}
-                        >
-                          {item.letter}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </header>
-
-              <ol
-                className="values-card-grid"
-                aria-label={`ENERGIA ${activeValuesVersion.complement}`}
-              >
-                {activeValuesVersion.values.map((value, index) => (
-                  <li
-                    key={value.id}
-                    data-value-accent={value.accent}
-                    data-value-index={index}
-                    className="value-home-card"
-                  >
-                    <span className="value-home-card-ghost" aria-hidden="true">
-                      {value.letter}
-                    </span>
-
-                    <div className="value-home-card-marker" aria-hidden="true">
-                      <span>{value.letter}</span>
-                    </div>
-
-                    <h3 className="value-home-card-title">{value.title}</h3>
-                    <p className="value-home-card-description">
-                      {value.description}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </article>
+    <HomeSection id="valores" headingId="valores-heading">
+      <article className="relative">
+        <div className="values-system">
+          <CompanyValuesIntro />
+          <CompanyValuesGrid />
         </div>
-      </section>
-    </>
+      </article>
+    </HomeSection>
+  );
+}
+
+/** Introduces the official ENERGIA value set without changing the approved copy. */
+function CompanyValuesIntro() {
+  return (
+    <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center">
+      <div className="max-w-xl">
+        <Badge text={companyValuesContent.sectionLabel} icon={Heart} />
+        <h2
+          id="valores-heading"
+          className="max-w-2xl text-3xl font-extrabold tracking-normal md:text-4xl"
+        >
+          {companyValuesContent.heading}
+        </h2>
+        <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+          {companyValuesContent.description}
+        </p>
+      </div>
+
+      <div className="border-t-3 border-elinsa-primary pt-6 md:border-l-3 md:border-t-0 md:py-2 md:pl-10">
+        <p className="text-xs font-black uppercase leading-4 tracking-[0.18em] text-elinsa-primary">
+          Acrônimo de valores
+        </p>
+        <div className="mt-3 flex flex-col gap-4">
+          <div>
+            <p className="text-xl font-black leading-7 text-foreground">
+              {activeValuesVersion.summaryTitle}
+            </p>
+            <p className="mt-2 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
+              {activeValuesVersion.description}
+            </p>
+          </div>
+
+          <EnergyRibbon />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function EnergyRibbon() {
+  return (
+    <div
+      className="energy-ribbon"
+      aria-label={`Acrônimo ENERGIA ${activeValuesVersion.complement}`}
+      role="img"
+    >
+      {energyWordmarkLetters.map((item, index) => (
+        <span
+          key={item.id}
+          className="energy-ribbon-letter"
+          data-energy-index={index}
+        >
+          {item.letter}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function CompanyValuesGrid() {
+  return (
+    <ol
+      className="values-card-grid"
+      aria-label={`ENERGIA ${activeValuesVersion.complement}`}
+    >
+      {activeValuesVersion.values.map((value, index) => (
+        <CompanyValueCard key={value.id} index={index} value={value} />
+      ))}
+    </ol>
+  );
+}
+
+function CompanyValueCard({
+  index,
+  value,
+}: {
+  index: number;
+  value: CompanyValue;
+}) {
+  return (
+    <li
+      data-value-accent={value.accent}
+      data-value-index={index}
+      className="value-home-card"
+    >
+      <span className="value-home-card-ghost" aria-hidden="true">
+        {value.letter}
+      </span>
+
+      <div className="value-home-card-marker" aria-hidden="true">
+        <span>{value.letter}</span>
+      </div>
+
+      <h3 className="value-home-card-title">{value.title}</h3>
+      <p className="value-home-card-description">{value.description}</p>
+    </li>
   );
 }
