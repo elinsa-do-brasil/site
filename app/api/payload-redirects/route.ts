@@ -1,5 +1,5 @@
 import configPromise from "@payload-config";
-import { getPayload } from "payload";
+import { type CollectionSlug, getPayload } from "payload";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -84,6 +84,10 @@ async function resolveDestination(redirect: RedirectDoc) {
     return null;
   }
 
+  if (!isPublicContentCollection(relationTo)) {
+    return null;
+  }
+
   if (typeof value === "object") {
     return getDocumentPath(relationTo, value.slug);
   }
@@ -116,6 +120,10 @@ function getDocumentPath(collection: string, slug: null | string | undefined) {
   }
 
   return null;
+}
+
+function isPublicContentCollection(value: string): value is CollectionSlug {
+  return value === "blog" || value === "imprensa" || value === "vagas";
 }
 
 function getRedirectStatusCode(type: null | string | undefined) {

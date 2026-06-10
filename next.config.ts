@@ -26,6 +26,23 @@ const s3RemotePatterns = [
   createRemotePattern(process.env.S3_ENDPOINT),
   createRemotePattern(process.env.AWS_ENDPOINT_URL_S3),
 ].filter((pattern) => pattern !== null);
+const payloadDevRemotePatterns =
+  process.env.NODE_ENV === "development"
+    ? ([
+        {
+          protocol: "http",
+          hostname: "localhost",
+          port: "3000",
+          pathname: "/api/galeria/file/**",
+        },
+        {
+          protocol: "http",
+          hostname: "127.0.0.1",
+          port: "3000",
+          pathname: "/api/galeria/file/**",
+        },
+      ] as const)
+    : [];
 const s3Prefix = process.env.S3_PREFIX || "galeria";
 const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
@@ -102,6 +119,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       ...s3RemotePatterns,
+      ...payloadDevRemotePatterns,
     ],
   },
   reactCompiler: true,

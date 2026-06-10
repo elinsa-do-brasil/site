@@ -18,7 +18,7 @@ import { es } from "@payloadcms/translations/languages/es";
 import { pt } from "@payloadcms/translations/languages/pt";
 import * as Sentry from "@sentry/nextjs";
 import { mediaPreview } from "@seshuk/payload-media-preview";
-import { buildConfig } from "payload";
+import { buildConfig, type CollectionSlug } from "payload";
 import computeBlurhash from "payload-blurhash-plugin";
 import sharp from "sharp";
 
@@ -55,6 +55,8 @@ const shouldForceS3PathStyle =
   process.env.S3_FORCE_PATH_STYLE === "false" ? false : Boolean(s3Endpoint);
 const siteURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
+const usersCollectionSlug = Users.slug as CollectionSlug;
+const galleryCollectionSlug = Galeria.slug as CollectionSlug;
 const imageSearchConfigured = Boolean(
   process.env.API_KEY_UNSPLASH ||
     process.env.API_KEY_PEXELS ||
@@ -164,7 +166,7 @@ export default buildConfig({
     }),
     auditFieldsPlugin({
       createdByLabel: "Criado por",
-      excludedCollections: [Users.slug],
+      excludedCollections: [usersCollectionSlug],
       lastModifiedByLabel: "Última alteração por",
       showInSidebar: true,
     }),
@@ -267,7 +269,7 @@ export default buildConfig({
           export: true,
         },
         {
-          slug: Galeria.slug,
+          slug: galleryCollectionSlug,
           import: true,
           export: true,
         },
