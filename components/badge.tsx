@@ -14,7 +14,7 @@ export function Badge({ text, icon: Icon, className }: BadgeProps) {
     <ShadcnBadge
       variant="outline"
       className={cn(
-        "mb-5 h-auto gap-2.5 rounded-md border-elinsa-sky/30 bg-elinsa-light/80 px-4 py-2.5 text-sm font-bold text-elinsa-primary shadow-sm backdrop-blur dark:border-elinsa-primary/20 dark:bg-background/70 dark:text-elinsa-sky [&>svg]:size-4!",
+        "mb-5 h-auto max-w-full justify-start gap-2.5 whitespace-normal rounded-md border-elinsa-sky/30 bg-elinsa-light/80 px-4 py-2.5 text-left text-sm font-bold leading-5 text-elinsa-primary shadow-sm backdrop-blur dark:border-elinsa-primary/20 dark:bg-background/70 dark:text-elinsa-sky [&>svg]:size-4!",
         className,
       )}
     >
