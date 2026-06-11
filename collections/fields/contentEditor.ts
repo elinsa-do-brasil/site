@@ -10,7 +10,7 @@ import { YouTubeEmbedBlock } from "../blocks/YouTubeEmbed.ts";
 export const createContentEditor = () =>
   lexicalEditor({
     features: ({ defaultFeatures }) => [
-      ...defaultFeatures,
+      ...defaultFeatures.filter((feature) => feature.key !== "relationship"),
       FixedToolbarFeature(),
       // O UploadFeature continua apontando para a galeria; o renderer separa imagem e vídeo.
       UploadFeature({

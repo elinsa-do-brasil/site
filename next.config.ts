@@ -1,3 +1,4 @@
+import path from "node:path";
 import { withPayload } from "@payloadcms/next/withPayload";
 import { withSentryConfig } from "@sentry/nextjs";
 import { createMDX } from "fumadocs-mdx/next";
@@ -124,6 +125,9 @@ const nextConfig: NextConfig = {
   },
   reactCompiler: true,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  sassOptions: {
+    loadPaths: [path.resolve("node_modules/@payloadcms/ui/dist/scss")],
+  },
   experimental: {
     globalNotFound: true,
   },

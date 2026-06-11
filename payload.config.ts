@@ -105,7 +105,10 @@ export default buildConfig({
     fallbackLanguage: "pt",
   },
 
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) =>
+      defaultFeatures.filter((feature) => feature.key !== "relationship"),
+  }),
 
   routes: {
     admin: "/payload",

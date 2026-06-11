@@ -80,6 +80,7 @@ function createEditorialConverters(): JSXConvertersFunction {
 
       return createElement(tag, id ? { id } : undefined, children);
     },
+    relationship: () => null,
     upload: ({ node }: { node: unknown }) => renderUpload(node as UploadNode),
     blocks: {
       youtubeEmbed: ({ node }: { node: unknown }) =>
