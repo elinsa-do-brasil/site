@@ -53,20 +53,38 @@ export const Vagas: CollectionConfig = {
   folders: true,
   fields: [
     {
-      name: "title",
-      type: "text",
-      label: "Título",
-      required: true,
+      type: "tabs",
+      tabs: [
+        {
+          label: "Vaga",
+          fields: [
+            {
+              name: "title",
+              type: "text",
+              label: "Título",
+              required: true,
+            },
+            {
+              name: "summary",
+              type: "textarea",
+              label: "Descrição rápida",
+              required: true,
+              admin: {
+                description: "Resumo curto para a listagem pública de vagas.",
+              },
+            },
+            {
+              name: "content",
+              type: "richText",
+              label: "Descrição da vaga",
+              required: true,
+              editor: createContentEditor(),
+            },
+          ],
+        },
+      ],
     },
-    {
-      name: "summary",
-      type: "textarea",
-      label: "Descrição rápida",
-      required: true,
-      admin: {
-        description: "Resumo curto para a listagem pública de vagas.",
-      },
-    },
+    // Campos fora das abas continuam disponíveis para o sidebar mesmo com a aba de SEO do plugin.
     {
       name: "jobStatus",
       type: "select",
@@ -128,13 +146,6 @@ export const Vagas: CollectionConfig = {
       hooks: {
         beforeValidate: [formatSlug("title")],
       },
-    },
-    {
-      name: "content",
-      type: "richText",
-      label: "Descrição da vaga",
-      required: true,
-      editor: createContentEditor(),
     },
   ],
 };

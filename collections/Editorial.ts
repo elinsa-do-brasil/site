@@ -71,21 +71,38 @@ const createEditorialCollection = ({
   folders: true,
   fields: [
     {
-      name: "title",
-      type: "text",
-      label: "Título",
-      required: true,
+      type: "tabs",
+      tabs: [
+        {
+          label: labelSingular,
+          fields: [
+            {
+              name: "title",
+              type: "text",
+              label: "Título",
+              required: true,
+            },
+            {
+              name: "summary",
+              type: "textarea",
+              label: "Descrição rápida",
+              required: true,
+              admin: {
+                description:
+                  "Resumo curto para listagens e para quem não for ler a notícia completa.",
+              },
+            },
+            {
+              name: "content",
+              type: "richText",
+              label: "Conteúdo",
+              editor: createContentEditor(),
+            },
+          ],
+        },
+      ],
     },
-    {
-      name: "summary",
-      type: "textarea",
-      label: "Descrição rápida",
-      required: true,
-      admin: {
-        description:
-          "Resumo curto para listagens e para quem não for ler a notícia completa.",
-      },
-    },
+    // Campos fora das abas continuam disponíveis para o sidebar mesmo com a aba de SEO do plugin.
     {
       name: "publishedAt",
       type: "date",
@@ -149,12 +166,6 @@ const createEditorialCollection = ({
       hooks: {
         beforeValidate: [formatSlug("title")],
       },
-    },
-    {
-      name: "content",
-      type: "richText",
-      label: "Conteúdo",
-      editor: createContentEditor(),
     },
   ],
 });
