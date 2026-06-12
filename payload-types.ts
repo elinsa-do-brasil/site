@@ -188,14 +188,6 @@ export interface Imprensa {
    * Resumo curto para listagens e para quem não for ler a notícia completa.
    */
   summary: string;
-  publishedAt: string;
-  subject: 'institucional' | 'operacao' | 'seguranca' | 'pessoas' | 'recrutamento' | 'eventos' | 'comunicados';
-  author: number | User;
-  coverImage?: (number | null) | Galeria;
-  /**
-   * Gerado automaticamente a partir do título se deixado em branco.
-   */
-  slug?: string | null;
   content?: {
     root: {
       type: string;
@@ -211,14 +203,6 @@ export interface Imprensa {
     };
     [k: string]: unknown;
   } | null;
-  createdBy?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
-  lastModifiedBy?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -227,6 +211,22 @@ export interface Imprensa {
      */
     image?: (number | null) | Galeria;
   };
+  publishedAt: string;
+  subject: 'institucional' | 'operacao' | 'seguranca' | 'pessoas' | 'recrutamento' | 'eventos' | 'comunicados';
+  author: number | User;
+  coverImage?: (number | null) | Galeria;
+  /**
+   * Gerado automaticamente a partir do título se deixado em branco.
+   */
+  slug?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
   folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
@@ -348,14 +348,6 @@ export interface Blog {
    * Resumo curto para listagens e para quem não for ler a notícia completa.
    */
   summary: string;
-  publishedAt: string;
-  subject: 'institucional' | 'operacao' | 'seguranca' | 'pessoas' | 'recrutamento' | 'eventos' | 'comunicados';
-  author: number | User;
-  coverImage?: (number | null) | Galeria;
-  /**
-   * Gerado automaticamente a partir do título se deixado em branco.
-   */
-  slug?: string | null;
   content?: {
     root: {
       type: string;
@@ -371,14 +363,6 @@ export interface Blog {
     };
     [k: string]: unknown;
   } | null;
-  createdBy?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
-  lastModifiedBy?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -387,6 +371,22 @@ export interface Blog {
      */
     image?: (number | null) | Galeria;
   };
+  publishedAt: string;
+  subject: 'institucional' | 'operacao' | 'seguranca' | 'pessoas' | 'recrutamento' | 'eventos' | 'comunicados';
+  author: number | User;
+  coverImage?: (number | null) | Galeria;
+  /**
+   * Gerado automaticamente a partir do título se deixado em branco.
+   */
+  slug?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
   folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
@@ -404,6 +404,29 @@ export interface Vagas {
    * Resumo curto para a listagem pública de vagas.
    */
   summary: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Galeria;
+  };
   /**
    * A página /vagas exibe apenas vagas abertas.
    */
@@ -466,21 +489,6 @@ export interface Vagas {
    * Gerado automaticamente a partir do título se deixado em branco.
    */
   slug?: string | null;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
   createdBy?: {
     relationTo: 'users';
     value: number | User;
@@ -489,14 +497,6 @@ export interface Vagas {
     relationTo: 'users';
     value: number | User;
   } | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Galeria;
-  };
   folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
@@ -882,14 +882,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface ImprensaSelect<T extends boolean = true> {
   title?: T;
   summary?: T;
-  publishedAt?: T;
-  subject?: T;
-  author?: T;
-  coverImage?: T;
-  slug?: T;
   content?: T;
-  createdBy?: T;
-  lastModifiedBy?: T;
   meta?:
     | T
     | {
@@ -897,6 +890,13 @@ export interface ImprensaSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  publishedAt?: T;
+  subject?: T;
+  author?: T;
+  coverImage?: T;
+  slug?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -910,14 +910,7 @@ export interface ImprensaSelect<T extends boolean = true> {
 export interface BlogSelect<T extends boolean = true> {
   title?: T;
   summary?: T;
-  publishedAt?: T;
-  subject?: T;
-  author?: T;
-  coverImage?: T;
-  slug?: T;
   content?: T;
-  createdBy?: T;
-  lastModifiedBy?: T;
   meta?:
     | T
     | {
@@ -925,6 +918,13 @@ export interface BlogSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  publishedAt?: T;
+  subject?: T;
+  author?: T;
+  coverImage?: T;
+  slug?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -938,14 +938,7 @@ export interface BlogSelect<T extends boolean = true> {
 export interface VagasSelect<T extends boolean = true> {
   title?: T;
   summary?: T;
-  jobStatus?: T;
-  sector?: T;
-  city?: T;
-  publishedAt?: T;
-  slug?: T;
   content?: T;
-  createdBy?: T;
-  lastModifiedBy?: T;
   meta?:
     | T
     | {
@@ -953,6 +946,13 @@ export interface VagasSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  jobStatus?: T;
+  sector?: T;
+  city?: T;
+  publishedAt?: T;
+  slug?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -4,4 +4,10 @@ export const docs = defineDocs({
   dir: "docs",
 });
 
-export default defineConfig();
+export default defineConfig({
+  mdxOptions: {
+    remarkRehypeOptions: {
+      footnoteLabel: "Notas",
+    },
+  },
+});
