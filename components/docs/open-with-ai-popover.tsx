@@ -1,18 +1,17 @@
 "use client";
 
 import { usePathname } from "fumadocs-core/framework";
-import { renderTranslation } from "fumadocs-core/i18n";
 import { buttonVariants } from "fumadocs-ui/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "fumadocs-ui/components/ui/popover";
-import { useTranslations } from "fumadocs-ui/contexts/i18n";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { useMemo } from "react";
 import type { IconType } from "react-icons";
 import { RiClaudeFill, RiOpenaiFill } from "react-icons/ri";
+import { docsTranslations } from "@/components/docs/docs-translations";
 import { cn } from "@/lib/utils";
 
 type AIOption = {
@@ -23,7 +22,6 @@ type AIOption = {
 
 export function OpenWithAIPopover({ className }: { className?: string }) {
   const pathname = usePathname();
-  const t = useTranslations();
 
   const items = useMemo<AIOption[]>(() => {
     const markdownPath = pathname.replace(/^\/docs(?=\/|$)/, "/docs-markdown");
@@ -31,9 +29,10 @@ export function OpenWithAIPopover({ className }: { className?: string }) {
       typeof window === "undefined"
         ? markdownPath
         : String(new URL(markdownPath, window.location.origin));
-    const q = renderTranslation(t.pageActionsOpenInLLMPrompt, {
-      url: markdownUrl,
-    });
+    const q = docsTranslations.pageActionsOpenInLLMPrompt.replace(
+      "{url}",
+      markdownUrl,
+    );
 
     return [
       {
@@ -47,10 +46,10 @@ export function OpenWithAIPopover({ className }: { className?: string }) {
       {
         href: `https://claude.ai/new?${new URLSearchParams({ q })}`,
         icon: RiClaudeFill,
-        title: t.pageActionsOpenClaude,
+        title: docsTranslations.pageActionsOpenClaude,
       },
     ];
-  }, [pathname, t]);
+  }, [pathname]);
 
   return (
     <Popover>
@@ -65,7 +64,7 @@ export function OpenWithAIPopover({ className }: { className?: string }) {
         )}
         type="button"
       >
-        {t.pageActionsOpen}
+        {docsTranslations.pageActionsOpen}
         <ChevronDown className="size-3.5 text-fd-muted-foreground" />
       </PopoverTrigger>
       <PopoverContent className="flex flex-col">
