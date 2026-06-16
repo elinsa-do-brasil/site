@@ -47,8 +47,9 @@ const payloadDevRemotePatterns =
 const s3Prefix = process.env.S3_PREFIX || "galeria";
 const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 const sharpNativeTracingIncludes = [
-  "node_modules/.pnpm/@img+sharp-libvips-linux-x64@1.3.0/node_modules/@img/sharp-libvips-linux-x64/lib/libvips-cpp.so.8.18.3",
-  "node_modules/.pnpm/@img+sharp-libvips-linux-x64@1.3.0/node_modules/@img/sharp-libvips-linux-x64/lib/glib-2.0/include/glibconfig.h",
+  "node_modules/sharp/**/*",
+  "node_modules/@img/sharp-linux-x64/**/*",
+  "node_modules/@img/sharp-libvips-linux-x64/**/*",
 ];
 
 const nextConfig: NextConfig = {
@@ -129,6 +130,7 @@ const nextConfig: NextConfig = {
   },
   reactCompiler: true,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  serverExternalPackages: ["sharp"],
   outputFileTracingIncludes: {
     "/*": sharpNativeTracingIncludes,
   },
