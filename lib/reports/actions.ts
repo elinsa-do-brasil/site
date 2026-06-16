@@ -48,11 +48,8 @@ export async function updateReportStatusAction(
   }
 
   revalidatePath("/portal/comite-de-etica");
-  revalidatePath("/portal/comite-de-etica/denuncias");
-  revalidatePath(`/portal/comite-de-etica/denuncias/${parsedReportId.data}`);
-  revalidatePath(
-    `/portal/comite-de-etica/denuncias/${parsedReportId.data}/historico`,
-  );
+  revalidatePath(`/portal/comite-de-etica/${parsedReportId.data}`);
+  revalidatePath(`/portal/comite-de-etica/${parsedReportId.data}/historico`);
   revalidatePath("/acompanhar-denuncia");
 
   return {

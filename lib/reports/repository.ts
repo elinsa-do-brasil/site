@@ -1,4 +1,13 @@
-import { and, asc, count, desc, eq, inArray } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  type SQL,
+} from "drizzle-orm";
 import { db } from "@/lib/db";
 import { reportEvents, reports, user } from "@/lib/db/schema";
 import {
@@ -15,6 +24,35 @@ import {
 } from "./status";
 import type { CreateReportInput } from "./validation";
 import { toEncryptedPayload } from "./validation";
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const REPORT_SUMMARY_PAGE_SIZE = 20;
+const IN_PROGRESS_REPORT_STATUSES = [
+  "opened",
+  "triage",
+  "review",
+  "in_review",
+  "investigation",
+  "waiting_information",
+];
+const FINISHED_REPORT_STATUSES = ["completed", "closed", "archived"];
+
+export const REPORT_SUMMARY_STATUS_FILTERS = [
+  "new",
+  "in_progress",
+  "finished",
+] as const;
+
+export type ReportSummaryStatusFilter =
+  (typeof REPORT_SUMMARY_STATUS_FILTERS)[number];
+
+type ListReportSummariesOptions = {
+  page?: number;
+  pageSize?: number;
+  protocolSearch?: string;
+  statusFilter?: ReportSummaryStatusFilter;
+};
 
 export async function createReport(input: CreateReportInput) {
   const encrypted = encryptReportPayload(toEncryptedPayload(input));
@@ -63,8 +101,32 @@ export async function createReport(input: CreateReportInput) {
   throw new Error("REPORT_PROTOCOL_GENERATION_FAILED");
 }
 
-export async function listReportSummaries(limit = 20) {
-  return db
+export async function listReportSummaries({
+  page = 1,
+  pageSize = REPORT_SUMMARY_PAGE_SIZE,
+  protocolSearch = "",
+  statusFilter,
+}: ListReportSummariesOptions = {}) {
+  const normalizedSearch = normalizeProtocolSearch(protocolSearch);
+  const conditions = [
+    normalizedSearch ? ilike(reports.protocol, `%${normalizedSearch}%`) : null,
+    getReportStatusFilterWhere(statusFilter),
+  ].filter((condition): condition is SQL => Boolean(condition));
+  const where =
+    conditions.length === 0
+      ? undefined
+      : conditions.length === 1
+        ? conditions[0]
+        : and(...conditions);
+  const safePageSize = clampInteger(pageSize, 1, REPORT_SUMMARY_PAGE_SIZE);
+  const [{ total } = { total: 0 }] = await db
+    .select({ total: count() })
+    .from(reports)
+    .where(where);
+  const totalPages = Math.max(Math.ceil(Number(total) / safePageSize), 1);
+  const currentPage = clampInteger(page, 1, totalPages);
+  const start = (currentPage - 1) * safePageSize;
+  const items = await db
     .select({
       id: reports.id,
       protocol: reports.protocol,
@@ -74,8 +136,38 @@ export async function listReportSummaries(limit = 20) {
       updatedAt: reports.updatedAt,
     })
     .from(reports)
+    .where(where)
     .orderBy(desc(reports.createdAt))
-    .limit(limit);
+    .limit(safePageSize)
+    .offset(start);
+
+  return {
+    items,
+    page: currentPage,
+    pageSize: safePageSize,
+    protocolSearch,
+    statusFilter,
+    total: Number(total),
+    totalPages,
+  };
+}
+
+function getReportStatusFilterWhere(
+  filter: ReportSummaryStatusFilter | undefined,
+) {
+  if (filter === "new") {
+    return eq(reports.status, "new");
+  }
+
+  if (filter === "in_progress") {
+    return inArray(reports.status, IN_PROGRESS_REPORT_STATUSES);
+  }
+
+  if (filter === "finished") {
+    return inArray(reports.status, FINISHED_REPORT_STATUSES);
+  }
+
+  return null;
 }
 
 export async function getReportCountsByStatus() {
@@ -94,6 +186,10 @@ export async function getReportCountsByStatus() {
 }
 
 export async function getReportById(id: string) {
+  if (!isUuid(id)) {
+    return null;
+  }
+
   const [report] = await db.select().from(reports).where(eq(reports.id, id));
   return report ?? null;
 }
@@ -139,6 +235,10 @@ export async function getPublicReportTrackingByProtocol(protocol: string) {
 }
 
 export async function listReportEvents(reportId: string) {
+  if (!isUuid(reportId)) {
+    return [];
+  }
+
   return db
     .select({
       id: reportEvents.id,
@@ -277,4 +377,18 @@ function isUniqueViolation(error: unknown) {
     "code" in error &&
     error.code === "23505"
   );
+}
+
+function isUuid(value: string) {
+  return UUID_PATTERN.test(value);
+}
+
+function clampInteger(value: number, min: number, max: number) {
+  if (!Number.isFinite(value)) return min;
+
+  return Math.min(Math.max(Math.trunc(value), min), max);
+}
+
+function normalizeProtocolSearch(value: string) {
+  return value.trim().toUpperCase();
 }

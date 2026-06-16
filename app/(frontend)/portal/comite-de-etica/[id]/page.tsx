@@ -84,52 +84,53 @@ export default async function ReportDetailPage({
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <ReportStatusBadge status={report.status} />
-            <span className="font-mono text-sm text-muted-foreground">
-              {report.protocol}
-            </span>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">{payload.title}</h1>
-          <p className="mt-2 text-muted-foreground">{report.category}</p>
-          <div className="mt-4">
-            <ReportStatusSelect reportId={report.id} status={report.status} />
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link
-              href={`/portal/comite-de-etica/denuncias/${report.id}/historico`}
-            >
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <header className="mb-6 border-b pb-5">
+        <nav
+          aria-label="Navegação da denúncia"
+          className="mb-3 flex flex-wrap gap-2"
+        >
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/portal/comite-de-etica/${report.id}/historico`}>
               Histórico
             </Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link href="/portal/comite-de-etica/denuncias">Voltar</Link>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/portal/comite-de-etica">Voltar</Link>
           </Button>
+        </nav>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <ReportStatusBadge status={report.status} />
+          <span className="font-mono text-sm text-muted-foreground">
+            {report.protocol}
+          </span>
         </div>
-      </div>
+        <h1 className="max-w-4xl text-2xl font-semibold tracking-tight">
+          {payload.title}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">{report.category}</p>
+        <div className="mt-3">
+          <ReportStatusSelect reportId={report.id} status={report.status} />
+        </div>
+      </header>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Relato</CardTitle>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Relato</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="py-4">
             <p className="whitespace-pre-wrap text-sm leading-relaxed">
               {payload.description}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Dados do caso</CardTitle>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Dados do caso</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="py-4">
             <dl className="flex flex-col gap-3 text-sm">
               <DetailItem
                 label="Identificação"
@@ -154,33 +155,33 @@ export default async function ReportDetailPage({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Pessoas envolvidas</CardTitle>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Pessoas envolvidas</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="py-4">
             <p className="whitespace-pre-wrap text-sm leading-relaxed">
               {payload.involvedPeople || "Não informado."}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Testemunhas</CardTitle>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Testemunhas</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="py-4">
             <p className="whitespace-pre-wrap text-sm leading-relaxed">
               {payload.witnesses || "Não informado."}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Anexos</CardTitle>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm lg:col-span-2">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Anexos</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="py-4">
             {attachments.length > 0 ? (
               <div className="flex flex-col gap-3">
                 {attachments.map((attachment) => (
@@ -247,11 +248,11 @@ export default async function ReportDetailPage({
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Tentativas anteriores</CardTitle>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm lg:col-span-2">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Tentativas anteriores</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="py-4">
             <p className="whitespace-pre-wrap text-sm leading-relaxed">
               {payload.previousAttempts || "Não informado."}
             </p>

@@ -196,8 +196,8 @@ function PortalSidebar({
               <ReportMetric label="finalizadas" value={finishedReports} />
             </div>
             <Button asChild className="mt-3 w-full justify-between" size="sm">
-              <Link href="/portal/comite-de-etica/denuncias">
-                Ver denúncias
+              <Link href="/portal/comite-de-etica">
+                Abrir comitê
                 <ArrowRight className="size-3" />
               </Link>
             </Button>

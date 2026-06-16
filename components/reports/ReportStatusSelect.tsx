@@ -55,7 +55,11 @@ export function ReportStatusSelect({
         onValueChange={(value) => handleChange(value as ReportStatus)}
         value={currentStatus}
       >
-        <SelectTrigger className="w-48" size="default">
+        <SelectTrigger
+          aria-label="Status da denúncia"
+          className="w-48"
+          size="default"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

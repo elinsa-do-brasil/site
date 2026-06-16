@@ -1,25 +1,59 @@
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Inbox,
+  ListChecks,
+  Search,
+} from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { auth } from "@/lib/auth";
 import { requireCommitteeAccess, requireUserId } from "@/lib/comite/access";
 import {
   getReportCountsByStatus,
   listReportSummaries,
+  REPORT_SUMMARY_STATUS_FILTERS,
+  type ReportSummaryStatusFilter,
 } from "@/lib/reports/repository";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export default async function ComitePage() {
+const REPORTS_PER_PAGE = 20;
+const STATUS_FILTER_LABELS: Record<ReportSummaryStatusFilter, string> = {
+  new: "novas",
+  in_progress: "em andamento",
+  finished: "finalizadas",
+};
+
+type ComitePageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function ComitePage({ searchParams }: ComitePageProps) {
+  const params = await searchParams;
+  const search = normalizeSearchParam(getSingleParam(params.q));
+  const statusFilter = normalizeStatusFilter(getSingleParam(params.status));
+  const page = parsePage(getSingleParam(params.page));
   const session = await auth.api.getSession({ headers: await headers() });
   const userId = requireUserId(session?.user.id);
   await requireCommitteeAccess(userId);
-  const [counts, latestReports] = await Promise.all([
+  const [counts, reportPage] = await Promise.all([
     getReportCountsByStatus(),
-    listReportSummaries(6),
+    listReportSummaries({
+      page,
+      pageSize: REPORTS_PER_PAGE,
+      protocolSearch: search,
+      statusFilter,
+    }),
   ]);
+  const reports = reportPage.items;
   const inProgressCount =
     (counts.opened ?? 0) +
     (counts.triage ?? 0) +
@@ -31,81 +65,212 @@ export default async function ComitePage() {
     (counts.completed ?? 0) + (counts.closed ?? 0) + (counts.archived ?? 0);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Comitê de Ética</h1>
-          <p className="mt-2 text-muted-foreground">
-            Painel interno para triagem e acompanhamento de denúncias.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/portal/comite-de-etica/denuncias">Ver denúncias</Link>
-        </Button>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <header className="mb-5 border-b pb-5">
+        <nav
+          aria-label="Navegação do comitê"
+          className="mb-3 flex flex-wrap gap-2"
+        >
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/portal">Voltar ao portal</Link>
+          </Button>
+        </nav>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Comitê de Ética
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Central de triagem, análise e acompanhamento das denúncias recebidas.
+        </p>
+      </header>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <MetricCard label="Novas" value={counts.new ?? 0} />
-        <MetricCard label="Em andamento" value={inProgressCount} />
-        <MetricCard label="Finalizadas" value={finishedCount} />
-      </section>
-
-      <section className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Últimas denúncias</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px] text-left text-sm">
-                <thead className="border-b text-muted-foreground">
-                  <tr>
-                    <th className="py-2 pr-4 font-medium">Protocolo</th>
-                    <th className="py-2 pr-4 font-medium">Categoria</th>
-                    <th className="py-2 pr-4 font-medium">Status</th>
-                    <th className="py-2 pr-4 font-medium">Recebida</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {latestReports.map((report) => (
-                    <tr key={report.id} className="border-b last:border-0">
-                      <td className="py-3 pr-4 font-mono">
-                        <Link
-                          href={`/portal/comite-de-etica/denuncias/${report.id}`}
-                          className="underline-offset-4 hover:underline"
-                        >
-                          {report.protocol}
-                        </Link>
-                      </td>
-                      <td className="py-3 pr-4">{report.category}</td>
-                      <td className="py-3 pr-4">
-                        <ReportStatusBadge status={report.status} />
-                      </td>
-                      <td className="py-3 pr-4">
-                        {formatDate(report.createdAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
+        <main className="min-w-0">
+          <form
+            action="/portal/comite-de-etica"
+            className="mb-4 grid gap-2 rounded-md border bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto]"
+          >
+            {statusFilter && (
+              <input name="status" type="hidden" value={statusFilter} />
+            )}
+            <div className="relative">
+              <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground" />
+              <Input
+                className="h-9 pl-8 text-sm"
+                defaultValue={search}
+                name="q"
+                placeholder="Buscar por protocolo"
+              />
             </div>
-          </CardContent>
-        </Card>
-      </section>
+            <div className="flex gap-2">
+              <Button className="h-9" type="submit">
+                Buscar
+              </Button>
+              {search && (
+                <Button className="h-9" variant="outline" asChild>
+                  <Link href={buildCommitteeHref({ statusFilter })}>
+                    Limpar
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </form>
+
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span>
+              {reportPage.total} denúncia(s) encontrada(s) · página{" "}
+              {reportPage.page} de {reportPage.totalPages}
+              {statusFilter
+                ? ` · filtro: ${STATUS_FILTER_LABELS[statusFilter]}`
+                : ""}
+            </span>
+            <Pagination
+              page={reportPage.page}
+              search={search}
+              statusFilter={statusFilter}
+              totalPages={reportPage.totalPages}
+            />
+          </div>
+
+          <section
+            aria-label="Denúncias recebidas"
+            className="overflow-hidden rounded-md border bg-card shadow-sm"
+          >
+            {reports.length > 0 ? (
+              <div className="divide-y">
+                {reports.map((report) => (
+                  <Link
+                    aria-label={`Ver denúncia ${report.protocol}`}
+                    key={report.id}
+                    href={`/portal/comite-de-etica/${report.id}`}
+                    className="group grid gap-3 px-4 py-4 text-left transition-colors hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-center"
+                  >
+                    <div className="min-w-0">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <ReportStatusBadge status={report.status} />
+                      </div>
+                      <p className="font-mono text-base font-semibold tracking-tight group-hover:text-elinsa-primary">
+                        {report.protocol}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {report.category}
+                      </p>
+                    </div>
+                    <dl className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:block lg:space-y-2">
+                      <ReportDate label="Recebida" value={report.createdAt} />
+                      <ReportDate label="Atualizada" value={report.updatedAt} />
+                    </dl>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="px-4 py-10 text-center">
+                <Inbox className="mx-auto mb-3 size-8 text-muted-foreground/70" />
+                <p className="text-sm text-muted-foreground">
+                  {search || statusFilter
+                    ? "Nenhuma denúncia encontrada com esses filtros."
+                    : "Nenhuma denúncia recebida ainda."}
+                </p>
+              </div>
+            )}
+          </section>
+
+          <div className="mt-4 flex justify-end">
+            <Pagination
+              page={reportPage.page}
+              search={search}
+              statusFilter={statusFilter}
+              totalPages={reportPage.totalPages}
+            />
+          </div>
+        </main>
+
+        <aside className="grid gap-3 lg:sticky lg:top-24">
+          <MetricCard
+            active={statusFilter === "new"}
+            href={buildCommitteeHref({
+              search,
+              statusFilter: statusFilter === "new" ? undefined : "new",
+            })}
+            icon={<Inbox className="size-4" />}
+            label="Novas"
+            value={counts.new ?? 0}
+          />
+          <MetricCard
+            active={statusFilter === "in_progress"}
+            href={buildCommitteeHref({
+              search,
+              statusFilter:
+                statusFilter === "in_progress" ? undefined : "in_progress",
+            })}
+            icon={<Clock3 className="size-4" />}
+            label="Em andamento"
+            value={inProgressCount}
+          />
+          <MetricCard
+            active={statusFilter === "finished"}
+            href={buildCommitteeHref({
+              search,
+              statusFilter:
+                statusFilter === "finished" ? undefined : "finished",
+            })}
+            icon={<ListChecks className="size-4" />}
+            label="Finalizadas"
+            value={finishedCount}
+          />
+        </aside>
+      </div>
     </div>
   );
 }
 
-function MetricCard({ label, value }: { label: string; value: number }) {
+function MetricCard({
+  active,
+  href,
+  icon,
+  label,
+  value,
+}: {
+  active: boolean;
+  href: string;
+  icon: ReactNode;
+  label: string;
+  value: number;
+}) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{label}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-3xl font-semibold">{value}</p>
-      </CardContent>
-    </Card>
+    <Link
+      aria-current={active ? "page" : undefined}
+      aria-label={
+        active ? `Remover filtro: ${label}` : `Filtrar denúncias: ${label}`
+      }
+      className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+      href={href}
+    >
+      <Card
+        className={cn(
+          "rounded-md border-border/80 py-0 shadow-sm transition-colors hover:bg-muted/35 hover:ring-elinsa-primary/30",
+          active && "bg-elinsa-primary/5 ring-elinsa-primary/40",
+        )}
+      >
+        <CardContent className="flex items-center justify-between gap-3 py-3">
+          <span className="flex items-center gap-2 text-sm font-medium">
+            <span className="text-elinsa-primary">{icon}</span>
+            {label}
+          </span>
+          <span className="text-2xl font-semibold leading-none">{value}</span>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+function ReportDate({ label, value }: { label: string; value: Date }) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd className="mt-0.5 font-medium text-foreground">
+        {formatDate(value)}
+      </dd>
+    </div>
   );
 }
 
@@ -114,4 +279,115 @@ function formatDate(date: Date) {
     dateStyle: "short",
     timeStyle: "short",
   }).format(date);
+}
+
+function Pagination({
+  page,
+  search,
+  statusFilter,
+  totalPages,
+}: {
+  page: number;
+  search: string;
+  statusFilter: ReportSummaryStatusFilter | undefined;
+  totalPages: number;
+}) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        aria-disabled={page <= 1}
+        className={page <= 1 ? "pointer-events-none opacity-50" : undefined}
+        size="sm"
+        variant="outline"
+        asChild
+      >
+        <Link
+          href={buildCommitteeHref({
+            page: page - 1,
+            search,
+            statusFilter,
+          })}
+        >
+          <ChevronLeft className="size-3" />
+          Anterior
+        </Link>
+      </Button>
+      <Button
+        aria-disabled={page >= totalPages}
+        className={
+          page >= totalPages ? "pointer-events-none opacity-50" : undefined
+        }
+        size="sm"
+        variant="outline"
+        asChild
+      >
+        <Link
+          href={buildCommitteeHref({
+            page: page + 1,
+            search,
+            statusFilter,
+          })}
+        >
+          Próxima
+          <ChevronRight className="size-3" />
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+function buildCommitteeHref({
+  page,
+  search,
+  statusFilter,
+}: {
+  page?: number;
+  search?: string;
+  statusFilter?: ReportSummaryStatusFilter;
+}) {
+  const params = new URLSearchParams();
+
+  if (search) {
+    params.set("q", search);
+  }
+
+  if (statusFilter) {
+    params.set("status", statusFilter);
+  }
+
+  if (typeof page === "number" && page > 1) {
+    params.set("page", String(page));
+  }
+
+  const query = params.toString();
+  return query ? `/portal/comite-de-etica?${query}` : "/portal/comite-de-etica";
+}
+
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function normalizeSearchParam(value: string) {
+  return value.trim().slice(0, 200);
+}
+
+function normalizeStatusFilter(
+  value: string,
+): ReportSummaryStatusFilter | undefined {
+  return REPORT_SUMMARY_STATUS_FILTERS.includes(
+    value as ReportSummaryStatusFilter,
+  )
+    ? (value as ReportSummaryStatusFilter)
+    : undefined;
+}
+
+function parsePage(value: string) {
+  const page = Number.parseInt(value, 10);
+  return Number.isFinite(page) && page > 0 ? page : 1;
 }

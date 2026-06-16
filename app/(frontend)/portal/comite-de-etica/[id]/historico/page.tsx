@@ -42,26 +42,27 @@ export default async function ReportHistoryPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Histórico</h1>
-          <p className="mt-2 font-mono text-sm text-muted-foreground">
-            {report.protocol}
-          </p>
-        </div>
-        <Button variant="outline" asChild>
-          <Link href={`/portal/comite-de-etica/denuncias/${report.id}`}>
-            Voltar
-          </Link>
-        </Button>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <header className="mb-6 border-b pb-5">
+        <nav
+          aria-label="Navegação do histórico"
+          className="mb-3 flex flex-wrap gap-2"
+        >
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/portal/comite-de-etica/${report.id}`}>Voltar</Link>
+          </Button>
+        </nav>
+        <h1 className="text-2xl font-semibold tracking-tight">Histórico</h1>
+        <p className="mt-1 font-mono text-sm text-muted-foreground">
+          {report.protocol}
+        </p>
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Movimentações registradas</CardTitle>
+      <Card className="rounded-md border-border/80 py-0 shadow-sm">
+        <CardHeader className="border-b py-4">
+          <CardTitle className="text-base">Movimentações registradas</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="py-4">
           <div className="flex flex-col gap-4">
             {events.map((event) => (
               <div key={event.id} className="border-b pb-4 last:border-0">
