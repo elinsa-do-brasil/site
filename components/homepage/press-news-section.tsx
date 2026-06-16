@@ -1,4 +1,5 @@
 import { Activity, ArrowRight, CalendarDays, Clock3 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/badge";
 import { Badge as ShadcnBadge } from "@/components/ui/badge";
@@ -18,8 +19,8 @@ import {
 } from "@/lib/editorial";
 import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
+import Lampada from "@/public/images/lampada.webp";
 import { HomeSection } from "./home-section";
-import { PressNewsCover } from "./press-news-cover";
 
 type PressNewsSectionProps = {
   posts: EditorialPost[];
@@ -97,10 +98,12 @@ function FeaturedPressNewsCard({ post }: { post: EditorialPost }) {
   return (
     <Link className="group block h-full" href={card.href}>
       <ShadcnCard className="relative h-full min-h-[32rem] overflow-hidden rounded-3xl border-border/70 bg-elinsa-dark py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10">
-        <PressNewsCover
-          image={card.coverImage}
+        <Image
+          src={card.coverImage?.url ?? Lampada}
+          alt={card.coverImage?.alt ?? post.title}
+          fill
+          className="object-cover object-center transition duration-700 group-hover:scale-105"
           sizes="(min-width: 1024px) 43rem, 100vw"
-          variant="featured"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.48)_42%,rgba(4,14,22,0.92)_100%)]" />
 
@@ -142,8 +145,11 @@ function CompactPressNewsCard({ post }: { post: EditorialPost }) {
     <Link className="group block h-full" href={card.href}>
       <ShadcnCard className="grid h-full overflow-hidden rounded-3xl border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 md:grid-cols-[13rem_minmax(0,1fr)] lg:grid-cols-1 xl:grid-cols-[12.5rem_minmax(0,1fr)]">
         <div className="relative min-h-48 overflow-hidden bg-elinsa-dark md:min-h-full lg:min-h-44 xl:min-h-full">
-          <PressNewsCover
-            image={card.coverImage}
+          <Image
+            src={card.coverImage?.url ?? Lampada}
+            alt={card.coverImage?.alt ?? post.title}
+            fill
+            className="object-cover object-center transition duration-500 group-hover:scale-105"
             sizes="(min-width: 1280px) 13rem, (min-width: 1024px) 35vw, (min-width: 768px) 13rem, 100vw"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.06)_0%,rgba(4,14,22,0.64)_100%)]" />

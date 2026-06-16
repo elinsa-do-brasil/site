@@ -1,6 +1,5 @@
 "use client";
 
-import type * as GeoJSON from "geojson";
 import {
   ArrowLeft,
   Building2,

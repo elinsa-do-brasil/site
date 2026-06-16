@@ -32,8 +32,8 @@ import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { ExportListMenuItem as ExportListMenuItem_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { ImportListMenuItem as ImportListMenuItem_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
-import { MediaPreviewCell as MediaPreviewCell_6a2946bba07d6063b2e03940438cdfa3 } from '@seshuk/payload-plugin-media-preview/rsc'
-import { MediaPreview as MediaPreview_6a2946bba07d6063b2e03940438cdfa3 } from '@seshuk/payload-plugin-media-preview/rsc'
+import { MediaPreviewCell as MediaPreviewCell_3df7154bbd817bf4bc10925ce5a97d5b } from '@seshuk/payload-media-preview/rsc'
+import { MediaPreview as MediaPreview_3df7154bbd817bf4bc10925ce5a97d5b } from '@seshuk/payload-media-preview/rsc'
 import { ImageSearch as ImageSearch_18763abdf72285ba4b0ce56755000778 } from '@payload-bites/image-search/client'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -90,8 +90,8 @@ export const importMap = {
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/plugin-import-export/rsc#ExportListMenuItem": ExportListMenuItem_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#ImportListMenuItem": ImportListMenuItem_cdf7e044479f899a31f804427d568b36,
-  "@seshuk/payload-plugin-media-preview/rsc#MediaPreviewCell": MediaPreviewCell_6a2946bba07d6063b2e03940438cdfa3,
-  "@seshuk/payload-plugin-media-preview/rsc#MediaPreview": MediaPreview_6a2946bba07d6063b2e03940438cdfa3,
+  "@seshuk/payload-media-preview/rsc#MediaPreviewCell": MediaPreviewCell_3df7154bbd817bf4bc10925ce5a97d5b,
+  "@seshuk/payload-media-preview/rsc#MediaPreview": MediaPreview_3df7154bbd817bf4bc10925ce5a97d5b,
   "@payload-bites/image-search/client#ImageSearch": ImageSearch_18763abdf72285ba4b0ce56755000778,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,

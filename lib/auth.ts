@@ -6,10 +6,7 @@ import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
 
-const authBaseURL = getAuthBaseURL();
-
 export const auth = betterAuth({
-  baseURL: authBaseURL,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
@@ -72,7 +69,8 @@ export const auth = betterAuth({
       },
       requireEmailVerificationOnInvitation: true,
       sendInvitationEmail: async (data) => {
-        const inviteLink = `${authBaseURL}/convite/${data.id}`;
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+        const inviteLink = `${baseUrl}/convite/${data.id}`;
 
         await sendInternalAuthEmail({
           to: data.email,
@@ -93,23 +91,3 @@ export const auth = betterAuth({
 });
 
 export type AuthSession = typeof auth.$Infer.Session;
-
-function getAuthBaseURL() {
-  if (process.env.BETTER_AUTH_URL) {
-    return process.env.BETTER_AUTH_URL;
-  }
-
-  if (process.env.NEXT_PUBLIC_URL) {
-    return process.env.NEXT_PUBLIC_URL;
-  }
-
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
-  }
-
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-
-  return "http://localhost:3000";
-}
