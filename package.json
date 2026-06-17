@@ -14,7 +14,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx --env-file=.env lib/db/seed.ts",
     "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
-    "reports:keys": "tsx scripts/generate-report-encryption-keys.ts"
+    "reports:keys": "tsx scripts/generate-report-encryption-keys.ts",
+    "email:dev": "email dev"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1053.0",
@@ -67,6 +68,7 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.7",
     "react-dom": "19.2.7",
+    "react-email": "^6.6.2",
     "react-hook-form": "^7.75.0",
     "react-icons": "^5.6.0",
     "resend": "^6.12.3",
@@ -79,6 +81,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.14",
+    "@react-email/ui": "6.6.2",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
@@ -90,5 +93,5 @@
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   },
-  "packageManager": "pnpm@11.5.3+sha512.7ac1c919341c213a34dc0d02afb7143c5c26ac26ee8c4782deea821b8ac64d2134a081fd8941dae6e29bbb48f58dfc2b7fbceeccc07cb2f09d219d342a4969ed"
+  "packageManager": "pnpm@11.7.0"
 }
