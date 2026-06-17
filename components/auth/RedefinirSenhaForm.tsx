@@ -11,6 +11,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
 export function RedefinirSenhaForm() {
@@ -25,7 +26,7 @@ export function RedefinirSenhaForm() {
 
   if (!token) {
     return (
-      <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
         <h2 className="text-xl font-bold text-destructive">Link Inválido</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           O token de redefinição de senha não foi encontrado ou expirou.
@@ -39,7 +40,7 @@ export function RedefinirSenhaForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
         <h2 className="text-2xl font-bold tracking-tight text-primary">
           Senha redefinida!
         </h2>
@@ -87,7 +88,7 @@ export function RedefinirSenhaForm() {
   }
 
   return (
-    <div className="w-full max-w-md rounded-lg border bg-card p-8 shadow-sm">
+    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
       <div className="mb-6 text-center">
         <h2 className="text-2xl font-bold tracking-tight">Nova Senha</h2>
         <p className="mt-2 text-xs text-muted-foreground">
@@ -123,8 +124,8 @@ export function RedefinirSenhaForm() {
 
           {error && <FieldError>{error}</FieldError>}
 
-          <Button type="submit" className="w-full mt-2" disabled={isPending}>
-            {isPending ? "Salvando..." : "Redefinir Senha"}
+          <Button type="submit" className="mt-2 w-full" disabled={isPending}>
+            {isPending ? <Spinner /> : "Redefinir Senha"}
           </Button>
         </FieldGroup>
       </form>

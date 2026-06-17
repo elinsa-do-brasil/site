@@ -15,17 +15,15 @@ type ProfileCardUser = {
 
 export function ProfileCard({ user }: { user: ProfileCardUser }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <UserRound className="size-4" />
+    <Card className="rounded-md border-border/80 py-0 shadow-sm ring-1 ring-foreground/5">
+      <CardHeader className="border-b bg-muted/30 py-4">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <UserRound className="size-4 text-elinsa-primary" />
           Perfil
         </CardTitle>
-        <CardDescription>
-          Atualize seu nome e a imagem exibida no menu da conta.
-        </CardDescription>
+        <CardDescription>Nome e foto usados no portal.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="py-4">
         <ProfileForm user={user} />
       </CardContent>
     </Card>

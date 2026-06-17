@@ -46,6 +46,10 @@ function formatDate(value?: Date | string | null) {
   }).format(date);
 }
 
+function formatSessionsCount(count: number) {
+  return `${count} de 5 ${count === 1 ? "sessão ativa" : "sessões ativas"}.`;
+}
+
 export function AccountOverviewCard({
   user,
   hasPassword,
@@ -58,18 +62,16 @@ export function AccountOverviewCard({
   sessionsCount: number;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <UserRound className="size-4" />
+    <Card className="rounded-md border-border/80 py-0 shadow-sm ring-1 ring-foreground/5">
+      <CardHeader className="border-b bg-muted/30 py-4">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <UserRound className="size-4 text-elinsa-primary" />
           Conta
         </CardTitle>
-        <CardDescription>
-          Dados principais da sua conta no portal.
-        </CardDescription>
+        <CardDescription>Dados principais da sua conta.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center gap-3 rounded-md border bg-muted/20 p-3">
+      <CardContent className="space-y-4 py-4">
+        <div className="flex items-center gap-3 rounded-md border border-border/80 bg-background/70 p-3">
           <Avatar size="lg">
             <AvatarImage src={user.image || undefined} />
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
@@ -112,8 +114,7 @@ export function AccountOverviewCard({
         </div>
 
         <p className="text-muted-foreground">
-          {sessionsCount} sessão{sessionsCount === 1 ? "" : "es"} ativa
-          {sessionsCount === 1 ? "" : "s"} no momento.
+          {formatSessionsCount(sessionsCount)}
         </p>
       </CardContent>
     </Card>
@@ -132,9 +133,9 @@ function InfoTile({
   active: boolean;
 }) {
   return (
-    <div className="rounded-md border p-3">
+    <div className="rounded-md border border-border/80 bg-background/70 p-3">
       <p className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="size-4" />
+        <Icon className="size-4 text-elinsa-primary" />
         {label}
       </p>
       <Badge className="mt-2" variant={active ? "secondary" : "outline"}>

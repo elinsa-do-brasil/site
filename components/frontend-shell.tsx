@@ -46,6 +46,20 @@ export function FrontendShell({
     );
   }
 
+  if (pathname === "/configuracoes") {
+    return (
+      <div className="min-h-screen bg-muted/30" data-frontend-shell="account">
+        <div data-frontend-shell-header>
+          <InternalHeader />
+        </div>
+        <main className="pt-24" data-frontend-shell-main>
+          {children}
+        </main>
+        <Toaster />
+      </div>
+    );
+  }
+
   if (isAccountRoute(pathname)) {
     return (
       <div className="min-h-screen bg-muted/30">

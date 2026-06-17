@@ -94,19 +94,19 @@ export function PasskeysCard({
   }
 
   return (
-    <Card id="passkeys">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Fingerprint className="size-4" />
+    <Card
+      className="rounded-md border-border/80 py-0 shadow-sm ring-1 ring-foreground/5"
+      id="passkeys"
+    >
+      <CardHeader className="border-b bg-muted/30 py-4">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Fingerprint className="size-4 text-elinsa-primary" />
           Passkeys
         </CardTitle>
-        <CardDescription>
-          Cadastre chaves de acesso para entrar sem senha em dispositivos
-          confiáveis.
-        </CardDescription>
+        <CardDescription>Chaves salvas para entrar sem senha.</CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 py-4">
         <Field>
           <FieldLabel htmlFor="passkey-name">Nome da nova passkey</FieldLabel>
           <Input
@@ -117,12 +117,12 @@ export function PasskeysCard({
             maxLength={80}
           />
           <FieldDescription>
-            O navegador abrirá o fluxo nativo de passkeys ao adicionar.
+            O navegador abrirá o fluxo nativo.
           </FieldDescription>
         </Field>
 
         {passkeys.length === 0 ? (
-          <div className="rounded-md border bg-muted/20 p-4 text-muted-foreground">
+          <div className="rounded-md border border-border/80 bg-background/70 p-4 text-muted-foreground">
             Nenhuma passkey cadastrada.
           </div>
         ) : (
@@ -130,7 +130,7 @@ export function PasskeysCard({
             {passkeys.map((passkey) => (
               <div
                 key={passkey.id}
-                className="flex items-center justify-between gap-3 rounded-md border p-3"
+                className="flex items-center justify-between gap-3 rounded-md border border-border/80 bg-background/70 p-3"
               >
                 <div>
                   <p className="font-medium">
@@ -168,7 +168,7 @@ export function PasskeysCard({
         )}
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="border-t bg-muted/20 py-3">
         <Button type="button" onClick={handleAddPasskey} disabled={isAdding}>
           {isAdding ? <Spinner /> : <Plus className="size-4" />}
           Adicionar passkey

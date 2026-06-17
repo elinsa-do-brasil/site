@@ -39,6 +39,8 @@ type ActiveSessionsCardProps = {
   currentSessionToken: string | null;
 };
 
+const MAX_ACTIVE_SESSIONS = 5;
+
 function formatDateTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Não disponível";
@@ -64,6 +66,40 @@ function inferDevice(userAgent: string | null) {
   }
 
   return { label: "Desktop / Notebook", icon: Laptop2 };
+}
+
+function inferClient(userAgent: string | null) {
+  if (!userAgent) return "Navegador não identificado";
+
+  const normalized = userAgent.toLowerCase();
+  const browser = normalized.includes("edg/")
+    ? "Edge"
+    : normalized.includes("firefox")
+      ? "Firefox"
+      : normalized.includes("chrome")
+        ? "Chrome"
+        : normalized.includes("safari")
+          ? "Safari"
+          : "Navegador";
+  const platform = normalized.includes("windows")
+    ? "Windows"
+    : normalized.includes("mac os")
+      ? "macOS"
+      : normalized.includes("linux")
+        ? "Linux"
+        : normalized.includes("android")
+          ? "Android"
+          : normalized.includes("iphone") || normalized.includes("ipad")
+            ? "iOS"
+            : null;
+
+  return platform ? `${browser} em ${platform}` : browser;
+}
+
+function formatSessionsCount(count: number) {
+  return `${count} de ${MAX_ACTIVE_SESSIONS} ${
+    count === 1 ? "sessão ativa" : "sessões ativas"
+  }`;
 }
 
 export function ActiveSessionsCard({
@@ -122,22 +158,22 @@ export function ActiveSessionsCard({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Laptop2 className="size-4" />
+    <Card className="rounded-md border-border/80 py-0 shadow-sm ring-1 ring-foreground/5">
+      <CardHeader className="border-b bg-muted/30 py-4">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Laptop2 className="size-4 text-elinsa-primary" />
           Sessões ativas
         </CardTitle>
-        <CardDescription>
-          Revogue acessos antigos em outros dispositivos.
-        </CardDescription>
+        <CardDescription>Últimos acessos autorizados.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-muted/20 p-3">
+      <CardContent className="space-y-4 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border/80 bg-background/70 p-3">
           <div>
-            <p className="font-medium">{orderedSessions.length} sessão ativa</p>
+            <p className="font-medium">
+              {formatSessionsCount(orderedSessions.length)}
+            </p>
             <p className="text-muted-foreground">
-              {otherSessions.length} em outros dispositivos.
+              {otherSessions.length} fora desta sessão.
             </p>
           </div>
           <Button
@@ -156,18 +192,20 @@ export function ActiveSessionsCard({
             const device = inferDevice(session.userAgent);
             const DeviceIcon = device.icon;
             const isCurrent = session.token === currentSessionToken;
+            const client = inferClient(session.userAgent);
 
             return (
-              <div className="rounded-md border p-3" key={session.id}>
+              <div
+                className="rounded-md border border-border/80 bg-background/70 p-3"
+                key={session.id}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 space-y-2">
                     <p className="flex items-center gap-2 font-medium">
                       <DeviceIcon className="size-4 text-muted-foreground" />
                       {device.label}
                     </p>
-                    <p className="break-all text-muted-foreground">
-                      {session.userAgent || "Navegador não identificado"}
-                    </p>
+                    <p className="text-muted-foreground">{client}</p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
                         <Clock3 className="size-3.5" />

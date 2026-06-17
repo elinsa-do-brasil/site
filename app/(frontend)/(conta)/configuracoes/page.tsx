@@ -17,6 +17,7 @@ import { ActiveSessionsCard } from "./components/active-sessions-card";
 import { LoginMethodsCard } from "./components/login-methods-card";
 import { PasskeysCard } from "./components/passkeys-card";
 import { ProfileCard } from "./components/profile-card";
+import { SecurityCard } from "./components/security-card";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,8 @@ export default async function AccountSettingsPage() {
       })
       .from(sessionTable)
       .where(eq(sessionTable.userId, userId))
-      .orderBy(desc(sessionTable.updatedAt)),
+      .orderBy(desc(sessionTable.updatedAt))
+      .limit(5),
   ]);
 
   const currentUser = users[0] ?? {
@@ -105,49 +107,56 @@ export default async function AccountSettingsPage() {
   const socialProviders = accounts
     .map((account) => account.providerId)
     .filter((providerId) => providerId !== "credential");
+  const canChangeEmail = hasPassword && socialProviders.length === 0;
 
   return (
-    <main className="min-h-screen px-4 py-10">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Configurações da conta
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Gerencie seus dados de acesso ao Portal Interno Elinsa.
-            </p>
-          </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <header className="mb-5 border-b pb-5">
+        <nav
+          aria-label="Navegação da conta"
+          className="mb-3 flex flex-wrap gap-2"
+        >
           <Button asChild variant="outline">
             <Link href="/portal">Voltar ao portal</Link>
           </Button>
-        </div>
+        </nav>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Configurações da conta
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Dados, acesso e sessões do Portal Interno Elinsa.
+        </p>
+      </header>
 
-        <div className="grid gap-6 lg:grid-cols-12">
-          <section className="space-y-6 lg:col-span-5">
-            <AccountOverviewCard
-              user={currentUser}
-              hasPassword={hasPassword}
-              passkeysCount={normalizedPasskeys.length}
-              sessionsCount={normalizedSessions.length}
-            />
-            <ProfileCard user={currentUser} />
-            <LoginMethodsCard
-              accounts={accounts}
-              hasPassword={hasPassword}
-              socialProviders={socialProviders}
-            />
-          </section>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <section className="space-y-5">
+          <AccountOverviewCard
+            user={currentUser}
+            hasPassword={hasPassword}
+            passkeysCount={normalizedPasskeys.length}
+            sessionsCount={normalizedSessions.length}
+          />
+          <SecurityCard
+            canChangeEmail={canChangeEmail}
+            hasPassword={hasPassword}
+            userEmail={currentUser.email}
+          />
+          <LoginMethodsCard
+            accounts={accounts}
+            hasPassword={hasPassword}
+            socialProviders={socialProviders}
+          />
+        </section>
 
-          <section className="space-y-6 lg:col-span-7">
-            <PasskeysCard initialPasskeys={normalizedPasskeys} />
-            <ActiveSessionsCard
-              initialSessions={normalizedSessions}
-              currentSessionToken={currentSessionToken}
-            />
-          </section>
-        </div>
+        <section className="space-y-5">
+          <ProfileCard user={currentUser} />
+          <PasskeysCard initialPasskeys={normalizedPasskeys} />
+          <ActiveSessionsCard
+            initialSessions={normalizedSessions}
+            currentSessionToken={currentSessionToken}
+          />
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

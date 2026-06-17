@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
 export function AceitarConvite({ invitationId }: { invitationId: string }) {
@@ -49,7 +50,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
 
   if (accepted) {
     return (
-      <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
         <h2 className="text-2xl font-bold tracking-tight text-primary">
           Convite aceito com sucesso!
         </h2>
@@ -62,7 +63,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
   }
 
   return (
-    <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
+    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
       <h2 className="text-2xl font-bold tracking-tight">
         Convite Organizacional
       </h2>
@@ -71,7 +72,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
         Elinsa.
       </p>
 
-      <div className="my-6 space-y-3 text-left bg-muted/50 p-4 rounded-md text-xs text-muted-foreground">
+      <div className="my-6 space-y-3 rounded-md border border-border/80 bg-muted/50 p-4 text-left text-xs text-muted-foreground">
         <p className="font-medium text-foreground">Regras de segurança:</p>
         <ul className="list-disc list-inside space-y-1">
           <li>É necessário ter verificado seu e-mail.</li>
@@ -88,7 +89,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
           className="w-full font-medium"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Vinculando acesso..." : "Aceitar Convite"}
+          {isSubmitting ? <Spinner /> : "Aceitar Convite"}
         </Button>
 
         <div className="grid grid-cols-2 gap-2 pt-2">

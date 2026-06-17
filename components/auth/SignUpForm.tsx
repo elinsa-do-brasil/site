@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -10,6 +10,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
 export function CriarContaForm() {
@@ -54,7 +55,7 @@ export function CriarContaForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
         <h2 className="text-2xl font-bold tracking-tight text-primary">
           Conta criada com sucesso!
         </h2>
@@ -62,8 +63,8 @@ export function CriarContaForm() {
           Enviamos um link de verificação para <strong>{email}</strong>.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Após verificar seu e-mail, clique no link do convite que recebeu para ter
-          acesso às ferramentas internas.
+          Após verificar seu e-mail, clique no link do convite que recebeu para
+          ter acesso às ferramentas internas.
         </p>
         <Button className="mt-6 w-full" asChild>
           <Link href="/entrar">Ir para o Login</Link>
@@ -73,12 +74,12 @@ export function CriarContaForm() {
   }
 
   return (
-    <div className="w-full max-w-md rounded-lg border bg-card p-8 shadow-sm">
+    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
       <div className="mb-6 text-center">
         <h2 className="text-2xl font-bold tracking-tight">Criar Conta</h2>
         <p className="mt-2 text-xs text-muted-foreground">
-          Use o mesmo e-mail que recebeu o convite. O acesso às ferramentas internas
-          só será liberado após aceitar o convite enviado pela Elinsa.
+          Use o mesmo e-mail que recebeu o convite. O acesso às ferramentas
+          internas só será liberado após aceitar o convite enviado pela Elinsa.
         </p>
       </div>
 
@@ -107,7 +108,9 @@ export function CriarContaForm() {
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor="register-password">Senha (mín. 12 caracteres)</FieldLabel>
+            <FieldLabel htmlFor="register-password">
+              Senha (mín. 12 caracteres)
+            </FieldLabel>
             <Input
               id="register-password"
               type="password"
@@ -131,15 +134,18 @@ export function CriarContaForm() {
             />
           </Field>
           {error && <FieldError>{error}</FieldError>}
-          <Button type="submit" className="w-full mt-2" disabled={isSubmitting}>
-            {isSubmitting ? "Criando conta..." : "Criar conta"}
+          <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
+            {isSubmitting ? <Spinner /> : "Criar conta"}
           </Button>
         </FieldGroup>
       </form>
 
       <div className="mt-6 text-center text-sm text-muted-foreground">
         <span>Já possui uma conta? </span>
-        <Link href="/entrar" className="underline underline-offset-4 hover:text-primary">
+        <Link
+          href="/entrar"
+          className="underline underline-offset-4 hover:text-primary"
+        >
           Entrar
         </Link>
       </div>

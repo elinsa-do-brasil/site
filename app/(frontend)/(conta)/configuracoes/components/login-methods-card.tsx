@@ -45,17 +45,15 @@ export function LoginMethodsCard({
   socialProviders: string[];
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <KeyRound className="size-4" />
+    <Card className="rounded-md border-border/80 py-0 shadow-sm ring-1 ring-foreground/5">
+      <CardHeader className="border-b bg-muted/30 py-4">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <KeyRound className="size-4 text-elinsa-primary" />
           Métodos de acesso
         </CardTitle>
-        <CardDescription>
-          Formas de login já vinculadas à sua conta.
-        </CardDescription>
+        <CardDescription>Logins vinculados a esta conta.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 py-4">
         <div className="grid gap-2 sm:grid-cols-2">
           <StatusTile
             icon={MailCheck}
@@ -77,13 +75,13 @@ export function LoginMethodsCard({
 
         <div className="space-y-2">
           {accounts.length === 0 ? (
-            <p className="rounded-md border p-3 text-muted-foreground">
+            <p className="rounded-md border border-border/80 bg-background/70 p-3 text-muted-foreground">
               Nenhum método de login foi encontrado.
             </p>
           ) : (
             accounts.map((account) => (
               <div
-                className="flex items-center justify-between gap-3 rounded-md border p-3"
+                className="flex items-center justify-between gap-3 rounded-md border border-border/80 bg-background/70 p-3"
                 key={account.id}
               >
                 <div>
@@ -119,9 +117,9 @@ function StatusTile({
   active: boolean;
 }) {
   return (
-    <div className="rounded-md border bg-muted/20 p-3">
+    <div className="rounded-md border border-border/80 bg-background/70 p-3">
       <p className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="size-4" />
+        <Icon className="size-4 text-elinsa-primary" />
         {label}
       </p>
       <Badge className="mt-2" variant={active ? "secondary" : "outline"}>

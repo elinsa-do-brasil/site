@@ -48,7 +48,7 @@ export function ProfileForm({ user }: { user: ProfileUser }) {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="flex items-center gap-3 rounded-md border bg-muted/20 p-3">
+      <div className="flex items-center gap-3 rounded-md border border-border/80 bg-background/70 p-3">
         <Avatar size="lg">
           <AvatarImage src={image.trim() || undefined} />
           <AvatarFallback>{getInitial(name || user.name || "")}</AvatarFallback>

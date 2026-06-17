@@ -2,9 +2,12 @@ import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins/organization";
+import { desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
+
+const MAX_ACTIVE_SESSIONS_PER_USER = 5;
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -53,6 +56,20 @@ export const auth = betterAuth({
       trustedProviders: ["microsoft"],
     },
   },
+  user: {
+    changeEmail: {
+      enabled: true,
+    },
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        async after(session) {
+          await pruneOldUserSessions(session.userId);
+        },
+      },
+    },
+  },
   secret: process.env.BETTER_AUTH_SECRET,
   trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS
     ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",").map((origin) =>
@@ -91,3 +108,25 @@ export const auth = betterAuth({
 });
 
 export type AuthSession = typeof auth.$Infer.Session;
+
+async function pruneOldUserSessions(userId: string) {
+  const sessions = await db
+    .select({
+      id: schema.session.id,
+    })
+    .from(schema.session)
+    .where(eq(schema.session.userId, userId))
+    .orderBy(desc(schema.session.createdAt));
+
+  const oldSessionIds = sessions
+    .slice(MAX_ACTIVE_SESSIONS_PER_USER)
+    .map((session) => session.id);
+
+  if (oldSessionIds.length === 0) {
+    return;
+  }
+
+  await db
+    .delete(schema.session)
+    .where(inArray(schema.session.id, oldSessionIds));
+}
