@@ -7,8 +7,28 @@ import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "../logo";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
-export function AceitarConvite({ invitationId }: { invitationId: string }) {
+type AceitarConviteProps = {
+  invitationEmail: string;
+  invitationId: string;
+  organizationName: string;
+  roleLabel: string;
+};
+
+export function AceitarConvite({
+  invitationEmail,
+  invitationId,
+  organizationName,
+  roleLabel,
+}: AceitarConviteProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [accepted, setAccepted] = useState(false);
@@ -23,9 +43,7 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
 
     if (!session?.user) {
       setIsSubmitting(false);
-      setError(
-        "Você precisa estar conectado para aceitar o convite. Faça login ou crie sua conta com o e-mail convidado.",
-      );
+      setError("Entre com o e-mail convidado para aceitar este convite.");
       return;
     }
 
@@ -50,57 +68,55 @@ export function AceitarConvite({ invitationId }: { invitationId: string }) {
 
   if (accepted) {
     return (
-      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h2 className="text-2xl font-bold tracking-tight text-primary">
-          Convite aceito com sucesso!
-        </h2>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Seu acesso à organização Elinsa foi vinculado. Redirecionando para as
-          ferramentas internas...
-        </p>
-      </div>
+      <Card className="w-full max-w-108">
+        <CardHeader className="px-6 text-center">
+          <CardTitle className="mt-6 mb-3">
+            <Logo className="mx-auto" />
+          </CardTitle>
+          <CardDescription>
+            Convite aceito. Redirecionando para o portal...
+          </CardDescription>
+        </CardHeader>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-      <h2 className="text-2xl font-bold tracking-tight">
-        Convite Organizacional
-      </h2>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Você foi convidado(a) para integrar a organização institucional da
-        Elinsa.
-      </p>
+    <Card className="w-full max-w-108">
+      <CardHeader className="px-6">
+        <CardTitle className="mt-6 mb-3">
+          <Logo className="mx-auto" />
+        </CardTitle>
+        <CardDescription className="text-center">
+          Aceite o convite de {organizationName} para liberar seu acesso.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 px-6 pb-6">
+        <div className="rounded-md border border-border/80 bg-muted/40 p-3 text-sm">
+          <p className="font-medium">{roleLabel}</p>
+          <p className="text-muted-foreground">{invitationEmail}</p>
+        </div>
 
-      <div className="my-6 space-y-3 rounded-md border border-border/80 bg-muted/50 p-4 text-left text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Regras de segurança:</p>
-        <ul className="list-disc list-inside space-y-1">
-          <li>É necessário ter verificado seu e-mail.</li>
-          <li>A sessão atual deve corresponder ao e-mail convidado.</li>
-          <li>Após aceitar, seus acessos internos serão liberados.</li>
-        </ul>
-      </div>
+        {error && <FieldError className="text-center">{error}</FieldError>}
 
-      {error && <FieldError className="mb-4 text-center">{error}</FieldError>}
-
-      <div className="space-y-3">
         <Button
           onClick={handleAccept}
           className="w-full font-medium"
           disabled={isSubmitting}
         >
-          {isSubmitting ? <Spinner /> : "Aceitar Convite"}
+          {isSubmitting ? <Spinner /> : "Aceitar convite"}
         </Button>
 
-        <div className="grid grid-cols-2 gap-2 pt-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/entrar">Fazer Login</Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/criar">Criar Conta</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
+        <p className="text-center text-xs text-muted-foreground">
+          Está em outra conta?{" "}
+          <Link
+            href="/entrar"
+            className="underline underline-offset-4 hover:text-primary"
+          >
+            Entrar novamente
+          </Link>
+        </p>
+      </CardContent>
+    </Card>
   );
 }

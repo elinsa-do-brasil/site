@@ -84,7 +84,7 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
   }
 
   return (
-    <Card className="min-w-[24rem] max-w-108">
+    <Card className="w-full max-w-108">
       <CardHeader className="px-6">
         <CardTitle className="mt-6 mb-3">
           <Logo className="mx-auto" />

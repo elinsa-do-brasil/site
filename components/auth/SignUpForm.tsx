@@ -1,10 +1,15 @@
 "use client";
 
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { EyeClosedIcon, EyeIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -12,42 +17,76 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "../logo";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
-export function CriarContaForm() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+const signUpInfos = z
+  .object({
+    name: z.string().trim().min(1, { message: "Informe seu nome completo." }),
+    password: z
+      .string()
+      .min(12, { message: "A senha deve ter no mínimo 12 caracteres." })
+      .max(128, { message: "A senha deve ter no máximo 128 caracteres." }),
+    confirmPassword: z.string().min(1, { message: "Confirme sua senha." }),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
+
+type CriarContaFormProps = {
+  invitationId: string;
+  invitedEmail: string;
+  organizationName: string;
+  roleLabel: string;
+};
+
+export function CriarContaForm({
+  invitationId,
+  invitedEmail,
+  organizationName,
+  roleLabel,
+}: CriarContaFormProps) {
   const [success, setSuccess] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const invitationPath = `/convite/${encodeURIComponent(invitationId)}`;
+  const loginHref = `/entrar?redirectTo=${encodeURIComponent(invitationPath)}`;
+  const form = useForm<z.infer<typeof signUpInfos>>({
+    defaultValues: {
+      confirmPassword: "",
+      name: "",
+      password: "",
+    },
+    resolver: standardSchemaResolver(signUpInfos),
+  });
+  const password = useWatch({ control: form.control, name: "password" });
+  const disableShowPasswordButton = !password;
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
+  async function onSubmit(values: z.infer<typeof signUpInfos>) {
+    form.clearErrors("root");
 
-    if (password.length < 12) {
-      setError("A senha deve ter no mínimo 12 caracteres.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const result = await authClient.signUp.email({
-      email,
-      password,
-      name,
-    });
-
-    setIsSubmitting(false);
+    const signUpBody = {
+      email: invitedEmail,
+      password: values.password,
+      name: values.name,
+      callbackURL: `${window.location.origin}${invitationPath}`,
+      invitationId,
+    } as Parameters<typeof authClient.signUp.email>[0] & {
+      invitationId: string;
+    };
+    const result = await authClient.signUp.email(signUpBody);
 
     if (result.error) {
-      setError(result.error.message || "Erro ao criar conta. Tente novamente.");
+      form.setError("root", {
+        message:
+          result.error.message || "Erro ao criar conta. Tente novamente.",
+      });
     } else {
       setSuccess(true);
     }
@@ -55,100 +94,169 @@ export function CriarContaForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h2 className="text-2xl font-bold tracking-tight text-primary">
-          Conta criada com sucesso!
-        </h2>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Enviamos um link de verificação para <strong>{email}</strong>.
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Após verificar seu e-mail, clique no link do convite que recebeu para
-          ter acesso às ferramentas internas.
-        </p>
-        <Button className="mt-6 w-full" asChild>
-          <Link href="/entrar">Ir para o Login</Link>
-        </Button>
-      </div>
+      <Card className="w-full max-w-108">
+        <CardHeader className="px-6 text-center">
+          <CardTitle className="mt-6 mb-3">
+            <Logo className="mx-auto" />
+          </CardTitle>
+          <CardDescription>
+            Enviamos a verificação para <strong>{invitedEmail}</strong>.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 px-6 pb-6 text-center text-sm text-muted-foreground">
+          <p>
+            Depois de verificar o e-mail, volte para este convite para liberar o
+            acesso ao portal.
+          </p>
+          <Button className="w-full" asChild>
+            <Link href={invitationPath}>Voltar ao convite</Link>
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">Criar Conta</h2>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Use o mesmo e-mail que recebeu o convite. O acesso às ferramentas
-          internas só será liberado após aceitar o convite enviado pela Elinsa.
-        </p>
-      </div>
+    <Card className="w-full max-w-108">
+      <CardHeader className="px-6">
+        <CardTitle className="mt-6 mb-3">
+          <Logo className="mx-auto" />
+        </CardTitle>
+        <CardDescription className="text-center">
+          Crie sua conta para aceitar o convite de {organizationName}.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4 px-6">
+        <div className="rounded-md border border-border/80 bg-muted/40 p-3 text-sm">
+          <p className="font-medium">{roleLabel}</p>
+          <p className="text-muted-foreground">{invitedEmail}</p>
+        </div>
 
-      <form onSubmit={onSubmit}>
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="register-name">Nome completo</FieldLabel>
-            <Input
-              id="register-name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="register-email">E-mail</FieldLabel>
-            <Input
-              id="register-email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="register-password">
-              Senha (mín. 12 caracteres)
-            </FieldLabel>
-            <Input
-              id="register-password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              minLength={12}
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="register-confirm">Confirmar senha</FieldLabel>
-            <Input
-              id="register-confirm"
-              type="password"
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-              required
-              minLength={12}
-            />
-          </Field>
-          {error && <FieldError>{error}</FieldError>}
-          <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner /> : "Criar conta"}
-          </Button>
-        </FieldGroup>
-      </form>
-
-      <div className="mt-6 text-center text-sm text-muted-foreground">
-        <span>Já possui uma conta? </span>
-        <Link
-          href="/entrar"
-          className="underline underline-offset-4 hover:text-primary"
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mb-6 flex flex-col gap-4"
+          noValidate
         >
-          Entrar
-        </Link>
-      </div>
-    </div>
+          <FieldGroup>
+            <Controller
+              control={form.control}
+              name="name"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid || undefined}>
+                  <FieldLabel htmlFor="register-name">Nome completo</FieldLabel>
+                  <Input
+                    id="register-name"
+                    type="text"
+                    autoComplete="name"
+                    aria-invalid={fieldState.invalid}
+                    {...field}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Field>
+              <FieldLabel htmlFor="register-email">
+                E-mail do convite
+              </FieldLabel>
+              <Input
+                id="register-email"
+                type="email"
+                autoComplete="email"
+                aria-readonly="true"
+                value={invitedEmail}
+                readOnly
+              />
+              <FieldDescription>
+                Este endereço vem do convite e não pode ser alterado.
+              </FieldDescription>
+            </Field>
+            <Controller
+              control={form.control}
+              name="password"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid || undefined}>
+                  <FieldLabel htmlFor="register-password">
+                    Senha (mín. 12 caracteres)
+                  </FieldLabel>
+                  <div className="flex">
+                    <Input
+                      id="register-password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      aria-invalid={fieldState.invalid}
+                      className="rounded-r-none"
+                      {...field}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="rounded-l-none border-l-0"
+                      onClick={() => setShowPassword((current) => !current)}
+                      disabled={disableShowPasswordButton}
+                    >
+                      {showPassword && !disableShowPasswordButton ? (
+                        <EyeIcon className="size-4" aria-hidden="true" />
+                      ) : (
+                        <EyeClosedIcon className="size-4" aria-hidden="true" />
+                      )}
+                      <span className="sr-only">
+                        {showPassword ? "Esconder senha" : "Mostrar senha"}
+                      </span>
+                    </Button>
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="confirmPassword"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid || undefined}>
+                  <FieldLabel htmlFor="register-confirm">
+                    Confirmar senha
+                  </FieldLabel>
+                  <Input
+                    id="register-confirm"
+                    type="password"
+                    autoComplete="new-password"
+                    aria-invalid={fieldState.invalid}
+                    {...field}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            {form.formState.errors.root && (
+              <FieldError errors={[form.formState.errors.root]} />
+            )}
+            <Button
+              type="submit"
+              className="mt-2 w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? <Spinner /> : "Criar conta"}
+            </Button>
+          </FieldGroup>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          <span>Já possui uma conta? </span>
+          <Link
+            href={loginHref}
+            className="underline underline-offset-4 hover:text-primary"
+          >
+            Entrar
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

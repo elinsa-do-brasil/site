@@ -197,8 +197,8 @@ export async function enviarConviteAdmin(
   });
 
   const baseUrl =
-    process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_URL ||
+    process.env.BETTER_AUTH_URL ||
     "http://localhost:3000";
   const inviteLink = `${baseUrl}/convite/${inviteId}`;
   const linhasEmail = [
@@ -216,7 +216,7 @@ export async function enviarConviteAdmin(
     "Para aceitar o convite e liberar seu acesso, utilize o link abaixo:",
     inviteLink,
     "",
-    "Caso ainda não possua uma conta ativada, crie sua conta usando este mesmo e-mail antes de aceitar o convite.",
+    "Caso ainda não possua conta, este mesmo link abrirá a criação com o e-mail do convite.",
     "",
     `Este convite expira em ${DEFAULT_INVITATION_DAYS} dias.`,
   ].filter((line) => line !== "");
