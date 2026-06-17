@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Or } from "@/components/auth/or";
 
 export const metadata: Metadata = {
   title: "Criar conta",
@@ -33,27 +33,31 @@ export default async function CriarContaPage({
   }
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-108">
-        <CardHeader className="px-6 text-center">
+    <main className="flex min-h-screen w-full items-center justify-center">
+      <Card className="w-full max-w-108 ">
+        <CardHeader className="flex flex-col items-center space-y-4 text-center">
           <CardTitle className="mt-6 mb-3">
             <Logo className="mx-auto" />
           </CardTitle>
           <h1 className="text-lg font-semibold tracking-tight">
-            Cadastro por convite
+            Olá!
           </h1>
-          <CardDescription>
-            Contas do Portal Interno Elinsa são criadas a partir do link de
-            convite enviado pela organização.
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 px-6 pb-6">
-          <p className="text-center text-sm text-muted-foreground">
-            Use o link recebido por e-mail. Ele abre o formulário com o endereço
-            do convite já definido.
+        <CardContent className="space-y-4 px-8 pb-6">
+          <p className="text-center text-sm">
+            Para criar uma conta no Portal Interno da Elinsa você precisa de um convite. 
           </p>
-          <Button className="w-full" asChild>
-            <Link href="/entrar">Ir para o login</Link>
+          <p className="text-center text-sm">
+            Se você recebeu um convite por e-mail, clique no link do convite para abrir o formulário
+            de criação de conta.
+          </p>
+          <Or />
+          <Button 
+            variant="link"
+            className="w-full text-sm" 
+            asChild 
+          >
+            <Link href="/entrar">Eu já tenho uma conta</Link>
           </Button>
         </CardContent>
       </Card>
