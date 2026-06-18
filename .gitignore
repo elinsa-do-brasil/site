@@ -56,3 +56,4 @@ secrets/
 /.agents/plans
 
 /.venv
+/.pnpm-store
