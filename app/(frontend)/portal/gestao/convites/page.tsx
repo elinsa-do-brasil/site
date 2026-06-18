@@ -1,21 +1,30 @@
 import { and, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { GerenciarConvites } from "@/components/admin/GerenciarConvites";
-import { Button } from "@/components/ui/button";
+import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
 import { db } from "@/lib/db";
-import { invitation, organization, team } from "@/lib/db/schema";
+import {
+  invitation,
+  organization,
+  organizationRole,
+  team,
+} from "@/lib/db/schema";
 import { getAllElinsaTeams, requireOrgAdmin } from "@/lib/organization/access";
+import { BUILTIN_ORG_ROLES } from "@/lib/organization/constants";
 
 export const metadata: Metadata = {
   title: "Gerenciar convites",
 };
 
 export default async function AdminConvitesPage() {
-  await requireOrgAdmin();
+  const context = await requireOrgAdmin();
 
-  const [teams, pendingInvites] = await Promise.all([
+  const [teams, customRoles, pendingInvites] = await Promise.all([
     getAllElinsaTeams(),
+    db
+      .select({ role: organizationRole.role })
+      .from(organizationRole)
+      .where(eq(organizationRole.organizationId, context.organizationId)),
     db
       .select({
         id: invitation.id,
@@ -33,24 +42,23 @@ export default async function AdminConvitesPage() {
       )
       .orderBy(desc(invitation.createdAt)),
   ]);
+  const roleOptions = Array.from(
+    new Set([...BUILTIN_ORG_ROLES, ...customRoles.map((role) => role.role)]),
+  );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4">
-      <div className="mb-8 flex items-center justify-between border-b pb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Gestão de Convites
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Painel de administração para envio e revogação de convites de acesso
-          </p>
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/portal">Voltar ao Portal</Link>
-        </Button>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <GestaoPageHeader
+        active="convites"
+        title="Convites"
+        description="Envie links de acesso, acompanhe pendências e revogue convites que não devem mais funcionar."
+      />
 
-      <GerenciarConvites teams={teams} pendingInvitations={pendingInvites} />
+      <GerenciarConvites
+        pendingInvitations={pendingInvites}
+        roleOptions={roleOptions}
+        teams={teams}
+      />
     </div>
   );
 }

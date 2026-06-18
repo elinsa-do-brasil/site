@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import {
   adicionarMembroExistente,
@@ -129,7 +130,7 @@ export function TeamInviteDialog({
       <DialogTrigger asChild>
         {trigger ?? (
           <Button type="button" variant="secondary">
-            <UserPlus className="size-4" />
+            <UserPlus data-icon="inline-start" />
             Convidar
           </Button>
         )}
@@ -143,9 +144,23 @@ export function TeamInviteDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <input name="teamId" type="hidden" value={team.id} />
-          {!isOrgAdmin && <input name="role" type="hidden" value="member" />}
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <input
+            name="teamId"
+            type="hidden"
+            defaultValue={team.id}
+            style={{ caretColor: "transparent" }}
+            suppressHydrationWarning
+          />
+          {!isOrgAdmin && (
+            <input
+              name="role"
+              type="hidden"
+              defaultValue="member"
+              style={{ caretColor: "transparent" }}
+              suppressHydrationWarning
+            />
+          )}
 
           <FieldGroup>
             <Field>
@@ -244,8 +259,14 @@ export function TeamInviteDialog({
 
           <DialogFooter>
             <Button disabled={isPending} type="submit">
-              <UserPlus className="size-4" />
-              {selectedUser ? "Adicionar à equipe" : "Enviar convite"}
+              {isPending ? (
+                <Spinner />
+              ) : (
+                <>
+                  <UserPlus data-icon="inline-start" />
+                  {selectedUser ? "Adicionar à equipe" : "Enviar convite"}
+                </>
+              )}
             </Button>
           </DialogFooter>
         </form>

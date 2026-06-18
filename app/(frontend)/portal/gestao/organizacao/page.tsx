@@ -1,8 +1,7 @@
 import { asc, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
 import { OrganizacaoAdmin } from "@/components/admin/OrganizacaoAdmin";
-import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -88,32 +87,22 @@ export default async function OrganizacaoAdminPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4">
-      <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Administração da organização
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Membros, funções, convites, status e equipes da Elinsa.
-          </p>
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/portal">Voltar ao portal</Link>
-        </Button>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <GestaoPageHeader
+        active="organizacao"
+        title="Organização"
+        description="Gerencie membros, vínculos e funções de acesso do Portal Interno Elinsa."
+      />
 
       <OrganizacaoAdmin
-        invitations={invitations.map((item) => ({
-          ...item,
-          createdAt: item.createdAt.toISOString(),
-          expiresAt: item.expiresAt?.toISOString() ?? null,
-        }))}
         members={members.map((item) => ({
           ...item,
           createdAt: item.createdAt.toISOString(),
           teams: teamsByUser.get(item.userId) ?? [],
         }))}
+        pendingInvitationCount={
+          invitations.filter((item) => item.status === "pending").length
+        }
         roleOptions={roleOptions}
         roles={roles}
         teams={teams}

@@ -1,12 +1,11 @@
 "use client";
 
-import { ArrowLeft, Save, Trash2, UserPlus } from "lucide-react";
-import Link from "next/link";
+import { Save, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { TeamInviteDialog } from "@/components/admin/TeamInviteDialog";
+import { ConfirmActionDialog } from "@/components/admin/ConfirmActionDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
@@ -41,12 +41,6 @@ import {
   removerTimeOrganizacao,
 } from "@/lib/organization/actions";
 import { formatOrganizationRole } from "@/lib/organization/constants";
-
-type RegisteredUser = {
-  id: string;
-  name: string;
-  email: string;
-};
 
 type TeamMemberRow = {
   memberId: string;
@@ -67,7 +61,6 @@ type TeamAdminProps = {
   invitations: InvitationRow[];
   isOrgAdmin: boolean;
   members: TeamMemberRow[];
-  registeredUsers: RegisteredUser[];
   roleOptions: string[];
   team: {
     id: string;
@@ -84,7 +77,6 @@ export function TeamAdmin({
   invitations,
   isOrgAdmin,
   members,
-  registeredUsers,
   roleOptions,
   team,
 }: TeamAdminProps) {
@@ -121,56 +113,8 @@ export function TeamAdmin({
     };
   }
 
-  function runAction(
-    action: () => Promise<ActionResult>,
-    successMessage: string,
-    options?: { redirectToTeams?: boolean },
-  ) {
-    startTransition(async () => {
-      const result = await action();
-      if (result.error) {
-        toast.error(result.error);
-        return;
-      }
-
-      toast.success(successMessage);
-      if (options?.redirectToTeams) {
-        router.push("/portal/gestao/equipes");
-      } else {
-        router.refresh();
-      }
-    });
-  }
-
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
-      <div className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/portal/gestao/equipes">
-              <ArrowLeft className="size-4" />
-              Equipes
-            </Link>
-          </Button>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight">{teamName}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Adicione, remova e revise os membros desta equipe.
-          </p>
-        </div>
-        <TeamInviteDialog
-          isOrgAdmin={isOrgAdmin}
-          registeredUsers={registeredUsers}
-          roleOptions={roleOptions}
-          team={team}
-          trigger={
-            <Button type="button">
-              <UserPlus className="size-4" />
-              Adicionar ou convidar
-            </Button>
-          }
-        />
-      </div>
-
+    <div className="flex flex-col gap-5">
       {isOrgAdmin && (
         <Card className="rounded-md">
           <CardHeader>
@@ -188,7 +132,13 @@ export function TeamAdmin({
                 { redirectToTeamFromName: true },
               )}
             >
-              <input name="teamId" type="hidden" value={team.id} />
+              <input
+                name="teamId"
+                type="hidden"
+                defaultValue={team.id}
+                style={{ caretColor: "transparent" }}
+                suppressHydrationWarning
+              />
               <Field>
                 <FieldLabel htmlFor="team-name">Nome da equipe</FieldLabel>
                 <Input
@@ -199,30 +149,33 @@ export function TeamAdmin({
                 />
               </Field>
               <Button className="self-end" disabled={isPending} type="submit">
-                <Save className="size-4" />
-                Salvar
+                {isPending ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    <Save data-icon="inline-start" />
+                    Salvar
+                  </>
+                )}
               </Button>
             </form>
 
-            <Button
-              className="self-end"
-              disabled={isPending}
-              onClick={() => {
-                if (!window.confirm(`Excluir a equipe ${teamName}?`)) return;
-                runAction(
-                  () => removerTimeOrganizacao(team.id),
-                  "Equipe excluída.",
-                  {
-                    redirectToTeams: true,
-                  },
-                );
-              }}
-              type="button"
-              variant="destructive"
-            >
-              <Trash2 className="size-4" />
-              Excluir
-            </Button>
+            <div className="self-end">
+              <ConfirmActionDialog
+                action={() => removerTimeOrganizacao(team.id)}
+                confirmLabel="Excluir equipe"
+                description={`A equipe ${teamName} será removida. Os usuários continuam na organização.`}
+                onSuccess={() => router.push("/portal/gestao/equipes")}
+                successMessage="Equipe excluída."
+                title="Excluir equipe?"
+                trigger={
+                  <Button type="button" variant="destructive">
+                    <Trash2 data-icon="inline-start" />
+                    Excluir
+                  </Button>
+                }
+              />
+            </div>
           </CardContent>
         </Card>
       )}
@@ -264,7 +217,9 @@ export function TeamAdmin({
                         <input
                           name="memberId"
                           type="hidden"
-                          value={member.memberId}
+                          defaultValue={member.memberId}
+                          style={{ caretColor: "transparent" }}
+                          suppressHydrationWarning
                         />
                         <RoleSelect
                           currentRole={member.role}
@@ -277,7 +232,7 @@ export function TeamAdmin({
                           type="submit"
                           variant="secondary"
                         >
-                          Salvar
+                          {isPending ? <Spinner /> : "Salvar"}
                         </Button>
                       </form>
                     ) : (
@@ -287,29 +242,24 @@ export function TeamAdmin({
                     )}
                   </TableCell>
                   <TableCell className="text-right">
-                    <form
-                      onSubmit={submitForm(
-                        removerMembroDoTime,
-                        "Membro removido da equipe.",
-                        { refresh: true },
-                      )}
-                    >
-                      <input name="teamId" type="hidden" value={team.id} />
-                      <input
-                        name="userId"
-                        type="hidden"
-                        value={member.userId}
-                      />
-                      <Button
-                        className="text-destructive hover:text-destructive"
-                        disabled={isPending}
-                        size="sm"
-                        type="submit"
-                        variant="ghost"
-                      >
-                        Remover
-                      </Button>
-                    </form>
+                    <ConfirmActionDialog
+                      action={() => {
+                        const formData = new FormData();
+                        formData.set("teamId", team.id);
+                        formData.set("userId", member.userId);
+                        return removerMembroDoTime(formData);
+                      }}
+                      confirmLabel="Remover da equipe"
+                      description={`${member.name} perderá o acesso às ferramentas desta equipe.`}
+                      onSuccess={() => router.refresh()}
+                      successMessage="Membro removido da equipe."
+                      title="Remover membro da equipe?"
+                      trigger={
+                        <Button size="sm" type="button" variant="destructive">
+                          Remover
+                        </Button>
+                      }
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -352,21 +302,19 @@ export function TeamAdmin({
                   <TableCell>{formatOrganizationRole(invite.role)}</TableCell>
                   <TableCell>{formatDate(invite.expiresAt)}</TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      className="text-destructive hover:text-destructive"
-                      disabled={isPending}
-                      onClick={() =>
-                        runAction(
-                          () => cancelarConviteAdmin(invite.id),
-                          "Convite revogado.",
-                        )
+                    <ConfirmActionDialog
+                      action={() => cancelarConviteAdmin(invite.id)}
+                      confirmLabel="Revogar convite"
+                      description={`O convite enviado para ${invite.email} deixará de funcionar imediatamente.`}
+                      onSuccess={() => router.refresh()}
+                      successMessage="Convite revogado."
+                      title="Revogar convite?"
+                      trigger={
+                        <Button size="sm" type="button" variant="destructive">
+                          Revogar
+                        </Button>
                       }
-                      size="sm"
-                      type="button"
-                      variant="ghost"
-                    >
-                      Revogar
-                    </Button>
+                    />
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,48 +1,58 @@
 "use client";
 
+import { Plus, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { FormEvent, ReactNode } from "react";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { ConfirmActionDialog } from "@/components/admin/ConfirmActionDialog";
+import { formatAdminName } from "@/components/admin/GestaoPageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import {
   adicionarMembroExistente,
   atualizarFuncaoMembro,
-  atualizarStatusConviteAdmin,
-  cancelarConviteAdmin,
-  criarTimeOrganizacao,
-  enviarConviteAdmin,
   excluirRoleOrganizacao,
+  excluirUsuarioDoPortal,
   removerMembroDaOrganizacao,
   salvarRoleOrganizacao,
 } from "@/lib/organization/actions";
-import {
-  formatOrganizationRole,
-  INVITATION_STATUS_OPTIONS,
-} from "@/lib/organization/constants";
+import { formatOrganizationRole } from "@/lib/organization/constants";
+import { cn } from "@/lib/utils";
 
 type TeamOption = {
   id: string;
@@ -59,16 +69,6 @@ type MemberRow = {
   createdAt: string;
 };
 
-type InvitationRow = {
-  id: string;
-  email: string;
-  role: string;
-  status: string;
-  teamName: string | null;
-  createdAt: string;
-  expiresAt: string | null;
-};
-
 type RoleRow = {
   id: string;
   role: string;
@@ -77,489 +77,546 @@ type RoleRow = {
 
 type OrganizacaoAdminProps = {
   members: MemberRow[];
-  invitations: InvitationRow[];
-  teams: TeamOption[];
-  roles: RoleRow[];
+  pendingInvitationCount: number;
   roleOptions: string[];
-};
-
-type ActionResult = {
-  error?: string;
-  success?: boolean;
+  roles: RoleRow[];
+  teams: TeamOption[];
 };
 
 export function OrganizacaoAdmin({
   members,
-  invitations,
-  teams,
-  roles,
+  pendingInvitationCount,
   roleOptions,
+  roles,
+  teams,
 }: OrganizacaoAdminProps) {
-  const [message, setMessage] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [memberSearch, setMemberSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [teamFilter, setTeamFilter] = useState("all");
+  const normalizedMemberSearch = normalizeSearch(memberSearch);
+  const visibleMembers = members.filter(
+    (member) =>
+      matchesMemberSearch(member, normalizedMemberSearch) &&
+      matchesMemberRole(member, roleFilter) &&
+      matchesMemberTeam(member, teamFilter),
+  );
+  const ownerCount = members.filter((member) =>
+    member.role
+      .split(",")
+      .map((role) => role.trim())
+      .includes("owner"),
+  ).length;
 
-  function submitForm(
-    action: (formData: FormData) => Promise<ActionResult>,
-    successMessage: string,
-    options?: { reset?: boolean },
-  ) {
-    return (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      const formData = new FormData(form);
-      if (formData.get("teamId") === "none") {
-        formData.delete("teamId");
-      }
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="grid gap-3 md:grid-cols-4">
+        <MetricCard label="Membros" value={members.length} />
+        <MetricCard label="Equipes" value={teams.length} />
+        <MetricCard label="Convites pendentes" value={pendingInvitationCount} />
+        <MetricCard label="Proprietários" value={ownerCount} />
+      </div>
 
-      startTransition(async () => {
-        const result = await action(formData);
-        setMessage(result.error ?? successMessage);
-        if (!result.error && options?.reset) {
-          form.reset();
-        }
-      });
-    };
+      <Card className="rounded-md">
+        <CardHeader>
+          <CardTitle>Membros da organização</CardTitle>
+          <CardDescription>
+            Controle o vínculo institucional, as funções e a conta de acesso ao
+            portal.
+          </CardDescription>
+          <CardAction className="flex gap-2">
+            <AddExistingMemberDialog
+              roleOptions={roleOptions}
+              teams={teams}
+              trigger={
+                <Button type="button" size="sm">
+                  <UserPlus data-icon="inline-start" />
+                  Adicionar membro
+                </Button>
+              }
+            />
+          </CardAction>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_14rem_14rem]">
+            <Input
+              aria-label="Buscar membros por nome ou e-mail"
+              onChange={(event) => setMemberSearch(event.target.value)}
+              placeholder="Buscar por nome ou e-mail"
+              type="search"
+              value={memberSearch}
+            />
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger aria-label="Filtrar membros por função">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">Todas as funções</SelectItem>
+                  {roleOptions.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {formatOrganizationRole(role)}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Select value={teamFilter} onValueChange={setTeamFilter}>
+              <SelectTrigger aria-label="Filtrar membros por equipe">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="all">Todas as equipes</SelectItem>
+                  <SelectItem value="none">Sem equipe</SelectItem>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.name}>
+                      {formatAdminName(team.name)}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="divide-y rounded-md border">
+            {visibleMembers.map((member) => (
+              <MemberItem
+                key={member.id}
+                member={member}
+                roleOptions={roleOptions}
+              />
+            ))}
+            {members.length === 0 && (
+              <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                Nenhum membro vinculado à organização.
+              </div>
+            )}
+            {members.length > 0 && visibleMembers.length === 0 && (
+              <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                Nenhum membro encontrado para esta busca.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-md">
+        <CardHeader>
+          <CardTitle>Funções customizadas</CardTitle>
+          <CardDescription>
+            Nomeie funções em português claro e use o identificador apenas para
+            controle interno.
+          </CardDescription>
+          <CardAction>
+            <RoleDialog
+              trigger={
+                <Button type="button" variant="outline" size="sm">
+                  <Plus data-icon="inline-start" />
+                  Nova função
+                </Button>
+              }
+            />
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2">
+            {roles.map((role) => (
+              <RoleItem key={role.id} role={role} />
+            ))}
+            {roles.length === 0 && (
+              <div className="rounded-md border border-dashed px-4 py-10 text-center text-sm text-muted-foreground md:col-span-2">
+                Nenhuma função customizada criada.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function MetricCard({ label, value }: { label: string; value: number }) {
+  return (
+    <Card className="rounded-md" size="sm">
+      <CardHeader>
+        <CardDescription>{label}</CardDescription>
+        <CardTitle className="text-2xl font-semibold tabular-nums">
+          {value}
+        </CardTitle>
+      </CardHeader>
+    </Card>
+  );
+}
+
+function matchesMemberSearch(member: MemberRow, normalizedSearch: string) {
+  if (!normalizedSearch) {
+    return true;
   }
 
-  function runAction(
-    action: () => Promise<ActionResult>,
-    successMessage: string,
-  ) {
+  return normalizeSearch([member.name, member.email].join(" ")).includes(
+    normalizedSearch,
+  );
+}
+
+function matchesMemberRole(member: MemberRow, roleFilter: string) {
+  if (roleFilter === "all") {
+    return true;
+  }
+
+  return member.role
+    .split(",")
+    .map((role) => role.trim())
+    .includes(roleFilter);
+}
+
+function matchesMemberTeam(member: MemberRow, teamFilter: string) {
+  if (teamFilter === "all") {
+    return true;
+  }
+
+  if (teamFilter === "none") {
+    return member.teams.length === 0;
+  }
+
+  return member.teams.includes(teamFilter);
+}
+
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR")
+    .trim();
+}
+
+function MemberItem({
+  member,
+  roleOptions,
+}: {
+  member: MemberRow;
+  roleOptions: string[];
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  function handleRoleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
     startTransition(async () => {
-      const result = await action();
-      setMessage(result.error ?? successMessage);
+      const result = await atualizarFuncaoMembro(formData);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Função atualizada.");
+      router.refresh();
     });
   }
 
   return (
-    <div className="space-y-6">
-      {message && (
-        <div className="rounded-md border bg-card px-4 py-3 text-sm">
-          {message}
+    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,34rem)] lg:items-center">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-medium">{member.name}</p>
+          <Badge variant="outline">{formatOrganizationRole(member.role)}</Badge>
         </div>
-      )}
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Novo convite</CardTitle>
-            <CardDescription>
-              Convide alguém para a organização e opcionalmente para uma equipe.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form
-              onSubmit={submitForm(enviarConviteAdmin, "Convite enviado.", {
-                reset: true,
-              })}
-            >
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="invite-email">E-mail</FieldLabel>
-                  <Input
-                    id="invite-email"
-                    name="email"
-                    type="email"
-                    placeholder="nome@empresa.com"
-                    required
-                  />
-                </Field>
-                <RoleSelect id="invite-role" roles={roleOptions} />
-                <TeamSelect id="invite-team" teams={teams} />
-                <Field>
-                  <FieldLabel htmlFor="invite-msg">Mensagem</FieldLabel>
-                  <Textarea id="invite-msg" name="mensagem" rows={3} />
-                </Field>
-                <Button type="submit" disabled={isPending}>
-                  Enviar convite
-                </Button>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Adicionar existente</CardTitle>
-            <CardDescription>
-              Vincule uma conta já criada à organização ou a uma equipe.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form
-              onSubmit={submitForm(
-                adicionarMembroExistente,
-                "Membro adicionado.",
-                { reset: true },
-              )}
-            >
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="member-email">E-mail</FieldLabel>
-                  <Input
-                    id="member-email"
-                    name="email"
-                    type="email"
-                    placeholder="nome@empresa.com"
-                    required
-                  />
-                </Field>
-                <RoleSelect id="member-role" roles={roleOptions} />
-                <TeamSelect id="member-team" teams={teams} />
-                <Button type="submit" disabled={isPending}>
-                  Adicionar membro
-                </Button>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Equipes e funções</CardTitle>
-            <CardDescription>
-              Crie novas equipes e funções reutilizáveis no portal.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form
-              onSubmit={submitForm(criarTimeOrganizacao, "Equipe criada.", {
-                reset: true,
-              })}
-            >
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="team-name">Nova equipe</FieldLabel>
-                  <Input
-                    id="team-name"
-                    name="name"
-                    placeholder="administrativo"
-                    required
-                  />
-                </Field>
-                <Button type="submit" variant="secondary" disabled={isPending}>
-                  Criar equipe
-                </Button>
-              </FieldGroup>
-            </form>
-
-            <form
-              onSubmit={submitForm(salvarRoleOrganizacao, "Função salva.", {
-                reset: true,
-              })}
-            >
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="role-name">Nova função</FieldLabel>
-                  <Input
-                    id="role-name"
-                    name="role"
-                    placeholder="financeiro_aprovador"
-                    required
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="role-permission">
-                    Descrição da função
-                  </FieldLabel>
-                  <Textarea
-                    id="role-permission"
-                    name="permission"
-                    placeholder="Descreva quando esta função deve ser usada."
-                    rows={3}
-                  />
-                </Field>
-                <Button type="submit" variant="secondary" disabled={isPending}>
-                  Salvar função
-                </Button>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
+        <p className="truncate text-sm text-muted-foreground">{member.email}</p>
+        <div className="mt-2 flex flex-wrap gap-1">
+          {member.teams.length > 0 ? (
+            member.teams.map((team) => (
+              <Badge key={team} variant="secondary">
+                {formatAdminName(team)}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-xs text-muted-foreground">Sem equipe</span>
+          )}
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Membros da organização</CardTitle>
-          <CardDescription>
-            Atualize funções, confira equipes e remova vínculos quando
-            necessário.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Usuário</TableHead>
-                <TableHead>Funções</TableHead>
-                <TableHead>Equipes</TableHead>
-                <TableHead>Entrada</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {members.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-muted-foreground">{item.email}</div>
-                  </TableCell>
-                  <TableCell className="min-w-56">
-                    <form
-                      className="flex gap-2"
-                      onSubmit={submitForm(
-                        atualizarFuncaoMembro,
-                        "Função atualizada.",
-                      )}
-                    >
-                      <input name="memberId" type="hidden" value={item.id} />
-                      <RoleSelect
-                        currentRole={item.role}
-                        hideLabel
-                        id={`member-role-${item.id}`}
-                        label={`Função de ${item.email}`}
-                        roles={roleOptions}
-                      />
-                      <Button
-                        type="submit"
-                        size="sm"
-                        variant="secondary"
-                        disabled={isPending}
-                      >
-                        Salvar
-                      </Button>
-                    </form>
-                  </TableCell>
-                  <TableCell className="max-w-64 whitespace-normal">
-                    <BadgeList values={item.teams} empty="Sem equipe" />
-                  </TableCell>
-                  <TableCell>{formatDate(item.createdAt)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive"
-                      disabled={isPending}
-                      onClick={() =>
-                        runAction(
-                          () => removerMembroDaOrganizacao(item.id),
-                          "Membro removido.",
-                        )
-                      }
-                    >
-                      Remover
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="flex min-w-0 flex-col gap-3 lg:items-end">
+        <form
+          onSubmit={handleRoleSubmit}
+          className="grid w-full gap-2 sm:grid-cols-[minmax(0,1fr)_auto]"
+        >
+          <input
+            name="memberId"
+            type="hidden"
+            defaultValue={member.id}
+            style={{ caretColor: "transparent" }}
+            suppressHydrationWarning
+          />
+          <RoleSelect
+            currentRole={member.role}
+            label={`Função de ${member.email}`}
+            roles={roleOptions}
+          />
+          <Button type="submit" variant="secondary" disabled={isPending}>
+            {isPending ? <Spinner /> : "Salvar"}
+          </Button>
+        </form>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Convites</CardTitle>
-            <CardDescription>
-              Acompanhe status e revogue convites da organização.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Função</TableHead>
-                  <TableHead>Equipe</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invitations.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.email}</TableCell>
-                    <TableCell>
-                      <form
-                        className="flex gap-2"
-                        onSubmit={submitForm(
-                          atualizarStatusConviteAdmin,
-                          "Status atualizado.",
-                        )}
-                      >
-                        <input
-                          name="invitationId"
-                          type="hidden"
-                          value={item.id}
-                        />
-                        <Select name="status" defaultValue={item.status}>
-                          <SelectTrigger className="h-8 w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {INVITATION_STATUS_OPTIONS.map((status) => (
-                              <SelectItem key={status} value={status}>
-                                {status}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          type="submit"
-                          size="sm"
-                          variant="secondary"
-                          disabled={isPending}
-                        >
-                          Salvar
-                        </Button>
-                      </form>
-                    </TableCell>
-                    <TableCell>{formatOrganizationRole(item.role)}</TableCell>
-                    <TableCell>{item.teamName ?? "-"}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        disabled={isPending}
-                        onClick={() =>
-                          runAction(
-                            () => cancelarConviteAdmin(item.id),
-                            "Convite revogado.",
-                          )
-                        }
-                      >
-                        Revogar
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {invitations.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="py-8 text-center text-muted-foreground"
-                    >
-                      Nenhum convite registrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Funções customizadas</CardTitle>
-            <CardDescription>
-              Funções criadas pela organização para compor permissões internas.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Função</TableHead>
-                  <TableHead>Permissões</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {roles.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <div className="font-medium">
-                        {formatOrganizationRole(item.role)}
-                      </div>
-                      <div className="font-mono text-xs text-muted-foreground">
-                        {item.role}
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-96 whitespace-normal">
-                      {item.permission}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
-                        disabled={isPending}
-                        onClick={() =>
-                          runAction(
-                            () => excluirRoleOrganizacao(item.id),
-                            "Função excluída.",
-                          )
-                        }
-                      >
-                        Excluir
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {roles.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      className="py-8 text-center text-muted-foreground"
-                    >
-                      Nenhuma função customizada criada.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <div className="flex flex-wrap justify-start gap-2 lg:justify-end">
+          <ConfirmActionDialog
+            action={() => removerMembroDaOrganizacao(member.id)}
+            confirmLabel="Remover vínculo"
+            description={
+              <>
+                {member.name} perderá o acesso às áreas internas desta
+                organização, mas a conta de login continuará existindo.
+              </>
+            }
+            onSuccess={() => router.refresh()}
+            successMessage="Membro removido da organização."
+            title="Remover da organização?"
+            trigger={
+              <Button type="button" variant="outline">
+                Remover vínculo
+              </Button>
+            }
+          />
+          <ConfirmActionDialog
+            action={() => excluirUsuarioDoPortal(member.userId)}
+            confirmLabel="Excluir conta"
+            description={
+              <>
+                Esta ação apaga a conta de {member.email} do portal, incluindo
+                sessões e vínculos internos relacionados.
+              </>
+            }
+            onSuccess={() => router.refresh()}
+            successMessage="Conta excluída do portal."
+            title="Excluir usuário do portal?"
+            trigger={
+              <Button type="button" variant="destructive">
+                Excluir conta
+              </Button>
+            }
+          />
+        </div>
       </div>
     </div>
   );
 }
 
+function AddExistingMemberDialog({
+  roleOptions,
+  teams,
+  trigger,
+}: {
+  roleOptions: string[];
+  teams: TeamOption[];
+  trigger: ReactNode;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    if (formData.get("teamId") === "none") {
+      formData.delete("teamId");
+    }
+
+    startTransition(async () => {
+      const result = await adicionarMembroExistente(formData);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Membro adicionado.");
+      form.reset();
+      setOpen(false);
+      router.refresh();
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Adicionar conta existente</DialogTitle>
+          <DialogDescription>
+            Use esta opção para vincular uma conta que já foi criada no portal.
+            Para novas pessoas, envie um convite.
+          </DialogDescription>
+        </DialogHeader>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="member-email">E-mail</FieldLabel>
+              <Input
+                id="member-email"
+                name="email"
+                placeholder="nome@empresa.com"
+                type="email"
+                required
+              />
+            </Field>
+            <RoleSelect id="member-role" roles={roleOptions} />
+            <TeamSelect id="member-team" teams={teams} />
+          </FieldGroup>
+          <DialogFooter>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Spinner /> : "Adicionar membro"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RoleDialog({ trigger }: { trigger: ReactNode }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    startTransition(async () => {
+      const result = await salvarRoleOrganizacao(formData);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Função salva.");
+      form.reset();
+      setOpen(false);
+      router.refresh();
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nova função</DialogTitle>
+          <DialogDescription>
+            Crie um identificador curto e uma descrição de uso compreensível
+            para administradores.
+          </DialogDescription>
+        </DialogHeader>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="role-name">Identificador</FieldLabel>
+              <Input
+                id="role-name"
+                name="role"
+                placeholder="aprovador_financeiro"
+                required
+              />
+              <FieldDescription>
+                Use letras, números e sublinhado. O sistema transforma o nome
+                automaticamente.
+              </FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="role-permission">Descrição</FieldLabel>
+              <Textarea
+                id="role-permission"
+                name="permission"
+                placeholder="Quando esta função deve ser usada?"
+                rows={3}
+              />
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Spinner /> : "Salvar função"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RoleItem({ role }: { role: RoleRow }) {
+  const router = useRouter();
+
+  return (
+    <div className="rounded-md border p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium">{formatOrganizationRole(role.role)}</p>
+          <p className="text-xs text-muted-foreground">{role.role}</p>
+        </div>
+        <ConfirmActionDialog
+          action={() => excluirRoleOrganizacao(role.id)}
+          confirmLabel="Excluir função"
+          description="A função só pode ser excluída se não estiver atribuída a nenhum membro."
+          onSuccess={() => router.refresh()}
+          successMessage="Função excluída."
+          title="Excluir função?"
+          trigger={
+            <Button type="button" variant="ghost">
+              Excluir
+            </Button>
+          }
+        />
+      </div>
+      <p className="mt-3 text-sm text-muted-foreground">
+        {role.permission || "Sem descrição registrada."}
+      </p>
+    </div>
+  );
+}
+
 function RoleSelect({
+  className,
   currentRole = "member",
-  hideLabel = false,
   id,
   label = "Função",
   roles,
 }: {
+  className?: string;
   currentRole?: string;
-  hideLabel?: boolean;
-  id: string;
+  id?: string;
   label?: string;
   roles: string[];
 }) {
   const options = Array.from(new Set([currentRole, ...roles]));
 
   return (
-    <Field>
-      <FieldLabel className={hideLabel ? "sr-only" : undefined} htmlFor={id}>
-        {label}
-      </FieldLabel>
-      <Select name="role" defaultValue={currentRole}>
-        <SelectTrigger id={id} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((role) => (
-            <SelectItem key={role} value={role}>
-              {formatOrganizationRole(role)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </Field>
+    <Select name="role" defaultValue={currentRole}>
+      <SelectTrigger
+        id={id}
+        aria-label={label}
+        className={cn("w-full min-w-0", className)}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((role) => (
+          <SelectItem key={role} value={role}>
+            {formatOrganizationRole(role)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
 function TeamSelect({ id, teams }: { id: string; teams: TeamOption[] }) {
   return (
     <Field>
-      <FieldLabel htmlFor={id}>Equipe</FieldLabel>
+      <FieldLabel htmlFor={id}>Equipe inicial</FieldLabel>
       <Select name="teamId" defaultValue="none">
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
@@ -568,36 +625,11 @@ function TeamSelect({ id, teams }: { id: string; teams: TeamOption[] }) {
           <SelectItem value="none">Nenhuma equipe inicial</SelectItem>
           {teams.map((team) => (
             <SelectItem key={team.id} value={team.id}>
-              {team.name}
+              {formatAdminName(team.name)}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
     </Field>
   );
-}
-
-function BadgeList({ values, empty }: { values: string[]; empty: string }) {
-  if (values.length === 0) {
-    return <span className="text-muted-foreground">{empty}</span>;
-  }
-
-  return (
-    <div className="flex flex-wrap gap-1">
-      {values.map((value) => (
-        <Badge key={value} variant="outline">
-          {value}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function formatDate(value: string | null) {
-  if (!value) return "-";
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  }).format(new Date(value));
 }
