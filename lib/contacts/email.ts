@@ -1,4 +1,6 @@
+import { createElement } from "react";
 import { Resend } from "resend";
+import ContactNotificationEmail from "@/emails/contact-notification";
 import type { Contact } from "@/lib/db/schema";
 
 type ContactEmailResult =
@@ -36,6 +38,15 @@ export async function maybeSendContactEmail(
     from,
     subject: "[Site Elinsa] Novo contato recebido",
     text: buildContactEmailText(contact),
+    react: createElement(ContactNotificationEmail, {
+      company: contact.company,
+      createdAt: contact.createdAt,
+      email: contact.email,
+      message: contact.message,
+      name: contact.name,
+      phone: contact.phone,
+      subject: contact.subject,
+    }),
     to,
   });
   const error = "error" in result ? result.error : null;

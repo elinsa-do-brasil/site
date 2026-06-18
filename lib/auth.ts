@@ -4,6 +4,10 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { organization } from "better-auth/plugins/organization";
 import { and, desc, eq, inArray } from "drizzle-orm";
+import { createElement } from "react";
+import InviteEmail from "@/emails/invite";
+import ResetPasswordEmail from "@/emails/reset-password";
+import ConfirmEmail from "@/emails/verification";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
@@ -30,6 +34,10 @@ export const auth = betterAuth({
         subject: "Redefinir senha do Portal Interno Elinsa",
         text: `Use o link para redefinir sua senha: ${url}`,
         idempotencyKey: `reset-password/${user.id}/${Date.now()}`,
+        react: createElement(ResetPasswordEmail, {
+          url,
+          userEmail: user.email,
+        }),
       });
     },
   },
@@ -38,9 +46,10 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       await sendInternalAuthEmail({
         to: user.email,
-        subject: "Verifique seu e-mail no Portal Interno Elinsa",
+        subject: "Verifique seu e-mail | Portal Elinsa",
         text: `Use o link para verificar seu e-mail: ${url}`,
         idempotencyKey: `verify-email/${user.id}/${Date.now()}`,
+        react: createElement(ConfirmEmail, { url }),
       });
     },
   },
@@ -117,6 +126,13 @@ export const auth = betterAuth({
             "Se você ainda não possui conta, o link abrirá a criação de conta com o e-mail do convite.",
           ].join("\n"),
           idempotencyKey: `invite/${data.id}/${Date.now()}`,
+          react: createElement(InviteEmail, {
+            inviteLink,
+            inviteeEmail: data.email,
+            inviterEmail: data.inviter?.user?.email,
+            organizationName: data.organization.name,
+            role: data.role,
+          }),
         });
       },
     }),

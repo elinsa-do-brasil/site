@@ -1,4 +1,5 @@
-import { Resend } from "resend";
+import type { ReactNode } from "react";
+import { type CreateEmailOptions, Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -7,6 +8,7 @@ type SendAuthEmailOptions = {
   subject: string;
   text: string;
   idempotencyKey?: string;
+  react?: ReactNode;
 };
 
 export async function sendInternalAuthEmail({
@@ -14,6 +16,7 @@ export async function sendInternalAuthEmail({
   subject,
   text,
   idempotencyKey,
+  react,
 }: SendAuthEmailOptions) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("RESEND_API_KEY não configurada. E-mail simulado no console:");
@@ -24,16 +27,17 @@ export async function sendInternalAuthEmail({
   const key =
     idempotencyKey ||
     `auth-email/${to}/${Buffer.from(subject).toString("base64url").slice(0, 16)}`;
+  const email: CreateEmailOptions = {
+    from: "Portal Elinsa <portal@amperelinsa.com.br>",
+    to: [to],
+    subject,
+    text,
+    ...(react ? { react } : {}),
+  };
 
-  const { data, error } = await resend.emails.send(
-    {
-      from: "Portal Interno Elinsa <interno@amperelinsa.com.br>",
-      to: [to],
-      subject,
-      text,
-    },
-    { idempotencyKey: key },
-  );
+  const { data, error } = await resend.emails.send(email, {
+    idempotencyKey: key,
+  });
 
   if (error) {
     console.error("Erro ao enviar e-mail via Resend:", error.message);
