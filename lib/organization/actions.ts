@@ -2,6 +2,8 @@
 
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { createElement } from "react";
+import InviteEmail from "@/emails/invite";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -220,12 +222,24 @@ export async function enviarConviteAdmin(
     "",
     `Este convite expira em ${DEFAULT_INVITATION_DAYS} dias.`,
   ].filter((line) => line !== "");
+  const [inviter] = await db
+    .select({ email: user.email })
+    .from(user)
+    .where(eq(user.id, context.userId))
+    .limit(1);
 
   await sendInternalAuthEmail({
     to: email,
     subject: `Convite de acesso: Portal Interno ${org.name}`,
     text: linhasEmail.join("\n"),
     idempotencyKey: `invite-admin/${inviteId}/${Date.now()}`,
+    react: createElement(InviteEmail, {
+      inviteLink,
+      inviteeEmail: email,
+      inviterEmail: inviter?.email,
+      organizationName: org.name,
+      role,
+    }),
   });
 
   revalidateAdminPortal(selectedTeam?.name);
