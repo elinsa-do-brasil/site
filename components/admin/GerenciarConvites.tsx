@@ -1,35 +1,51 @@
 "use client";
 
+import { MailPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { FormEvent, ReactNode } from "react";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { ConfirmActionDialog } from "@/components/admin/ConfirmActionDialog";
+import { formatAdminName } from "@/components/admin/GestaoPageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import {
   cancelarConviteAdmin,
   enviarConviteAdmin,
 } from "@/lib/organization/actions";
-import { formatOrganizationRole } from "@/lib/organization/constants";
+import {
+  formatInvitationStatus,
+  formatOrganizationRole,
+} from "@/lib/organization/constants";
 
 type TeamOption = {
   id: string;
@@ -46,226 +62,312 @@ type PendingInvite = {
 };
 
 type GerenciarConvitesProps = {
-  teams: TeamOption[];
   pendingInvitations: PendingInvite[];
+  roleOptions: string[];
+  teams: TeamOption[];
 };
 
 export function GerenciarConvites({
-  teams,
   pendingInvitations,
+  roleOptions,
+  teams,
 }: GerenciarConvitesProps) {
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [inviteSearch, setInviteSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [teamFilter, setTeamFilter] = useState("all");
+  const normalizedInviteSearch = normalizeSearch(inviteSearch);
+  const visibleInvitations = pendingInvitations.filter(
+    (invite) =>
+      matchesInvitationSearch(invite, normalizedInviteSearch) &&
+      matchesInvitationRole(invite, roleFilter) &&
+      matchesInvitationTeam(invite, teamFilter),
+  );
+
+  return (
+    <Card className="rounded-md">
+      <CardHeader>
+        <CardTitle>Convites pendentes</CardTitle>
+        <CardDescription>
+          Envie convites de acesso e acompanhe os links ainda não aceitos.
+        </CardDescription>
+        <CardAction>
+          <InviteDialog
+            roleOptions={roleOptions}
+            teams={teams}
+            trigger={
+              <Button type="button" size="sm">
+                <MailPlus data-icon="inline-start" />
+                Novo convite
+              </Button>
+            }
+          />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_14rem_14rem]">
+          <Input
+            aria-label="Buscar convites por e-mail"
+            onChange={(event) => setInviteSearch(event.target.value)}
+            placeholder="Buscar por e-mail"
+            type="search"
+            value={inviteSearch}
+          />
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger aria-label="Filtrar convites por função">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">Todas as funções</SelectItem>
+                {roleOptions.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {formatOrganizationRole(role)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Select value={teamFilter} onValueChange={setTeamFilter}>
+            <SelectTrigger aria-label="Filtrar convites por equipe">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">Todas as equipes</SelectItem>
+                <SelectItem value="none">Sem equipe</SelectItem>
+                {teams.map((team) => (
+                  <SelectItem key={team.id} value={team.name}>
+                    {formatAdminName(team.name)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        {pendingInvitations.length > 0 ? (
+          <div className="divide-y rounded-md border">
+            {visibleInvitations.map((invite) => (
+              <InvitationItem invite={invite} key={invite.id} />
+            ))}
+            {visibleInvitations.length === 0 && (
+              <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                Nenhum convite encontrado para esta busca.
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="rounded-md border border-dashed px-4 py-12 text-center text-sm text-muted-foreground">
+            Nenhum convite pendente.
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function matchesInvitationSearch(
+  invite: PendingInvite,
+  normalizedSearch: string,
+) {
+  if (!normalizedSearch) {
+    return true;
+  }
+
+  return normalizeSearch(invite.email).includes(normalizedSearch);
+}
+
+function matchesInvitationRole(invite: PendingInvite, roleFilter: string) {
+  if (roleFilter === "all") {
+    return true;
+  }
+
+  return invite.role === roleFilter;
+}
+
+function matchesInvitationTeam(invite: PendingInvite, teamFilter: string) {
+  if (teamFilter === "all") {
+    return true;
+  }
+
+  if (teamFilter === "none") {
+    return !invite.teamName;
+  }
+
+  return invite.teamName === teamFilter;
+}
+
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR")
+    .trim();
+}
+
+function InvitationItem({ invite }: { invite: PendingInvite }) {
+  const router = useRouter();
+  const isExpired = invite.expiresAt
+    ? new Date(invite.expiresAt) < new Date()
+    : false;
+
+  return (
+    <div className="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_16rem_auto] lg:items-center">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate font-medium">{invite.email}</p>
+          <Badge variant={isExpired ? "destructive" : "secondary"}>
+            {isExpired ? "Expirado" : formatInvitationStatus("pending")}
+          </Badge>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Criado em {formatDate(invite.createdAt)}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline">{formatOrganizationRole(invite.role)}</Badge>
+        <Badge variant="outline">
+          {invite.teamName ? formatAdminName(invite.teamName) : "Sem equipe"}
+        </Badge>
+      </div>
+
+      <div className="flex items-center justify-start gap-3 lg:justify-end">
+        <span className="text-sm text-muted-foreground">
+          Expira {formatDate(invite.expiresAt)}
+        </span>
+        <ConfirmActionDialog
+          action={() => cancelarConviteAdmin(invite.id)}
+          confirmLabel="Revogar convite"
+          description={`O convite enviado para ${invite.email} deixará de funcionar imediatamente.`}
+          onSuccess={() => router.refresh()}
+          successMessage="Convite revogado."
+          title="Revogar convite?"
+          trigger={
+            <Button type="button" variant="destructive">
+              Revogar
+            </Button>
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+function InviteDialog({
+  roleOptions,
+  teams,
+  trigger,
+}: {
+  roleOptions: string[];
+  teams: TeamOption[];
+  trigger: ReactNode;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
-    setSuccess(false);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    const formData = new FormData(event.currentTarget);
     if (formData.get("teamId") === "none") {
       formData.delete("teamId");
     }
 
     startTransition(async () => {
       const result = await enviarConviteAdmin(formData);
-      if (result?.error) {
-        setError(result.error);
-      } else {
-        setSuccess(true);
-        // Limpar o formulário
-        (event.target as HTMLFormElement).reset();
-      }
-    });
-  }
 
-  function handleCancelInvite(id: string) {
-    startTransition(async () => {
-      await cancelarConviteAdmin(id);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Convite enviado.");
+      form.reset();
+      setOpen(false);
+      router.refresh();
     });
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-3">
-      <Card className="md:col-span-1 self-start">
-        <CardHeader>
-          <CardTitle>Novo Convite</CardTitle>
-          <CardDescription>
-            Conceder acesso restrito ao portal e alocar equipes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {success && (
-            <div className="mb-4 rounded-md bg-primary/10 p-3 text-xs text-primary font-medium text-center">
-              Convite enviado com sucesso!
-            </div>
-          )}
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Novo convite</DialogTitle>
+          <DialogDescription>
+            O link enviado abre a criação de conta com o e-mail já fixado.
+          </DialogDescription>
+        </DialogHeader>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="invite-email">
+                E-mail do destinatário
+              </FieldLabel>
+              <Input
+                id="invite-email"
+                name="email"
+                placeholder="nome@empresa.com"
+                required
+                type="email"
+              />
+            </Field>
 
-          <form onSubmit={onSubmit}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="invite-email">
-                  E-mail do destinatário
-                </FieldLabel>
-                <Input
-                  id="invite-email"
-                  name="email"
-                  type="email"
-                  placeholder="nome@empresa.com"
-                  required
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="invite-role">Função</FieldLabel>
-                <Select name="role" defaultValue="member">
-                  <SelectTrigger id="invite-role" className="w-full">
-                    <SelectValue placeholder="Selecione a função" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="member">
-                      {formatOrganizationRole("member")}
+            <Field>
+              <FieldLabel htmlFor="invite-role">Função</FieldLabel>
+              <Select name="role" defaultValue="member">
+                <SelectTrigger id="invite-role" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {formatOrganizationRole(role)}
                     </SelectItem>
-                    <SelectItem value="admin">
-                      {formatOrganizationRole("admin")}
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="invite-team">Equipe inicial</FieldLabel>
+              <Select name="teamId" defaultValue="none">
+                <SelectTrigger id="invite-team" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Nenhuma equipe inicial</SelectItem>
+                  {teams.map((team) => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {formatAdminName(team.name)}
                     </SelectItem>
-                    <SelectItem value="owner">
-                      {formatOrganizationRole("owner")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
 
-              <Field>
-                <FieldLabel htmlFor="invite-team">
-                  Equipe inicial (opcional)
-                </FieldLabel>
-                <Select name="teamId" defaultValue="none">
-                  <SelectTrigger id="invite-team" className="w-full">
-                    <SelectValue placeholder="Nenhuma equipe específica" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
-                      Nenhuma equipe específica
-                    </SelectItem>
-
-                    {teams.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.name.replace("_", " ").toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="invite-msg">
-                  Mensagem (Opcional)
-                </FieldLabel>
-                <Textarea
-                  id="invite-msg"
-                  name="mensagem"
-                  placeholder="Instruções ou contexto adicional..."
-                  rows={3}
-                />
-              </Field>
-
-              {error && <FieldError>{error}</FieldError>}
-
-              <Button
-                type="submit"
-                className="w-full mt-2"
-                disabled={isPending}
-              >
-                {isPending ? "Processando..." : "Enviar Convite"}
-              </Button>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card className="md:col-span-2 self-start">
-        <CardHeader>
-          <CardTitle>Convites Pendentes</CardTitle>
-          <CardDescription>
-            Aguardando aceite e confirmação de e-mail pelos usuários
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {pendingInvitations.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="border-b text-muted-foreground">
-                  <tr>
-                    <th className="py-2 pr-2 font-medium">E-mail</th>
-                    <th className="py-2 pr-2 font-medium">Função</th>
-                    <th className="py-2 pr-2 font-medium">Equipe</th>
-                    <th className="py-2 pr-2 font-medium">Expira em</th>
-                    <th className="py-2 text-right font-medium">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {pendingInvitations.map((inv) => {
-                    const isExpired =
-                      inv.expiresAt && new Date() > new Date(inv.expiresAt);
-
-                    return (
-                      <tr key={inv.id} className="group">
-                        <td className="py-3 pr-2 font-mono max-w-[180px] truncate">
-                          {inv.email}
-                        </td>
-                        <td className="py-3 pr-2 capitalize">
-                          <Badge
-                            variant={
-                              inv.role === "admin" ? "default" : "outline"
-                            }
-                          >
-                            {formatOrganizationRole(inv.role)}
-                          </Badge>
-                        </td>
-                        <td className="py-3 pr-2 capitalize text-muted-foreground">
-                          {inv.teamName ? inv.teamName.replace("_", " ") : "-"}
-                        </td>
-                        <td className="py-3 pr-2">
-                          {inv.expiresAt ? (
-                            <span
-                              className={
-                                isExpired ? "text-destructive font-medium" : ""
-                              }
-                            >
-                              {new Intl.DateTimeFormat("pt-BR", {
-                                dateStyle: "short",
-                              }).format(new Date(inv.expiresAt))}
-                            </span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td className="py-3 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-7 px-2"
-                            onClick={() => handleCancelInvite(inv.id)}
-                            disabled={isPending}
-                          >
-                            Cancelar
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="py-8 text-center text-muted-foreground">
-              <p className="text-sm">Nenhum convite pendente no momento.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            <Field>
+              <FieldLabel htmlFor="invite-msg">Mensagem</FieldLabel>
+              <Textarea id="invite-msg" name="mensagem" rows={3} />
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Spinner /> : "Enviar convite"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
+}
+
+function formatDate(value: Date | null) {
+  if (!value) return "-";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+  }).format(new Date(value));
 }

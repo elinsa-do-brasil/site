@@ -15,6 +15,10 @@ import {
   teamMember,
   user,
 } from "@/lib/db/schema";
+import {
+  reportAssignments,
+  reportAttachmentAccessLogs,
+} from "@/lib/db/schema/reports";
 import { sendInternalAuthEmail } from "@/lib/email";
 import {
   canManageTeam,
@@ -475,6 +479,66 @@ export async function removerMembroDaOrganizacao(
   }
 
   await db.delete(member).where(eq(member.id, memberId));
+
+  revalidateAdminPortal();
+  return { success: true };
+}
+
+export async function excluirUsuarioDoPortal(
+  userId: string,
+): Promise<ActionResult> {
+  const context = await requireOrgAdmin();
+
+  if (userId === context.userId) {
+    return { error: "Você não pode excluir a própria conta por aqui." };
+  }
+
+  const [targetUser] = await db
+    .select({ id: user.id, email: user.email })
+    .from(user)
+    .where(eq(user.id, userId));
+
+  if (!targetUser) {
+    return { error: "Usuário não encontrado." };
+  }
+
+  const [targetMember] = await db
+    .select({
+      id: member.id,
+      organizationId: member.organizationId,
+      role: member.role,
+    })
+    .from(member)
+    .where(
+      and(
+        eq(member.organizationId, context.organizationId),
+        eq(member.userId, userId),
+      ),
+    );
+
+  if (!targetMember) {
+    return { error: "Usuário não pertence à organização atual." };
+  }
+
+  if (
+    parseRoleList(targetMember.role).includes("owner") &&
+    (await isLastOwner({
+      organizationId: targetMember.organizationId,
+      memberId: targetMember.id,
+    }))
+  ) {
+    return {
+      error: "Não é possível excluir o último proprietário da organização.",
+    };
+  }
+
+  await db
+    .delete(reportAssignments)
+    .where(eq(reportAssignments.userId, userId));
+  await db
+    .delete(reportAttachmentAccessLogs)
+    .where(eq(reportAttachmentAccessLogs.userId, userId));
+  await db.delete(user).where(eq(user.id, userId));
 
   revalidateAdminPortal();
   return { success: true };

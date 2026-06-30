@@ -26,6 +26,13 @@ export const INVITATION_STATUS_OPTIONS = [
 
 export type InvitationStatus = (typeof INVITATION_STATUS_OPTIONS)[number];
 
+export const INVITATION_STATUS_LABELS: Record<InvitationStatus, string> = {
+  accepted: "Aceito",
+  canceled: "Revogado",
+  pending: "Pendente",
+  rejected: "Recusado",
+};
+
 export function formatOrganizationRole(role: string) {
   return (
     role
@@ -34,6 +41,13 @@ export function formatOrganizationRole(role: string) {
       .filter(Boolean)
       .map((item) => getOrganizationRoleLabel(item))
       .join(", ") || ORGANIZATION_ROLE_LABELS.member
+  );
+}
+
+export function formatInvitationStatus(status: string) {
+  return (
+    INVITATION_STATUS_LABELS[status as InvitationStatus] ??
+    getOrganizationRoleLabel(status)
   );
 }
 

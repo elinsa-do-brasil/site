@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { formatAdminName } from "@/components/admin/GestaoPageHeader";
 import { TeamInviteDialog } from "@/components/admin/TeamInviteDialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { criarTimeOrganizacao } from "@/lib/organization/actions";
 
 type RegisteredUser = {
@@ -61,16 +63,8 @@ export function TimesAdmin({
   teams,
 }: TimesAdminProps) {
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Administração de equipes
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Gerencie membros e convites a partir do card de cada equipe.
-          </p>
-        </div>
+    <div className="flex flex-col gap-5">
+      <div className="flex justify-end">
         {isOrgAdmin && <CreateTeamDialog />}
       </div>
 
@@ -108,7 +102,7 @@ function TeamCard({
   roleOptions: string[];
   team: TeamCardRow;
 }) {
-  const teamName = formatTeamName(team.name);
+  const teamName = formatAdminName(team.name);
   const href = `/portal/gestao/equipes/${encodeURIComponent(team.name)}`;
 
   return (
@@ -121,12 +115,12 @@ function TeamCard({
         <CardAction>
           <Button aria-label={`Editar ${teamName}`} asChild size="icon-lg">
             <Link href={href}>
-              <Pencil className="size-4" />
+              <Pencil />
             </Link>
           </Button>
         </CardAction>
       </CardHeader>
-      <CardContent className="mt-auto space-y-5 pb-5">
+      <CardContent className="mt-auto flex flex-col gap-5 pb-5">
         <dl className="grid gap-2 text-sm">
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted-foreground">Membros</dt>
@@ -146,7 +140,7 @@ function TeamCard({
             team={team}
             trigger={
               <Button type="button" variant="secondary">
-                <UserPlus className="size-4" />
+                <UserPlus data-icon="inline-start" />
                 Convidar
               </Button>
             }
@@ -189,7 +183,7 @@ function CreateTeamDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button">
-          <Plus className="size-4" />
+          <Plus data-icon="inline-start" />
           Nova equipe
         </Button>
       </DialogTrigger>
@@ -200,7 +194,7 @@ function CreateTeamDialog() {
             Crie uma equipe para agrupar membros e ferramentas do portal.
           </DialogDescription>
         </DialogHeader>
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="new-team-name">Nome da equipe</FieldLabel>
@@ -209,15 +203,11 @@ function CreateTeamDialog() {
           </FieldGroup>
           <DialogFooter>
             <Button disabled={isPending} type="submit">
-              Criar equipe
+              {isPending ? <Spinner /> : "Criar equipe"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
-}
-
-function formatTeamName(value: string) {
-  return value.replace(/_/g, " ");
 }

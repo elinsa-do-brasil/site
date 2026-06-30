@@ -1,8 +1,7 @@
 import { asc, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { FerramentasTeamAdmin } from "@/components/admin/FerramentasTeamAdmin";
-import { Button } from "@/components/ui/button";
+import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
 import { db } from "@/lib/db";
 import { portalTool } from "@/lib/db/schema";
 import {
@@ -48,20 +47,12 @@ export default async function FerramentasTeamAdminPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4">
-      <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Ferramentas das equipes
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Configure os cards de ferramentas exibidos no portal interno.
-          </p>
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/portal">Voltar ao portal</Link>
-        </Button>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+      <GestaoPageHeader
+        active="ferramentas"
+        title="Ferramentas"
+        description="Configure os cards de acesso exibidos no portal interno de cada equipe."
+      />
 
       <FerramentasTeamAdmin
         teams={manageableTeams.map((item) => ({
