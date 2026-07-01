@@ -4,8 +4,10 @@ import {
   CheckmarkCircle02Icon,
   Copy01Icon,
   CopyCheckIcon,
+  FileSearchIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +30,9 @@ export function ReportSuccessMessage({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const copiedTimeoutRef = useRef<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const trackingHref = protocol
+    ? `/acompanhar-denuncia?protocolo=${encodeURIComponent(protocol)}`
+    : "/acompanhar-denuncia";
 
   useEffect(() => {
     const animationFrame = window.requestAnimationFrame(() => {
@@ -128,8 +133,8 @@ export function ReportSuccessMessage({
                 </span>
               </Button>
               <p className="mt-2 text-xs leading-relaxed text-emerald-900/75 dark:text-emerald-200/75">
-                Guarde este código. Ele identifica o registro internamente sem
-                expor os dados enviados.
+                Guarde este código em um local seguro. Ele é necessário para
+                acompanhar o andamento público sem expor os dados enviados.
               </p>
             </div>
           )}
@@ -139,16 +144,31 @@ export function ReportSuccessMessage({
 
         <CardFooter className="flex flex-col items-stretch gap-3 px-5 pb-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Você já pode fechar esta página ou iniciar um novo envio.
+            Você já pode acompanhar o andamento público, fechar esta página ou
+            iniciar um novo envio.
           </p>
-          <Button
-            variant="outline"
-            onClick={onReset}
-            type="button"
-            className="sm:w-fit"
-          >
-            Enviar outra denúncia
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {protocol && (
+              <Button asChild className="sm:w-fit">
+                <Link href={trackingHref}>
+                  <HugeiconsIcon
+                    icon={FileSearchIcon}
+                    data-icon="inline-start"
+                    strokeWidth={2}
+                  />
+                  Acompanhar denúncia
+                </Link>
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={onReset}
+              type="button"
+              className="sm:w-fit"
+            >
+              Enviar outra denúncia
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </section>

@@ -22,7 +22,7 @@ export function buildReportPayload(
     involvedPeople: nullableText(values.involvedPeople),
     witnesses: nullableText(values.witnesses),
     previousAttempts: nullableText(values.previousAttempts),
-    contactPreference: isIdentified ? "other" : "no_contact",
+    contactPreference: isIdentified ? values.contactPreference : "no_contact",
     contactInfo: isIdentified ? nullableText(values.contactInfo) : null,
     reporterName: isIdentified ? nullableText(values.reporterName) : null,
   };

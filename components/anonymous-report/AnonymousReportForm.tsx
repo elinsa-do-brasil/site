@@ -8,10 +8,16 @@ import {
   FileAttachmentIcon,
   Loading03Icon,
   RefreshIcon,
+  ShieldKeyIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { type ChangeEvent, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import {
+  Controller,
+  type FieldErrors,
+  type FieldPath,
+  useForm,
+} from "react-hook-form";
 import { ReportSuccessMessage } from "@/components/anonymous-report/ReportSuccessMessage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,6 +67,54 @@ const REPORT_CATEGORIES = [
   "Outro",
 ] as const;
 
+const CONTACT_PREFERENCE_OPTIONS = [
+  {
+    value: "email",
+    label: "E-mail",
+    placeholder: "nome@empresa.com",
+  },
+  {
+    value: "phone",
+    label: "Telefone",
+    placeholder: "(00) 0000-0000",
+  },
+  {
+    value: "whatsapp",
+    label: "WhatsApp",
+    placeholder: "(00) 00000-0000",
+  },
+  {
+    value: "other",
+    label: "Outro",
+    placeholder: "Informe o melhor canal de contato",
+  },
+] as const;
+
+const FIRST_ERROR_FIELDS: FieldPath<AnonymousReportSchema>[] = [
+  "identify",
+  "reporterName",
+  "contactPreference",
+  "contactInfo",
+  "category",
+  "title",
+  "description",
+  "occurredAt",
+  "location",
+  "involvedPeople",
+  "witnesses",
+  "previousAttempts",
+];
+
+const REPORT_FIELD_FOCUS_TARGETS: Partial<
+  Record<FieldPath<AnonymousReportSchema>, string>
+> = {
+  category: "#report-category",
+  contactPreference: "#report-contact-preference",
+  identify: "#identify-no",
+};
+
+const FIXED_NAV_SCROLL_OFFSET = 112;
+
 type AttachmentStatus =
   | "ready"
   | "encrypting"
@@ -106,23 +160,9 @@ export function AnonymousReportForm() {
   });
 
   const identify = form.watch("identify");
+  const contactPreference = form.watch("contactPreference");
 
   async function onSubmit(values: AnonymousReportSchema) {
-    if (values.identify === "yes") {
-      if (!values.reporterName?.trim()) {
-        form.setError("reporterName", {
-          message: "Informe seu nome para se identificar.",
-        });
-        return;
-      }
-      if (!values.contactInfo?.trim()) {
-        form.setError("contactInfo", {
-          message: "Informe um meio de contato.",
-        });
-        return;
-      }
-    }
-
     try {
       setStatus("submitting");
 
@@ -149,6 +189,10 @@ export function AnonymousReportForm() {
     } catch {
       setStatus("error");
     }
+  }
+
+  function handleInvalid(errors: FieldErrors<AnonymousReportSchema>) {
+    focusFirstInvalidReportField(errors);
   }
 
   function handleAttachmentChange(event: ChangeEvent<HTMLInputElement>) {
@@ -314,7 +358,7 @@ export function AnonymousReportForm() {
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(onSubmit, handleInvalid)}
       autoComplete="off"
       className="[&_[data-slot=field-label]]:text-sm [&_[data-slot=field-description]]:text-sm [&_[data-slot=field-error]]:text-sm [&_[data-slot=textarea]]:text-sm [&_[data-slot=input]]:text-sm [&_[data-slot=select-trigger]]:text-sm"
     >
@@ -342,7 +386,30 @@ export function AnonymousReportForm() {
                 </FieldDescription>
                 <RadioGroup
                   value={field.value}
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+
+                    if (value === "yes") {
+                      if (
+                        form.getValues("contactPreference") === "no_contact"
+                      ) {
+                        form.setValue("contactPreference", "email", {
+                          shouldDirty: true,
+                        });
+                      }
+                      return;
+                    }
+
+                    form.setValue("contactPreference", "no_contact", {
+                      shouldDirty: true,
+                    });
+                    form.setValue("contactInfo", "");
+                    form.clearErrors([
+                      "reporterName",
+                      "contactPreference",
+                      "contactInfo",
+                    ]);
+                  }}
                   className="flex flex-col gap-3 mt-4 sm:flex-row sm:gap-6"
                 >
                   <Field
@@ -380,7 +447,7 @@ export function AnonymousReportForm() {
 
           {/* ── Nome e Contato (Condicionais se identificado) ── */}
           {identify === "yes" && (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-5 pt-5 border-t border-sky-300/60 dark:border-sky-500/30 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 mt-5 pt-5 border-t border-sky-300/60 dark:border-sky-500/30 animate-in fade-in slide-in-from-top-2 duration-300">
               <Controller
                 name="reporterName"
                 control={form.control}
@@ -404,20 +471,62 @@ export function AnonymousReportForm() {
               />
 
               <Controller
-                name="contactInfo"
+                name="contactPreference"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid || undefined}>
+                    <FieldLabel htmlFor="report-contact-preference">
+                      Canal preferido *
+                    </FieldLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        id="report-contact-preference"
+                        className="w-full"
+                        aria-invalid={fieldState.invalid}
+                      >
+                        <SelectValue placeholder="Selecione o canal" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CONTACT_PREFERENCE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldDescription>
+                      Usado apenas se o Comitê precisar retornar sobre o relato.
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="contactInfo"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field
+                    className="sm:col-span-2"
+                    data-invalid={fieldState.invalid || undefined}
+                  >
                     <FieldLabel htmlFor="report-contact-info">
-                      Contato *
+                      Contato para retorno *
                     </FieldLabel>
                     <Input
                       {...field}
                       id="report-contact-info"
-                      placeholder="E-mail, telefone ou WhatsApp"
+                      type={getContactInputType(contactPreference)}
+                      inputMode={getContactInputMode(contactPreference)}
+                      placeholder={getContactPlaceholder(contactPreference)}
                       aria-invalid={fieldState.invalid}
                       autoComplete="off"
                     />
+                    <FieldDescription>
+                      Esses dados ficam restritos ao Comitê de Ética.
+                    </FieldDescription>
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -451,6 +560,9 @@ export function AnonymousReportForm() {
                   ))}
                 </SelectContent>
               </Select>
+              <FieldDescription>
+                Escolha o tema que melhor descreve o relato.
+              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -470,6 +582,10 @@ export function AnonymousReportForm() {
                 aria-invalid={fieldState.invalid}
                 autoComplete="off"
               />
+              <FieldDescription>
+                Use um resumo objetivo, sem incluir seu nome se quiser manter o
+                anonimato.
+              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -491,6 +607,10 @@ export function AnonymousReportForm() {
                 autoComplete="off"
                 className="min-h-36 resize-y"
               />
+              <FieldDescription>
+                Inclua o que aconteceu, quando, onde e quem pode ajudar a
+                esclarecer os fatos.
+              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -703,7 +823,10 @@ export function AnonymousReportForm() {
 
         {/* ── Erro genérico ── */}
         {status === "error" && (
-          <div className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          <div
+            role="alert"
+            className="flex items-center gap-2.5 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
             <HugeiconsIcon
               icon={Alert02Icon}
               className="size-5 shrink-0"
@@ -717,7 +840,10 @@ export function AnonymousReportForm() {
         )}
 
         {status === "attachment-error" && (
-          <div className="flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          <div
+            role="alert"
+            className="flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          >
             <div className="flex items-start gap-2.5">
               <HugeiconsIcon
                 icon={Alert02Icon}
@@ -755,6 +881,43 @@ export function AnonymousReportForm() {
           </div>
         )}
 
+        <div className="rounded-lg border border-emerald-300/60 bg-emerald-50/80 px-4 py-3 text-sm text-emerald-950 dark:border-emerald-800/60 dark:bg-emerald-950/25 dark:text-emerald-100">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+              <HugeiconsIcon icon={ShieldKeyIcon} strokeWidth={2} />
+            </span>
+            <div className="flex min-w-0 flex-col gap-2">
+              <p className="font-medium">Antes de enviar</p>
+              <ul className="grid gap-1.5 text-xs leading-relaxed text-emerald-900/80 sm:grid-cols-3 dark:text-emerald-100/80">
+                <li className="flex gap-1.5">
+                  <HugeiconsIcon
+                    icon={CheckmarkCircle02Icon}
+                    className="mt-0.5 size-3.5 shrink-0"
+                    strokeWidth={2}
+                  />
+                  Relato criptografado no servidor
+                </li>
+                <li className="flex gap-1.5">
+                  <HugeiconsIcon
+                    icon={CheckmarkCircle02Icon}
+                    className="mt-0.5 size-3.5 shrink-0"
+                    strokeWidth={2}
+                  />
+                  Anexos criptografados no navegador
+                </li>
+                <li className="flex gap-1.5">
+                  <HugeiconsIcon
+                    icon={CheckmarkCircle02Icon}
+                    className="mt-0.5 size-3.5 shrink-0"
+                    strokeWidth={2}
+                  />
+                  Dados restritos ao Comitê de Ética
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* ── Botão de envio ── */}
         <Button
           type="submit"
@@ -778,6 +941,68 @@ export function AnonymousReportForm() {
       </FieldGroup>
     </form>
   );
+}
+
+function focusFirstInvalidReportField(
+  errors: FieldErrors<AnonymousReportSchema>,
+) {
+  const errorRecord = errors as Partial<
+    Record<FieldPath<AnonymousReportSchema>, unknown>
+  >;
+  const firstErrorField = FIRST_ERROR_FIELDS.find((field) =>
+    Boolean(errorRecord[field]),
+  );
+
+  if (!firstErrorField) return;
+
+  const selector =
+    REPORT_FIELD_FOCUS_TARGETS[firstErrorField] ??
+    `[name="${firstErrorField}"]`;
+  const target = document.querySelector<HTMLElement>(selector);
+
+  if (!target) return;
+
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  window.scrollTo({
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+    top:
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      FIXED_NAV_SCROLL_OFFSET,
+  });
+
+  window.setTimeout(
+    () => {
+      target.focus({ preventScroll: true });
+    },
+    prefersReducedMotion ? 0 : 250,
+  );
+}
+
+function getContactPlaceholder(
+  value: AnonymousReportSchema["contactPreference"],
+) {
+  return (
+    CONTACT_PREFERENCE_OPTIONS.find((option) => option.value === value)
+      ?.placeholder ?? "Informe o melhor canal de contato"
+  );
+}
+
+function getContactInputType(
+  value: AnonymousReportSchema["contactPreference"],
+) {
+  return value === "email" ? "email" : "text";
+}
+
+function getContactInputMode(
+  value: AnonymousReportSchema["contactPreference"],
+): "email" | "tel" | "text" {
+  if (value === "email") return "email";
+  if (value === "phone" || value === "whatsapp") return "tel";
+  return "text";
 }
 
 function attachmentStatusLabel(status: AttachmentStatus) {

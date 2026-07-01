@@ -7,6 +7,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { getPublicReportTrackingByProtocol } from "@/lib/reports/repository";
 import {
@@ -65,7 +67,13 @@ export default async function FollowReportPage({
   searchParams,
 }: FollowReportPageProps) {
   const params = await searchParams;
-  const protocol = normalizeProtocol(getSingleParam(params.protocolo));
+  const rawProtocol = getSingleParam(params.protocolo).trim();
+  const protocol = normalizeProtocol(rawProtocol);
+
+  if (rawProtocol && rawProtocol !== protocol) {
+    redirect(`/acompanhar-denuncia?protocolo=${encodeURIComponent(protocol)}`);
+  }
+
   const tracking = protocol
     ? await getPublicReportTrackingByProtocol(protocol)
     : null;
@@ -108,16 +116,22 @@ export default async function FollowReportPage({
           <CardContent className="p-5">
             <form
               action="/acompanhar-denuncia"
-              className="flex min-w-0 flex-col gap-3 sm:flex-row"
+              className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
             >
-              <Input
-                aria-label="Protocolo da denúncia"
-                autoComplete="off"
-                className="h-10 min-w-0 flex-1 font-mono text-sm uppercase"
-                defaultValue={protocol}
-                name="protocolo"
-                placeholder="DEN-20260527-XXXXXXXX"
-              />
+              <div className="min-w-0 space-y-2">
+                <Label htmlFor="follow-report-protocol">
+                  Protocolo da denúncia
+                </Label>
+                <Input
+                  id="follow-report-protocol"
+                  autoComplete="off"
+                  className="h-10 min-w-0 flex-1 font-mono text-sm uppercase"
+                  defaultValue={protocol}
+                  name="protocolo"
+                  placeholder="Ex.: DEN-20260610-5AD80724"
+                  spellCheck={false}
+                />
+              </div>
               <Button type="submit" className="h-10 sm:w-fit">
                 <HugeiconsIcon
                   icon={AiSearch02Icon}
@@ -277,7 +291,7 @@ function EmptyTrackingState({ wasSearched }: { wasSearched: boolean }) {
           </p>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {wasSearched
-              ? "Não encontramos uma denúncia com esse protocolo. Verifique o código e tente novamente."
+              ? "Não encontramos uma denúncia com esse protocolo. Copie exatamente o código exibido na confirmação do envio e tente novamente."
               : "O protocolo fica disponível na tela de confirmação após o envio da denúncia."}
           </p>
         </div>

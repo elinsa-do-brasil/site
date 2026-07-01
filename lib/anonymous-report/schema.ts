@@ -75,6 +75,13 @@ export const anonymousReportSchema = z
           path: ["contactInfo"],
         });
       }
+      if (data.contactPreference === "no_contact") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Selecione como o Comitê pode entrar em contato.",
+          path: ["contactPreference"],
+        });
+      }
     }
   });
 
