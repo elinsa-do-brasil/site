@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
@@ -40,6 +41,7 @@ export default async function ReportHistoryPage({
   if (!report) {
     notFound();
   }
+  const historyEntries = groupReportEvents(events);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-12">
@@ -64,29 +66,144 @@ export default async function ReportHistoryPage({
         </CardHeader>
         <CardContent className="py-4">
           <div className="flex flex-col gap-4">
-            {events.map((event) => (
-              <div key={event.id} className="border-b pb-4 last:border-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium">
-                    {formatEventType(event.type)}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {formatDate(event.createdAt)}
-                  </span>
-                </div>
-                {event.message && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {event.message}
-                  </p>
-                )}
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatActor(event.actorUserId, event.actorName)}
-                </p>
-              </div>
+            {historyEntries.map((entry) => (
+              <HistoryEntryView key={entry.id} entry={entry} />
             ))}
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+type ReportEvent = Awaited<ReturnType<typeof listReportEvents>>[number];
+
+type HistoryEntry =
+  | {
+      event: ReportEvent;
+      id: string;
+      kind: "single";
+    }
+  | {
+      actorName: string | null;
+      actorUserId: string | null;
+      dateKey: string;
+      events: ReportEvent[];
+      id: string;
+      kind: "viewed-group";
+    };
+
+function groupReportEvents(events: ReportEvent[]): HistoryEntry[] {
+  const entries: HistoryEntry[] = [];
+
+  for (const event of events) {
+    if (event.type !== "report.viewed") {
+      entries.push({
+        event,
+        id: event.id,
+        kind: "single",
+      });
+      continue;
+    }
+
+    const dateKey = formatDateKey(event.createdAt);
+    const lastEntry = entries.at(-1);
+
+    if (
+      lastEntry?.kind === "viewed-group" &&
+      lastEntry.actorUserId === event.actorUserId &&
+      lastEntry.actorName === event.actorName &&
+      lastEntry.dateKey === dateKey
+    ) {
+      lastEntry.events.push(event);
+      continue;
+    }
+
+    entries.push({
+      actorName: event.actorName,
+      actorUserId: event.actorUserId,
+      dateKey,
+      events: [event],
+      id: `viewed-${event.actorUserId ?? "public"}-${dateKey}-${event.id}`,
+      kind: "viewed-group",
+    });
+  }
+
+  return entries;
+}
+
+function HistoryEntryView({ entry }: { entry: HistoryEntry }) {
+  if (entry.kind === "single") {
+    return <SingleEvent event={entry.event} />;
+  }
+
+  const latestEvent = entry.events[0];
+
+  if (!latestEvent) return null;
+
+  const oldestEvent = entry.events.at(-1) ?? latestEvent;
+
+  return (
+    <div className="border-b pb-4 last:border-0">
+      <EventHeader
+        date={formatViewedGroupDate(
+          latestEvent.createdAt,
+          oldestEvent.createdAt,
+        )}
+        title={`Denúncia consultada ${entry.events.length} ${
+          entry.events.length === 1 ? "vez" : "vezes"
+        }`}
+      />
+      <p className="mt-1 text-sm text-muted-foreground">
+        Acessos autorizados agrupados para reduzir ruído no histórico.
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {formatActor(entry.actorUserId, entry.actorName)}
+      </p>
+
+      {entry.events.length > 1 && (
+        <details className="mt-3 rounded-md border bg-muted/20 px-3 py-2">
+          <summary className="cursor-pointer text-xs font-medium">
+            Ver acessos individuais
+          </summary>
+          <div className="mt-3 flex flex-col gap-2">
+            {entry.events.map((event) => (
+              <p
+                key={event.id}
+                className="font-mono text-xs text-muted-foreground"
+              >
+                {formatDate(event.createdAt)}
+              </p>
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function SingleEvent({ event }: { event: ReportEvent }) {
+  return (
+    <div className="border-b pb-4 last:border-0">
+      <EventHeader
+        date={formatDate(event.createdAt)}
+        title={formatEventType(event.type)}
+      />
+      {event.message && (
+        <p className="mt-1 text-sm text-muted-foreground">{event.message}</p>
+      )}
+      <p className="mt-1 text-xs text-muted-foreground">
+        {formatActor(event.actorUserId, event.actorName)}
+      </p>
+    </div>
+  );
+}
+
+function EventHeader({ date, title }: { date: ReactNode; title: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-medium">{title}</span>
+      <span className="text-xs text-muted-foreground">{date}</span>
     </div>
   );
 }
@@ -96,6 +213,20 @@ function formatDate(date: Date) {
     dateStyle: "short",
     timeStyle: "short",
   }).format(date);
+}
+
+function formatDateKey(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+  }).format(date);
+}
+
+function formatViewedGroupDate(latest: Date, oldest: Date) {
+  if (latest.getTime() === oldest.getTime()) {
+    return formatDate(latest);
+  }
+
+  return `${formatDate(oldest)} até ${formatDate(latest)}`;
 }
 
 function formatEventType(type: string) {

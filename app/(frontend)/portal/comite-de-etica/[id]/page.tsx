@@ -7,6 +7,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+import { ExpandableReportText } from "@/components/reports/ExpandableReportText";
 import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
 import { ReportStatusSelect } from "@/components/reports/ReportStatusSelect";
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +84,12 @@ export default async function ReportDetailPage({
       originalName: decryptAttachmentOriginalName(attachment),
     }),
   );
+  const reporterLabel =
+    "reporterName" in payload && payload.reporterName
+      ? `Identificado (${payload.reporterName})`
+      : "Anônimo";
+  const contactPreference = contactPreferenceLabel(payload.contactPreference);
+  const receivedAt = formatDate(report.createdAt);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-12">
@@ -112,50 +120,79 @@ export default async function ReportDetailPage({
         <div className="mt-3">
           <ReportStatusSelect reportId={report.id} status={report.status} />
         </div>
+        <nav
+          aria-label="Seções da denúncia"
+          className="mt-4 flex flex-wrap gap-2"
+        >
+          <Button variant="outline" size="sm" asChild>
+            <a href="#dados-do-caso">Dados</a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="#relato">Relato</a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="#anexos">Anexos</a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="#tentativas-anteriores">Tentativas</a>
+          </Button>
+        </nav>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <Card className="rounded-md border-border/80 py-0 shadow-sm">
-          <CardHeader className="border-b py-4">
-            <CardTitle className="text-base">Relato</CardTitle>
-          </CardHeader>
-          <CardContent className="py-4">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">
-              {payload.description}
-            </p>
-          </CardContent>
-        </Card>
+      <section
+        aria-label="Resumo operacional"
+        className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <SummaryItem
+          label="Status"
+          value={<ReportStatusBadge status={report.status} />}
+        />
+        <SummaryItem label="Recebida em" value={receivedAt} />
+        <SummaryItem label="Identificação" value={reporterLabel} />
+        <SummaryItem
+          label="Anexos"
+          value={`${attachments.length} ${
+            attachments.length === 1 ? "arquivo" : "arquivos"
+          }`}
+        />
+      </section>
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+        <Card
+          id="dados-do-caso"
+          className="order-1 scroll-mt-28 rounded-md border-border/80 py-0 shadow-sm lg:order-2"
+        >
           <CardHeader className="border-b py-4">
             <CardTitle className="text-base">Dados do caso</CardTitle>
           </CardHeader>
           <CardContent className="py-4">
             <dl className="flex flex-col gap-3 text-sm">
-              <DetailItem
-                label="Identificação"
-                value={
-                  "reporterName" in payload && payload.reporterName
-                    ? `Identificado (${payload.reporterName})`
-                    : "Anônimo"
-                }
-              />
+              <DetailItem label="Identificação" value={reporterLabel} />
               <DetailItem label="Quando ocorreu" value={payload.occurredAt} />
               <DetailItem label="Onde ocorreu" value={payload.location} />
               <DetailItem
                 label="Preferência de contato"
-                value={contactPreferenceLabel(payload.contactPreference)}
+                value={contactPreference}
               />
               <DetailItem label="Contato" value={payload.contactInfo} />
-              <DetailItem
-                label="Recebida em"
-                value={formatDate(report.createdAt)}
-              />
+              <DetailItem label="Recebida em" value={receivedAt} />
             </dl>
           </CardContent>
         </Card>
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+        <Card
+          id="relato"
+          className="order-2 scroll-mt-28 rounded-md border-border/80 py-0 shadow-sm lg:order-1"
+        >
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">Relato</CardTitle>
+          </CardHeader>
+          <CardContent className="py-4">
+            <ExpandableReportText text={payload.description} />
+          </CardContent>
+        </Card>
+
+        <Card className="order-3 rounded-md border-border/80 py-0 shadow-sm">
           <CardHeader className="border-b py-4">
             <CardTitle className="text-base">Pessoas envolvidas</CardTitle>
           </CardHeader>
@@ -166,7 +203,7 @@ export default async function ReportDetailPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+        <Card className="order-4 rounded-md border-border/80 py-0 shadow-sm">
           <CardHeader className="border-b py-4">
             <CardTitle className="text-base">Testemunhas</CardTitle>
           </CardHeader>
@@ -177,7 +214,10 @@ export default async function ReportDetailPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm lg:col-span-2">
+        <Card
+          id="anexos"
+          className="order-5 scroll-mt-28 rounded-md border-border/80 py-0 shadow-sm lg:col-span-2"
+        >
           <CardHeader className="border-b py-4">
             <CardTitle className="text-base">Anexos</CardTitle>
           </CardHeader>
@@ -248,7 +288,10 @@ export default async function ReportDetailPage({
           </CardContent>
         </Card>
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm lg:col-span-2">
+        <Card
+          id="tentativas-anteriores"
+          className="order-6 scroll-mt-28 rounded-md border-border/80 py-0 shadow-sm lg:col-span-2"
+        >
           <CardHeader className="border-b py-4">
             <CardTitle className="text-base">Tentativas anteriores</CardTitle>
           </CardHeader>
@@ -268,6 +311,15 @@ function DetailItem({ label, value }: { label: string; value: string | null }) {
     <div>
       <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
       <dd className="mt-1 break-words">{value || "Não informado."}</dd>
+    </div>
+  );
+}
+
+function SummaryItem({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-2 rounded-md border border-border/80 bg-card px-4 py-3 shadow-sm">
+      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      <div className="min-w-0 break-words text-sm font-semibold">{value}</div>
     </div>
   );
 }
