@@ -51,7 +51,12 @@ import {
   removerMembroDaOrganizacao,
   salvarRoleOrganizacao,
 } from "@/lib/organization/actions";
-import { formatOrganizationRole } from "@/lib/organization/constants";
+import {
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
+  formatOrganizationRole,
+  parseOrganizationRoleList,
+} from "@/lib/organization/constants";
 import { cn } from "@/lib/utils";
 
 type TeamOption = {
@@ -297,6 +302,10 @@ function MemberItem({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const isCommitteeTeamMember = member.teams.includes(ETHICS_COMMITTEE_TEAM);
+  const hasCommitteeRole = parseOrganizationRoleList(member.role).includes(
+    ETHICS_COMMITTEE_ROLE,
+  );
 
   function handleRoleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -334,6 +343,12 @@ function MemberItem({
             <span className="text-xs text-muted-foreground">Sem equipe</span>
           )}
         </div>
+        {hasCommitteeRole && !isCommitteeTeamMember && (
+          <p className="mt-2 text-xs text-destructive" role="alert">
+            A função do Comitê exige vínculo com a equipe{" "}
+            {formatAdminName(ETHICS_COMMITTEE_TEAM)}.
+          </p>
+        )}
       </div>
 
       <div className="flex min-w-0 flex-col gap-3 lg:items-end">
@@ -350,6 +365,9 @@ function MemberItem({
           />
           <RoleSelect
             currentRole={member.role}
+            disabledRoles={
+              isCommitteeTeamMember ? undefined : [ETHICS_COMMITTEE_ROLE]
+            }
             label={`Função de ${member.email}`}
             roles={roleOptions}
           />
@@ -412,7 +430,10 @@ function AddExistingMemberDialog({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [selectedTeamId, setSelectedTeamId] = useState("none");
   const [isPending, startTransition] = useTransition();
+  const selectedTeam = teams.find((team) => team.id === selectedTeamId);
+  const canAssignCommitteeRole = selectedTeam?.name === ETHICS_COMMITTEE_TEAM;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -433,13 +454,22 @@ function AddExistingMemberDialog({
 
       toast.success("Membro adicionado.");
       form.reset();
+      setSelectedTeamId("none");
       setOpen(false);
       router.refresh();
     });
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          setSelectedTeamId("none");
+        }
+      }}
+    >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -461,8 +491,19 @@ function AddExistingMemberDialog({
                 required
               />
             </Field>
-            <RoleSelect id="member-role" roles={roleOptions} />
-            <TeamSelect id="member-team" teams={teams} />
+            <TeamSelect
+              id="member-team"
+              onValueChange={setSelectedTeamId}
+              teams={teams}
+              value={selectedTeamId}
+            />
+            <RoleSelect
+              disabledRoles={
+                canAssignCommitteeRole ? undefined : [ETHICS_COMMITTEE_ROLE]
+              }
+              id="member-role"
+              roles={roleOptions}
+            />
           </FieldGroup>
           <DialogFooter>
             <Button type="submit" disabled={isPending}>
@@ -581,12 +622,14 @@ function RoleItem({ role }: { role: RoleRow }) {
 function RoleSelect({
   className,
   currentRole = "member",
+  disabledRoles = [],
   id,
   label = "Função",
   roles,
 }: {
   className?: string;
   currentRole?: string;
+  disabledRoles?: string[];
   id?: string;
   label?: string;
   roles: string[];
@@ -603,21 +646,45 @@ function RoleSelect({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {options.map((role) => (
-          <SelectItem key={role} value={role}>
-            {formatOrganizationRole(role)}
-          </SelectItem>
-        ))}
+        {options.map((role) => {
+          const isDisabled = disabledRoles.some((disabledRole) =>
+            parseOrganizationRoleList(role).includes(disabledRole),
+          );
+
+          return (
+            <SelectItem disabled={isDisabled} key={role} value={role}>
+              {formatOrganizationRole(role)}
+              {isDisabled
+                ? ` (exige equipe ${formatAdminName(ETHICS_COMMITTEE_TEAM)})`
+                : ""}
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );
 }
 
-function TeamSelect({ id, teams }: { id: string; teams: TeamOption[] }) {
+function TeamSelect({
+  id,
+  onValueChange,
+  teams,
+  value,
+}: {
+  id: string;
+  onValueChange?: (value: string) => void;
+  teams: TeamOption[];
+  value?: string;
+}) {
   return (
     <Field>
       <FieldLabel htmlFor={id}>Equipe inicial</FieldLabel>
-      <Select name="teamId" defaultValue="none">
+      <Select
+        name="teamId"
+        defaultValue={value ? undefined : "none"}
+        onValueChange={onValueChange}
+        value={value}
+      >
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
         </SelectTrigger>

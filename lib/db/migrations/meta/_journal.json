@@ -15,6 +15,13 @@
       "when": 1779805555507,
       "tag": "0001_faithful_true_believers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782950140671,
+      "tag": "0002_pretty_mariko_yashida",
+      "breakpoints": true
     }
   ]
 }

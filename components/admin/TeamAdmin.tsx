@@ -40,7 +40,12 @@ import {
   removerMembroDoTime,
   removerTimeOrganizacao,
 } from "@/lib/organization/actions";
-import { formatOrganizationRole } from "@/lib/organization/constants";
+import {
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
+  formatOrganizationRole,
+  parseOrganizationRoleList,
+} from "@/lib/organization/constants";
 
 type TeamMemberRow = {
   memberId: string;
@@ -223,6 +228,11 @@ export function TeamAdmin({
                         />
                         <RoleSelect
                           currentRole={member.role}
+                          disabledRoles={
+                            team.name === ETHICS_COMMITTEE_TEAM
+                              ? undefined
+                              : [ETHICS_COMMITTEE_ROLE]
+                          }
                           label={`Função de ${member.email}`}
                           roles={roleOptions}
                         />
@@ -350,10 +360,12 @@ function formatTeamName(value: string) {
 
 function RoleSelect({
   currentRole,
+  disabledRoles = [],
   label,
   roles,
 }: {
   currentRole: string;
+  disabledRoles?: string[];
   label: string;
   roles: string[];
 }) {
@@ -365,11 +377,20 @@ function RoleSelect({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {options.map((role) => (
-          <SelectItem key={role} value={role}>
-            {formatOrganizationRole(role)}
-          </SelectItem>
-        ))}
+        {options.map((role) => {
+          const isDisabled = disabledRoles.some((disabledRole) =>
+            parseOrganizationRoleList(role).includes(disabledRole),
+          );
+
+          return (
+            <SelectItem disabled={isDisabled} key={role} value={role}>
+              {formatOrganizationRole(role)}
+              {isDisabled
+                ? ` (exige equipe ${formatTeamName(ETHICS_COMMITTEE_TEAM)})`
+                : ""}
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );

@@ -1,12 +1,11 @@
 import {
   ArrowRight,
   BookOpen,
+  ExternalLink,
   FileText,
+  icons,
   LayoutGrid,
-  Link2,
-  Mail,
   Newspaper,
-  QrCode,
   ShieldCheck,
   UsersRound,
   Wrench,
@@ -14,8 +13,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { formatAdminName } from "@/components/admin/GestaoPageHeader";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -102,34 +102,89 @@ export default async function InternoDashboardPage() {
 }
 
 function ToolCard({ tool }: { tool: InternalTool }) {
+  const isExternal = tool.href.startsWith("https://");
+  const teamLabel = tool.teamName
+    ? `Equipe ${formatAdminName(tool.teamName)}`
+    : "Portal interno";
+
   return (
-    <Card className="min-h-40 rounded-md border-border/80 py-0 shadow-sm transition hover:border-elinsa-primary/40 hover:shadow-md">
-      <CardHeader className="gap-4 py-4">
-        <div className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-elinsa-primary/10 text-elinsa-primary">
-            <ToolIcon tool={tool} />
+    <Link
+      aria-label={`Abrir ${tool.label}`}
+      className="group block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-elinsa-primary/40"
+      href={tool.href}
+      rel={isExternal ? "noreferrer" : undefined}
+      target={isExternal ? "_blank" : undefined}
+    >
+      <Card className="flex h-full min-h-44 overflow-hidden rounded-md border-border/80 bg-card/95 py-0 shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-elinsa-primary/45 group-hover:shadow-md">
+        <CardHeader className="flex-1 gap-4 px-4 pt-4 pb-5">
+          <div className="flex items-start gap-3">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-md border border-elinsa-primary/15 bg-elinsa-primary/10 text-elinsa-primary transition group-hover:bg-elinsa-primary group-hover:text-primary-foreground">
+              <ToolIcon tool={tool} />
+            </div>
+            <div className="min-w-0">
+              <CardTitle className="text-base leading-tight">
+                {tool.label}
+              </CardTitle>
+              <CardDescription className="mt-1 line-clamp-3 leading-relaxed">
+                {tool.description}
+              </CardDescription>
+            </div>
           </div>
-          <div className="min-w-0">
-            <CardTitle className="text-base">{tool.label}</CardTitle>
-            <CardDescription className="mt-1 line-clamp-3">
-              {tool.description}
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="mt-auto flex items-center justify-between gap-3 border-t py-3">
-        <span className="truncate text-xs text-muted-foreground">
-          {tool.teamName ? `Equipe ${tool.teamName}` : "Portal interno"}
-        </span>
-        <Button size="sm" asChild>
-          <Link href={tool.href}>
+        </CardHeader>
+        <CardContent className="mt-auto flex items-center justify-between gap-3 border-t bg-muted/20 px-4 py-3">
+          <span className="min-w-0 truncate text-xs font-medium text-muted-foreground">
+            {teamLabel}
+          </span>
+          <span
+            className={buttonVariants({
+              className:
+                "h-7 shrink-0 gap-1.5 px-2.5 text-xs transition group-hover:bg-elinsa-primary/90",
+              size: "sm",
+            })}
+          >
             Abrir
-            <ArrowRight className="size-3" />
-          </Link>
-        </Button>
-      </CardContent>
-    </Card>
+            {isExternal ? (
+              <ExternalLink className="size-3" />
+            ) : (
+              <ArrowRight className="size-3 transition group-hover:translate-x-0.5" />
+            )}
+          </span>
+        </CardContent>
+      </Card>
+    </Link>
   );
+}
+
+function ToolIcon({ tool }: { tool: InternalTool }) {
+  const Icon = icons[getToolIconName(tool)] ?? LayoutGrid;
+
+  return <Icon aria-hidden="true" className="size-5" />;
+}
+
+function getToolIconName(tool: InternalTool): keyof typeof icons {
+  if (tool.icon && tool.icon in icons) {
+    return tool.icon as keyof typeof icons;
+  }
+
+  const text = `${tool.id} ${tool.label}`.toLowerCase();
+
+  if (text.includes("qr")) return "QrCode";
+  if (text.includes("link")) return "Link2";
+  if (text.includes("assinatura") || text.includes("email")) {
+    return "Mail";
+  }
+  if (text.includes("comit")) return "ShieldCheck";
+  if (text.includes("contato")) return "Inbox";
+  if (
+    text.includes("blog") ||
+    text.includes("payload") ||
+    text.includes("cms")
+  ) {
+    return "PanelsTopLeft";
+  }
+  if (text.includes("ti")) return "Wrench";
+
+  return "LayoutGrid";
 }
 
 function PortalSidebar({
@@ -310,20 +365,6 @@ function BlogPostLink({ post }: { post: EditorialPost }) {
       </div>
     </Link>
   );
-}
-
-function ToolIcon({ tool }: { tool: InternalTool }) {
-  const text = `${tool.id} ${tool.label}`.toLowerCase();
-
-  if (text.includes("qr")) return <QrCode className="size-5" />;
-  if (text.includes("link")) return <Link2 className="size-5" />;
-  if (text.includes("assinatura") || text.includes("email")) {
-    return <Mail className="size-5" />;
-  }
-  if (text.includes("comit")) return <ShieldCheck className="size-5" />;
-  if (text.includes("ti")) return <Wrench className="size-5" />;
-
-  return <LayoutGrid className="size-5" />;
 }
 
 type AdminLink = {

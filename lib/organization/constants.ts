@@ -1,12 +1,13 @@
 export const TEAM_LEADER_ROLE = "team_leader";
 export const ETHICS_COMMITTEE_ROLE = "ethics";
+export const ETHICS_COMMITTEE_TEAM = "comite_etica";
 
 export const ORGANIZATION_ROLE_LABELS = {
   member: "Membro",
   admin: "Administrador",
   owner: "Proprietário",
   [TEAM_LEADER_ROLE]: "Líder de equipe",
-  [ETHICS_COMMITTEE_ROLE]: "Advogada externa do Comitê de Ética",
+  [ETHICS_COMMITTEE_ROLE]: "Membro do comitê",
 } as const;
 
 export const BUILTIN_ORG_ROLES = [
@@ -35,13 +36,17 @@ export const INVITATION_STATUS_LABELS: Record<InvitationStatus, string> = {
 
 export function formatOrganizationRole(role: string) {
   return (
-    role
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean)
+    parseOrganizationRoleList(role)
       .map((item) => getOrganizationRoleLabel(item))
       .join(", ") || ORGANIZATION_ROLE_LABELS.member
   );
+}
+
+export function parseOrganizationRoleList(role: string) {
+  return role
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 export function formatInvitationStatus(status: string) {

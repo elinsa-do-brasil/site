@@ -4,9 +4,10 @@ import {
   getUserTeamsInElinsa,
   parseRoleList,
 } from "@/lib/organization/access";
-import { ETHICS_COMMITTEE_ROLE } from "@/lib/organization/constants";
-
-const COMMITTEE_TEAM = "comite_etica";
+import {
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
+} from "@/lib/organization/constants";
 
 export type CommitteeContext = {
   userId: string;
@@ -30,7 +31,7 @@ export async function getCommitteeContext(
   const teams = await getUserTeamsInElinsa(userId);
   const teamNames = teams.map((item) => item.name);
   const roles = parseRoleList(membership.role);
-  const isCommitteeTeamMember = teamNames.includes(COMMITTEE_TEAM);
+  const isCommitteeTeamMember = teamNames.includes(ETHICS_COMMITTEE_TEAM);
   const isCommitteeLawyer = roles.includes(ETHICS_COMMITTEE_ROLE);
 
   return {

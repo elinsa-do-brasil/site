@@ -7,6 +7,7 @@ import { portalTool } from "@/lib/db/schema";
 import {
   canManageTeam,
   getAllElinsaTeams,
+  isMissingPortalToolIconColumnError,
   requireOrgAdminOrTeamLeader,
 } from "@/lib/organization/access";
 
@@ -23,21 +24,7 @@ export default async function FerramentasTeamAdminPage() {
     canManageTeam(context, item.name),
   );
   const teamIds = manageableTeams.map((item) => item.id);
-  const tools = teamIds.length
-    ? await db
-        .select({
-          id: portalTool.id,
-          teamId: portalTool.teamId,
-          slug: portalTool.slug,
-          label: portalTool.label,
-          description: portalTool.description,
-          href: portalTool.href,
-          isActive: portalTool.isActive,
-        })
-        .from(portalTool)
-        .where(inArray(portalTool.teamId, teamIds))
-        .orderBy(asc(portalTool.label))
-    : [];
+  const tools = teamIds.length ? await listManageableTools(teamIds) : [];
 
   const toolsByTeam = new Map<string, typeof tools>();
   for (const item of tools) {
@@ -62,4 +49,43 @@ export default async function FerramentasTeamAdminPage() {
       />
     </div>
   );
+}
+
+async function listManageableTools(teamIds: string[]) {
+  try {
+    return await db
+      .select({
+        id: portalTool.id,
+        teamId: portalTool.teamId,
+        slug: portalTool.slug,
+        label: portalTool.label,
+        description: portalTool.description,
+        href: portalTool.href,
+        icon: portalTool.icon,
+        isActive: portalTool.isActive,
+      })
+      .from(portalTool)
+      .where(inArray(portalTool.teamId, teamIds))
+      .orderBy(asc(portalTool.label));
+  } catch (error) {
+    if (!isMissingPortalToolIconColumnError(error)) {
+      throw error;
+    }
+
+    const tools = await db
+      .select({
+        id: portalTool.id,
+        teamId: portalTool.teamId,
+        slug: portalTool.slug,
+        label: portalTool.label,
+        description: portalTool.description,
+        href: portalTool.href,
+        isActive: portalTool.isActive,
+      })
+      .from(portalTool)
+      .where(inArray(portalTool.teamId, teamIds))
+      .orderBy(asc(portalTool.label));
+
+    return tools.map((tool) => ({ ...tool, icon: null }));
+  }
 }

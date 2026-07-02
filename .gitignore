@@ -52,7 +52,7 @@ __pycache__/
 # secrets
 secrets/
 
-/.agent/memories
+/.agents/memories
 /.agents/plans
 
 /.venv

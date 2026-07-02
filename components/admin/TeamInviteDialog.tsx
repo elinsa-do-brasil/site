@@ -30,7 +30,12 @@ import {
   adicionarMembroExistente,
   enviarConviteAdmin,
 } from "@/lib/organization/actions";
-import { formatOrganizationRole } from "@/lib/organization/constants";
+import {
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
+  formatOrganizationRole,
+  parseOrganizationRoleList,
+} from "@/lib/organization/constants";
 import { cn } from "@/lib/utils";
 
 type RegisteredUser = {
@@ -74,6 +79,7 @@ export function TeamInviteDialog({
     registeredUsers.find(
       (user) => user.email.toLowerCase() === normalizedEmail,
     );
+  const canAssignCommitteeRole = team.name === ETHICS_COMMITTEE_TEAM;
   const matches = useMemo(() => {
     const query = normalizedEmail;
     if (query.length < 2) return [];
@@ -233,11 +239,26 @@ export function TeamInviteDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {roleOptions.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {formatOrganizationRole(role)}
-                      </SelectItem>
-                    ))}
+                    {roleOptions.map((role) => {
+                      const isCommitteeRole = parseOrganizationRoleList(
+                        role,
+                      ).includes(ETHICS_COMMITTEE_ROLE);
+                      const isDisabled =
+                        isCommitteeRole && !canAssignCommitteeRole;
+
+                      return (
+                        <SelectItem
+                          disabled={isDisabled}
+                          key={role}
+                          value={role}
+                        >
+                          {formatOrganizationRole(role)}
+                          {isDisabled
+                            ? ` (exige equipe ${formatTeamName(ETHICS_COMMITTEE_TEAM)})`
+                            : ""}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </Field>

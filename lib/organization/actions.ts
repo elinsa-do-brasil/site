@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq, inArray } from "drizzle-orm";
+import { icons } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import { createElement } from "react";
 import InviteEmail from "@/emails/invite";
@@ -24,6 +25,7 @@ import {
   canManageTeam,
   ELINSA_ORGANIZATION_SLUG,
   getAllElinsaTeams,
+  isMissingPortalToolIconColumnError,
   parseRoleList,
   requireInternalAccess,
   requireOrgAdmin,
@@ -31,6 +33,8 @@ import {
 } from "@/lib/organization/access";
 import {
   BUILTIN_ORG_ROLES,
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
   formatOrganizationRole,
   INVITATION_STATUS_OPTIONS,
   type InvitationStatus,
@@ -84,6 +88,15 @@ function isValidHref(value: string) {
   return value.startsWith("/") || value.startsWith("https://");
 }
 
+function normalizeLucideIconName(value: FormDataEntryValue | null) {
+  const icon = value?.toString().trim();
+  return icon || null;
+}
+
+function isValidLucideIconName(icon: string) {
+  return icon in icons;
+}
+
 async function getElinsaOrganization() {
   const [org] = await db
     .select()
@@ -124,6 +137,57 @@ async function canManageTeamId(teamId: string) {
   const selectedTeam = teams.find((item) => item.id === teamId);
 
   return { context, selectedTeam };
+}
+
+function roleIncludesCommitteeAccess(role: string) {
+  return parseRoleList(role).includes(ETHICS_COMMITTEE_ROLE);
+}
+
+function isCommitteeTeamName(teamName: string | null | undefined) {
+  return teamName === ETHICS_COMMITTEE_TEAM;
+}
+
+function validateCommitteeRoleWithSelectedTeam(input: {
+  role: string;
+  selectedTeam?: { name: string } | null;
+}) {
+  if (!roleIncludesCommitteeAccess(input.role)) {
+    return null;
+  }
+
+  if (isCommitteeTeamName(input.selectedTeam?.name)) {
+    return null;
+  }
+
+  return "A função do Comitê de Ética só pode ser atribuída junto da equipe Comitê Ética.";
+}
+
+async function userBelongsToCommitteeTeam(input: {
+  organizationId: string;
+  userId: string;
+}) {
+  const [link] = await db
+    .select({ id: teamMember.id })
+    .from(teamMember)
+    .innerJoin(team, eq(teamMember.teamId, team.id))
+    .where(
+      and(
+        eq(team.organizationId, input.organizationId),
+        eq(team.name, ETHICS_COMMITTEE_TEAM),
+        eq(teamMember.userId, input.userId),
+      ),
+    )
+    .limit(1);
+
+  return Boolean(link);
+}
+
+function removeCommitteeRole(role: string) {
+  const nextRoles = parseRoleList(role).filter(
+    (item) => item !== ETHICS_COMMITTEE_ROLE,
+  );
+
+  return nextRoles.join(",") || "member";
 }
 
 async function isLastOwner(input: {
@@ -174,6 +238,14 @@ export async function enviarConviteAdmin(
   }
 
   const role = context.isOrgAdmin ? requestedRole : "member";
+  const committeeRoleError = validateCommitteeRoleWithSelectedTeam({
+    role,
+    selectedTeam,
+  });
+
+  if (committeeRoleError) {
+    return { error: committeeRoleError };
+  }
 
   await db
     .update(invitation)
@@ -358,6 +430,15 @@ export async function adicionarMembroExistente(
   }
 
   const role = context.isOrgAdmin ? requestedRole : "member";
+  const committeeRoleError = validateCommitteeRoleWithSelectedTeam({
+    role,
+    selectedTeam,
+  });
+
+  if (committeeRoleError) {
+    return { error: committeeRoleError };
+  }
+
   const [existingMembership] = await db
     .select({ id: member.id })
     .from(member)
@@ -423,6 +504,19 @@ export async function atualizarFuncaoMembro(
   ) {
     return {
       error: "Não é possível remover o último proprietário da organização.",
+    };
+  }
+
+  if (
+    roleIncludesCommitteeAccess(role) &&
+    !(await userBelongsToCommitteeTeam({
+      organizationId: targetMember.organizationId,
+      userId: targetMember.userId,
+    }))
+  ) {
+    return {
+      error:
+        "Adicione a pessoa à equipe Comitê Ética antes de atribuir a função do Comitê.",
     };
   }
 
@@ -670,6 +764,15 @@ export async function atualizarTimeOrganizacao(
     return { error: "Equipe não encontrada." };
   }
 
+  if (
+    isCommitteeTeamName(selectedTeam.name) &&
+    name !== ETHICS_COMMITTEE_TEAM
+  ) {
+    return {
+      error: "A equipe Comitê Ética é reservada e não pode ser renomeada.",
+    };
+  }
+
   const [existingTeam] = await db
     .select({ id: team.id })
     .from(team)
@@ -699,6 +802,12 @@ export async function removerTimeOrganizacao(
 
   if (!selectedTeam || selectedTeam.organizationId !== context.organizationId) {
     return { error: "Equipe não encontrada." };
+  }
+
+  if (isCommitteeTeamName(selectedTeam.name)) {
+    return {
+      error: "A equipe Comitê Ética é reservada e não pode ser removida.",
+    };
   }
 
   const teams = await getAllElinsaTeams();
@@ -770,7 +879,7 @@ export async function removerMembroDoTime(
   }
 
   const [targetMembership] = await db
-    .select({ role: member.role })
+    .select({ id: member.id, role: member.role })
     .from(member)
     .where(
       and(
@@ -787,6 +896,17 @@ export async function removerMembroDoTime(
     return {
       error: "Apenas administradores da organização removem líderes de equipe.",
     };
+  }
+
+  if (
+    selectedTeam.name === ETHICS_COMMITTEE_TEAM &&
+    targetMembership &&
+    roleIncludesCommitteeAccess(targetMembership.role)
+  ) {
+    await db
+      .update(member)
+      .set({ role: removeCommitteeRole(targetMembership.role) })
+      .where(eq(member.id, targetMembership.id));
   }
 
   await db
@@ -807,6 +927,7 @@ export async function salvarFerramentaTime(
   const label = formData.get("label")?.toString().trim();
   const description = formData.get("description")?.toString().trim();
   const href = formData.get("href")?.toString().trim();
+  const icon = normalizeLucideIconName(formData.get("icon"));
   const isActive = formData.get("isActive") === "on";
 
   if (!teamId || !slug || !label || !description || !href) {
@@ -817,43 +938,91 @@ export async function salvarFerramentaTime(
     return { error: "Use um caminho interno iniciado por / ou uma URL https." };
   }
 
+  if (icon && !isValidLucideIconName(icon)) {
+    return {
+      error:
+        "Ícone Lucide inválido. Use o nome do componente, por exemplo ShieldCheck.",
+    };
+  }
+
   const { context, selectedTeam } = await canManageTeamId(teamId);
   if (!selectedTeam) {
     return { error: "Você não pode gerenciar ferramentas desta equipe." };
   }
 
-  if (toolId) {
-    const [existingTool] = await db
-      .select({ id: portalTool.id, teamId: portalTool.teamId })
-      .from(portalTool)
-      .where(eq(portalTool.id, toolId));
+  const toolValues = {
+    slug,
+    label,
+    description,
+    href,
+    isActive,
+  };
 
-    if (!existingTool || existingTool.teamId !== teamId) {
-      return { error: "Ferramenta não encontrada." };
+  try {
+    if (toolId) {
+      const [existingTool] = await db
+        .select({ id: portalTool.id, teamId: portalTool.teamId })
+        .from(portalTool)
+        .where(eq(portalTool.id, toolId));
+
+      if (!existingTool || existingTool.teamId !== teamId) {
+        return { error: "Ferramenta não encontrada." };
+      }
+
+      await db
+        .update(portalTool)
+        .set({
+          ...toolValues,
+          icon,
+          updatedAt: new Date(),
+        })
+        .where(eq(portalTool.id, toolId));
+    } else {
+      await db.insert(portalTool).values({
+        id: crypto.randomUUID(),
+        organizationId: context.organizationId,
+        teamId,
+        ...toolValues,
+        icon,
+      });
+    }
+  } catch (error) {
+    if (!isMissingPortalToolIconColumnError(error)) {
+      throw error;
     }
 
-    await db
-      .update(portalTool)
-      .set({
-        slug,
-        label,
-        description,
-        href,
-        isActive,
-        updatedAt: new Date(),
-      })
-      .where(eq(portalTool.id, toolId));
-  } else {
-    await db.insert(portalTool).values({
-      id: crypto.randomUUID(),
-      organizationId: context.organizationId,
-      teamId,
-      slug,
-      label,
-      description,
-      href,
-      isActive,
-    });
+    if (icon) {
+      return {
+        error:
+          "A coluna de ícone ainda não foi aplicada no banco. Rode a migration antes de salvar um ícone.",
+      };
+    }
+
+    if (toolId) {
+      const [existingTool] = await db
+        .select({ id: portalTool.id, teamId: portalTool.teamId })
+        .from(portalTool)
+        .where(eq(portalTool.id, toolId));
+
+      if (!existingTool || existingTool.teamId !== teamId) {
+        return { error: "Ferramenta não encontrada." };
+      }
+
+      await db
+        .update(portalTool)
+        .set({
+          ...toolValues,
+          updatedAt: new Date(),
+        })
+        .where(eq(portalTool.id, toolId));
+    } else {
+      await db.insert(portalTool).values({
+        id: crypto.randomUUID(),
+        organizationId: context.organizationId,
+        teamId,
+        ...toolValues,
+      });
+    }
   }
 
   revalidateAdminPortal();

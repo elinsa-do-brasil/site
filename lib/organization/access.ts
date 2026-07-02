@@ -10,15 +10,15 @@ import {
   team,
   teamMember,
 } from "@/lib/db/schema";
-import { TEAM_LEADER_ROLE } from "@/lib/organization/constants";
+import {
+  parseOrganizationRoleList,
+  TEAM_LEADER_ROLE,
+} from "@/lib/organization/constants";
 
 export const ELINSA_ORGANIZATION_SLUG = "elinsa";
 
 export function parseRoleList(role: string) {
-  return role
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+  return parseOrganizationRoleList(role);
 }
 
 export async function getElinsaMembership(userId: string) {
@@ -120,6 +120,7 @@ export type InternalTool = {
   label: string;
   description: string;
   href: string;
+  icon?: string | null;
   teamName?: string;
 };
 
@@ -130,6 +131,7 @@ const BUILTIN_INTERNAL_TOOLS: InternalTool[] = [
     description:
       "Gere e copie a assinatura corporativa no padrão da marca Elinsa.",
     href: "/portal/assinatura-de-email",
+    icon: "Mail",
   },
 ];
 
@@ -148,6 +150,7 @@ export async function getAvailableInternalTools(
       label: tool.label,
       description: tool.description,
       href: tool.href,
+      icon: tool.icon,
       teamName: tool.teamName,
     }));
 
@@ -162,6 +165,7 @@ async function listConfiguredPortalTools() {
         label: portalTool.label,
         description: portalTool.description,
         href: portalTool.href,
+        icon: portalTool.icon,
         teamName: team.name,
       })
       .from(portalTool)
@@ -174,6 +178,28 @@ async function listConfiguredPortalTools() {
         ),
       );
   } catch (error) {
+    if (isMissingPortalToolIconColumnError(error)) {
+      const tools = await db
+        .select({
+          id: portalTool.id,
+          label: portalTool.label,
+          description: portalTool.description,
+          href: portalTool.href,
+          teamName: team.name,
+        })
+        .from(portalTool)
+        .innerJoin(team, eq(portalTool.teamId, team.id))
+        .innerJoin(organization, eq(portalTool.organizationId, organization.id))
+        .where(
+          and(
+            eq(organization.slug, ELINSA_ORGANIZATION_SLUG),
+            eq(portalTool.isActive, true),
+          ),
+        );
+
+      return tools.map((tool) => ({ ...tool, icon: null }));
+    }
+
     if (isMissingRelationError(error)) {
       return [];
     }
@@ -196,6 +222,22 @@ function isMissingRelationError(error: unknown) {
   }
 
   return error.message.includes('relation "portal_tool" does not exist');
+}
+
+export function isMissingPortalToolIconColumnError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+
+  const cause = "cause" in error ? error.cause : undefined;
+  if (
+    cause &&
+    typeof cause === "object" &&
+    "code" in cause &&
+    cause.code === "42703"
+  ) {
+    return true;
+  }
+
+  return error.message.includes('column "icon" does not exist');
 }
 
 export function canManageTeam(

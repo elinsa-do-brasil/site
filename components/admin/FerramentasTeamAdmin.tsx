@@ -1,6 +1,7 @@
 "use client";
 
-import { ExternalLink, Pencil, Plus } from "lucide-react";
+import { ExternalLink, LayoutGrid, Pencil, Plus } from "lucide-react";
+import { DynamicIcon, type IconName, iconNames } from "lucide-react/dynamic";
 import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
 import { useState, useTransition } from "react";
@@ -47,6 +48,7 @@ type ToolRow = {
   label: string;
   description: string;
   href: string;
+  icon: string | null;
   isActive: boolean;
 };
 
@@ -119,37 +121,54 @@ function TeamToolsCard({ team }: { team: TeamToolsRow }) {
 
 function ToolItem({ team, tool }: { team: TeamToolsRow; tool: ToolRow }) {
   const router = useRouter();
+  const isExternal = tool.href.startsWith("https://");
 
   return (
-    <div className="rounded-md border p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+    <div className="overflow-hidden rounded-md border bg-card/80 shadow-sm">
+      <div className="flex min-h-32 items-start gap-3 p-4">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-elinsa-primary/15 bg-elinsa-primary/10 text-elinsa-primary">
+          <ToolPreviewIcon tool={tool} />
+        </div>
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-medium">{tool.label}</p>
-            <Badge variant={tool.isActive ? "default" : "outline"}>
+            <p className="text-sm font-semibold leading-tight">{tool.label}</p>
+            <Badge
+              className="h-5 px-1.5 text-[0.68rem]"
+              variant={tool.isActive ? "default" : "outline"}
+            >
               {tool.isActive ? "Ativa" : "Oculta"}
             </Badge>
+            {tool.icon && (
+              <Badge
+                className="h-5 max-w-full truncate px-1.5 font-mono text-[0.68rem]"
+                variant="outline"
+              >
+                {tool.icon}
+              </Badge>
+            )}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {tool.description}
           </p>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 border-t bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
         <a
-          className="inline-flex min-w-0 items-center gap-1 truncate text-sm text-muted-foreground hover:text-foreground"
+          className="inline-flex min-w-0 items-center gap-1.5 truncate text-sm text-muted-foreground hover:text-foreground"
           href={tool.href}
+          rel={isExternal ? "noreferrer" : undefined}
+          target={isExternal ? "_blank" : undefined}
         >
           <ExternalLink data-icon="inline-start" />
           <span className="truncate">{tool.href}</span>
         </a>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           <ToolDialog
             team={team}
             tool={tool}
             trigger={
-              <Button type="button" variant="outline">
+              <Button size="sm" type="button" variant="outline">
                 <Pencil data-icon="inline-start" />
                 Editar
               </Button>
@@ -163,7 +182,7 @@ function ToolItem({ team, tool }: { team: TeamToolsRow; tool: ToolRow }) {
             successMessage="Ferramenta excluída."
             title="Excluir ferramenta?"
             trigger={
-              <Button type="button" variant="destructive">
+              <Button size="sm" type="button" variant="destructive">
                 Excluir
               </Button>
             }
@@ -172,6 +191,34 @@ function ToolItem({ team, tool }: { team: TeamToolsRow; tool: ToolRow }) {
       </div>
     </div>
   );
+}
+
+function ToolPreviewIcon({ tool }: { tool: ToolRow }) {
+  const iconName = tool.icon ? toDynamicIconName(tool.icon) : null;
+
+  if (!iconName) {
+    return <LayoutGrid aria-hidden="true" className="size-5" />;
+  }
+
+  return (
+    <DynamicIcon
+      aria-hidden="true"
+      className="size-5"
+      fallback={() => <LayoutGrid aria-hidden="true" className="size-5" />}
+      name={iconName}
+    />
+  );
+}
+
+function toDynamicIconName(componentName: string): IconName | null {
+  const name = componentName
+    .trim()
+    .replace(/Icon$/, "")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .toLowerCase();
+
+  return iconNames.includes(name as IconName) ? (name as IconName) : null;
 }
 
 function ToolDialog({
@@ -292,6 +339,30 @@ function ToolDialog({
                 defaultValue={tool?.href}
                 required
               />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`${team.id}-${tool?.id ?? "new"}-icon`}>
+                Ícone Lucide
+              </FieldLabel>
+              <Input
+                id={`${team.id}-${tool?.id ?? "new"}-icon`}
+                name="icon"
+                placeholder="ShieldCheck"
+                defaultValue={tool?.icon ?? ""}
+              />
+              <FieldDescription>
+                Copie o component name em{" "}
+                <a
+                  className="inline-flex items-center gap-1 font-medium text-foreground underline underline-offset-4 hover:text-elinsa-primary"
+                  href="https://lucide.dev/icons/"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  lucide.dev/icons
+                  <ExternalLink className="size-3" />
+                </a>
+                . Exemplos: ShieldCheck, Mail, PanelsTopLeft.
+              </FieldDescription>
             </Field>
             <label
               className="flex items-center gap-2 text-sm"

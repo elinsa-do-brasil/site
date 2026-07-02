@@ -43,8 +43,11 @@ import {
   enviarConviteAdmin,
 } from "@/lib/organization/actions";
 import {
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
   formatInvitationStatus,
   formatOrganizationRole,
+  parseOrganizationRoleList,
 } from "@/lib/organization/constants";
 
 type TeamOption = {
@@ -264,7 +267,10 @@ function InviteDialog({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [selectedTeamId, setSelectedTeamId] = useState("none");
   const [isPending, startTransition] = useTransition();
+  const selectedTeam = teams.find((team) => team.id === selectedTeamId);
+  const canAssignCommitteeRole = selectedTeam?.name === ETHICS_COMMITTEE_TEAM;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -285,13 +291,22 @@ function InviteDialog({
 
       toast.success("Convite enviado.");
       form.reset();
+      setSelectedTeamId("none");
       setOpen(false);
       router.refresh();
     });
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          setSelectedTeamId("none");
+        }
+      }}
+    >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -316,24 +331,12 @@ function InviteDialog({
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="invite-role">Função</FieldLabel>
-              <Select name="role" defaultValue="member">
-                <SelectTrigger id="invite-role" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {roleOptions.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {formatOrganizationRole(role)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field>
               <FieldLabel htmlFor="invite-team">Equipe inicial</FieldLabel>
-              <Select name="teamId" defaultValue="none">
+              <Select
+                name="teamId"
+                onValueChange={setSelectedTeamId}
+                value={selectedTeamId}
+              >
                 <SelectTrigger id="invite-team" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -344,6 +347,33 @@ function InviteDialog({
                       {formatAdminName(team.name)}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="invite-role">Função</FieldLabel>
+              <Select name="role" defaultValue="member">
+                <SelectTrigger id="invite-role" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((role) => {
+                    const isCommitteeRole = parseOrganizationRoleList(
+                      role,
+                    ).includes(ETHICS_COMMITTEE_ROLE);
+                    const isDisabled =
+                      isCommitteeRole && !canAssignCommitteeRole;
+
+                    return (
+                      <SelectItem disabled={isDisabled} key={role} value={role}>
+                        {formatOrganizationRole(role)}
+                        {isDisabled
+                          ? ` (exige equipe ${formatAdminName(ETHICS_COMMITTEE_TEAM)})`
+                          : ""}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </Field>

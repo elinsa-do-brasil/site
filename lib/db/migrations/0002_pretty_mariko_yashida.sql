@@ -1,0 +1,1 @@
+ALTER TABLE "portal_tool" ADD COLUMN "icon" text;

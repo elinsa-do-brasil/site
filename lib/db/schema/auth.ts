@@ -268,6 +268,7 @@ export const portalTool = pgTable(
     label: text("label").notNull(),
     description: text("description").notNull(),
     href: text("href").notNull(),
+    icon: text("icon"),
     isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
