@@ -90,8 +90,14 @@ const runtimeDependencies: LicenseItem[] = [
     url: "https://payloadcms.com",
   },
   {
-    name: "@payloadcms/storage-s3",
-    version: "3.84.1",
+    name: "@azure/storage-blob",
+    version: "12.33.0",
+    license: "MIT",
+    url: "https://github.com/Azure/azure-sdk-for-js/tree/main/sdk/storage/storage-blob",
+  },
+  {
+    name: "@payloadcms/storage-azure",
+    version: "3.85.1",
     license: "MIT",
     url: "https://payloadcms.com",
   },

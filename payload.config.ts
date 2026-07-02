@@ -12,7 +12,7 @@ import { searchPlugin } from "@payloadcms/plugin-search";
 import { sentryPlugin } from "@payloadcms/plugin-sentry";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import { s3Storage } from "@payloadcms/storage-s3";
+import { azureStorage } from "@payloadcms/storage-azure";
 import { en } from "@payloadcms/translations/languages/en";
 import { es } from "@payloadcms/translations/languages/es";
 import { pt } from "@payloadcms/translations/languages/pt";
@@ -26,6 +26,10 @@ import { Blog, Imprensa } from "./collections/Editorial.ts";
 import { Galeria } from "./collections/Galeria.ts";
 import { Users } from "./collections/Users.ts";
 import { Vagas } from "./collections/Vagas.ts";
+import {
+  getAzureStorageAccountBaseURL,
+  shouldCreateAzureContainers,
+} from "./lib/azure-storage.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -38,21 +42,20 @@ if (!process.env.API_KEY_PEXELS && process.env.PEXELS_API_KEY) {
   process.env.API_KEY_PEXELS = process.env.PEXELS_API_KEY;
 }
 
-const s3Bucket = process.env.S3_BUCKET || process.env.AWS_S3_BUCKET;
-const s3AccessKeyId =
-  process.env.S3_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
-const s3SecretAccessKey =
-  process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
-const s3Region =
-  process.env.S3_REGION ||
-  process.env.AWS_REGION ||
-  process.env.AWS_DEFAULT_REGION;
-const s3Endpoint = process.env.S3_ENDPOINT || process.env.AWS_ENDPOINT_URL_S3;
-const s3PublicUrl = process.env.S3_PUBLIC_URL;
-const s3Prefix = process.env.S3_PREFIX || "galeria";
-const isS3Configured = Boolean(s3Bucket && s3AccessKeyId && s3SecretAccessKey);
-const shouldForceS3PathStyle =
-  process.env.S3_FORCE_PATH_STYLE === "false" ? false : Boolean(s3Endpoint);
+const azureConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+const azurePayloadContainerName =
+  process.env.AZURE_PAYLOAD_CONTAINER_NAME || "galeria";
+const azurePayloadPrefix = process.env.AZURE_PAYLOAD_PREFIX || "galeria";
+const azureStorageBaseURL = getAzureStorageAccountBaseURL({
+  connectionString: azureConnectionString,
+  explicitBaseURL: process.env.AZURE_STORAGE_ACCOUNT_BASEURL,
+});
+const isAzurePayloadStorageConfigured = Boolean(
+  azureConnectionString && azureStorageBaseURL && azurePayloadContainerName,
+);
+const allowAzureContainerCreate = shouldCreateAzureContainers(
+  process.env.AZURE_STORAGE_ALLOW_CONTAINER_CREATE,
+);
 const siteURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
 const usersCollectionSlug = Users.slug as CollectionSlug;
@@ -98,6 +101,21 @@ function getUploadID(value: unknown) {
   return undefined;
 }
 
+function generatePayloadFileURL({
+  collection,
+  filename,
+  prefix,
+}: {
+  collection: { slug: string };
+  filename: string;
+  prefix?: string;
+}) {
+  const encodedFilename = encodeURIComponent(filename);
+  const basePath = `/api/${collection.slug}/file/${encodedFilename}`;
+
+  return prefix ? `${basePath}?prefix=${encodeURIComponent(prefix)}` : basePath;
+}
+
 export default buildConfig({
   // Idioma do painel administrativo
   i18n: {
@@ -130,42 +148,18 @@ export default buildConfig({
   collections: [Users, Imprensa, Blog, Vagas, Galeria],
 
   plugins: [
-    s3Storage({
-      enabled: isS3Configured,
+    azureStorage({
+      enabled: isAzurePayloadStorageConfigured,
       collections: {
         galeria: {
-          prefix: s3Prefix,
-          ...(s3PublicUrl
-            ? {
-                disablePayloadAccessControl: true,
-                generateFileURL: ({
-                  filename,
-                  prefix,
-                }: {
-                  filename: string;
-                  prefix?: string;
-                }) => {
-                  const key = prefix ? `${prefix}/${filename}` : filename;
-
-                  return `${s3PublicUrl.replace(/\/$/, "")}/${key}`;
-                },
-              }
-            : {}),
+          generateFileURL: generatePayloadFileURL,
+          prefix: azurePayloadPrefix,
         },
       },
-      bucket: s3Bucket || "elinsa-galeria",
-      config: {
-        credentials:
-          s3AccessKeyId && s3SecretAccessKey
-            ? {
-                accessKeyId: s3AccessKeyId,
-                secretAccessKey: s3SecretAccessKey,
-              }
-            : undefined,
-        endpoint: s3Endpoint,
-        forcePathStyle: shouldForceS3PathStyle,
-        region: s3Region || (s3Endpoint ? "auto" : "us-east-1"),
-      },
+      allowContainerCreate: allowAzureContainerCreate,
+      baseURL: azureStorageBaseURL,
+      connectionString: azureConnectionString || "",
+      containerName: azurePayloadContainerName,
     }),
     auditFieldsPlugin({
       createdByLabel: "Criado por",

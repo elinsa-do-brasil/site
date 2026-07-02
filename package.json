@@ -18,7 +18,7 @@
     "email:dev": "email dev"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1053.0",
+    "@azure/storage-blob": "^12.33.0",
     "@better-auth/passkey": "^1.6.18",
     "@better-auth/utils": "0.4.1",
     "@hookform/resolvers": "^5.2.2",
@@ -41,7 +41,7 @@
     "@payloadcms/plugin-sentry": "3.85.1",
     "@payloadcms/plugin-seo": "3.85.1",
     "@payloadcms/richtext-lexical": "^3.85.1",
-    "@payloadcms/storage-s3": "^3.85.1",
+    "@payloadcms/storage-azure": "3.85.1",
     "@payloadcms/translations": "^3.85.1",
     "@payloadcms/ui": "3.85.1",
     "@sentry/nextjs": "^10.57.0",
@@ -80,6 +80,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1077.0",
     "@biomejs/biome": "2.4.14",
     "@react-email/ui": "6.6.2",
     "@tailwindcss/postcss": "^4.2.4",

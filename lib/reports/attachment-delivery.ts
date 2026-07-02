@@ -6,7 +6,7 @@ import {
   decryptAttachmentBuffer,
   decryptAttachmentOriginalName,
 } from "./attachment-crypto";
-import { downloadEncryptedAttachmentFromProof } from "./attachment-storage";
+import { downloadEncryptedAttachmentFromStorage } from "./attachment-storage";
 import {
   getReportAttachmentById,
   recordReportAttachmentAccess,
@@ -36,7 +36,7 @@ export async function createCommitteeAttachmentResponse(input: {
   }
 
   try {
-    const encryptedFileBuffer = await downloadEncryptedAttachmentFromProof(
+    const encryptedFileBuffer = await downloadEncryptedAttachmentFromStorage(
       attachment.storageKey,
     );
     const ciphertextSha256 = crypto

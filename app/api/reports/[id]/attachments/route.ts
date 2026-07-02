@@ -6,8 +6,8 @@ import {
   REPORT_ATTACHMENT_KEY_ID,
 } from "@/lib/reports/attachment-limits";
 import {
-  deleteEncryptedAttachmentFromProof,
-  uploadEncryptedAttachmentToProof,
+  deleteEncryptedAttachmentFromStorage,
+  uploadEncryptedAttachmentToStorage,
 } from "@/lib/reports/attachment-storage";
 import { verifyReportUploadToken } from "@/lib/reports/attachment-token";
 import {
@@ -130,7 +130,7 @@ export async function POST(
     let uploaded = false;
 
     try {
-      await uploadEncryptedAttachmentToProof({
+      await uploadEncryptedAttachmentToStorage({
         key: storageKey,
         body: encryptedFileBuffer,
       });
@@ -169,7 +169,7 @@ export async function POST(
       });
     } catch {
       if (uploaded) {
-        await deleteEncryptedAttachmentFromProof(storageKey).catch(() => {});
+        await deleteEncryptedAttachmentFromStorage(storageKey).catch(() => {});
       }
 
       return attachmentResponse(500);

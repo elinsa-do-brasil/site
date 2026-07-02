@@ -1,85 +1,79 @@
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
+import { BlobServiceClient, type ContainerClient } from "@azure/storage-blob";
+import { shouldCreateAzureContainers } from "@/lib/azure-storage";
 
-type ProofStorageConfig = {
-  bucket: string;
-  client: S3Client;
+type AttachmentStorageConfig = {
+  allowContainerCreate: boolean;
+  containerClient: ContainerClient;
 };
 
-let storageConfig: ProofStorageConfig | null = null;
+let storageConfig: AttachmentStorageConfig | null = null;
+let createContainerPromise: Promise<void> | null = null;
 
-export async function uploadEncryptedAttachmentToProof(input: {
+export async function uploadEncryptedAttachmentToStorage(input: {
   key: string;
   body: Buffer;
 }) {
-  const { bucket, client } = getProofStorageConfig();
+  const { allowContainerCreate, containerClient } =
+    getAttachmentStorageConfig();
 
-  await client.send(
-    new PutObjectCommand({
-      Bucket: bucket,
-      Key: input.key,
-      Body: input.body,
-      ContentType: "application/octet-stream",
-    }),
-  );
-}
-
-export async function downloadEncryptedAttachmentFromProof(key: string) {
-  const { bucket, client } = getProofStorageConfig();
-  const response = await client.send(
-    new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    }),
-  );
-
-  if (!response.Body) {
-    throw new Error("REPORT_ATTACHMENT_EMPTY_OBJECT");
+  if (allowContainerCreate) {
+    await ensureContainerExists(containerClient);
   }
 
-  const bytes = await response.Body.transformToByteArray();
-  return Buffer.from(bytes);
+  await containerClient.getBlockBlobClient(input.key).uploadData(input.body, {
+    blobHTTPHeaders: {
+      blobContentType: "application/octet-stream",
+    },
+  });
 }
 
-export async function deleteEncryptedAttachmentFromProof(key: string) {
-  const { bucket, client } = getProofStorageConfig();
+export async function downloadEncryptedAttachmentFromStorage(key: string) {
+  const { containerClient } = getAttachmentStorageConfig();
+  const buffer = await containerClient
+    .getBlockBlobClient(key)
+    .downloadToBuffer();
 
-  await client.send(
-    new DeleteObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    }),
-  );
+  return Buffer.from(buffer);
 }
 
-function getProofStorageConfig() {
+export async function deleteEncryptedAttachmentFromStorage(key: string) {
+  const { containerClient } = getAttachmentStorageConfig();
+
+  await containerClient.getBlockBlobClient(key).deleteIfExists();
+}
+
+function getAttachmentStorageConfig() {
   if (storageConfig) return storageConfig;
 
-  const endpoint = process.env.PROOF_S3_ENDPOINT;
-  const region = process.env.PROOF_S3_REGION;
-  const accessKeyId = process.env.PROOF_S3_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.PROOF_S3_SECRET_ACCESS_KEY;
+  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+  const containerName =
+    process.env.AZURE_REPORTS_CONTAINER_NAME ||
+    process.env.AZURE_STORAGE_CONTAINER_NAME ||
+    "denuncias";
 
-  if (!endpoint || !region || !accessKeyId || !secretAccessKey) {
-    throw new Error("Variaveis PROOF_S3_* nao configuradas.");
+  if (!connectionString) {
+    throw new Error(
+      "Variavel AZURE_STORAGE_CONNECTION_STRING nao configurada.",
+    );
   }
 
   storageConfig = {
-    bucket: process.env.PROOF_S3_BUCKET || "proof",
-    client: new S3Client({
-      endpoint,
-      region,
-      forcePathStyle: process.env.PROOF_S3_FORCE_PATH_STYLE !== "false",
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
-    }),
+    allowContainerCreate: shouldCreateAzureContainers(
+      process.env.AZURE_STORAGE_ALLOW_CONTAINER_CREATE,
+    ),
+    containerClient:
+      BlobServiceClient.fromConnectionString(
+        connectionString,
+      ).getContainerClient(containerName),
   };
 
   return storageConfig;
+}
+
+async function ensureContainerExists(containerClient: ContainerClient) {
+  createContainerPromise ??= containerClient
+    .createIfNotExists()
+    .then(() => undefined);
+
+  await createContainerPromise;
 }

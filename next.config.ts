@@ -3,6 +3,7 @@ import { withPayload } from "@payloadcms/next/withPayload";
 import { withSentryConfig } from "@sentry/nextjs";
 import { createMDX } from "fumadocs-mdx/next";
 import type { NextConfig } from "next";
+import { getAzureStorageAccountBaseURL } from "./lib/azure-storage";
 
 function createRemotePattern(value: string | undefined) {
   if (!value) {
@@ -22,11 +23,13 @@ function createRemotePattern(value: string | undefined) {
   }
 }
 
-const s3RemotePatterns = [
-  createRemotePattern(process.env.S3_PUBLIC_URL),
-  createRemotePattern(process.env.S3_ENDPOINT),
-  createRemotePattern(process.env.AWS_ENDPOINT_URL_S3),
-].filter((pattern) => pattern !== null);
+const azureStorageBaseURL = getAzureStorageAccountBaseURL({
+  connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING,
+  explicitBaseURL: process.env.AZURE_STORAGE_ACCOUNT_BASEURL,
+});
+const azureRemotePatterns = [createRemotePattern(azureStorageBaseURL)].filter(
+  (pattern) => pattern !== null,
+);
 const payloadDevRemotePatterns =
   process.env.NODE_ENV === "development"
     ? ([
@@ -44,7 +47,7 @@ const payloadDevRemotePatterns =
         },
       ] as const)
     : [];
-const s3Prefix = process.env.S3_PREFIX || "galeria";
+const payloadStoragePrefix = process.env.AZURE_PAYLOAD_PREFIX || "galeria";
 const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
@@ -110,7 +113,7 @@ const nextConfig: NextConfig = {
     localPatterns: [
       {
         pathname: "/api/galeria/file/**",
-        search: `?prefix=${s3Prefix}`,
+        search: `?prefix=${payloadStoragePrefix}`,
       },
     ],
     remotePatterns: [
@@ -119,7 +122,7 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
-      ...s3RemotePatterns,
+      ...azureRemotePatterns,
       ...payloadDevRemotePatterns,
     ],
   },
