@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CardContent, Card as ShadcnCard } from "@/components/ui/card";
+import { getDocsUrl } from "@/lib/docs-url";
 import { cn } from "@/lib/utils";
 import type { ImpactMetric } from "./home-data";
 import { HomeSection, HomeSectionIntro } from "./home-section";
@@ -146,7 +147,7 @@ function CareGuideNavigation() {
           className="w-full justify-between bg-card"
           asChild
         >
-          <Link href="/docs/etica/o-que-pode-ser-denunciado">
+          <Link href={getDocsUrl("/etica/o-que-pode-ser-denunciado")}>
             O que denunciar
             <CircleHelp aria-hidden="true" data-icon="inline-end" />
           </Link>
@@ -157,7 +158,7 @@ function CareGuideNavigation() {
           className="w-full justify-between bg-card"
           asChild
         >
-          <Link href="/docs/etica/como-denunciar">
+          <Link href={getDocsUrl("/etica/como-denunciar")}>
             Como denunciar
             <ListChecks aria-hidden="true" data-icon="inline-end" />
           </Link>

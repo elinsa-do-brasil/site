@@ -24,6 +24,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { getDocsUrl } from "@/lib/docs-url";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ui/theme-toggle";
 
@@ -118,13 +119,13 @@ export function Header() {
                         </h4>
                         <ul className="flex flex-col gap-2">
                           <DropdownItem
-                            href="/docs"
+                            href={getDocsUrl()}
                             icon={LighthouseIcon}
                             title="Ajuda ao colaborador"
                             description="Orientações e materiais úteis"
                           />
                           <DropdownItem
-                            href="/docs"
+                            href={getDocsUrl()}
                             icon={GoogleDocIcon}
                             title="Documentação"
                             description="Guias, políticas institucionais"
@@ -139,7 +140,7 @@ export function Header() {
                         </h4>
                         <ul className="flex flex-col gap-2">
                           <DropdownItem
-                            href="/docs/codigo-de-conduta"
+                            href={getDocsUrl("/etica/codigo-de-conduta")}
                             icon={LegalDocument01Icon}
                             title="Código de conduta"
                             description="As diretrizes da nossa atuação"
