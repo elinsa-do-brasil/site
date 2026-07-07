@@ -68,6 +68,11 @@ const imageSearchConfigured = Boolean(
 const payloadSentryEnabled = Boolean(
   process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN,
 );
+const cmsDatabaseURL = process.env.CMS_DATABASE_URL;
+
+if (!cmsDatabaseURL) {
+  throw new Error("CMS_DATABASE_URL is not set");
+}
 
 function getDocumentPath(collectionSlug: string | undefined, slug: unknown) {
   if (typeof slug !== "string" || !slug) {
@@ -291,7 +296,7 @@ export default buildConfig({
 
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL,
+      connectionString: cmsDatabaseURL,
     },
     migrationDir: "./migrations",
     push: process.env.PAYLOAD_DB_PUSH === "true",
