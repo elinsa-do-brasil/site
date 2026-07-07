@@ -1,4 +1,4 @@
-const DEFAULT_SITE_ORIGIN = "https://elinsa.com.br";
+const DEFAULT_SITE_ORIGIN = "https://amperelinsa.com.br";
 
 function normalizeOrigin(value: string | undefined) {
   if (!value) {
@@ -16,7 +16,7 @@ function normalizeOrigin(value: string | undefined) {
 
 function getConfiguredSiteOrigin() {
   return (
-    normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
+    normalizeOrigin(process.env.NEXT_PUBLIC_URL) ??
     normalizeOrigin(process.env.NEXT_PUBLIC_SERVER_URL) ??
     DEFAULT_SITE_ORIGIN
   );
