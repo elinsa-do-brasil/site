@@ -1,5 +1,6 @@
 import type { IconType } from "react-icons";
 import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { getDocsUrl } from "@/lib/docs-url";
 
 export type FooterLink = {
   href: string;
@@ -41,8 +42,11 @@ export const footerLinkGroups: FooterLinkGroup[] = [
     ariaLabel: "Links de apoio e ética",
     title: "Apoio e ética",
     links: [
-      { href: "/docs", label: "Ajuda ao colaborador" },
-      { href: "/docs/codigo-de-conduta", label: "Código de conduta" },
+      { href: getDocsUrl(), label: "Ajuda ao colaborador" },
+      {
+        href: getDocsUrl("/etica/codigo-de-conduta"),
+        label: "Código de conduta",
+      },
       { href: "/denunciar", label: "Canal de denúncias" },
       { href: "/acompanhar-denuncia", label: "Acompanhar denúncia" },
     ],

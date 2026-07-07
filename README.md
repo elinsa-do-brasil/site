@@ -4,7 +4,7 @@
 
 Proposta de tecnologias, paleta de cores e arquitetura para o portal institucional da Elinsa do Brasil.
 
-> Documento de referência: [Projeto do Site Institucional](.docs/gemini-code-1777929287737.md)
+> Site institucional da Elinsa do Brasil.
 
 ---
 
@@ -134,7 +134,6 @@ O editor de texto é compatível com **Markdown**, um formato de escrita simples
 elinsa/
 ├── app/
 │   ├── (frontend)/           # Páginas públicas do site
-│   │   ├── docs/             # Layout Fumadocs publicado em /docs
 │   │   ├── noticias/
 │   │   ├── trabalhe-conosco/
 │   │   └── ...
@@ -156,25 +155,8 @@ elinsa/
 
 ## Documentação
 
-A área `/docs` usa Fumadocs e lê o conteúdo versionado no submodule `docs/`.
-Depois de clonar o repositório, inicialize o submodule:
-
-```bash
-git submodule update --init --recursive
-```
-
-Para atualizar a documentação, atualize o submodule e commite o novo ponteiro no
-repo principal:
-
-```bash
-cd docs
-git pull origin main
-cd ..
-git add docs
-git commit -m "docs: atualiza documentação"
-```
-
-Em CI/deploy, o checkout precisa baixar submodules recursivamente.
+A documentação fica em outro repositório e é publicada no subdomínio `docs.*`
+do mesmo ambiente. Links antigos em `/docs` são redirecionados para esse host.
 
 ---
 

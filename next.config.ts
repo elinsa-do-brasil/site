@@ -1,7 +1,6 @@
 import path from "node:path";
 import { withPayload } from "@payloadcms/next/withPayload";
 import { withSentryConfig } from "@sentry/nextjs";
-import { createMDX } from "fumadocs-mdx/next";
 import type { NextConfig } from "next";
 import { getAzureStorageAccountBaseURL } from "./lib/azure-storage";
 
@@ -127,7 +126,6 @@ const nextConfig: NextConfig = {
     ],
   },
   reactCompiler: true,
-  pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   sassOptions: {
     loadPaths: [path.resolve("node_modules/@payloadcms/ui/dist/scss")],
   },
@@ -136,9 +134,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withMDX = createMDX();
-
-export default withSentryConfig(withPayload(withMDX(nextConfig)), {
+export default withSentryConfig(withPayload(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
