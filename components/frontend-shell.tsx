@@ -69,15 +69,6 @@ export function FrontendShell({
     );
   }
 
-  if (pathname === "/docs" || pathname.startsWith("/docs/")) {
-    return (
-      <div className="min-h-screen bg-background" data-frontend-shell="docs">
-        {children}
-        <Toaster />
-      </div>
-    );
-  }
-
   return (
     <>
       {!isMapRoute && (

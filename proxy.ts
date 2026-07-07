@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { getDocsUrl } from "@/lib/docs-url";
 
 const SESSION_COOKIE_NAMES = [
   "better-auth.session_token",
@@ -7,6 +8,9 @@ const SESSION_COOKIE_NAMES = [
 ];
 const LEGACY_EMAIL_SIGNATURE_PATH = "/portal/assinatura-de-email";
 const REDIRECT_LOOKUP_PATH = "/api/payload-redirects";
+const DOCS_PATH_ALIASES = new Map([
+  ["/codigo-de-conduta", "/etica/codigo-de-conduta"],
+]);
 
 type PayloadRedirect = {
   destination?: string;
@@ -22,8 +26,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 308);
   }
 
-  const isProtectedPath =
-    pathname.startsWith("/portal") || pathname.startsWith("/docs/interno");
+  if (pathname === "/docs" || pathname.startsWith("/docs/")) {
+    return redirectToDocsSite(request);
+  }
+
+  const isProtectedPath = pathname.startsWith("/portal");
 
   if (isProtectedPath) {
     const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
@@ -55,6 +62,23 @@ export async function proxy(request: NextRequest) {
   }
 
   return NextResponse.next();
+}
+
+function redirectToDocsSite(request: NextRequest) {
+  const docsPath = normalizeDocsPath(
+    request.nextUrl.pathname.replace(/^\/docs(?=\/|$)/, ""),
+  );
+  const destination = new URL(
+    getDocsUrl(docsPath || "/", request.nextUrl.origin),
+  );
+
+  destination.search = request.nextUrl.search;
+
+  return NextResponse.redirect(destination, 308);
+}
+
+function normalizeDocsPath(pathname: string) {
+  return DOCS_PATH_ALIASES.get(pathname) ?? pathname;
 }
 
 async function getPayloadRedirect(request: NextRequest) {

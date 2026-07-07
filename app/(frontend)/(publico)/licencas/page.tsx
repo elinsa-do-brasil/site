@@ -48,24 +48,6 @@ const runtimeDependencies: LicenseItem[] = [
     url: "https://hugeicons.com",
   },
   {
-    name: "@mdx-js/loader",
-    version: "3.1.1",
-    license: "MIT",
-    url: "https://mdxjs.com",
-  },
-  {
-    name: "@mdx-js/react",
-    version: "3.1.1",
-    license: "MIT",
-    url: "https://mdxjs.com",
-  },
-  {
-    name: "@next/mdx",
-    version: "16.2.4",
-    license: "MIT",
-    url: "https://nextjs.org/docs/app/guides/mdx",
-  },
-  {
     name: "@payloadcms/db-postgres",
     version: "3.84.1",
     license: "MIT",
@@ -112,12 +94,6 @@ const runtimeDependencies: LicenseItem[] = [
     version: "3.42.0",
     license: "MIT",
     url: "https://tabler.io/icons",
-  },
-  {
-    name: "@types/mdx",
-    version: "2.0.13",
-    license: "MIT",
-    url: "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mdx",
   },
   {
     name: "@vercel/speed-insights",
