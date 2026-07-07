@@ -81,7 +81,7 @@ const CARGO_ABBREVIATIONS: Record<string, string> = {
 const SOCIAL_LINKS_HTML = `<strong>Elinsa do Brasil:</strong> <a href="https://www.instagram.com/elinsadobrasil/">Instagram</a> &bull; <a href="https://www.linkedin.com/in/elinsadobrasil/">LinkedIn</a> &bull; <a href="https://elinsa.es/">Site</a><br />
 <strong>Grupo Amper:</strong> <a href="https://www.linkedin.com/company/amper-sa/">LinkedIn</a> &bull; <a href="https://www.grupoamper.com/">Site</a>`;
 
-const TUTORIAL_URL = process.env.NEXT_PUBLIC_YT_LINK;
+const TUTORIAL_URL = "https://www.youtube.com/watch?v=cPnVJZ6l1TQ";
 
 export function EmailSignatureGenerator() {
   const [values, setValues] = useState<SignatureValues>(() => ({
@@ -104,7 +104,7 @@ export function EmailSignatureGenerator() {
     const saved = localStorage.getItem(
       "dismiss-elinsa-signature-tutorial-warning",
     );
-    setShowWarning(Boolean(TUTORIAL_URL) && saved !== "true");
+    setShowWarning(saved !== "true");
   }, []);
 
   const dismissWarning = () => {
@@ -196,7 +196,11 @@ export function EmailSignatureGenerator() {
                 asChild
                 className="h-8 w-fit rounded-md bg-elinsa-primary px-4 text-xs font-medium text-white shadow-sm transition-all hover:bg-elinsa-primary/90 dark:bg-elinsa-sky dark:text-neutral-950 dark:hover:bg-elinsa-sky/90"
               >
-                <a href={TUTORIAL_URL} target="_blank" rel="noreferrer">
+                <a
+                  href={TUTORIAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Veja o tutorial
                   <CirclePlay className="size-3.5" />
                 </a>
