@@ -1,7 +1,14 @@
 "use client";
 
-import { Check, Copy, WandSparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  AlertCircle,
+  Check,
+  CirclePlay,
+  Copy,
+  WandSparkles,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +25,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const EMAIL_DOMAIN = "@grupoamperelinsa.com";
 const SIGNATURE_LOGO_PATH = "/kit-de-marca/png/logo-colorido.png";
@@ -49,10 +63,6 @@ type SignatureValues = {
 
 type FormErrors = Partial<Record<keyof SignatureValues, string>>;
 
-export type InitialSignatureValues = Partial<
-  Pick<SignatureValues, "email" | "nome">
->;
-
 type Recommendation = {
   field: "cargo" | "nome";
   label: string;
@@ -71,30 +81,58 @@ const CARGO_ABBREVIATIONS: Record<string, string> = {
 const SOCIAL_LINKS_HTML = `<strong>Elinsa do Brasil:</strong> <a href="https://www.instagram.com/elinsadobrasil/">Instagram</a> &bull; <a href="https://www.linkedin.com/in/elinsadobrasil/">LinkedIn</a> &bull; <a href="https://elinsa.es/">Site</a><br />
 <strong>Grupo Amper:</strong> <a href="https://www.linkedin.com/company/amper-sa/">LinkedIn</a> &bull; <a href="https://www.grupoamper.com/">Site</a>`;
 
-export function EmailSignatureGenerator({
-  initialValues,
-}: {
-  initialValues?: InitialSignatureValues;
-}) {
+const TUTORIAL_URL = process.env.NEXT_PUBLIC_YT_LINK;
+
+export function EmailSignatureGenerator() {
   const [values, setValues] = useState<SignatureValues>(() => ({
     cargo: "",
-    email: initialValues?.email ?? "",
+    email: "",
     local: "",
-    nome: initialValues?.nome ?? "",
+    nome: "",
     telefone: { ddi: "+55", numero: "" },
     telefone2: { ddi: "+55", numero: "" },
   }));
+  const [touched, setTouched] = useState<
+    Partial<Record<keyof SignatureValues, boolean>>
+  >({});
   const [copyState, setCopyState] = useState<"copied" | "error" | "idle">(
     "idle",
   );
+  const [showWarning, setShowWarning] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(
+      "dismiss-elinsa-signature-tutorial-warning",
+    );
+    setShowWarning(Boolean(TUTORIAL_URL) && saved !== "true");
+  }, []);
+
+  const dismissWarning = () => {
+    setShowWarning(false);
+    localStorage.setItem("dismiss-elinsa-signature-tutorial-warning", "true");
+  };
 
   const previewValues = useMemo(() => getPreviewValues(values), [values]);
   const errors = useMemo(() => validateValues(values), [values]);
-  const isValid = Object.keys(errors).length === 0;
+
+  const displayErrors = useMemo(() => {
+    const result: FormErrors = {};
+    for (const key of Object.keys(errors) as Array<keyof SignatureValues>) {
+      if (touched[key]) {
+        result[key] = errors[key];
+      }
+    }
+    return result;
+  }, [errors, touched]);
+
   const recommendations = useMemo(
     () => getRecommendations(values.nome, values.cargo),
     [values.nome, values.cargo],
   );
+
+  function handleBlur(field: keyof SignatureValues) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  }
 
   function updateField<K extends keyof SignatureValues>(
     field: K,
@@ -111,6 +149,13 @@ export function EmailSignatureGenerator({
     const nextErrors = validateValues(values);
 
     if (Object.keys(nextErrors).length > 0) {
+      setTouched({
+        cargo: true,
+        email: true,
+        nome: true,
+        telefone: true,
+        telefone2: true,
+      });
       setCopyState("error");
       return;
     }
@@ -131,118 +176,164 @@ export function EmailSignatureGenerator({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.1fr)]">
-      <Card className="rounded-md border-border/80 py-0 shadow-sm">
-        <CardHeader className="border-b py-4">
-          <CardTitle>Dados da assinatura</CardTitle>
-          <CardDescription>Informe os dados da assinatura.</CardDescription>
-        </CardHeader>
-        <CardContent className="py-4">
-          <FieldGroup>
-            <Field data-invalid={!!errors.nome}>
-              <FieldLabel htmlFor="signature-name">Nome completo</FieldLabel>
-              <Input
-                aria-invalid={!!errors.nome}
-                id="signature-name"
-                onChange={(event) => updateField("nome", event.target.value)}
-                placeholder="Fulano de Tal"
-                value={values.nome}
-              />
-              <FieldError>{errors.nome}</FieldError>
-            </Field>
-
-            <Field data-invalid={!!errors.cargo}>
-              <FieldLabel htmlFor="signature-role">Cargo</FieldLabel>
-              <Input
-                aria-invalid={!!errors.cargo}
-                id="signature-role"
-                onChange={(event) => updateField("cargo", event.target.value)}
-                placeholder="Auxiliar administrativo"
-                value={values.cargo}
-              />
-              <FieldError>{errors.cargo}</FieldError>
-            </Field>
-
-            <Field data-invalid={!!errors.email}>
-              <FieldLabel htmlFor="signature-email">E-mail</FieldLabel>
-              <div className="grid grid-cols-[minmax(0,1fr)_auto]">
-                <Input
-                  aria-invalid={!!errors.email}
-                  autoComplete="off"
-                  className="rounded-r-none border-r-0"
-                  id="signature-email"
-                  onChange={(event) => updateField("email", event.target.value)}
-                  placeholder="nome.sobrenome"
-                  value={values.email}
-                />
-                <span className="inline-flex h-7 items-center rounded-r-md border border-l-0 border-input bg-muted/45 px-2 text-xs text-muted-foreground">
-                  {EMAIL_DOMAIN}
-                </span>
+    <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.1fr)]">
+      <div className="min-w-0">
+        {showWarning && (
+          <div className="relative mb-6 flex items-start gap-4 rounded-md border border-elinsa-primary/20 bg-elinsa-light py-4 pr-12 pl-5 shadow-sm transition-all dark:border-elinsa-primary/30 dark:bg-elinsa-primary/10">
+            <AlertCircle className="mt-0.5 size-5 shrink-0 text-elinsa-primary dark:text-elinsa-sky" />
+            <div className="flex flex-col gap-3">
+              <div className="space-y-1">
+                <p className="text-sm leading-snug font-bold text-elinsa-dark dark:text-elinsa-light">
+                  O processo de configuração mudou!
+                </p>
+                <p className="text-xs leading-relaxed text-elinsa-dark/95 dark:text-elinsa-light/80">
+                  A forma anterior de criar e colar a assinatura foi
+                  substituída. Siga o tutorial para garantir que ela seja
+                  exibida corretamente.
+                </p>
               </div>
-              <FieldError>{errors.email}</FieldError>
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="signature-location">
-                Local de atuação{" "}
-                <span className="font-normal text-muted-foreground">
-                  (opcional)
-                </span>
-              </FieldLabel>
-              <Input
-                id="signature-location"
-                onChange={(event) => updateField("local", event.target.value)}
-                placeholder="Base de Paragominas"
-                value={values.local}
-              />
-              <FieldDescription>
-                Use quando o cargo precisar indicar base, regional ou área.
-              </FieldDescription>
-            </Field>
-
-            <PhoneField
-              description="Se não informar um celular, a linha de telefone não será exibida na assinatura."
-              error={errors.telefone}
-              id="signature-phone"
-              label="Telefone"
-              onChange={(phone) => updateField("telefone", phone)}
-              value={values.telefone}
-            />
-            <PhoneField
-              description="Use apenas quando houver outro número; se ficar em branco, ele não aparece."
-              error={errors.telefone2}
-              id="signature-phone-secondary"
-              label="Segundo telefone"
-              onChange={(phone) => updateField("telefone2", phone)}
-              value={values.telefone2}
-            />
-
-            <Button
-              className="mt-1 h-8 w-full"
-              disabled={!isValid}
-              onClick={handleCopy}
+              <Button
+                asChild
+                className="h-8 w-fit rounded-md bg-elinsa-primary px-4 text-xs font-medium text-white shadow-sm transition-all hover:bg-elinsa-primary/90 dark:bg-elinsa-sky dark:text-neutral-950 dark:hover:bg-elinsa-sky/90"
+              >
+                <a href={TUTORIAL_URL} target="_blank" rel="noreferrer">
+                  Veja o tutorial
+                  <CirclePlay className="size-3.5" />
+                </a>
+              </Button>
+            </div>
+            <button
+              onClick={dismissWarning}
+              className="absolute top-3.5 right-3.5 rounded-full p-1 text-elinsa-dark/40 transition-colors hover:bg-elinsa-dark/10 hover:text-elinsa-dark dark:text-elinsa-light/40 dark:hover:bg-elinsa-light/10 dark:hover:text-elinsa-light"
+              aria-label="Dispensar aviso"
               type="button"
             >
-              {copyState === "copied" ? (
-                <Check className="size-4" />
-              ) : (
-                <Copy className="size-4" />
+              <X className="size-4" />
+            </button>
+          </div>
+        )}
+
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle>Dados da assinatura</CardTitle>
+            <CardDescription>Informe os dados da assinatura.</CardDescription>
+          </CardHeader>
+          <CardContent className="py-4">
+            <FieldGroup>
+              <Field data-invalid={!!displayErrors.nome}>
+                <FieldLabel htmlFor="signature-name">Nome completo</FieldLabel>
+                <Input
+                  aria-invalid={!!displayErrors.nome}
+                  id="signature-name"
+                  onBlur={() => handleBlur("nome")}
+                  onChange={(event) => updateField("nome", event.target.value)}
+                  placeholder="Fulano de Tal"
+                  value={values.nome}
+                />
+                <FieldError>{displayErrors.nome}</FieldError>
+              </Field>
+
+              <Field data-invalid={!!displayErrors.cargo}>
+                <FieldLabel htmlFor="signature-role">Cargo</FieldLabel>
+                <Input
+                  aria-invalid={!!displayErrors.cargo}
+                  id="signature-role"
+                  onBlur={() => handleBlur("cargo")}
+                  onChange={(event) => updateField("cargo", event.target.value)}
+                  placeholder="Auxiliar administrativo"
+                  value={values.cargo}
+                />
+                <FieldError>{displayErrors.cargo}</FieldError>
+              </Field>
+
+              <Field data-invalid={!!displayErrors.email}>
+                <FieldLabel htmlFor="signature-email">E-mail</FieldLabel>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto]">
+                  <Input
+                    aria-invalid={!!displayErrors.email}
+                    autoComplete="off"
+                    className="rounded-r-none border-r-0"
+                    id="signature-email"
+                    onBlur={() => handleBlur("email")}
+                    onChange={(event) =>
+                      updateField(
+                        "email",
+                        normalizeEmailUsername(event.target.value),
+                      )
+                    }
+                    placeholder="nome.sobrenome"
+                    value={values.email}
+                  />
+                  <span className="inline-flex h-7 items-center rounded-r-md border border-input border-l-0 bg-muted/45 px-2 text-xs text-muted-foreground">
+                    {EMAIL_DOMAIN}
+                  </span>
+                </div>
+                <FieldError>{displayErrors.email}</FieldError>
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="signature-location">
+                  Local de atuação{" "}
+                  <span className="font-normal text-muted-foreground">
+                    (opcional)
+                  </span>
+                </FieldLabel>
+                <Input
+                  id="signature-location"
+                  onChange={(event) => updateField("local", event.target.value)}
+                  placeholder="Base de Paragominas"
+                  value={values.local}
+                />
+                <FieldDescription>
+                  Use quando o cargo precisar indicar base, regional ou área.
+                </FieldDescription>
+              </Field>
+
+              <PhoneField
+                description="Se não informar um celular, a linha de telefone não será exibida na assinatura."
+                error={displayErrors.telefone}
+                id="signature-phone"
+                label="Telefone"
+                onBlur={() => handleBlur("telefone")}
+                onChange={(phone) => updateField("telefone", phone)}
+                value={values.telefone}
+              />
+              <PhoneField
+                description="Use apenas quando houver outro número; se ficar em branco, ele não aparece."
+                error={displayErrors.telefone2}
+                id="signature-phone-secondary"
+                label="Segundo telefone"
+                onBlur={() => handleBlur("telefone2")}
+                onChange={(phone) => updateField("telefone2", phone)}
+                value={values.telefone2}
+              />
+
+              <Button
+                className="mt-1 h-8 w-full"
+                onClick={handleCopy}
+                type="button"
+              >
+                {copyState === "copied" ? (
+                  <Check className="size-4" />
+                ) : (
+                  <Copy className="size-4" />
+                )}
+                {copyState === "copied"
+                  ? "Assinatura copiada"
+                  : "Copiar assinatura"}
+              </Button>
+
+              {copyState === "error" && (
+                <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs/relaxed text-destructive">
+                  Revise os campos obrigatórios antes de copiar.
+                </p>
               )}
-              {copyState === "copied"
-                ? "Assinatura copiada"
-                : "Copiar assinatura"}
-            </Button>
+            </FieldGroup>
+          </CardContent>
+        </Card>
+      </div>
 
-            {copyState === "error" && (
-              <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs/relaxed text-destructive">
-                Revise os campos obrigatórios antes de copiar.
-              </p>
-            )}
-          </FieldGroup>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-4">
+      <div className="min-w-0 space-y-4 lg:sticky lg:top-24 lg:self-start">
         <div>
           <h2 className="text-sm font-semibold tracking-tight">Preview</h2>
           <p className="text-xs text-muted-foreground">
@@ -253,7 +344,7 @@ export function EmailSignatureGenerator({
 
         <div className="overflow-x-auto rounded-md border bg-white p-4 shadow-sm">
           <div
-            className="min-w-175"
+            className="w-max max-w-none"
             style={{
               fontFamily: "Aptos, Arial, sans-serif",
             }}
@@ -292,7 +383,7 @@ export function EmailSignatureGenerator({
                       <p className="text-sm font-medium">
                         {recommendation.label}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {recommendation.suggestion}
                       </p>
                     </div>
@@ -462,6 +553,7 @@ function PhoneField({
   error,
   id,
   label,
+  onBlur,
   onChange,
   value,
 }: {
@@ -469,6 +561,7 @@ function PhoneField({
   error?: string;
   id: string;
   label: string;
+  onBlur?: () => void;
   onChange: (value: PhoneValue) => void;
   value: PhoneValue;
 }) {
@@ -479,20 +572,28 @@ function PhoneField({
         <span className="font-normal text-muted-foreground">(opcional)</span>
       </FieldLabel>
       <div className="grid grid-cols-[5.25rem_minmax(0,1fr)] gap-2">
-        <select
-          aria-label={`DDI do ${label.toLocaleLowerCase("pt-BR")}`}
-          className="h-7 rounded-md border border-input bg-input/20 px-2 text-xs/relaxed outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-          onChange={(event) =>
-            onChange({ ddi: event.target.value as PhoneDdi, numero: "" })
+        <Select
+          onValueChange={(ddi) =>
+            onChange({ ddi: ddi as PhoneDdi, numero: "" })
           }
           value={value.ddi}
         >
-          <option value="+55">BR +55</option>
-          <option value="+34">ES +34</option>
-        </select>
+          <SelectTrigger
+            aria-label={`DDI do ${label.toLocaleLowerCase("pt-BR")}`}
+            className="w-full"
+            id={`${id}-ddi`}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="+55">BR +55</SelectItem>
+            <SelectItem value="+34">ES +34</SelectItem>
+          </SelectContent>
+        </Select>
         <Input
           aria-invalid={!!error}
           id={id}
+          onBlur={onBlur}
           onChange={(event) =>
             onChange({
               ddi: value.ddi,
@@ -631,6 +732,17 @@ function maskES(value: string) {
 
 function applyMask(ddi: PhoneDdi, value: string) {
   return ddi === "+55" ? maskBR(value) : maskES(value);
+}
+
+function normalizeEmailUsername(value: string) {
+  const trimmedValue = value.trim();
+  const withoutKnownDomain = trimmedValue
+    .toLocaleLowerCase("en-US")
+    .endsWith(EMAIL_DOMAIN)
+    ? trimmedValue.slice(0, -EMAIL_DOMAIN.length)
+    : trimmedValue;
+
+  return withoutKnownDomain.replace(/@.*$/, "");
 }
 
 function getSignatureContent(values: SignatureValues) {

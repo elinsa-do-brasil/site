@@ -130,17 +130,21 @@ const BUILTIN_INTERNAL_TOOLS: InternalTool[] = [
     label: "Assinatura de e-mail",
     description:
       "Gere e copie a assinatura corporativa no padrão da marca Elinsa.",
-    href: "/portal/assinatura-de-email",
+    href: "/assinatura-de-email",
     icon: "Mail",
   },
 ];
+const LEGACY_BUILTIN_TOOL_HREFS = new Set(["/portal/assinatura-de-email"]);
 
 export async function getAvailableInternalTools(
   context: InternalAccessContext,
 ) {
   const userTeamSet = new Set(context.teams);
   const configuredTools = await listConfiguredPortalTools();
-  const builtinHrefs = new Set(BUILTIN_INTERNAL_TOOLS.map((tool) => tool.href));
+  const builtinHrefs = new Set([
+    ...BUILTIN_INTERNAL_TOOLS.map((tool) => tool.href),
+    ...LEGACY_BUILTIN_TOOL_HREFS,
+  ]);
 
   const teamTools = configuredTools
     .filter((tool) => context.isOrgAdmin || userTeamSet.has(tool.teamName))

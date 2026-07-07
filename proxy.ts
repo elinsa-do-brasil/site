@@ -5,6 +5,7 @@ const SESSION_COOKIE_NAMES = [
   "better-auth.session_token",
   "__Secure-better-auth.session_token",
 ];
+const LEGACY_EMAIL_SIGNATURE_PATH = "/portal/assinatura-de-email";
 const REDIRECT_LOOKUP_PATH = "/api/payload-redirects";
 
 type PayloadRedirect = {
@@ -14,6 +15,12 @@ type PayloadRedirect = {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === LEGACY_EMAIL_SIGNATURE_PATH) {
+    const redirectUrl = new URL("/assinatura-de-email", request.url);
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(redirectUrl, 308);
+  }
 
   const isProtectedPath =
     pathname.startsWith("/portal") || pathname.startsWith("/docs/interno");
