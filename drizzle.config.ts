@@ -1,7 +1,7 @@
 import { defineConfig } from "drizzle-kit";
 
-if (!process.env.AUTH_DATABASE_URL) {
-  throw new Error("AUTH_DATABASE_URL is not set");
+if (!process.env.SITE_DATABASE_URL) {
+  throw new Error("SITE_DATABASE_URL is not set");
 }
 
 export default defineConfig({
@@ -10,6 +10,6 @@ export default defineConfig({
   dialect: "postgresql",
   schemaFilter: ["public"],
   dbCredentials: {
-    url: process.env.AUTH_DATABASE_URL,
+    url: process.env.SITE_DATABASE_URL,
   },
 });

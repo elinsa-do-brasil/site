@@ -4,23 +4,23 @@ import * as schema from "./schema";
 
 declare global {
   // eslint-disable-next-line no-var
-  var elinsaAuthDbPool: Pool | undefined;
+  var elinsaSiteDbPool: Pool | undefined;
 }
 
 function createPool() {
-  if (!process.env.AUTH_DATABASE_URL) {
-    throw new Error("AUTH_DATABASE_URL nao configurada.");
+  if (!process.env.SITE_DATABASE_URL) {
+    throw new Error("SITE_DATABASE_URL nao configurada.");
   }
 
   return new Pool({
-    connectionString: process.env.AUTH_DATABASE_URL,
+    connectionString: process.env.SITE_DATABASE_URL,
   });
 }
 
-export const dbPool = globalThis.elinsaAuthDbPool ?? createPool();
+export const dbPool = globalThis.elinsaSiteDbPool ?? createPool();
 
 if (process.env.NODE_ENV !== "production") {
-  globalThis.elinsaAuthDbPool = dbPool;
+  globalThis.elinsaSiteDbPool = dbPool;
 }
 
 export const db = drizzle({ client: dbPool, schema });
