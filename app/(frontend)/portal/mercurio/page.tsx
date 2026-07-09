@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "Crie uma assinatura de e-mail no padrão visual da Elinsa do Brasil.",
   alternates: {
-    canonical: "/assinatura-de-email",
+    canonical: "/portal/mercurio",
   },
 };
 

@@ -6,7 +6,10 @@ const SESSION_COOKIE_NAMES = [
   "better-auth.session_token",
   "__Secure-better-auth.session_token",
 ];
-const LEGACY_EMAIL_SIGNATURE_PATH = "/portal/assinatura-de-email";
+const LEGACY_EMAIL_SIGNATURE_PATHS = new Set([
+  "/assinatura-de-email",
+  "/portal/assinatura-de-email",
+]);
 const REDIRECT_LOOKUP_PATH = "/api/payload-redirects";
 const DOCS_PATH_ALIASES = new Map([
   ["/codigo-de-conduta", "/etica/codigo-de-conduta"],
@@ -20,8 +23,8 @@ type PayloadRedirect = {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === LEGACY_EMAIL_SIGNATURE_PATH) {
-    const redirectUrl = new URL("/assinatura-de-email", request.url);
+  if (LEGACY_EMAIL_SIGNATURE_PATHS.has(pathname)) {
+    const redirectUrl = new URL("/portal/mercurio", request.url);
     redirectUrl.search = request.nextUrl.search;
     return NextResponse.redirect(redirectUrl, 308);
   }

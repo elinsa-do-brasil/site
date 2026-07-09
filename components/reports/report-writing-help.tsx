@@ -1,67 +1,69 @@
-"use client";
-
 import {
   AiChat02Icon,
+  Download02Icon,
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function ReportWritingHelp() {
   return (
-    <Card className="border-border/50">
-      <CardContent className="flex flex-col gap-3 pt-5">
-        <div className="flex items-center gap-2">
-          <div className="flex size-7 items-center justify-center rounded-md bg-violet-100 dark:bg-violet-900/30">
-            <HugeiconsIcon
-              icon={AiChat02Icon}
-              className="size-4 text-violet-600 dark:text-violet-400"
-              strokeWidth={2}
-            />
-          </div>
-          <h3 className="text-sm font-semibold">
+    <Card
+      size="sm"
+      className="rounded-md border-violet-300/40 bg-violet-50/70 dark:border-violet-800/60 dark:bg-violet-950/25"
+    >
+      <CardHeader>
+        <CardTitle>
+          <span className="flex items-center gap-2">
+            <span className="flex size-9 items-center justify-center rounded-md bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300">
+              <HugeiconsIcon
+                icon={AiChat02Icon}
+                className="size-5"
+                strokeWidth={2}
+              />
+            </span>
             Precisa de ajuda para escrever?
-          </h3>
-        </div>
+          </span>
+        </CardTitle>
+      </CardHeader>
 
+      <CardContent className="flex flex-col gap-3">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Disponibilizamos um <strong>guia de instrução para IA</strong> — um
+          Disponibilizamos um <strong>guia de instrução para IA</strong>, um
           arquivo que você pode carregar em qualquer assistente de IA (como
           ChatGPT, Claude ou Gemini) para que ele saiba como te ajudar a redigir
           uma denúncia.
         </p>
 
-        {/* Como usar */}
-        <div className="rounded-md border border-border/60 bg-violet-100 dark:bg-violet-900/30 px-3 py-2.5 text-sm">
-          <p className="mb-1.5 flex items-center gap-1.5 font-medium text-foreground">
+        <div className="rounded-md border border-violet-300/50 bg-violet-100/70 px-3 py-2.5 text-sm dark:border-violet-800/60 dark:bg-violet-900/30">
+          <p className="mb-1.5 flex items-center gap-1.5 font-medium">
             <HugeiconsIcon
               icon={InformationCircleIcon}
-              className="size-3.5 text-violet-500"
+              className="size-4 text-violet-700 dark:text-violet-300"
               strokeWidth={2}
             />
             Como usar
           </p>
-          <ol className="space-y-1 text-muted-foreground list-none">
+          <ol className="flex list-none flex-col gap-1 text-muted-foreground">
             <li className="flex gap-2">
-              <span className="text-violet-500 font-medium">1.</span>
+              <span className="font-medium text-foreground">1.</span>
               Baixe o arquivo abaixo
             </li>
             <li className="flex gap-2">
-              <span className="text-violet-500 font-medium">2.</span>
+              <span className="font-medium text-foreground">2.</span>
               Abra o assistente de IA de sua preferência
             </li>
             <li className="flex gap-2">
-              <span className="text-violet-500 font-medium">3.</span>
+              <span className="font-medium text-foreground">3.</span>
               <span>
                 Anexe o arquivo e diga:{" "}
                 <strong>"Siga as instruções do arquivo"</strong>
               </span>
             </li>
             <li className="flex gap-2">
-              <span className="text-violet-500 font-medium">4.</span>A IA irá
-              guiar você na escrita da denúncia
+              <span className="font-medium text-foreground">4.</span>
+              <span>A IA irá guiar você na escrita da denúncia</span>
             </li>
           </ol>
         </div>
@@ -71,13 +73,17 @@ export function ReportWritingHelp() {
           identificar você e revisar o texto antes do envio.
         </p>
 
-        <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="mt-1 grid grid-cols-1 gap-2 md:grid-cols-2">
           <Button variant="default" size="lg" asChild>
             <a
               href="/skills/skill-de-denunciante.md"
               download="guia-escrita-denuncia.md"
             >
-              <Download />
+              <HugeiconsIcon
+                icon={Download02Icon}
+                data-icon="inline-start"
+                strokeWidth={2}
+              />
               Baixar guia de IA
             </a>
           </Button>
@@ -90,7 +96,7 @@ export function ReportWritingHelp() {
             >
               <HugeiconsIcon
                 icon={AiChat02Icon}
-                className="size-3.5"
+                data-icon="inline-start"
                 strokeWidth={2}
               />
               Ler o guia

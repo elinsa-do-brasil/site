@@ -130,11 +130,14 @@ const BUILTIN_INTERNAL_TOOLS: InternalTool[] = [
     label: "Assinatura de e-mail",
     description:
       "Gere e copie a assinatura corporativa no padrão da marca Elinsa.",
-    href: "/assinatura-de-email",
+    href: "/portal/mercurio",
     icon: "Mail",
   },
 ];
-const LEGACY_BUILTIN_TOOL_HREFS = new Set(["/portal/assinatura-de-email"]);
+const LEGACY_BUILTIN_TOOL_HREFS = new Set([
+  "/assinatura-de-email",
+  "/portal/assinatura-de-email",
+]);
 
 export async function getAvailableInternalTools(
   context: InternalAccessContext,

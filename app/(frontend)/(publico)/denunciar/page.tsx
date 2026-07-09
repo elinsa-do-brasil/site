@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { AnonymousReportForm } from "@/components/anonymous-report/AnonymousReportForm";
-import { ReportAnonymizationInfo } from "@/components/anonymous-report/ReportAnonymizationInfo";
-import { ReportPrivacyNotice } from "@/components/anonymous-report/ReportPrivacyNotice";
-import { ReportWritingHelp } from "@/components/anonymous-report/ReportWritingHelp";
+import { AnonymousReportForm } from "@/components/reports/anonymous-report-form";
+import { ReportAnonymizationInfo } from "@/components/reports/report-anonymization-info";
+import { ReportPrivacyNotice } from "@/components/reports/report-privacy-notice";
+import { ReportWritingHelp } from "@/components/reports/report-writing-help";
 
 export const metadata: Metadata = {
   title: "Canal de denúncias",
@@ -16,13 +16,13 @@ export const metadata: Metadata = {
 
 export default function DenunciarPage() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
+    <div className="mx-auto w-full max-w-6xl pt-28 pb-16">
       {/* ── Grid geral: conteúdo + sidebar ── */}
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
         {/* ── Coluna esquerda ── */}
         <div className="flex flex-col gap-8">
           {/* Heading */}
-          <section className="space-y-3">
+          <section className="flex flex-col gap-3">
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Canal de denúncias
             </h1>

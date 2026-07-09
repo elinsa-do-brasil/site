@@ -17,7 +17,7 @@ O Canal de Denúncias da Elinsa foi projetado com o princípio de **Privacy by D
 ## 2. Fluxo no Frontend (Coleta e Envio)
 
 ### Estrutura do Formulário
-- **Arquivo Principal:** [AnonymousReportForm.tsx](file:///c:/Users/raave/Repositórios/elinsa/components/anonymous-report/AnonymousReportForm.tsx)
+- **Arquivo Principal:** [anonymous-report-form.tsx](file:///c:/Users/raave/Repositórios/elinsa/components/reports/anonymous-report-form.tsx)
 - **Zod Schema:** [schema.ts](file:///c:/Users/raave/Repositórios/elinsa/lib/anonymous-report/schema.ts)
 - **Payload Builder:** [build-report-payload.ts](file:///c:/Users/raave/Repositórios/elinsa/lib/anonymous-report/build-report-payload.ts)
 

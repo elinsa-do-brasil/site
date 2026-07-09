@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -63,11 +64,13 @@ export function ReportStatusSelect({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {REPORT_STATUS_VALUES.map((value) => (
-            <SelectItem key={value} value={value}>
-              {reportStatusLabels[value]}
-            </SelectItem>
-          ))}
+          <SelectGroup>
+            {REPORT_STATUS_VALUES.map((value) => (
+              <SelectItem key={value} value={value}>
+                {reportStatusLabels[value]}
+              </SelectItem>
+            ))}
+          </SelectGroup>
         </SelectContent>
       </Select>
       {isPending && <Spinner className="size-3.5 text-muted-foreground" />}

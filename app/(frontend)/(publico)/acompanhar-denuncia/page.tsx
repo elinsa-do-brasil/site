@@ -8,7 +8,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
+import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -118,7 +118,7 @@ export default async function FollowReportPage({
               action="/acompanhar-denuncia"
               className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
             >
-              <div className="min-w-0 space-y-2">
+              <div className="flex min-w-0 flex-col gap-2">
                 <Label htmlFor="follow-report-protocol">
                   Protocolo da denúncia
                 </Label>

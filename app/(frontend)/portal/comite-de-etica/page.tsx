@@ -1,15 +1,16 @@
 import {
-  ChevronLeft,
-  ChevronRight,
-  Clock3,
-  Inbox,
-  ListChecks,
-  Search,
-} from "lucide-react";
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  CheckListIcon,
+  Clock3Icon,
+  InboxIcon,
+  Search01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ReportStatusBadge } from "@/components/reports/ReportStatusBadge";
+import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -93,7 +94,11 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
               <input name="status" type="hidden" value={statusFilter} />
             )}
             <div className="relative">
-              <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground" />
+              <HugeiconsIcon
+                icon={Search01Icon}
+                className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground"
+                strokeWidth={2}
+              />
               <Input
                 className="h-9 pl-8 text-sm"
                 defaultValue={search}
@@ -155,7 +160,7 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
                         {report.category}
                       </p>
                     </div>
-                    <dl className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:block lg:space-y-2">
+                    <dl className="flex flex-col gap-2 text-xs text-muted-foreground sm:grid sm:grid-cols-2 lg:flex">
                       <ReportDate label="Recebida" value={report.createdAt} />
                       <ReportDate label="Atualizada" value={report.updatedAt} />
                     </dl>
@@ -164,7 +169,11 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
               </div>
             ) : (
               <div className="px-4 py-10 text-center">
-                <Inbox className="mx-auto mb-3 size-8 text-muted-foreground/70" />
+                <HugeiconsIcon
+                  icon={InboxIcon}
+                  className="mx-auto mb-3 size-8 text-muted-foreground/70"
+                  strokeWidth={2}
+                />
                 <p className="text-sm text-muted-foreground">
                   {search || statusFilter
                     ? "Nenhuma denúncia encontrada com esses filtros."
@@ -191,7 +200,7 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
               search,
               statusFilter: statusFilter === "new" ? undefined : "new",
             })}
-            icon={<Inbox className="size-4" />}
+            icon={<HugeiconsIcon icon={InboxIcon} strokeWidth={2} />}
             label="Novas"
             value={counts.new ?? 0}
           />
@@ -202,7 +211,7 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
               statusFilter:
                 statusFilter === "in_progress" ? undefined : "in_progress",
             })}
-            icon={<Clock3 className="size-4" />}
+            icon={<HugeiconsIcon icon={Clock3Icon} strokeWidth={2} />}
             label="Em andamento"
             value={inProgressCount}
           />
@@ -213,7 +222,7 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
               statusFilter:
                 statusFilter === "finished" ? undefined : "finished",
             })}
-            icon={<ListChecks className="size-4" />}
+            icon={<HugeiconsIcon icon={CheckListIcon} strokeWidth={2} />}
             label="Finalizadas"
             value={finishedCount}
           />
@@ -310,7 +319,11 @@ function Pagination({
             statusFilter,
           })}
         >
-          <ChevronLeft className="size-3" />
+          <HugeiconsIcon
+            icon={ArrowLeft01Icon}
+            data-icon="inline-start"
+            strokeWidth={2}
+          />
           Anterior
         </Link>
       </Button>
@@ -331,7 +344,11 @@ function Pagination({
           })}
         >
           Próxima
-          <ChevronRight className="size-3" />
+          <HugeiconsIcon
+            icon={ArrowRight01Icon}
+            data-icon="inline-end"
+            strokeWidth={2}
+          />
         </Link>
       </Button>
     </div>
