@@ -9,9 +9,9 @@ import {
   UserRound,
 } from "lucide-react";
 import { draftMode } from "next/headers";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EditorialCover } from "@/components/editorial/editorial-cover";
 import { EditorialRichText } from "@/components/editorial/editorial-rich-text";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -333,19 +333,13 @@ function FeaturedPostCard({
       <Card className="relative h-full min-h-[30rem] overflow-hidden rounded-3xl border-border/70 bg-elinsa-dark py-0 text-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/40 hover:shadow-xl hover:shadow-elinsa-primary/10 md:min-h-[34rem]">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(145deg,#145061,#061a22_58%,#0c2b36)]" />
-          {card.coverImage ? (
-            <Image
-              alt={card.coverImage.alt}
-              blurDataURL={card.coverImage.blurDataUrl}
-              className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
-              fill
-              placeholder={card.coverImage.blurDataUrl ? "blur" : "empty"}
-              sizes="(min-width: 1280px) 48rem, (min-width: 1024px) 62vw, 100vw"
-              src={card.coverImage.url}
-            />
-          ) : (
-            <FallbackCover />
-          )}
+          <EditorialCover
+            alt={card.coverImage?.alt ?? post.title}
+            blurDataURL={card.coverImage?.blurDataUrl}
+            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            sizes="(min-width: 1280px) 48rem, (min-width: 1024px) 62vw, 100vw"
+            src={card.coverImage?.url}
+          />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.44)_42%,rgba(4,14,22,0.94)_100%)]" />
         </div>
 
@@ -394,19 +388,13 @@ function CompactPostCard({
     <Link className="group block h-full min-w-0" href={card.href}>
       <Card className="grid h-full overflow-hidden rounded-3xl border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 sm:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]">
         <div className="relative min-h-48 overflow-hidden bg-elinsa-dark sm:min-h-full">
-          {card.coverImage ? (
-            <Image
-              alt={card.coverImage.alt}
-              blurDataURL={card.coverImage.blurDataUrl}
-              className="absolute inset-0 size-full object-cover object-center transition duration-500 group-hover:scale-105"
-              fill
-              placeholder={card.coverImage.blurDataUrl ? "blur" : "empty"}
-              sizes="(min-width: 1280px) 13rem, (min-width: 640px) 12rem, 100vw"
-              src={card.coverImage.url}
-            />
-          ) : (
-            <FallbackCover />
-          )}
+          <EditorialCover
+            alt={card.coverImage?.alt ?? post.title}
+            blurDataURL={card.coverImage?.blurDataUrl}
+            className="absolute inset-0 size-full object-cover object-center transition duration-500 group-hover:scale-105"
+            sizes="(min-width: 1280px) 13rem, (min-width: 640px) 12rem, 100vw"
+            src={card.coverImage?.url}
+          />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.06)_0%,rgba(4,14,22,0.64)_100%)]" />
         </div>
 
@@ -544,34 +532,6 @@ function SubjectFilterNav({
         ))}
       </div>
     </nav>
-  );
-}
-
-function FallbackCover() {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[linear-gradient(145deg,#dff5fc_0%,#88c4d6_46%,#0c4b61_100%)] dark:bg-[linear-gradient(145deg,#103746_0%,#0b2631_48%,#031018_100%)]">
-      <div className="relative text-white drop-shadow-[0_24px_42px_rgba(0,0,0,0.45)]">
-        <LightningSvg />
-      </div>
-    </div>
-  );
-}
-
-function LightningSvg() {
-  return (
-    <svg aria-hidden="true" className="size-28" fill="none" viewBox="0 0 96 96">
-      <path
-        d="M53.7 6 18 53.8h25.4L37.9 90 78 38.3H50.8L53.7 6Z"
-        fill="currentColor"
-        opacity="0.96"
-      />
-      <path
-        d="M53.7 6 18 53.8h25.4L37.9 90 78 38.3H50.8L53.7 6Z"
-        stroke="rgba(255,255,255,0.58)"
-        strokeLinejoin="round"
-        strokeWidth="3"
-      />
-    </svg>
   );
 }
 

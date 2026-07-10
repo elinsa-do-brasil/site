@@ -5,14 +5,21 @@ import { cn } from "@/lib/utils";
 function Card({
   className,
   size = "default",
+  variant = "standard",
   ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+}: React.ComponentProps<"div"> & {
+  size?: "default" | "sm";
+  variant?: "standard" | "panel" | "metric" | "auth" | "editorial" | "form";
+}) {
   return (
     <div
       data-slot="card"
       data-size={size}
+      data-variant={variant}
       className={cn(
-        "group/card flex flex-col gap-4 overflow-hidden rounded-3xl bg-card py-4 text-xs/relaxed text-card-foreground ring-1 ring-foreground/10 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg",
+        "group/card flex flex-col gap-4 overflow-hidden border border-border/80 bg-card py-4 text-xs/relaxed text-card-foreground shadow-card has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg",
+        "data-[variant=standard]:rounded-lg data-[variant=panel]:rounded-xl data-[variant=metric]:rounded-lg data-[variant=auth]:rounded-3xl data-[variant=editorial]:rounded-xl data-[variant=form]:rounded-lg",
+        "data-[variant=panel]:bg-surface-panel data-[variant=panel]:shadow-panel data-[variant=metric]:bg-surface-card data-[variant=auth]:shadow-auth data-[variant=form]:bg-surface-form",
         className,
       )}
       {...props}

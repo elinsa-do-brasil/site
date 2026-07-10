@@ -29,7 +29,10 @@ export default async function EntrarPage({ searchParams }: EntrarPageProps) {
   }
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-12">
+    <main
+      className="flex min-h-screen w-full items-center justify-center px-4 py-12"
+      id="conteudo-principal"
+    >
       <LoginForm redirectTo={safeRedirect} />
     </main>
   );

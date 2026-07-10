@@ -27,7 +27,7 @@ export function RedefinirSenhaForm() {
   if (!token) {
     return (
       <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h2 className="text-xl font-bold text-destructive">Link Inválido</h2>
+        <h1 className="text-xl font-bold text-destructive">Link inválido</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           O token de redefinição de senha não foi encontrado ou expirou.
         </p>
@@ -41,14 +41,14 @@ export function RedefinirSenhaForm() {
   if (success) {
     return (
       <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h2 className="text-2xl font-bold tracking-tight text-primary">
-          Senha redefinida!
-        </h2>
+        <h1 className="text-2xl font-bold tracking-tight text-primary">
+          Senha redefinida
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Sua senha foi alterada com sucesso. Você já pode acessar o portal.
         </p>
         <Button className="mt-6 w-full" asChild>
-          <Link href="/entrar">Entrar no Portal</Link>
+          <Link href="/entrar">Entrar no portal</Link>
         </Button>
       </div>
     );
@@ -90,7 +90,7 @@ export function RedefinirSenhaForm() {
   return (
     <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">Nova Senha</h2>
+        <h1 className="text-2xl font-bold tracking-tight">Nova senha</h1>
         <p className="mt-2 text-xs text-muted-foreground">
           Crie uma senha segura com no mínimo 12 caracteres.
         </p>
@@ -99,7 +99,7 @@ export function RedefinirSenhaForm() {
       <form onSubmit={onSubmit}>
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor="new-password">Nova Senha</FieldLabel>
+            <FieldLabel htmlFor="new-password">Nova senha</FieldLabel>
             <Input
               id="new-password"
               type="password"
@@ -111,7 +111,7 @@ export function RedefinirSenhaForm() {
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="confirm-password">Confirmar Senha</FieldLabel>
+            <FieldLabel htmlFor="confirm-password">Confirmar senha</FieldLabel>
             <Input
               id="confirm-password"
               type="password"
@@ -125,7 +125,7 @@ export function RedefinirSenhaForm() {
           {error && <FieldError>{error}</FieldError>}
 
           <Button type="submit" className="mt-2 w-full" disabled={isPending}>
-            {isPending ? <Spinner /> : "Redefinir Senha"}
+            {isPending ? <Spinner /> : "Redefinir senha"}
           </Button>
         </FieldGroup>
       </form>

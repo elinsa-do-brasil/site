@@ -84,11 +84,12 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
   }
 
   return (
-    <Card className="w-full max-w-108">
+    <Card className="w-full max-w-108" variant="auth">
       <CardHeader className="px-6">
         <CardTitle className="mt-6 mb-3">
           <Logo className="mx-auto" />
         </CardTitle>
+        <h1 className="sr-only">Entrar no portal</h1>
         <CardDescription className="text-center">
           Faça login para acessar nossas ferramentas internas.
         </CardDescription>
@@ -127,19 +128,17 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
             name="password"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid || undefined}>
-                <FieldLabel
-                  htmlFor="login-password"
-                  className="flex w-full justify-between items-center"
-                >
-                  Senha
+                <div className="flex items-center justify-between gap-3">
+                  <FieldLabel htmlFor="login-password">Senha</FieldLabel>
                   <Button
                     variant="link"
-                    className="text-muted-foreground hover:text-black dark:hover:text-white p-0 h-3.5"
+                    size="sm"
+                    className="h-auto px-0 py-0 text-xs text-muted-foreground hover:text-primary"
                     asChild
                   >
                     <Link href="/recuperar-senha">Esqueceu sua senha?</Link>
                   </Button>
-                </FieldLabel>
+                </div>
                 <div className="flex">
                   <Input
                     id="login-password"
@@ -158,9 +157,9 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
                     disabled={disableShowPassButton}
                   >
                     {showPass && !disableShowPassButton ? (
-                      <EyeIcon className="h-4 w-4" aria-hidden="true" />
+                      <EyeIcon aria-hidden="true" />
                     ) : (
-                      <EyeClosedIcon className="h-4 w-4" aria-hidden="true" />
+                      <EyeClosedIcon aria-hidden="true" />
                     )}
                     <span className="sr-only">
                       {showPass ? "Esconder senha" : "Mostrar senha"}

@@ -7,7 +7,10 @@ export const metadata: Metadata = {
 
 export default function RecuperarSenhaPage() {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-12">
+    <main
+      className="flex min-h-screen w-full items-center justify-center px-4 py-12"
+      id="conteudo-principal"
+    >
       <RecuperarSenhaForm />
     </main>
   );

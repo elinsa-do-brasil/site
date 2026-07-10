@@ -8,11 +8,14 @@ export const metadata: Metadata = {
 
 export default function VerificarEmailPage() {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-12">
+    <main
+      className="flex min-h-screen w-full items-center justify-center px-4 py-12"
+      id="conteudo-principal"
+    >
       <div className="w-full max-w-md rounded-lg border bg-card p-8 text-center shadow-sm">
-        <h2 className="text-2xl font-bold tracking-tight">
-          Verificação de E-mail
-        </h2>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Verificação de e-mail
+        </h1>
         <p className="mt-4 text-sm text-muted-foreground">
           Se você acessou o link enviado para o seu e-mail, sua conta foi
           confirmada pelo sistema de autenticação.
@@ -23,7 +26,7 @@ export default function VerificarEmailPage() {
           internas.
         </p>
         <Button className="mt-6 w-full" asChild>
-          <Link href="/entrar">Ir para o Login</Link>
+          <Link href="/entrar">Ir para o login</Link>
         </Button>
       </div>
     </main>

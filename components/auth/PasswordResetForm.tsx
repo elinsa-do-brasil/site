@@ -44,15 +44,15 @@ export function RecuperarSenhaForm() {
   if (success) {
     return (
       <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h2 className="text-2xl font-bold tracking-tight text-primary">
-          E-mail enviado!
-        </h2>
+        <h1 className="text-2xl font-bold tracking-tight text-primary">
+          E-mail enviado
+        </h1>
         <p className="mt-4 text-sm text-muted-foreground">
           Se o e-mail <strong>{email}</strong> estiver cadastrado, você receberá
           um link para criar uma nova senha.
         </p>
         <Button className="mt-6 w-full" asChild>
-          <Link href="/entrar">Voltar para o Login</Link>
+          <Link href="/entrar">Voltar para o login</Link>
         </Button>
       </div>
     );
@@ -61,7 +61,7 @@ export function RecuperarSenhaForm() {
   return (
     <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">Recuperar Senha</h2>
+        <h1 className="text-2xl font-bold tracking-tight">Recuperar senha</h1>
         <p className="mt-2 text-xs text-muted-foreground">
           Informe seu e-mail cadastrado para receber as instruções de
           redefinição.
@@ -93,7 +93,7 @@ export function RecuperarSenhaForm() {
           href="/entrar"
           className="underline underline-offset-4 hover:text-primary"
         >
-          Voltar para o Login
+          Voltar para o login
         </Link>
       </div>
     </div>

@@ -68,11 +68,14 @@ export function AceitarConvite({
 
   if (accepted) {
     return (
-      <Card className="w-full max-w-108">
+      <Card className="w-full max-w-108" variant="auth">
         <CardHeader className="px-6 text-center">
           <CardTitle className="mt-6 mb-3">
             <Logo className="mx-auto" />
           </CardTitle>
+          <h1 className="text-lg font-semibold tracking-tight">
+            Convite aceito
+          </h1>
           <CardDescription>
             Convite aceito. Redirecionando para o portal...
           </CardDescription>
@@ -82,12 +85,15 @@ export function AceitarConvite({
   }
 
   return (
-    <Card className="w-full max-w-108">
-      <CardHeader className="px-6">
+    <Card className="w-full max-w-108" variant="auth">
+      <CardHeader className="px-6 text-center">
         <CardTitle className="mt-6 mb-3">
           <Logo className="mx-auto" />
         </CardTitle>
-        <CardDescription className="text-center">
+        <h1 className="text-lg font-semibold tracking-tight">
+          Aceitar convite
+        </h1>
+        <CardDescription>
           Aceite o convite de {organizationName} para liberar seu acesso.
         </CardDescription>
       </CardHeader>

@@ -160,7 +160,10 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
 
 function InvitePageShell({ children }: { children: ReactNode }) {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-12">
+    <main
+      className="flex min-h-screen w-full items-center justify-center px-4 py-12"
+      id="conteudo-principal"
+    >
       {children}
     </main>
   );

@@ -94,11 +94,14 @@ export function CriarContaForm({
 
   if (success) {
     return (
-      <Card className="w-full max-w-108">
+      <Card className="w-full max-w-108" variant="auth">
         <CardHeader className="px-6 text-center">
           <CardTitle className="mt-6 mb-3">
             <Logo className="mx-auto" />
           </CardTitle>
+          <h1 className="text-lg font-semibold tracking-tight">
+            Verifique seu e-mail
+          </h1>
           <CardDescription>
             Enviamos a verificação para <strong>{invitedEmail}</strong>.
           </CardDescription>
@@ -117,12 +120,13 @@ export function CriarContaForm({
   }
 
   return (
-    <Card className="w-full max-w-108">
-      <CardHeader className="px-6">
+    <Card className="w-full max-w-108" variant="auth">
+      <CardHeader className="px-6 text-center">
         <CardTitle className="mt-6 mb-3">
           <Logo className="mx-auto" />
         </CardTitle>
-        <CardDescription className="text-center">
+        <h1 className="text-lg font-semibold tracking-tight">Criar conta</h1>
+        <CardDescription>
           Crie sua conta para aceitar o convite de {organizationName}.
         </CardDescription>
       </CardHeader>
@@ -198,9 +202,9 @@ export function CriarContaForm({
                       disabled={disableShowPasswordButton}
                     >
                       {showPassword && !disableShowPasswordButton ? (
-                        <EyeIcon className="size-4" aria-hidden="true" />
+                        <EyeIcon aria-hidden="true" />
                       ) : (
-                        <EyeClosedIcon className="size-4" aria-hidden="true" />
+                        <EyeClosedIcon aria-hidden="true" />
                       )}
                       <span className="sr-only">
                         {showPassword ? "Esconder senha" : "Mostrar senha"}

@@ -666,6 +666,7 @@ function BaseMarker({
 }) {
   return (
     <MapMarker
+      ariaLabel={`Base ${base.name}`}
       latitude={base.marker[1]}
       longitude={base.marker[0]}
       onClick={onSelect}
