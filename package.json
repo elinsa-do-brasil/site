@@ -15,7 +15,9 @@
     "db:seed": "tsx --env-file=.env lib/db/seed.ts",
     "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
     "reports:keys": "tsx scripts/generate-report-encryption-keys.ts",
-    "email:dev": "email dev"
+    "email:dev": "email dev",
+    "ai:crawl": "tsx scripts/ai/agent-browser-crawl.ts",
+    "ai:improve": "tsx scripts/ai/orchestrator.ts"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.33.0",

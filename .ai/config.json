@@ -1,0 +1,204 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "startCommand": "pnpm dev",
+  "serverReadyTimeoutMs": 90000,
+  "allowDirtyGit": false,
+  "maxIterations": 1,
+  "targetScore": 8.7,
+  "codex": {
+    "command": "codex",
+    "reviewSandbox": "read-only",
+    "writeSandbox": "workspace-write",
+    "extraArgs": []
+  },
+  "agentBrowser": {
+    "command": "agent-browser",
+    "headed": false,
+    "waitUntil": "networkidle",
+    "screenshotFullPage": true,
+    "closeAllBeforeCrawl": true
+  },
+  "auth": {
+    "loginPath": "/entrar",
+    "usernameEnv": "AGENT_BROWSER_TEST_EMAIL",
+    "passwordEnv": "AGENT_BROWSER_TEST_PASSWORD",
+    "usernameSelector": "input[type='email'], input[name='email'], input[name='username']",
+    "passwordSelector": "input[type='password']",
+    "submitSelector": "button[type='submit']",
+    "waitAfterSubmitMs": 2500
+  },
+  "routes": [
+    {
+      "path": "/",
+      "group": "publico"
+    },
+    {
+      "path": "/acompanhar-denuncia",
+      "group": "publico"
+    },
+    {
+      "path": "/assinatura-de-email",
+      "group": "publico"
+    },
+    {
+      "path": "/contato",
+      "group": "publico"
+    },
+    {
+      "path": "/denunciar",
+      "group": "publico"
+    },
+    {
+      "path": "/imprensa",
+      "group": "publico"
+    },
+    {
+      "path": "/licencas",
+      "group": "publico"
+    },
+    {
+      "path": "/mapas",
+      "group": "publico"
+    },
+    {
+      "path": "/marca",
+      "group": "publico"
+    },
+    {
+      "path": "/privacidade",
+      "group": "publico"
+    },
+    {
+      "path": "/quem-somos",
+      "group": "publico"
+    },
+    {
+      "path": "/termos",
+      "group": "publico"
+    },
+    {
+      "path": "/vagas",
+      "group": "publico"
+    },
+    {
+      "path": "/configuracoes",
+      "group": "conta"
+    },
+    {
+      "path": "/convite",
+      "group": "conta"
+    },
+    {
+      "path": "/criar",
+      "group": "conta"
+    },
+    {
+      "path": "/entrar",
+      "group": "conta"
+    },
+    {
+      "path": "/recuperar-senha",
+      "group": "conta"
+    },
+    {
+      "path": "/redefinir-senha",
+      "group": "conta"
+    },
+    {
+      "path": "/verificar-email",
+      "group": "conta"
+    },
+    {
+      "path": "/portal",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/blog",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/comite-de-etica",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/contatos",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/gestao",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/gestao/convites",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/gestao/equipes",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/gestao/ferramentas",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/gestao/organizacao",
+      "group": "portal",
+      "auth": true
+    },
+    {
+      "path": "/portal/mercurio",
+      "group": "portal",
+      "auth": true
+    }
+  ],
+  "viewports": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 1100
+    },
+    {
+      "name": "tablet",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "validationCommands": [
+    "pnpm lint",
+    "pnpm build"
+  ],
+  "forbiddenPaths": [
+    ".env",
+    ".env.local",
+    ".env.agent.local",
+    "drizzle/",
+    "prisma/",
+    "supabase/",
+    "payload.config.ts",
+    "src/app/api",
+    "src/server",
+    "src/lib/auth"
+  ],
+  "allowedImplementationFocus": [
+    "CSS variables",
+    "Tailwind config",
+    "global styles",
+    "shared UI components",
+    "page layout",
+    "copy and microcopy",
+    "accessibility labels and focus states"
+  ]
+}

@@ -57,3 +57,5 @@ secrets/
 
 /.venv
 /.pnpm-store
+
+/.ai/runs
