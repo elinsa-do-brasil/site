@@ -271,6 +271,28 @@ const MapRoot = forwardRef<MapRef, MapProps>(function MapRoot(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A map canvas does not automatically observe layout changes. This keeps its
+  // viewport correct when a responsive grid, sidebar or browser orientation
+  // changes size after the map has initialized.
+  useEffect(() => {
+    if (!mapInstance || !containerRef.current) return;
+
+    let frameId: number | null = null;
+    const resize = () => {
+      if (frameId !== null) cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => mapInstance.resize());
+    };
+    const observer = new ResizeObserver(resize);
+
+    observer.observe(containerRef.current);
+    resize();
+
+    return () => {
+      observer.disconnect();
+      if (frameId !== null) cancelAnimationFrame(frameId);
+    };
+  }, [mapInstance]);
+
   // Sync controlled viewport to map
   useEffect(() => {
     if (!mapInstance || !isControlled || !viewport) return;
@@ -1131,7 +1153,7 @@ function MapRoute({
   }, [isLoaded, map, coordinates, sourceId]);
 
   useEffect(() => {
-    if (!isLoaded || !map || !map.getLayer(layerId)) return;
+    if (!isLoaded || !map?.getLayer(layerId)) return;
 
     map.setPaintProperty(layerId, "line-color", color);
     map.setPaintProperty(layerId, "line-width", width);
@@ -1436,7 +1458,7 @@ function MapArc<T extends MapArcDatum = MapArcDatum>({
 
   // Sync paint/layout when they change.
   useEffect(() => {
-    if (!isLoaded || !map || !map.getLayer(layerId)) return;
+    if (!isLoaded || !map?.getLayer(layerId)) return;
     for (const [key, value] of Object.entries(mergedPaint)) {
       map.setPaintProperty(
         layerId,

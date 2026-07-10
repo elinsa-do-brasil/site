@@ -12,6 +12,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "../logo";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export function RecuperarSenhaForm() {
   const [email, setEmail] = useState("");
@@ -43,59 +52,79 @@ export function RecuperarSenhaForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h1 className="text-2xl font-bold tracking-tight text-primary">
-          E-mail enviado
-        </h1>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Se o e-mail <strong>{email}</strong> estiver cadastrado, você receberá
-          um link para criar uma nova senha.
-        </p>
-        <Button className="mt-6 w-full" asChild>
-          <Link href="/entrar">Voltar para o login</Link>
-        </Button>
-      </div>
+      <Card className="w-full max-w-108" variant="auth">
+        <CardHeader className="px-6 text-center">
+          <CardTitle className="mt-6 mb-3">
+            <Logo className="mx-auto" />
+          </CardTitle>
+          <h1 className="text-lg font-semibold tracking-tight">
+            E-mail enviado
+          </h1>
+          <CardDescription>
+            Se o e-mail <strong>{email}</strong> estiver cadastrado, você
+            receberá um link para criar uma nova senha.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="px-6">
+          <Button className="w-full" asChild>
+            <Link href="/entrar">Voltar para o login</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Recuperar senha</h1>
-        <p className="mt-2 text-xs text-muted-foreground">
+    <Card className="w-full max-w-108" variant="auth">
+      <CardHeader className="px-6 text-center">
+        <CardTitle className="mt-6 mb-3">
+          <Logo className="mx-auto" />
+        </CardTitle>
+        <h1 className="text-lg font-semibold tracking-tight">
+          Recuperar senha
+        </h1>
+        <CardDescription>
           Informe seu e-mail cadastrado para receber as instruções de
           redefinição.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="px-6 pb-6">
+        <form onSubmit={onSubmit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="reset-email">E-mail</FieldLabel>
+              <Input
+                id="reset-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </Field>
+            {error && <FieldError>{error}</FieldError>}
+            <Button
+              type="submit"
+              className="mt-2 w-full"
+              disabled={isSubmitting}
+              size="lg"
+            >
+              {isSubmitting ? <Spinner /> : "Enviar instruções"}
+            </Button>
+          </FieldGroup>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          <Link
+            href="/entrar"
+            className="underline underline-offset-4 hover:text-primary"
+          >
+            Voltar para o login
+          </Link>
         </p>
-      </div>
-
-      <form onSubmit={onSubmit}>
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="reset-email">E-mail</FieldLabel>
-            <Input
-              id="reset-email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </Field>
-          {error && <FieldError>{error}</FieldError>}
-          <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
-            {isSubmitting ? <Spinner /> : "Enviar instruções"}
-          </Button>
-        </FieldGroup>
-      </form>
-
-      <div className="mt-6 text-center text-sm text-muted-foreground">
-        <Link
-          href="/entrar"
-          className="underline underline-offset-4 hover:text-primary"
-        >
-          Voltar para o login
-        </Link>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -48,14 +48,10 @@ function EditorialCoverFallback() {
       aria-hidden="true"
       className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[linear-gradient(145deg,#dff5fc_0%,#88c4d6_46%,#0c4b61_100%)] text-white dark:bg-[linear-gradient(145deg,#103746_0%,#0b2631_48%,#031018_100%)]"
     >
-      <div className="flex flex-col items-center gap-3 text-center drop-shadow-[0_24px_42px_rgba(0,0,0,0.45)]">
-        <span className="grid size-16 place-items-center rounded-xl border border-white/25 bg-white/12 backdrop-blur">
-          <HugeiconsIcon icon={ImageNotFound01Icon} strokeWidth={2} />
-        </span>
-        <span className="text-xs font-semibold uppercase text-white/80">
-          Imagem indisponível
-        </span>
-      </div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.32),transparent_32%)]" />
+      <span className="relative grid size-12 place-items-center rounded-xl border border-white/25 bg-white/12 text-white/80 backdrop-blur">
+        <HugeiconsIcon icon={ImageNotFound01Icon} strokeWidth={2} />
+      </span>
     </div>
   );
 }

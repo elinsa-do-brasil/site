@@ -3,7 +3,7 @@
   "startCommand": "pnpm dev",
   "serverReadyTimeoutMs": 90000,
   "allowDirtyGit": false,
-  "maxIterations": 1,
+  "maxIterations": 2,
   "targetScore": 8.7,
   "codex": {
     "command": "codex",
@@ -34,10 +34,6 @@
     },
     {
       "path": "/acompanhar-denuncia",
-      "group": "publico"
-    },
-    {
-      "path": "/assinatura-de-email",
       "group": "publico"
     },
     {
@@ -81,19 +77,16 @@
       "group": "publico"
     },
     {
-      "path": "/configuracoes",
+      "path": "/entrar",
       "group": "conta"
     },
     {
-      "path": "/convite",
-      "group": "conta"
+      "path": "/configuracoes",
+      "group": "conta",
+      "auth": true
     },
     {
       "path": "/criar",
-      "group": "conta"
-    },
-    {
-      "path": "/entrar",
       "group": "conta"
     },
     {
@@ -121,17 +114,14 @@
     {
       "path": "/portal/comite-de-etica",
       "group": "portal",
-      "auth": true
+      "auth": true,
+      "expected": "restricted"
     },
     {
       "path": "/portal/contatos",
       "group": "portal",
-      "auth": true
-    },
-    {
-      "path": "/portal/gestao",
-      "group": "portal",
-      "auth": true
+      "auth": true,
+      "expected": "restricted"
     },
     {
       "path": "/portal/gestao/convites",
@@ -177,7 +167,8 @@
     }
   ],
   "validationCommands": [
-    "pnpm lint",
+    "pnpm exec tsc --noEmit",
+    "tsx scripts/ai/validate-changed-files.ts",
     "pnpm build"
   ],
   "forbiddenPaths": [
@@ -188,9 +179,9 @@
     "prisma/",
     "supabase/",
     "payload.config.ts",
-    "src/app/api",
-    "src/server",
-    "src/lib/auth"
+    "app/api",
+    "server",
+    "lib/auth"
   ],
   "allowedImplementationFocus": [
     "CSS variables",

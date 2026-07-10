@@ -1,5 +1,4 @@
 import {
-  ArrowDownToLine,
   CheckCircle2,
   Download,
   FileImage,
@@ -19,8 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 import { downloadAsset } from "@/lib/download-asset";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Kit de marca",
@@ -296,8 +295,6 @@ function AssetCard({ asset }: { asset: BrandAsset }) {
 }
 
 export default function MarcaPage() {
-  const featuredAsset = brandAssets[0];
-
   return (
     <div className="bg-background text-foreground">
       <section className="border-b border-border bg-background px-6 pb-14 pt-28 md:px-8 md:pb-16 md:pt-32 min-h-dvh">
@@ -307,7 +304,7 @@ export default function MarcaPage() {
               <SwatchBook className="size-4" />
               Identidade visual
             </div>
-            <h1 className="text-xl font-black leading-[0.98] tracking-normal text-elinsa-dark sm:text-5xl md:text-3xl dark:text-white">
+            <h1 className="text-4xl font-black leading-[0.98] tracking-normal text-elinsa-dark sm:text-5xl md:text-6xl dark:text-white">
               Kit de marca
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-foreground/80 md:text-xl md:leading-8">

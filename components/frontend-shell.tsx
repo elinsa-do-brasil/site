@@ -85,18 +85,28 @@ export function FrontendShell({
     );
   }
 
+  if (isMapRoute) {
+    return (
+      <>
+        {skipLink}
+        <div data-frontend-shell-main id="conteudo-principal">
+          {children}
+        </div>
+        <Toaster />
+      </>
+    );
+  }
+
   return (
     <>
       {skipLink}
-      {!isMapRoute && (
-        <div data-frontend-shell-header>
-          <Header />
-        </div>
-      )}
+      <div data-frontend-shell-header>
+        <Header />
+      </div>
       <main data-frontend-shell-main id="conteudo-principal">
         {children}
       </main>
-      {!isMapRoute && footer && <div data-frontend-shell-footer>{footer}</div>}
+      {footer && <div data-frontend-shell-footer>{footer}</div>}
       <Toaster />
     </>
   );

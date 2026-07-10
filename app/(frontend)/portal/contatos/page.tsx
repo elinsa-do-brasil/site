@@ -61,16 +61,24 @@ export default async function PortalContatosPage({
       >
         <div className="relative">
           <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground" />
+          <label className="sr-only" htmlFor="contacts-search">
+            Buscar contatos
+          </label>
           <Input
-            className="h-9 pl-8 text-sm"
+            className="pl-8"
             defaultValue={search}
+            id="contacts-search"
             name="search"
             placeholder="Buscar por nome, e-mail, empresa, assunto ou mensagem"
           />
         </div>
+        <label className="sr-only" htmlFor="contacts-status">
+          Filtrar por status
+        </label>
         <select
-          className="h-9 rounded-md border border-input bg-input/20 px-2 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+          className="h-9 rounded-md border border-input bg-input/20 px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
           defaultValue={status ?? ""}
+          id="contacts-status"
           name="status"
         >
           <option value="">Todos os status</option>
@@ -80,10 +88,8 @@ export default async function PortalContatosPage({
             </option>
           ))}
         </select>
-        <Button className="h-9" type="submit">
-          Filtrar
-        </Button>
-        <Button className="h-9" variant="outline" asChild>
+        <Button type="submit">Filtrar</Button>
+        <Button variant="outline" asChild>
           <Link href="/portal/contatos">Limpar</Link>
         </Button>
       </form>

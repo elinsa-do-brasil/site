@@ -1,7 +1,7 @@
 import { Activity, ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/badge";
 import { EditorialCover } from "@/components/editorial/editorial-cover";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 import { Badge as ShadcnBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +31,7 @@ export function PressNewsSection({ posts }: PressNewsSectionProps) {
   return (
     <HomeSection headingId="imprensa-heading" tone="default">
       <header className="mb-10 max-w-3xl">
-        <Badge text="Notícias" icon={Activity} />
+        <SectionEyebrow text="Notícias" icon={Activity} />
         <h2
           id="imprensa-heading"
           className="text-3xl font-black leading-tight tracking-normal md:text-4xl"

@@ -1,6 +1,6 @@
 import { ArrowRight, MessageCircle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/badge";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 import { Button } from "@/components/ui/button";
 import { HomeSection } from "./home-section";
 
@@ -14,7 +14,7 @@ export function HomeFinalCtaSection() {
       containerClassName="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center"
     >
       <div className="max-w-3xl">
-        <Badge text="Próximo passo" icon={MessageCircle} />
+        <SectionEyebrow text="Próximo passo" icon={MessageCircle} />
         <h2
           id="home-final-cta-heading"
           className="text-3xl font-extrabold leading-tight tracking-normal md:text-4xl"

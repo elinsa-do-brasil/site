@@ -52,7 +52,7 @@ export default async function InternoDashboardPage() {
   const adminLinks = getAdminLinks(context);
 
   return (
-    <div className="mx-auto w-full max-w-6xl pb-12">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
       <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Portal interno</h1>
       </div>

@@ -68,7 +68,12 @@ export async function EditorialIndex({
         !isPortalCollection && "pt-24",
       )}
     >
-      <section className={cn("mx-auto max-w-6xl", !isPortalCollection)}>
+      <section
+        className={cn(
+          "mx-auto w-full max-w-6xl px-4 sm:px-6",
+          isPortalCollection ? "pb-12" : "py-6 md:py-8",
+        )}
+      >
         <EditorialIndexHeader
           config={config}
           subject={subject}
@@ -162,7 +167,7 @@ export async function EditorialArticlePage({
 
       <section
         className={cn(
-          "mx-auto max-w-6xl px-6 md:px-8",
+          "mx-auto max-w-6xl px-4 sm:px-6 md:px-8",
           !isPortalCollection && "py-6 md:py-8",
         )}
       >
@@ -330,7 +335,10 @@ function FeaturedPostCard({
 
   return (
     <Link className="group block h-full min-w-0" href={card.href}>
-      <Card className="relative h-full min-h-[30rem] overflow-hidden rounded-3xl border-border/70 bg-elinsa-dark py-0 text-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/40 hover:shadow-xl hover:shadow-elinsa-primary/10 md:min-h-[34rem]">
+      <Card
+        className="relative h-full min-h-[30rem] overflow-hidden border-border/70 bg-elinsa-dark py-0 text-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/40 hover:shadow-xl hover:shadow-elinsa-primary/10 md:min-h-[34rem]"
+        variant="editorial"
+      >
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(145deg,#145061,#061a22_58%,#0c2b36)]" />
           <EditorialCover
@@ -386,7 +394,10 @@ function CompactPostCard({
 
   return (
     <Link className="group block h-full min-w-0" href={card.href}>
-      <Card className="grid h-full overflow-hidden rounded-3xl border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 sm:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]">
+      <Card
+        className="grid h-full overflow-hidden border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 sm:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]"
+        variant="editorial"
+      >
         <div className="relative min-h-48 overflow-hidden bg-elinsa-dark sm:min-h-full">
           <EditorialCover
             alt={card.coverImage?.alt ?? post.title}
@@ -531,6 +542,9 @@ function SubjectFilterNav({
           </Button>
         ))}
       </div>
+      <p className="mt-2 text-xs text-muted-foreground md:hidden">
+        Deslize para ver todos os assuntos.
+      </p>
     </nav>
   );
 }

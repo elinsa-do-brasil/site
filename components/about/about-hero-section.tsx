@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/badge";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import WorldMap from "@/components/ui/world-map";
@@ -30,7 +30,7 @@ export function AboutHeroSection() {
 
       <div className="mx-auto flex min-h-[38rem] w-full max-w-6xl flex-col justify-end gap-12 md:min-h-[42rem] md:justify-center">
         <div className="max-w-2xl">
-          <Badge
+          <SectionEyebrow
             text="Espanha e Brasil conectados pela engenharia elétrica"
             icon={aboutIcons.globe}
           />

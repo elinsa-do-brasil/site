@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import { Badge } from "@/components/badge";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 import { HomeSection } from "./home-section";
 
 type ValueAccent =
@@ -207,7 +207,7 @@ function CompanyValuesIntro() {
   return (
     <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center">
       <div className="max-w-xl">
-        <Badge text={companyValuesContent.sectionLabel} icon={Heart} />
+        <SectionEyebrow text={companyValuesContent.sectionLabel} icon={Heart} />
         <h2
           id="valores-heading"
           className="max-w-2xl text-3xl font-extrabold tracking-normal md:text-4xl"

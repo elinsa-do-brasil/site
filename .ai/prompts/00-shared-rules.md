@@ -69,3 +69,24 @@ Você pode usar:
 ## Critério de qualidade
 
 Prefira mudanças pequenas e coerentes. O site deve parecer mais padronizado, não redesenhado por alguém que acabou de descobrir `backdrop-blur`.
+
+## Contrato visual vigente
+
+O produto tem três contextos intencionais — institucional, fluxo/formulário e
+ferramenta operacional. Eles podem ter densidade e composição diferentes, mas
+devem compartilhar os mesmos tokens, ações, foco, tipografia e superfícies.
+Não tente fazer o mapa ou o portal parecerem uma landing page; faça-os parecer
+partes do mesmo produto.
+
+- Use `rounded-md` para controles e itens compactos, `rounded-lg` para cards
+  padrão, `rounded-xl` para painéis editoriais e `rounded-3xl` somente em auth
+  e modais. Não crie novos raios sem uma razão funcional.
+- Use `Card` e suas variantes para superfícies repetidas; não sobrescreva
+  radius, sombra e fundo de cada instância se a variante já resolve o caso.
+- CTA principal usa `Button`/`buttonVariants` primário; ações secundárias usam
+  `outline` ou `ghost`; ações destrutivas usam `destructive`/`danger`. Links
+  textuais não devem imitar botões por acaso.
+- Páginas de conteúdo e operação usam `max-w-6xl` com `px-4` no mobile. A
+  exceção deve ser consciente, como o canvas do mapa.
+- Em mobile, priorize título, ação principal e conteúdo. Navegação e ações
+  auxiliares devem recolher antes de forçar quebras de linha no cabeçalho.

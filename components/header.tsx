@@ -16,6 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { FloatingHeader } from "@/components/floating-header";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -47,193 +48,188 @@ export function Header() {
   }
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 flex justify-center p-3 pointer-events-none sm:p-4">
-      <header className="pointer-events-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/90 px-3 shadow-sm backdrop-blur-xl sm:px-4">
-        <div className="flex min-w-0 items-center gap-6">
-          <Link
-            href="/"
-            className="flex min-w-0 items-center gap-2 text-foreground transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-          >
-            <div className="flex size-7 items-center justify-center rounded-lg bg-muted">
-              {/** biome-ignore lint/performance/noImgElement: <usado para renderizar o svg do logo diretamente> */}
-              <img src="/svg/e.svg" alt="Logo" width={18} height={18} />
-            </div>
-            <span className="truncate text-sm font-semibold tracking-tight text-foreground hover:text-elinsa-primary sm:text-base">
-              Elinsa do Brasil
-            </span>
-          </Link>
-
-          <div className="hidden md:block">
-            <NavigationMenu aria-label="Principal">
-              <NavigationMenuList className="gap-1">
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent">
-                    Conteúdo
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-4 w-150 grid-cols-2 p-4">
-                      {/* Left Column */}
-                      <div>
-                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
-                          Institucional
-                        </h4>
-                        <ul className="flex flex-col gap-2">
-                          <DropdownItem
-                            href="/quem-somos"
-                            icon={Building01Icon}
-                            title="Quem somos"
-                            description="Histórico, missão, visão e valores"
-                          />
-                          <DropdownItem
-                            href="/vagas"
-                            icon={AiUserIcon}
-                            title="Carreiras"
-                            description="Oportunidades de trabalho e vagas"
-                          />
-                        </ul>
-                      </div>
-
-                      {/* Right Column */}
-                      <div>
-                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
-                          Comunicação
-                        </h4>
-                        <ul className="flex flex-col gap-2">
-                          <DropdownItem
-                            href="/imprensa"
-                            icon={Megaphone01Icon}
-                            title="Imprensa"
-                            description="Comunicados sobre a empresa"
-                          />
-                          <DropdownItem
-                            href="/marca"
-                            icon={LayoutGridIcon}
-                            title="Kit de marca"
-                            description="Cores e logos oficiais"
-                          />
-                        </ul>
-                      </div>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent">
-                    Apoio
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-4 w-150 grid-cols-2 p-4">
-                      {/* Left Column */}
-                      <div>
-                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
-                          Documentação
-                        </h4>
-                        <ul className="flex flex-col gap-2">
-                          <DropdownItem
-                            href={getDocsUrl()}
-                            icon={LighthouseIcon}
-                            title="Ajuda ao colaborador"
-                            description="Orientações e materiais úteis"
-                          />
-                          <DropdownItem
-                            href={getDocsUrl()}
-                            icon={GoogleDocIcon}
-                            title="Documentação"
-                            description="Guias, políticas institucionais"
-                          />
-                        </ul>
-                      </div>
-
-                      {/* Right Column */}
-                      <div>
-                        <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
-                          Ética
-                        </h4>
-                        <ul className="flex flex-col gap-2">
-                          <DropdownItem
-                            href={getDocsUrl("/etica/codigo-de-conduta")}
-                            icon={LegalDocument01Icon}
-                            title="Código de conduta"
-                            description="As diretrizes da nossa atuação"
-                          />
-                          <DropdownItem
-                            href="/denunciar"
-                            icon={Alert01Icon}
-                            title="Canal de denúncias"
-                            description="Denuncie de forma segura"
-                          />
-                          <DropdownItem
-                            href="/acompanhar-denuncia"
-                            icon={NotificationSquareIcon}
-                            title="Acompanhar denúncia"
-                            description="Verifique o status de sua denúncia"
-                          />
-                        </ul>
-                      </div>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    href="/contato"
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      "bg-transparent",
-                    )}
-                  >
-                    Contato
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+    <FloatingHeader>
+      <div className="flex min-w-0 items-center gap-6">
+        <Link
+          href="/"
+          className="flex min-w-0 items-center gap-2 text-foreground transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+        >
+          <div className="flex size-7 items-center justify-center rounded-lg bg-muted">
+            {/** biome-ignore lint/performance/noImgElement: <usado para renderizar o svg do logo diretamente> */}
+            <img src="/svg/e.svg" alt="Logo" width={18} height={18} />
           </div>
+          <span className="truncate text-sm font-semibold tracking-tight text-foreground hover:text-elinsa-primary sm:text-base">
+            Elinsa do Brasil
+          </span>
+        </Link>
+
+        <div className="hidden md:block">
+          <NavigationMenu aria-label="Principal">
+            <NavigationMenuList className="gap-1">
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent">
+                  Conteúdo
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-4 w-150 grid-cols-2 p-4">
+                    {/* Left Column */}
+                    <div>
+                      <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
+                        Institucional
+                      </h4>
+                      <ul className="flex flex-col gap-2">
+                        <DropdownItem
+                          href="/quem-somos"
+                          icon={Building01Icon}
+                          title="Quem somos"
+                          description="Histórico, missão, visão e valores"
+                        />
+                        <DropdownItem
+                          href="/vagas"
+                          icon={AiUserIcon}
+                          title="Carreiras"
+                          description="Oportunidades de trabalho e vagas"
+                        />
+                      </ul>
+                    </div>
+
+                    {/* Right Column */}
+                    <div>
+                      <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
+                        Comunicação
+                      </h4>
+                      <ul className="flex flex-col gap-2">
+                        <DropdownItem
+                          href="/imprensa"
+                          icon={Megaphone01Icon}
+                          title="Imprensa"
+                          description="Comunicados sobre a empresa"
+                        />
+                        <DropdownItem
+                          href="/marca"
+                          icon={LayoutGridIcon}
+                          title="Kit de marca"
+                          description="Cores e logos oficiais"
+                        />
+                      </ul>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent">
+                  Apoio
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-4 w-150 grid-cols-2 p-4">
+                    {/* Left Column */}
+                    <div>
+                      <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
+                        Documentação
+                      </h4>
+                      <ul className="flex flex-col gap-2">
+                        <DropdownItem
+                          href={getDocsUrl()}
+                          icon={LighthouseIcon}
+                          title="Ajuda ao colaborador"
+                          description="Orientações e materiais úteis"
+                        />
+                        <DropdownItem
+                          href={getDocsUrl()}
+                          icon={GoogleDocIcon}
+                          title="Documentação"
+                          description="Guias, políticas institucionais"
+                        />
+                      </ul>
+                    </div>
+
+                    {/* Right Column */}
+                    <div>
+                      <h4 className="mb-3 text-sm font-medium text-muted-foreground px-2">
+                        Ética
+                      </h4>
+                      <ul className="flex flex-col gap-2">
+                        <DropdownItem
+                          href={getDocsUrl("/etica/codigo-de-conduta")}
+                          icon={LegalDocument01Icon}
+                          title="Código de conduta"
+                          description="As diretrizes da nossa atuação"
+                        />
+                        <DropdownItem
+                          href="/denunciar"
+                          icon={Alert01Icon}
+                          title="Canal de denúncias"
+                          description="Denuncie de forma segura"
+                        />
+                        <DropdownItem
+                          href="/acompanhar-denuncia"
+                          icon={NotificationSquareIcon}
+                          title="Acompanhar denúncia"
+                          description="Verifique o status de sua denúncia"
+                        />
+                      </ul>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  href="/contato"
+                  className={cn(navigationMenuTriggerStyle(), "bg-transparent")}
+                >
+                  Contato
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
+      </div>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <div className="hidden items-center md:flex">
-            <Button variant="ghost" size="icon" asChild>
-              <a
-                href="https://www.instagram.com/elinsadobrasil/"
-                aria-label="Instagram da Elinsa do Brasil"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  icon={InstagramIcon}
-                  strokeWidth={2}
-                />
-              </a>
-            </Button>
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="hidden items-center md:flex">
+          <Button variant="ghost" size="icon" asChild>
+            <a
+              href="https://www.instagram.com/elinsadobrasil/"
+              aria-label="Instagram da Elinsa do Brasil"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <HugeiconsIcon
+                aria-hidden="true"
+                icon={InstagramIcon}
+                strokeWidth={2}
+              />
+            </a>
+          </Button>
 
-            <Button variant="ghost" size="icon" asChild>
-              <a
-                href="https://www.linkedin.com/in/elinsadobrasil/"
-                aria-label="LinkedIn da Elinsa do Brasil"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <HugeiconsIcon
-                  aria-hidden="true"
-                  icon={Linkedin01Icon}
-                  strokeWidth={2}
-                />
-              </a>
-            </Button>
-          </div>
-
-          <MobileMenu />
-          <ThemeToggle />
-
-          <Button asChild size="lg">
-            <Link href="/entrar" className="px-3 font-medium sm:px-4">
-              Entrar
-            </Link>
+          <Button variant="ghost" size="icon" asChild>
+            <a
+              href="https://www.linkedin.com/in/elinsadobrasil/"
+              aria-label="LinkedIn da Elinsa do Brasil"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <HugeiconsIcon
+                aria-hidden="true"
+                icon={Linkedin01Icon}
+                strokeWidth={2}
+              />
+            </a>
           </Button>
         </div>
-      </header>
-    </div>
+
+        <MobileMenu />
+        <ThemeToggle />
+
+        <Button asChild size="lg">
+          <Link href="/entrar" className="px-3 font-medium sm:px-4">
+            Entrar
+          </Link>
+        </Button>
+      </div>
+    </FloatingHeader>
   );
 }
 

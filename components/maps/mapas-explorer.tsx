@@ -346,10 +346,11 @@ export function MapasExplorer() {
   }
 
   return (
-    <SidebarProvider className="min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[376px_minmax(0,1fr)]">
+    <SidebarProvider className="flex min-h-dvh flex-col bg-background text-foreground lg:grid lg:grid-cols-[376px_minmax(0,1fr)]">
       <Sidebar
+        id="mapas-controles"
         variant="floating"
-        className="m-3 max-h-[calc(100dvh-1.5rem)] w-auto lg:sticky lg:top-3 lg:h-[calc(100dvh-1.5rem)]"
+        className="order-2 m-3 max-h-[calc(100dvh-1.5rem)] w-auto lg:order-none lg:sticky lg:top-3 lg:h-[calc(100dvh-1.5rem)]"
       >
         <SidebarHeader className="gap-5">
           <div className="flex items-center">
@@ -365,7 +366,7 @@ export function MapasExplorer() {
             </Button>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Badge
               variant="outline"
               className="border-primary/25 bg-primary/10 text-primary"
@@ -587,11 +588,14 @@ export function MapasExplorer() {
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset className="flex min-h-[calc(100dvh-1px)] flex-col p-3 pt-0 sm:p-4 sm:pt-0 lg:h-dvh lg:p-3 lg:pl-0">
-        <Card className="relative min-h-[620px] flex-1 gap-0 overflow-hidden rounded-2xl border-border/80 bg-card py-0 shadow-sm lg:min-h-0">
+      <SidebarInset className="order-1 flex min-h-[28rem] flex-col p-3 pt-0 sm:min-h-[36rem] sm:p-4 sm:pt-0 lg:order-none lg:h-dvh lg:min-h-0 lg:p-3 lg:pl-0">
+        <Card
+          className="relative min-h-[28rem] flex-1 gap-0 py-0 sm:min-h-[36rem] lg:min-h-0"
+          variant="panel"
+        >
           <MapComponent
             center={selectedRegional.center}
-            className="min-h-[620px] flex-1 lg:min-h-0"
+            className="min-h-[28rem] flex-1 sm:min-h-[36rem] lg:min-h-0"
             dragRotate={false}
             maxZoom={12}
             minZoom={4}
@@ -625,20 +629,36 @@ export function MapasExplorer() {
           </MapComponent>
 
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-3 sm:p-4">
-            <Card className="ml-auto w-full max-w-md gap-0 rounded-xl border-border/70 bg-card/90 py-0 shadow-sm backdrop-blur-md">
-              <CardHeader className="py-3">
-                <CardTitle className="text-base">{panelTitle}</CardTitle>
-                <CardDescription>{panelDescription}</CardDescription>
-                <CardAction>
-                  <Badge
-                    variant="outline"
-                    className="border-primary/25 bg-primary/10 text-primary"
-                  >
-                    {getModeLabel(viewMode)}
-                  </Badge>
-                </CardAction>
-              </CardHeader>
-            </Card>
+            <div className="ml-auto flex w-full max-w-md flex-col items-end gap-2">
+              <Button
+                asChild
+                className="pointer-events-auto lg:hidden"
+                size="sm"
+                variant="secondary"
+              >
+                <a href="#mapas-controles">
+                  <Layers3 aria-hidden="true" />
+                  Ver filtros
+                </a>
+              </Button>
+              <Card
+                className="w-full gap-0 border-border/70 bg-card/90 py-0 shadow-sm backdrop-blur-md"
+                variant="panel"
+              >
+                <CardHeader className="py-3">
+                  <CardTitle className="text-base">{panelTitle}</CardTitle>
+                  <CardDescription>{panelDescription}</CardDescription>
+                  <CardAction>
+                    <Badge
+                      variant="outline"
+                      className="border-primary/25 bg-primary/10 text-primary"
+                    >
+                      {getModeLabel(viewMode)}
+                    </Badge>
+                  </CardAction>
+                </CardHeader>
+              </Card>
+            </div>
           </div>
         </Card>
       </SidebarInset>

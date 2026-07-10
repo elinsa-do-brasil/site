@@ -1,6 +1,8 @@
 import { spawn } from "node:child_process";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+
+type ExpectedRouteState = "render" | "restricted";
 
 type RouteConfig =
   | string
@@ -9,6 +11,7 @@ type RouteConfig =
       group?: string;
       auth?: boolean;
       note?: string;
+      expected?: ExpectedRouteState;
     };
 
 type Viewport = {
@@ -37,6 +40,17 @@ type Config = {
     submitSelector?: string;
     waitAfterSubmitMs?: number;
   };
+};
+
+type CrawlResult = {
+  ok: boolean;
+  route: string;
+  group?: string;
+  auth: boolean;
+  expected: ExpectedRouteState;
+  viewport: string;
+  error?: string;
+  failureReasons?: string[];
 };
 
 const root = process.cwd();
@@ -97,6 +111,7 @@ function normalizeRoute(route: RouteConfig) {
       group: undefined,
       auth: false,
       note: undefined,
+      expected: "render" as const,
     };
   }
 
@@ -105,46 +120,58 @@ function normalizeRoute(route: RouteConfig) {
     group: route.group,
     auth: Boolean(route.auth),
     note: route.note,
+    expected: route.expected ?? "render",
   };
 }
 
-function run(command: string, args: string[], allowFailure = false, input?: string) {
-  return new Promise<{ stdout: string; stderr: string; code: number }>((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: root,
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+function run(
+  command: string,
+  args: string[],
+  allowFailure = false,
+  input?: string,
+) {
+  return new Promise<{ stdout: string; stderr: string; code: number }>(
+    (resolve, reject) => {
+      const child = spawn(command, args, {
+        cwd: root,
+        stdio: ["pipe", "pipe", "pipe"],
+      });
 
-    let stdout = "";
-    let stderr = "";
+      let stdout = "";
+      let stderr = "";
 
-    child.stdout.on("data", (chunk) => {
-      stdout += chunk.toString();
-    });
+      child.stdout.on("data", (chunk) => {
+        stdout += chunk.toString();
+      });
 
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk.toString();
-    });
+      child.stderr.on("data", (chunk) => {
+        stderr += chunk.toString();
+      });
 
-    child.on("error", reject);
+      child.on("error", reject);
 
-    child.on("close", (code) => {
-      const exitCode = code ?? 0;
+      child.on("close", (code) => {
+        const exitCode = code ?? 0;
 
-      if (exitCode !== 0 && !allowFailure) {
-        reject(new Error(`Command failed: ${command} ${args.join(" ")}\n${stderr || stdout}`));
-        return;
+        if (exitCode !== 0 && !allowFailure) {
+          reject(
+            new Error(
+              `Command failed: ${command} ${args.join(" ")}\n${stderr || stdout}`,
+            ),
+          );
+          return;
+        }
+
+        resolve({ stdout, stderr, code: exitCode });
+      });
+
+      if (input) {
+        child.stdin.write(input);
       }
 
-      resolve({ stdout, stderr, code: exitCode });
-    });
-
-    if (input) {
-      child.stdin.write(input);
-    }
-
-    child.stdin.end();
-  });
+      child.stdin.end();
+    },
+  );
 }
 
 function safeRouteName(route: string): string {
@@ -152,7 +179,12 @@ function safeRouteName(route: string): string {
   return route.replace(/^\/+/, "").replace(/[^\w-]+/g, "-") || "route";
 }
 
-async function runAgentBrowser(config: Config, args: string[], allowFailure = false, input?: string) {
+async function runAgentBrowser(
+  config: Config,
+  args: string[],
+  allowFailure = false,
+  input?: string,
+) {
   return await run(config.agentBrowser.command, args, allowFailure, input);
 }
 
@@ -160,9 +192,44 @@ function absoluteUrl(config: Config, route: string) {
   return new URL(route, config.baseUrl).toString();
 }
 
+async function exists(filePath: string) {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function routePath(url: string) {
+  try {
+    const pathname = new URL(url).pathname;
+    return pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
+  } catch {
+    return "";
+  }
+}
+
+function isNotFoundPage(meta: unknown, snapshot: string) {
+  const headings =
+    meta && typeof meta === "object" && "headings" in meta
+      ? ((meta as { headings?: Array<{ text?: string }> }).headings ?? [])
+      : [];
+  const text = [
+    snapshot,
+    ...headings.map((heading) => heading.text ?? ""),
+  ].join(" ");
+
+  return /(?:^|\s)404(?:\s|$)|Esta página não está disponível|Não temos esta página/i.test(
+    text,
+  );
+}
+
 async function loginIfNeeded(config: Config, viewport: Viewport) {
   if (!config.auth) {
-    throw new Error("Rota autenticada encontrada, mas .ai/config.json não tem bloco auth.");
+    throw new Error(
+      "Rota autenticada encontrada, mas .ai/config.json não tem bloco auth.",
+    );
   }
 
   const email = process.env[config.auth.usernameEnv];
@@ -174,15 +241,26 @@ async function loginIfNeeded(config: Config, viewport: Viewport) {
         "Credenciais de teste ausentes.",
         `Defina ${config.auth.usernameEnv} e ${config.auth.passwordEnv} em .env.agent.local.`,
         "A senha não deve ser commitada.",
-      ].join("\n")
+      ].join("\n"),
     );
   }
 
   const loginUrl = absoluteUrl(config, config.auth.loginPath);
 
-  await runAgentBrowser(config, ["set", "viewport", String(viewport.width), String(viewport.height)], true);
+  await runAgentBrowser(config, [
+    "set",
+    "viewport",
+    String(viewport.width),
+    String(viewport.height),
+  ]);
+  await runAgentBrowser(config, ["console", "--clear"], true);
+  await runAgentBrowser(config, ["errors", "--clear"], true);
   await runAgentBrowser(config, ["open", loginUrl]);
-  await runAgentBrowser(config, ["wait", "--load", config.agentBrowser.waitUntil || "networkidle"], true);
+  await runAgentBrowser(
+    config,
+    ["wait", "--load", config.agentBrowser.waitUntil || "networkidle"],
+    true,
+  );
 
   const js = `
 (() => {
@@ -282,8 +360,16 @@ async function loginIfNeeded(config: Config, viewport: Viewport) {
 `.trim();
 
   const filled = await runAgentBrowser(config, ["eval", js], true);
-  await runAgentBrowser(config, ["wait", String(config.auth.waitAfterSubmitMs ?? 2500)], true);
-  await runAgentBrowser(config, ["wait", "--load", config.agentBrowser.waitUntil || "networkidle"], true);
+  await runAgentBrowser(
+    config,
+    ["wait", String(config.auth.waitAfterSubmitMs ?? 2500)],
+    true,
+  );
+  await runAgentBrowser(
+    config,
+    ["wait", "--load", config.agentBrowser.waitUntil || "networkidle"],
+    true,
+  );
 
   const currentUrl = await runAgentBrowser(config, ["get", "url"], true);
   const currentUrlText = currentUrl.stdout.trim();
@@ -302,7 +388,7 @@ async function loginIfNeeded(config: Config, viewport: Viewport) {
         "",
         "Snapshot:",
         snapshot.stdout || snapshot.stderr,
-      ].join("\n")
+      ].join("\n"),
     );
   }
 }
@@ -391,12 +477,13 @@ async function collectPageMeta(config: Config) {
 })()
 `.trim();
 
-  const result = await runAgentBrowser(config, ["eval", js], true);
+  const result = await runAgentBrowser(config, ["eval", js]);
 
   try {
     const parsed = JSON.parse(result.stdout.trim());
     if (typeof parsed === "string") return JSON.parse(parsed);
-    if (parsed?.data && typeof parsed.data === "string") return JSON.parse(parsed.data);
+    if (parsed?.data && typeof parsed.data === "string")
+      return JSON.parse(parsed.data);
     return parsed;
   } catch {
     return {
@@ -407,7 +494,13 @@ async function collectPageMeta(config: Config) {
   }
 }
 
-async function crawlOne(config: Config, routeConfig: ReturnType<typeof normalizeRoute>, viewport: Viewport, outDir: string, authState: { loggedIn: boolean }) {
+async function crawlOne(
+  config: Config,
+  routeConfig: ReturnType<typeof normalizeRoute>,
+  viewport: Viewport,
+  outDir: string,
+  authState: { loggedIn: boolean },
+) {
   const url = absoluteUrl(config, routeConfig.path);
   const routeName = safeRouteName(routeConfig.path);
   const name = `${routeName}__${viewport.name}`;
@@ -425,44 +518,114 @@ async function crawlOne(config: Config, routeConfig: ReturnType<typeof normalize
     authState.loggedIn = true;
   }
 
-  await runAgentBrowser(config, ["set", "viewport", String(viewport.width), String(viewport.height)], true);
+  await runAgentBrowser(config, [
+    "set",
+    "viewport",
+    String(viewport.width),
+    String(viewport.height),
+  ]);
+  await runAgentBrowser(config, ["console", "--clear"], true);
+  await runAgentBrowser(config, ["errors", "--clear"], true);
 
   const openArgs = ["open", url];
   if (config.agentBrowser.headed) openArgs.push("--headed");
 
   await runAgentBrowser(config, openArgs);
-  await runAgentBrowser(config, ["wait", "--load", config.agentBrowser.waitUntil || "networkidle"], true);
+  await runAgentBrowser(
+    config,
+    ["wait", "--load", config.agentBrowser.waitUntil || "networkidle"],
+    true,
+  );
   await runAgentBrowser(config, ["wait", "750"], true);
 
-  const snapshot = await runAgentBrowser(config, ["snapshot", "-i"], true);
-  const snapshotJson = await runAgentBrowser(config, ["snapshot", "-i", "--json"], true);
+  const snapshot = await runAgentBrowser(config, ["snapshot", "-i"]);
+  const snapshotJson = await runAgentBrowser(config, [
+    "snapshot",
+    "-i",
+    "--json",
+  ]);
 
   const screenshotArgs = ["screenshot"];
   if (config.agentBrowser.screenshotFullPage) screenshotArgs.push("--full");
   screenshotArgs.push(screenshotPath);
 
-  await runAgentBrowser(config, screenshotArgs, true);
-  await runAgentBrowser(config, ["screenshot", "--annotate", annotatedPath], true);
+  await runAgentBrowser(config, screenshotArgs);
+  await runAgentBrowser(config, ["screenshot", "--annotate", annotatedPath]);
 
   const meta = await collectPageMeta(config);
   const consoleResult = await runAgentBrowser(config, ["console"], true);
   const errorsResult = await runAgentBrowser(config, ["errors"], true);
-  const finalUrl = await runAgentBrowser(config, ["get", "url"], true);
+  const finalUrl = await runAgentBrowser(config, ["get", "url"]);
 
   await writeFile(snapshotPath, snapshot.stdout || snapshot.stderr, "utf8");
-  await writeFile(snapshotJsonPath, snapshotJson.stdout || snapshotJson.stderr, "utf8");
+  await writeFile(
+    snapshotJsonPath,
+    snapshotJson.stdout || snapshotJson.stderr,
+    "utf8",
+  );
   await writeFile(metaPath, JSON.stringify(meta, null, 2), "utf8");
-  await writeFile(consolePath, consoleResult.stdout || consoleResult.stderr, "utf8");
-  await writeFile(errorsPath, errorsResult.stdout || errorsResult.stderr, "utf8");
+  await writeFile(
+    consolePath,
+    consoleResult.stdout || consoleResult.stderr,
+    "utf8",
+  );
+  await writeFile(
+    errorsPath,
+    errorsResult.stdout || errorsResult.stderr,
+    "utf8",
+  );
+
+  const finalUrlText = finalUrl.stdout.trim();
+  const failureReasons: string[] = [];
+  const requestedPath = routePath(url);
+  const reachedPath = routePath(finalUrlText);
+  const isNotFound = isNotFoundPage(meta, snapshot.stdout);
+  const requiredArtifacts = [
+    screenshotPath,
+    annotatedPath,
+    snapshotPath,
+    snapshotJsonPath,
+    metaPath,
+  ];
+  const artifactChecks = await Promise.all(requiredArtifacts.map(exists));
+
+  if (!finalUrlText) {
+    failureReasons.push("O navegador não retornou a URL final.");
+  }
+  if (artifactChecks.some((artifactExists) => !artifactExists)) {
+    failureReasons.push("Um ou mais artefatos obrigatórios não foram gerados.");
+  }
+  if (meta && typeof meta === "object" && "parseError" in meta) {
+    failureReasons.push("Não foi possível ler os metadados da página.");
+  }
+
+  if (routeConfig.expected === "render") {
+    if (requestedPath !== reachedPath) {
+      failureReasons.push(
+        `A rota esperada ${requestedPath} terminou em ${reachedPath || finalUrlText}.`,
+      );
+    }
+    if (isNotFound) {
+      failureReasons.push(
+        "A rota deveria renderizar, mas exibiu um estado 404.",
+      );
+    }
+  } else if (!isNotFound) {
+    failureReasons.push(
+      "A rota deveria permanecer restrita para a conta de teste, mas renderizou conteúdo.",
+    );
+  }
 
   return {
-    ok: true,
+    ok: failureReasons.length === 0,
     route: routeConfig.path,
     group: routeConfig.group,
     auth: routeConfig.auth,
+    expected: routeConfig.expected,
     viewport: viewport.name,
     url,
-    finalUrl: finalUrl.stdout.trim(),
+    finalUrl: finalUrlText,
+    failureReasons,
     files: {
       screenshot: path.relative(root, screenshotPath),
       annotatedScreenshot: path.relative(root, annotatedPath),
@@ -470,8 +633,8 @@ async function crawlOne(config: Config, routeConfig: ReturnType<typeof normalize
       snapshotJson: path.relative(root, snapshotJsonPath),
       meta: path.relative(root, metaPath),
       console: path.relative(root, consolePath),
-      errors: path.relative(root, errorsPath)
-    }
+      errors: path.relative(root, errorsPath),
+    },
   };
 }
 
@@ -483,53 +646,87 @@ async function main() {
     : "manual";
 
   const config = await readConfig();
-  const outDir = path.join(root, ".ai", "runs", `iteration-${iteration}`, "crawl");
+  const outDir = path.join(
+    root,
+    ".ai",
+    "runs",
+    `iteration-${iteration}`,
+    "crawl",
+  );
   await mkdir(outDir, { recursive: true });
 
   if (config.agentBrowser.closeAllBeforeCrawl) {
     await runAgentBrowser(config, ["close", "--all"], true);
   }
 
-  const results = [];
+  const results: CrawlResult[] = [];
   const authState = { loggedIn: false };
 
-  for (const rawRoute of config.routes) {
-    const route = normalizeRoute(rawRoute);
+  try {
+    for (const rawRoute of config.routes) {
+      const route = normalizeRoute(rawRoute);
 
-    for (const viewport of config.viewports) {
-      try {
-        const result = await crawlOne(config, route, viewport, outDir, authState);
-        results.push(result);
-        console.log(`✓ ${route.path} ${viewport.name}${route.auth ? " auth" : ""}`);
-      } catch (error) {
-        const failed = {
-          ok: false,
-          route: route.path,
-          group: route.group,
-          auth: route.auth,
-          viewport: viewport.name,
-          error: error instanceof Error ? error.message : String(error)
-        };
-        results.push(failed);
-        console.log(`✗ ${route.path} ${viewport.name}`);
-        console.error(failed.error);
+      for (const viewport of config.viewports) {
+        try {
+          const result = await crawlOne(
+            config,
+            route,
+            viewport,
+            outDir,
+            authState,
+          );
+          results.push(result);
+          const marker = result.ok ? "✓" : "✗";
+          console.log(
+            `${marker} ${route.path} ${viewport.name}${route.auth ? " auth" : ""}`,
+          );
+          if (!result.ok) {
+            for (const reason of result.failureReasons) {
+              console.error(`  - ${reason}`);
+            }
+          }
+        } catch (error) {
+          const failed: CrawlResult = {
+            ok: false,
+            route: route.path,
+            group: route.group,
+            auth: route.auth,
+            expected: route.expected,
+            viewport: viewport.name,
+            error: error instanceof Error ? error.message : String(error),
+          };
+          results.push(failed);
+          console.log(`✗ ${route.path} ${viewport.name}`);
+          console.error(failed.error);
+        }
       }
     }
+  } finally {
+    await runAgentBrowser(config, ["close"], true);
   }
-
-  await runAgentBrowser(config, ["close"], true);
 
   await writeFile(
     path.join(outDir, "index.json"),
-    JSON.stringify({
-      createdAt: new Date().toISOString(),
-      baseUrl: config.baseUrl,
-      results
-    }, null, 2),
-    "utf8"
+    JSON.stringify(
+      {
+        createdAt: new Date().toISOString(),
+        baseUrl: config.baseUrl,
+        results,
+      },
+      null,
+      2,
+    ),
+    "utf8",
   );
 
   console.log(`\nCrawl salvo em: ${path.relative(root, outDir)}`);
+
+  const failedResults = results.filter((result) => !result.ok);
+  if (failedResults.length > 0) {
+    throw new Error(
+      `${failedResults.length} captura(s) falharam. Consulte ${path.relative(root, outDir)}/index.json.`,
+    );
+  }
 }
 
 main().catch((error) => {

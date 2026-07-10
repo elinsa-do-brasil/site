@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function DenunciarPage() {
   return (
-    <div className="mx-auto w-full max-w-6xl pt-28 pb-16">
+    <div className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
       {/* ── Grid geral: conteúdo + sidebar ── */}
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
         {/* ── Coluna esquerda ── */}
@@ -31,6 +31,11 @@ export default function DenunciarPage() {
             </p>
           </section>
 
+          {/* A ajuda aparece antes do campo de relato no mobile, quando é mais útil. */}
+          <div className="lg:hidden">
+            <ReportWritingHelp />
+          </div>
+
           {/* Formulário */}
           <AnonymousReportForm />
 
@@ -38,7 +43,6 @@ export default function DenunciarPage() {
           <div className="flex flex-col gap-5 lg:hidden">
             <ReportPrivacyNotice />
             <ReportAnonymizationInfo />
-            <ReportWritingHelp />
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { RedefinirSenhaForm } from "@/components/auth/RedefinirSenhaForm";
+import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 
 export const metadata: Metadata = {
@@ -15,9 +16,11 @@ export default function RedefinirSenhaPage() {
     >
       <Suspense
         fallback={
-          <div className="flex w-full max-w-md justify-center rounded-md border border-border/80 bg-card p-8 text-muted-foreground shadow-sm ring-1 ring-foreground/5">
-            <Spinner />
-          </div>
+          <Card className="w-full max-w-108" variant="auth">
+            <CardContent className="flex justify-center px-6 text-muted-foreground">
+              <Spinner />
+            </CardContent>
+          </Card>
         }
       >
         <RedefinirSenhaForm />

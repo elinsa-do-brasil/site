@@ -13,6 +13,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
+import { Logo } from "../logo";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export function RedefinirSenhaForm() {
   const searchParams = useSearchParams();
@@ -26,31 +35,47 @@ export function RedefinirSenhaForm() {
 
   if (!token) {
     return (
-      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h1 className="text-xl font-bold text-destructive">Link inválido</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          O token de redefinição de senha não foi encontrado ou expirou.
-        </p>
-        <Button className="mt-6 w-full" asChild>
-          <Link href="/recuperar-senha">Solicitar novo link</Link>
-        </Button>
-      </div>
+      <Card className="w-full max-w-108" variant="auth">
+        <CardHeader className="px-6 text-center">
+          <CardTitle className="mt-6 mb-3">
+            <Logo className="mx-auto" />
+          </CardTitle>
+          <h1 className="text-lg font-semibold tracking-tight text-destructive">
+            Link inválido
+          </h1>
+          <CardDescription>
+            O token de redefinição de senha não foi encontrado ou expirou.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="px-6">
+          <Button className="w-full" asChild>
+            <Link href="/recuperar-senha">Solicitar novo link</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
   if (success) {
     return (
-      <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 text-center shadow-sm ring-1 ring-foreground/5">
-        <h1 className="text-2xl font-bold tracking-tight text-primary">
-          Senha redefinida
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sua senha foi alterada com sucesso. Você já pode acessar o portal.
-        </p>
-        <Button className="mt-6 w-full" asChild>
-          <Link href="/entrar">Entrar no portal</Link>
-        </Button>
-      </div>
+      <Card className="w-full max-w-108" variant="auth">
+        <CardHeader className="px-6 text-center">
+          <CardTitle className="mt-6 mb-3">
+            <Logo className="mx-auto" />
+          </CardTitle>
+          <h1 className="text-lg font-semibold tracking-tight">
+            Senha redefinida
+          </h1>
+          <CardDescription>
+            Sua senha foi alterada com sucesso. Você já pode acessar o portal.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter className="px-6">
+          <Button className="w-full" asChild>
+            <Link href="/entrar">Entrar no portal</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     );
   }
 
@@ -88,47 +113,63 @@ export function RedefinirSenhaForm() {
   }
 
   return (
-    <div className="w-full max-w-md rounded-md border border-border/80 bg-card p-8 shadow-sm ring-1 ring-foreground/5">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Nova senha</h1>
-        <p className="mt-2 text-xs text-muted-foreground">
+    <Card className="w-full max-w-108" variant="auth">
+      <CardHeader className="px-6 text-center">
+        <CardTitle className="mt-6 mb-3">
+          <Logo className="mx-auto" />
+        </CardTitle>
+        <h1 className="text-lg font-semibold tracking-tight">Nova senha</h1>
+        <CardDescription>
           Crie uma senha segura com no mínimo 12 caracteres.
-        </p>
-      </div>
+        </CardDescription>
+      </CardHeader>
 
-      <form onSubmit={onSubmit}>
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="new-password">Nova senha</FieldLabel>
-            <Input
-              id="new-password"
-              type="password"
-              placeholder="Mínimo de 12 caracteres"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </Field>
+      <CardContent className="px-6 pb-6">
+        <form onSubmit={onSubmit}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="new-password">Nova senha</FieldLabel>
+              <Input
+                id="new-password"
+                name="new-password"
+                type="password"
+                placeholder="Mínimo de 12 caracteres"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="confirm-password">Confirmar senha</FieldLabel>
-            <Input
-              id="confirm-password"
-              type="password"
-              placeholder="Repita a nova senha"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </Field>
+            <Field>
+              <FieldLabel htmlFor="confirm-password">
+                Confirmar senha
+              </FieldLabel>
+              <Input
+                id="confirm-password"
+                name="confirm-password"
+                type="password"
+                placeholder="Repita a nova senha"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </Field>
 
-          {error && <FieldError>{error}</FieldError>}
+            {error && <FieldError>{error}</FieldError>}
 
-          <Button type="submit" className="mt-2 w-full" disabled={isPending}>
-            {isPending ? <Spinner /> : "Redefinir senha"}
-          </Button>
-        </FieldGroup>
-      </form>
-    </div>
+            <Button
+              type="submit"
+              className="mt-2 w-full"
+              disabled={isPending}
+              size="lg"
+            >
+              {isPending ? <Spinner /> : "Redefinir senha"}
+            </Button>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

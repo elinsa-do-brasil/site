@@ -179,7 +179,7 @@ export function EmailSignatureGenerator() {
     <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.1fr)]">
       <div className="min-w-0">
         {showWarning && (
-          <div className="relative mb-6 flex items-start gap-4 rounded-md border border-elinsa-primary/20 bg-elinsa-light py-4 pr-12 pl-5 shadow-sm transition-all dark:border-elinsa-primary/30 dark:bg-elinsa-primary/10">
+          <div className="relative mb-6 flex items-start gap-4 rounded-md border border-elinsa-primary/20 bg-elinsa-light py-4 pr-12 pl-5 shadow-sm transition-[background-color,border-color,color,box-shadow] duration-150 dark:border-elinsa-primary/30 dark:bg-elinsa-primary/10">
             <AlertCircle className="mt-0.5 size-5 shrink-0 text-elinsa-primary dark:text-elinsa-sky" />
             <div className="flex flex-col gap-3">
               <div className="space-y-1">
@@ -194,7 +194,8 @@ export function EmailSignatureGenerator() {
               </div>
               <Button
                 asChild
-                className="h-8 w-fit rounded-md bg-elinsa-primary px-4 text-xs font-medium text-white shadow-sm transition-all hover:bg-elinsa-primary/90 dark:bg-elinsa-sky dark:text-neutral-950 dark:hover:bg-elinsa-sky/90"
+                className="w-fit bg-elinsa-primary text-white shadow-sm hover:bg-elinsa-primary/90 dark:bg-elinsa-sky dark:text-neutral-950 dark:hover:bg-elinsa-sky/90"
+                size="sm"
               >
                 <a href={TUTORIAL_URL} target="_blank" rel="noreferrer">
                   Veja o tutorial
@@ -213,7 +214,7 @@ export function EmailSignatureGenerator() {
           </div>
         )}
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+        <Card className="py-0" variant="form">
           <CardHeader className="border-b py-4">
             <CardTitle>Dados da assinatura</CardTitle>
             <CardDescription>Informe os dados da assinatura.</CardDescription>
@@ -224,7 +225,9 @@ export function EmailSignatureGenerator() {
                 <FieldLabel htmlFor="signature-name">Nome completo</FieldLabel>
                 <Input
                   aria-invalid={!!displayErrors.nome}
+                  autoComplete="name"
                   id="signature-name"
+                  name="name"
                   onBlur={() => handleBlur("nome")}
                   onChange={(event) => updateField("nome", event.target.value)}
                   placeholder="Fulano de Tal"
@@ -237,7 +240,9 @@ export function EmailSignatureGenerator() {
                 <FieldLabel htmlFor="signature-role">Cargo</FieldLabel>
                 <Input
                   aria-invalid={!!displayErrors.cargo}
+                  autoComplete="organization-title"
                   id="signature-role"
+                  name="organization-title"
                   onBlur={() => handleBlur("cargo")}
                   onChange={(event) => updateField("cargo", event.target.value)}
                   placeholder="Auxiliar administrativo"
@@ -254,6 +259,7 @@ export function EmailSignatureGenerator() {
                     autoComplete="off"
                     className="rounded-r-none border-r-0"
                     id="signature-email"
+                    name="email-username"
                     onBlur={() => handleBlur("email")}
                     onChange={(event) =>
                       updateField(
@@ -264,7 +270,7 @@ export function EmailSignatureGenerator() {
                     placeholder="nome.sobrenome"
                     value={values.email}
                   />
-                  <span className="inline-flex h-7 items-center rounded-r-md border border-input border-l-0 bg-muted/45 px-2 text-xs text-muted-foreground">
+                  <span className="inline-flex h-9 items-center rounded-r-md border border-input border-l-0 bg-muted/45 px-3 text-sm text-muted-foreground">
                     {EMAIL_DOMAIN}
                   </span>
                 </div>
@@ -279,7 +285,9 @@ export function EmailSignatureGenerator() {
                   </span>
                 </FieldLabel>
                 <Input
+                  autoComplete="organization"
                   id="signature-location"
+                  name="organization"
                   onChange={(event) => updateField("local", event.target.value)}
                   placeholder="Base de Paragominas"
                   value={values.local}
@@ -309,8 +317,9 @@ export function EmailSignatureGenerator() {
               />
 
               <Button
-                className="mt-1 h-8 w-full"
+                className="mt-1 w-full"
                 onClick={handleCopy}
+                size="lg"
                 type="button"
               >
                 {copyState === "copied" ? (
@@ -343,6 +352,9 @@ export function EmailSignatureGenerator() {
         </div>
 
         <div className="overflow-x-auto rounded-md border bg-white p-4 shadow-sm">
+          <p className="mb-3 text-xs font-medium text-neutral-600 sm:hidden">
+            Deslize para visualizar a assinatura completa.
+          </p>
           <div
             className="w-max max-w-none"
             style={{
@@ -357,7 +369,7 @@ export function EmailSignatureGenerator() {
           </div>
         </div>
 
-        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+        <Card className="py-0" variant="form">
           <CardHeader className="border-b py-4">
             <CardTitle className="flex items-center gap-2">
               <WandSparkles className="size-4 text-elinsa-primary" />
@@ -592,7 +604,10 @@ function PhoneField({
         </Select>
         <Input
           aria-invalid={!!error}
+          autoComplete="tel"
           id={id}
+          inputMode="tel"
+          name={id}
           onBlur={onBlur}
           onChange={(event) =>
             onChange({

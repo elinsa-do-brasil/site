@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
@@ -25,6 +25,17 @@ type RunOptions = {
   input?: string;
   allowFailure?: boolean;
   silent?: boolean;
+};
+
+type CommandResult = {
+  code: number;
+  stderr: string;
+  stdout: string;
+};
+
+type ValidationResult = {
+  hasFailures: boolean;
+  summary: string;
 };
 
 const root = process.cwd();
@@ -107,11 +118,11 @@ async function readProjectFile(rel: string) {
 async function save(rel: string, content: string) {
   const abs = path.join(root, rel);
   await mkdir(path.dirname(abs), { recursive: true });
-  await writeFile(abs, content.trim() + "\n", "utf8");
+  await writeFile(abs, `${content.trim()}\n`, "utf8");
 }
 
 function run(command: string, args: string[], options: RunOptions = {}) {
-  return new Promise<{ stdout: string; stderr: string; code: number }>((resolve, reject) => {
+  return new Promise<CommandResult>((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: root,
       stdio: ["pipe", "pipe", "pipe"],
@@ -138,7 +149,11 @@ function run(command: string, args: string[], options: RunOptions = {}) {
     child.on("close", (code) => {
       const exitCode = code ?? 0;
       if (exitCode !== 0 && !options.allowFailure) {
-        reject(new Error(`Command failed: ${command} ${args.join(" ")}\n${stderr || stdout}`));
+        reject(
+          new Error(
+            `Command failed: ${command} ${args.join(" ")}\n${stderr || stdout}`,
+          ),
+        );
         return;
       }
       resolve({ stdout, stderr, code: exitCode });
@@ -160,7 +175,9 @@ async function waitForUrl(url: string, timeoutMs: number) {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 2500);
-      const response = await fetch(url, { signal: controller.signal }).catch(() => null);
+      const response = await fetch(url, { signal: controller.signal }).catch(
+        () => null,
+      );
       clearTimeout(timeout);
 
       if (response && response.status < 500) return;
@@ -177,7 +194,10 @@ async function waitForUrl(url: string, timeoutMs: number) {
 async function ensureGitIsClean(config: Config) {
   if (!(await exists(path.join(root, ".git")))) return;
 
-  const result = await runShell("git status --porcelain", { allowFailure: true, silent: true });
+  const result = await runShell("git status --porcelain", {
+    allowFailure: true,
+    silent: true,
+  });
 
   if (result.stdout.trim() && !config.allowDirtyGit) {
     throw new Error(
@@ -187,18 +207,67 @@ async function ensureGitIsClean(config: Config) {
         "Faça commit/stash ou marque allowDirtyGit=true em .ai/config.json.",
         "",
         result.stdout,
-      ].join("\n")
+      ].join("\n"),
     );
   }
 }
 
 async function gitDiff() {
   if (!(await exists(path.join(root, ".git")))) return "Sem repositório git.";
-  const result = await runShell("git diff -- . ':!package-lock.json' ':!pnpm-lock.yaml' ':!yarn.lock'", {
+  const result = await runShell(
+    "git diff -- . ':!package-lock.json' ':!pnpm-lock.yaml' ':!yarn.lock'",
+    {
+      allowFailure: true,
+      silent: true,
+    },
+  );
+  return result.stdout || "Sem diff.";
+}
+
+async function gitDiffStat() {
+  if (!(await exists(path.join(root, ".git")))) return "Sem repositório git.";
+  const result = await runShell("git diff --stat", {
     allowFailure: true,
     silent: true,
   });
-  return result.stdout || "Sem diff.";
+  return result.stdout || "Sem alterações no diff.";
+}
+
+function commandOutputTail(result: CommandResult, maxLength = 4_000) {
+  const output = [result.stderr, result.stdout]
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+  if (!output) return "Sem saída adicional do comando.";
+  if (output.length <= maxLength) return output;
+  return `… saída anterior omitida …\n${output.slice(-maxLength)}`;
+}
+
+async function saveCodexFailure(params: {
+  detail?: string;
+  outputRel: string;
+  result: CommandResult;
+  title: string;
+}) {
+  await save(
+    params.outputRel,
+    [
+      "# Etapa Codex interrompida",
+      "",
+      `Etapa: ${params.title}`,
+      `Exit code: ${params.result.code}`,
+      "",
+      "A execução foi interrompida antes de gerar uma resposta utilizável. O pipeline não deve interpretar este arquivo como uma revisão aprovada.",
+      "",
+      "## Saída final do CLI",
+      "```txt",
+      commandOutputTail(params.result),
+      "```",
+      ...(params.detail
+        ? ["", "## Resposta rejeitada", "```txt", params.detail.trim(), "```"]
+        : []),
+    ].join("\n"),
+  );
 }
 
 async function runCodex(params: {
@@ -209,6 +278,7 @@ async function runCodex(params: {
   sandbox: Config["codex"]["reviewSandbox"];
   outputRel: string;
   imagePaths?: string[];
+  requiredHeading?: string;
 }) {
   const shared = await readProjectFile(prompts.shared);
   const prompt = await readProjectFile(params.promptRel);
@@ -232,6 +302,9 @@ async function runCodex(params: {
 
   const outputAbs = path.join(root, params.outputRel);
   await mkdir(path.dirname(outputAbs), { recursive: true });
+  await unlink(outputAbs).catch((error: NodeJS.ErrnoException) => {
+    if (error.code !== "ENOENT") throw error;
+  });
 
   const args = [
     "exec",
@@ -241,7 +314,10 @@ async function runCodex(params: {
     params.sandbox,
     "--output-last-message",
     outputAbs,
-    ...(params.imagePaths ?? []).flatMap((img) => ["--image", path.join(root, img)]),
+    ...(params.imagePaths ?? []).flatMap((img) => [
+      "--image",
+      path.join(root, img),
+    ]),
     ...(params.config.codex.extraArgs ?? []),
     "-",
   ];
@@ -251,11 +327,71 @@ async function runCodex(params: {
     allowFailure: true,
   });
 
-  if (!(await exists(outputAbs))) {
-    await writeFile(outputAbs, result.stdout || result.stderr || "Sem saída do Codex.", "utf8");
+  if (result.code !== 0) {
+    await saveCodexFailure({
+      outputRel: params.outputRel,
+      result,
+      title: params.title,
+    });
+    throw new Error(
+      `Etapa Codex falhou: ${params.title}. Consulte ${params.outputRel}.`,
+    );
   }
 
-  return await readFile(outputAbs, "utf8");
+  if (!(await exists(outputAbs))) {
+    await saveCodexFailure({
+      outputRel: params.outputRel,
+      result,
+      title: params.title,
+    });
+    throw new Error(
+      `Etapa Codex não gerou resposta: ${params.title}. Consulte ${params.outputRel}.`,
+    );
+  }
+
+  const output = await readFile(outputAbs, "utf8");
+  if (!output.trim()) {
+    await saveCodexFailure({
+      outputRel: params.outputRel,
+      result,
+      title: params.title,
+    });
+    throw new Error(
+      `Etapa Codex gerou uma resposta vazia: ${params.title}. Consulte ${params.outputRel}.`,
+    );
+  }
+
+  if (isUnusableCodexOutput(output)) {
+    await saveCodexFailure({
+      outputRel: params.outputRel,
+      result,
+      title: params.title,
+      detail: output,
+    });
+    throw new Error(
+      `Etapa Codex retornou uma mensagem de indisponibilidade: ${params.title}. Consulte ${params.outputRel}.`,
+    );
+  }
+
+  if (params.requiredHeading && !output.includes(params.requiredHeading)) {
+    await saveCodexFailure({
+      outputRel: params.outputRel,
+      result,
+      title: params.title,
+      detail: output,
+    });
+    throw new Error(
+      `Etapa Codex não respeitou o formato obrigatório: ${params.title}. Consulte ${params.outputRel}.`,
+    );
+  }
+
+  return output;
+}
+
+function isUnusableCodexOutput(output: string) {
+  return /you['’]ve hit your usage limit|usage limit (?:has been )?reached|rate limit(?:ed)?|insufficient quota|quota exceeded|temporarily unavailable/i.test(
+    output,
+  );
 }
 
 function crawlContext(iteration: number) {
@@ -275,53 +411,154 @@ function crawlContext(iteration: number) {
   ].join("\n");
 }
 
-async function collectImagesFromIndex(iteration: number, limit = 18) {
-  const indexPath = path.join(root, ".ai", "runs", `iteration-${iteration}`, "crawl", "index.json");
+async function collectImagesFromIndex(iteration: number, limit = 14) {
+  const indexPath = path.join(
+    root,
+    ".ai",
+    "runs",
+    `iteration-${iteration}`,
+    "crawl",
+    "index.json",
+  );
   if (!(await exists(indexPath))) return [];
 
   const index = JSON.parse(await readFile(indexPath, "utf8"));
   const images: string[] = [];
+  const selected = new Set<string>();
+  const visualSample = [
+    "home",
+    "denunciar",
+    "entrar",
+    "mapas",
+    "portal",
+    "imprensa",
+    "configuracoes",
+  ];
+
+  for (const route of visualSample) {
+    for (const viewport of ["desktop", "mobile"]) {
+      const result = (index.results ?? []).find(
+        (candidate: {
+          files?: { screenshot?: string };
+          ok?: boolean;
+          viewport?: { name?: string };
+        }) => {
+          const screenshot = candidate.files?.screenshot ?? "";
+          return (
+            candidate.ok &&
+            candidate.viewport?.name === viewport &&
+            screenshot.includes(`/${route}__`)
+          );
+        },
+      );
+      const screenshot = result?.files?.screenshot;
+      if (screenshot && !selected.has(screenshot)) {
+        images.push(screenshot);
+        selected.add(screenshot);
+      }
+    }
+  }
 
   for (const result of index.results ?? []) {
     if (!result.ok) continue;
-    if (result.files?.screenshot) images.push(result.files.screenshot);
-    if (result.files?.annotatedScreenshot) images.push(result.files.annotatedScreenshot);
-    if (images.length >= limit) break;
+    const screenshot = result.files?.screenshot;
+    if (screenshot && !selected.has(screenshot)) {
+      images.push(screenshot);
+      selected.add(screenshot);
+    }
+    if (images.length >= limit) return images.slice(0, limit);
   }
 
-  return images;
+  return images.slice(0, limit);
 }
 
 async function runCrawl(iteration: number) {
-  await run("tsx", ["scripts/ai/agent-browser-crawl.ts", "--iteration", String(iteration)]);
+  await run("tsx", [
+    "scripts/ai/agent-browser-crawl.ts",
+    "--iteration",
+    String(iteration),
+  ]);
 }
 
-async function runValidation(config: Config, iteration: number) {
+async function runValidation(
+  config: Config,
+  iteration: number,
+): Promise<ValidationResult> {
   const lines: string[] = [];
+  const summary: string[] = [];
+  let hasFailures = false;
 
   for (const command of config.validationCommands) {
     console.log(`\nValidação: ${command}\n`);
     const result = await runShell(command, { allowFailure: true });
-    lines.push([
-      `# ${command}`,
-      "",
-      `Exit code: ${result.code}`,
-      "",
-      "## stdout",
-      "```txt",
-      result.stdout.trim(),
-      "```",
-      "",
-      "## stderr",
-      "```txt",
-      result.stderr.trim(),
-      "```",
-      "",
-    ].join("\n"));
+    if (result.code !== 0) hasFailures = true;
+    const resultTail = commandOutputTail(result, 1_500);
+    lines.push(
+      [
+        `# ${command}`,
+        "",
+        `Exit code: ${result.code}`,
+        "",
+        "## stdout",
+        "```txt",
+        result.stdout.trim(),
+        "```",
+        "",
+        "## stderr",
+        "```txt",
+        result.stderr.trim(),
+        "```",
+        "",
+      ].join("\n"),
+    );
+    summary.push(
+      [
+        `- \`${command}\`: exit code ${result.code}.`,
+        result.code === 0
+          ? ""
+          : `  Últimas linhas:\n  \`\`\`txt\n${resultTail}\n  \`\`\``,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
   }
 
-  await save(`.ai/runs/iteration-${iteration}/validation.md`, lines.join("\n\n"));
-  return lines.join("\n\n");
+  const full = lines.join("\n\n");
+  await save(`.ai/runs/iteration-${iteration}/validation.md`, full);
+  return { hasFailures, summary: summary.join("\n") };
+}
+
+async function ensureForbiddenPathsUnchanged(config: Config) {
+  if (!(await exists(path.join(root, ".git")))) return;
+
+  const result = await runShell("git diff --name-only", {
+    allowFailure: true,
+    silent: true,
+  });
+  const changedPaths = result.stdout
+    .split("\n")
+    .map((file) => file.trim())
+    .filter(Boolean);
+  const forbidden = changedPaths.filter((file) =>
+    config.forbiddenPaths.some((blocked) => {
+      const normalized = blocked.replace(/\/+$/, "");
+      if (normalized === ".env") {
+        return file === ".env" || file.startsWith(".env.");
+      }
+      return file === normalized || file.startsWith(`${normalized}/`);
+    }),
+  );
+
+  if (forbidden.length > 0) {
+    throw new Error(
+      [
+        "A implementação alterou caminhos proibidos.",
+        "Interrompendo antes da validação para revisão humana.",
+        "",
+        ...forbidden.map((file) => `- ${file}`),
+      ].join("\n"),
+    );
+  }
 }
 
 function safetyContext(config: Config) {
@@ -337,11 +574,20 @@ function safetyContext(config: Config) {
 }
 
 function extractScore(markdown: string) {
-  const match = markdown.match(/Nota geral\s*\n\s*([0-9]+(?:[.,][0-9]+)?)/i)
-    ?? markdown.match(/Nota geral[^0-9]*([0-9]+(?:[.,][0-9]+)?)/i);
+  const match =
+    markdown.match(/Nota geral\s*\n\s*([0-9]+(?:[.,][0-9]+)?)/i) ??
+    markdown.match(/Nota geral[^0-9]*([0-9]+(?:[.,][0-9]+)?)/i);
 
   if (!match) return null;
   return Number(match[1].replace(",", "."));
+}
+
+function requiresHumanReview(markdown: string) {
+  return /## Veredito\s*\n\s*Requer revisão humana/i.test(markdown);
+}
+
+function isCriticApproved(markdown: string) {
+  return /## Veredito\s*\n\s*Aprovado/i.test(markdown);
 }
 
 async function main() {
@@ -388,6 +634,7 @@ async function main() {
         context: reviewBaseContext,
         outputRel: `.ai/runs/iteration-${iteration}/reviews/ui.md`,
         imagePaths: images,
+        requiredHeading: "# UI Review",
       });
 
       const ux = await runCodex({
@@ -398,6 +645,7 @@ async function main() {
         context: reviewBaseContext,
         outputRel: `.ai/runs/iteration-${iteration}/reviews/ux.md`,
         imagePaths: images,
+        requiredHeading: "# UX Review",
       });
 
       const accessibility = await runCodex({
@@ -408,6 +656,7 @@ async function main() {
         context: reviewBaseContext,
         outputRel: `.ai/runs/iteration-${iteration}/reviews/accessibility.md`,
         imagePaths: images,
+        requiredHeading: "# Accessibility Review",
       });
 
       const content = await runCodex({
@@ -417,6 +666,7 @@ async function main() {
         sandbox: config.codex.reviewSandbox,
         context: reviewBaseContext,
         outputRel: `.ai/runs/iteration-${iteration}/reviews/content.md`,
+        requiredHeading: "# Content Review",
       });
 
       const consistency = await runCodex({
@@ -427,6 +677,7 @@ async function main() {
         context: reviewBaseContext,
         outputRel: `.ai/runs/iteration-${iteration}/reviews/consistency.md`,
         imagePaths: images,
+        requiredHeading: "# Consistency Review",
       });
 
       const architectContext = [
@@ -457,6 +708,7 @@ async function main() {
         sandbox: config.codex.reviewSandbox,
         context: architectContext,
         outputRel: `.ai/runs/iteration-${iteration}/implementation-plan.md`,
+        requiredHeading: "# Implementation Plan",
       });
 
       const implementationContext = [
@@ -498,11 +750,18 @@ async function main() {
         outputRel: `.ai/runs/iteration-${iteration}/implementation-layout.md`,
       });
 
+      await ensureForbiddenPathsUnchanged(config);
       const validation = await runValidation(config, iteration);
+      if (validation.hasFailures) {
+        throw new Error(
+          `As validações da iteração ${iteration} falharam. Consulte .ai/runs/iteration-${iteration}/validation.md.`,
+        );
+      }
 
       await runCrawl(iteration + 100);
 
       const diff = await gitDiff();
+      const diffStat = await gitDiffStat();
       await save(`.ai/runs/iteration-${iteration}/git-diff.patch`, diff);
 
       const afterImages = await collectImagesFromIndex(iteration + 100);
@@ -516,11 +775,18 @@ async function main() {
         plan,
         "",
         "## Validação",
-        validation,
+        validation.summary,
         "",
-        "## Git diff",
+        `Relatório completo: .ai/runs/iteration-${iteration}/validation.md`,
+        "",
+        "## Resumo do Git diff",
+        "```txt",
+        diffStat,
+        "```",
+        "",
+        "## Amostra do Git diff",
         "```diff",
-        diff.slice(0, 80000),
+        diff.slice(0, 20_000),
         "```",
         "",
         "## Crawl antes",
@@ -538,18 +804,27 @@ async function main() {
         context: criticContext,
         outputRel: `.ai/runs/iteration-${iteration}/critic.md`,
         imagePaths: afterImages,
+        requiredHeading: "# Critic Report",
       });
 
       const score = extractScore(critic);
-      console.log(`\nNota detectada: ${score ?? "não encontrada"} / alvo ${config.targetScore}`);
+      console.log(
+        `\nNota detectada: ${score ?? "não encontrada"} / alvo ${config.targetScore}`,
+      );
 
-      if (score !== null && score >= config.targetScore) {
-        console.log("\nAprovado pelo Critic. Encerrando.");
+      if (requiresHumanReview(critic)) {
+        console.log(
+          "\nCritic pediu revisão humana. Encerrando para evitar fazer besteira com confiança.",
+        );
         break;
       }
 
-      if (/Requer revisão humana/i.test(critic)) {
-        console.log("\nCritic pediu revisão humana. Encerrando para evitar fazer besteira com confiança.");
+      if (
+        score !== null &&
+        score >= config.targetScore &&
+        isCriticApproved(critic)
+      ) {
+        console.log("\nAprovado pelo Critic. Encerrando.");
         break;
       }
 
