@@ -28,7 +28,7 @@ export async function sendInternalAuthEmail({
     idempotencyKey ||
     `auth-email/${to}/${Buffer.from(subject).toString("base64url").slice(0, 16)}`;
   const email: CreateEmailOptions = {
-    from: "Portal Elinsa <portal@amperelinsa.com.br>",
+    from: "Portal Elinsa <portal@elinsadobrasil.com.br>",
     to: [to],
     subject,
     text,
