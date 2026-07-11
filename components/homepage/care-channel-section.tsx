@@ -147,7 +147,7 @@ function CareGuideNavigation() {
           className="w-full justify-between bg-card"
           asChild
         >
-          <Link href={getDocsUrl("/etica/o-que-pode-ser-denunciado")}>
+          <Link href={getDocsUrl("/pt/etica/denuncias/o-que-pode-ser-denunciado")}>
             O que denunciar
             <CircleHelp aria-hidden="true" data-icon="inline-end" />
           </Link>
@@ -158,7 +158,7 @@ function CareGuideNavigation() {
           className="w-full justify-between bg-card"
           asChild
         >
-          <Link href={getDocsUrl("/etica/como-denunciar")}>
+          <Link href={getDocsUrl("/pt/etica/denuncias/como-denunciar")}>
             Como denunciar
             <ListChecks aria-hidden="true" data-icon="inline-end" />
           </Link>
