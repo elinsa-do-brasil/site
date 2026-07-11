@@ -25,7 +25,7 @@
     "usernameSelector": "input[type='email'], input[name='email'], input[name='username']",
     "passwordSelector": "input[type='password']",
     "submitSelector": "button[type='submit']",
-    "waitAfterSubmitMs": 2500
+    "waitAfterSubmitMs": 6000
   },
   "routes": [
     {

@@ -2,6 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { GerenciarConvites } from "@/components/admin/GerenciarConvites";
 import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
+import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -47,18 +48,21 @@ export default async function AdminConvitesPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <GestaoPageHeader
-        active="convites"
-        title="Convites"
-        description="Envie links de acesso, acompanhe pendências e revogue convites que não devem mais funcionar."
-      />
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <GestaoPageHeader
+          active="convites"
+          title="Convites"
+          description="Envie links de acesso, acompanhe pendências e revogue convites que não devem mais funcionar."
+          isOrgAdmin={context.isOrgAdmin}
+        />
 
-      <GerenciarConvites
-        pendingInvitations={pendingInvites}
-        roleOptions={roleOptions}
-        teams={teams}
-      />
-    </div>
+        <GerenciarConvites
+          pendingInvitations={pendingInvites}
+          roleOptions={roleOptions}
+          teams={teams}
+        />
+      </div>
+    </PageTransition>
   );
 }

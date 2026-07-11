@@ -1,10 +1,10 @@
 "use client";
 
 import DottedMap from "dotted-map";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 interface MapProps {
   className?: string;
@@ -37,7 +37,14 @@ export default function WorldMap({
     [],
   );
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const shouldReduceMotion = useReducedMotion();
+  const [isMounted, setIsMounted] = useState(false);
+  const isDark = isMounted && resolvedTheme === "dark";
+  const reduceMotion = isMounted && shouldReduceMotion;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const svgMap = useMemo(
     () =>
@@ -189,17 +196,21 @@ export default function WorldMap({
 
           return (
             <g key={`path-${dotKey}`}>
-              <motion.path
+              <path
+                className="hidden motion-reduce:inline"
                 d={createCurvedPath(startPoint, endPoint)}
                 fill="none"
                 stroke={`url(#${gradientId})`}
                 strokeWidth="1"
-                initial={{
-                  pathLength: 0,
-                }}
-                animate={{
-                  pathLength: 1,
-                }}
+              />
+              <motion.path
+                className="motion-reduce:hidden"
+                d={createCurvedPath(startPoint, endPoint)}
+                fill="none"
+                stroke={`url(#${gradientId})`}
+                strokeWidth="1"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
                 transition={{
                   duration: 1,
                   delay: 0.5 * i,
@@ -224,30 +235,33 @@ export default function WorldMap({
                   r="2"
                   fill={lineColor}
                 />
-                <circle
-                  cx={startPoint.x}
-                  cy={startPoint.y}
-                  r="2"
-                  fill={lineColor}
-                  opacity="0.5"
-                >
-                  <animate
-                    attributeName="r"
-                    from="2"
-                    to="8"
-                    dur="1.5s"
-                    begin="0s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    from="0.5"
-                    to="0"
-                    dur="1.5s"
-                    begin="0s"
-                    repeatCount="indefinite"
-                  />
-                </circle>
+                {!reduceMotion && (
+                  <circle
+                    className="motion-reduce:hidden"
+                    cx={startPoint.x}
+                    cy={startPoint.y}
+                    r="2"
+                    fill={lineColor}
+                    opacity="0.5"
+                  >
+                    <animate
+                      attributeName="r"
+                      begin="0s"
+                      dur="1.5s"
+                      from="2"
+                      repeatCount="indefinite"
+                      to="8"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      begin="0s"
+                      dur="1.5s"
+                      from="0.5"
+                      repeatCount="indefinite"
+                      to="0"
+                    />
+                  </circle>
+                )}
               </g>
               <g>
                 <circle
@@ -256,30 +270,33 @@ export default function WorldMap({
                   r="2"
                   fill={lineColor}
                 />
-                <circle
-                  cx={endPoint.x}
-                  cy={endPoint.y}
-                  r="2"
-                  fill={lineColor}
-                  opacity="0.5"
-                >
-                  <animate
-                    attributeName="r"
-                    from="2"
-                    to="8"
-                    dur="1.5s"
-                    begin="0s"
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    from="0.5"
-                    to="0"
-                    dur="1.5s"
-                    begin="0s"
-                    repeatCount="indefinite"
-                  />
-                </circle>
+                {!reduceMotion && (
+                  <circle
+                    className="motion-reduce:hidden"
+                    cx={endPoint.x}
+                    cy={endPoint.y}
+                    r="2"
+                    fill={lineColor}
+                    opacity="0.5"
+                  >
+                    <animate
+                      attributeName="r"
+                      begin="0s"
+                      dur="1.5s"
+                      from="2"
+                      repeatCount="indefinite"
+                      to="8"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      begin="0s"
+                      dur="1.5s"
+                      from="0.5"
+                      repeatCount="indefinite"
+                      to="0"
+                    />
+                  </circle>
+                )}
               </g>
             </g>
           );

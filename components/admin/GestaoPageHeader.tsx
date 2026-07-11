@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 type GestaoSection = "organizacao" | "convites" | "equipes" | "ferramentas";
 
@@ -37,6 +37,7 @@ type GestaoPageHeaderProps = {
   active: GestaoSection;
   description: string;
   eyebrow?: string;
+  isOrgAdmin: boolean;
   title: string;
 };
 
@@ -45,45 +46,52 @@ export function GestaoPageHeader({
   active,
   description,
   eyebrow = "Gestão do portal",
+  isOrgAdmin,
   title,
 }: GestaoPageHeaderProps) {
+  const availableSections = isOrgAdmin
+    ? GESTAO_NAV
+    : GESTAO_NAV.filter(
+        (item) => item.id === "equipes" || item.id === "ferramentas",
+      );
+
   return (
-    <header className="mb-6 border-b pb-5">
-      <nav
-        aria-label="Administração do portal"
-        className="mb-4 flex flex-wrap items-center gap-2"
-      >
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/portal">Voltar ao portal</Link>
-        </Button>
-        {GESTAO_NAV.map((item) => (
+    <PageHeader
+      actions={actions}
+      description={description}
+      eyebrow={eyebrow}
+      navigation={
+        <PageHeaderNavigation label="Administração do portal">
           <Button
-            aria-current={item.id === active ? "page" : undefined}
-            key={item.id}
-            variant={item.id === active ? "default" : "ghost"}
+            className="order-0 shrink-0"
             size="sm"
+            variant="outline"
             asChild
           >
-            <Link href={item.href}>{item.label}</Link>
+            <Link href="/portal" transitionTypes={["nav-back"]}>
+              Voltar ao portal
+            </Link>
           </Button>
-        ))}
-      </nav>
-
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-3xl">
-          <p className="mb-1 text-xs font-medium text-muted-foreground">
-            {eyebrow}
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-        </div>
-        {actions && (
-          <div className={cn("flex flex-wrap gap-2 sm:justify-end")}>
-            {actions}
-          </div>
-        )}
-      </div>
-    </header>
+          {availableSections.map((item) => (
+            <Button
+              aria-current={item.id === active ? "page" : undefined}
+              className={
+                item.id === active
+                  ? "order-1 shrink-0 md:order-none"
+                  : "order-2 shrink-0 md:order-none"
+              }
+              key={item.id}
+              size="sm"
+              variant={item.id === active ? "default" : "ghost"}
+              asChild
+            >
+              <Link href={item.href}>{item.label}</Link>
+            </Button>
+          ))}
+        </PageHeaderNavigation>
+      }
+      title={title}
+    />
   );
 }
 

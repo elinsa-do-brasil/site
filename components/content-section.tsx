@@ -38,14 +38,14 @@ export function ContentSection({
       id={id}
       aria-labelledby={headingId}
       className={cn(
-        "overflow-hidden px-6 py-16 md:px-8 lg:py-20",
+        "overflow-hidden py-16 lg:py-20",
         tone === "default" && "bg-background",
         tone === "muted" && "bg-muted/25",
         tone === "dark" && "bg-elinsa-dark text-white",
         className,
       )}
     >
-      <div className={cn("mx-auto max-w-6xl", containerClassName)}>
+      <div className={cn("mx-auto w-full max-w-6xl px-4", containerClassName)}>
         {children}
       </div>
     </section>

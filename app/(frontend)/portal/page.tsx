@@ -14,6 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { formatAdminName } from "@/components/admin/GestaoPageHeader";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -23,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PageTransition } from "@/components/ui/page-transition";
 import { Separator } from "@/components/ui/separator";
 import { canListReports } from "@/lib/comite/access";
 import {
@@ -52,57 +54,67 @@ export default async function InternoDashboardPage() {
   const adminLinks = getAdminLinks(context);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Portal interno</h1>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_23rem]">
-        <section className="min-w-0">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Ferramentas internas
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Atalhos disponíveis para suas equipes e funções.
-              </p>
-            </div>
-            <Badge variant="outline">{availableTools.length} ativa(s)</Badge>
-          </div>
-
-          {availableTools.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {availableTools.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
-              ))}
-            </div>
-          ) : (
-            <Card className="rounded-md border-dashed bg-card/70 py-10">
-              <CardContent className="text-center text-muted-foreground">
-                <LayoutGrid className="mx-auto mb-3 size-8 text-muted-foreground/70" />
-                <p className="text-sm">
-                  Nenhuma ferramenta interna foi disponibilizada para o seu
-                  perfil.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </section>
-
-        <PortalSidebar
-          adminLinks={adminLinks}
-          canSeeReports={canSeeReports}
-          latestBlogPosts={latestBlogPosts}
-          reportCounts={reportCounts}
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <PageHeader
+          description="Ferramentas, atualizações e áreas de gestão disponíveis para a sua conta."
+          eyebrow="Área de trabalho"
+          meta={
+            <Badge variant="outline">
+              {availableTools.length} ferramentas ativas
+            </Badge>
+          }
+          title="Portal interno"
         />
+
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_23rem]">
+          <section className="min-w-0">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Ferramentas internas
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Atalhos disponíveis para suas equipes e funções.
+                </p>
+              </div>
+              <Badge variant="outline">{availableTools.length} ativa(s)</Badge>
+            </div>
+
+            {availableTools.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {availableTools.map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} />
+                ))}
+              </div>
+            ) : (
+              <Card className="rounded-md border-dashed bg-card/70 py-10">
+                <CardContent className="text-center text-muted-foreground">
+                  <LayoutGrid className="mx-auto mb-3 size-8 text-muted-foreground/70" />
+                  <p className="text-sm">
+                    Nenhuma ferramenta interna foi disponibilizada para o seu
+                    perfil.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </section>
+
+          <PortalSidebar
+            adminLinks={adminLinks}
+            canSeeReports={canSeeReports}
+            latestBlogPosts={latestBlogPosts}
+            reportCounts={reportCounts}
+          />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }
 
 function ToolCard({ tool }: { tool: InternalTool }) {
   const isExternal = tool.href.startsWith("https://");
+  const supportsPageTransition = isPageTransitionTarget(tool.href);
   const teamLabel = tool.teamName
     ? `Equipe ${formatAdminName(tool.teamName)}`
     : "Portal interno";
@@ -114,6 +126,9 @@ function ToolCard({ tool }: { tool: InternalTool }) {
       href={tool.href}
       rel={isExternal ? "noreferrer" : undefined}
       target={isExternal ? "_blank" : undefined}
+      transitionTypes={
+        !isExternal && supportsPageTransition ? ["nav-forward"] : undefined
+      }
     >
       <Card className="flex h-full min-h-44 overflow-hidden rounded-md border-border/80 bg-card/95 py-0 shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:border-elinsa-primary/45 group-hover:shadow-md">
         <CardHeader className="flex-1 gap-4 px-4 pt-4 pb-5">
@@ -153,6 +168,22 @@ function ToolCard({ tool }: { tool: InternalTool }) {
       </Card>
     </Link>
   );
+}
+
+function isPageTransitionTarget(href: string) {
+  return [
+    "/configuracoes",
+    "/imprensa",
+    "/portal/blog",
+    "/portal/comite-de-etica",
+    "/portal/contatos",
+    "/portal/gestao/convites",
+    "/portal/gestao/equipes",
+    "/portal/gestao/ferramentas",
+    "/portal/gestao/organizacao",
+    "/portal/mercurio",
+    "/vagas",
+  ].some((path) => href === path || href.startsWith(`${path}/`));
 }
 
 function ToolIcon({ tool }: { tool: InternalTool }) {
@@ -225,7 +256,7 @@ function PortalSidebar({
                 key={item.href}
                 variant="secondary"
               >
-                <Link href={item.href}>
+                <Link href={item.href} transitionTypes={["nav-forward"]}>
                   <span className="inline-flex min-w-0 items-center gap-2">
                     {item.icon}
                     <span className="truncate">{item.label}</span>
@@ -251,7 +282,10 @@ function PortalSidebar({
               <ReportMetric label="finalizadas" value={finishedReports} />
             </div>
             <Button asChild className="mt-3 w-full justify-between" size="sm">
-              <Link href="/portal/comite-de-etica">
+              <Link
+                href="/portal/comite-de-etica"
+                transitionTypes={["nav-forward"]}
+              >
                 Abrir comitê
                 <ArrowRight className="size-3" />
               </Link>
@@ -283,7 +317,7 @@ function PortalSidebar({
           size="sm"
           variant="outline"
         >
-          <Link href="/portal/blog">
+          <Link href="/portal/blog" transitionTypes={["nav-forward"]}>
             Ver blog
             <ArrowRight className="size-3" />
           </Link>
@@ -333,6 +367,7 @@ function BlogPostLink({ post }: { post: EditorialPost }) {
     <Link
       className="group grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 rounded-md border bg-background/70 p-2 transition hover:border-elinsa-primary/45 hover:bg-background"
       href={href}
+      transitionTypes={["nav-forward"]}
     >
       <div className="relative min-h-20 overflow-hidden rounded-md bg-muted">
         {coverImage ? (

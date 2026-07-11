@@ -21,6 +21,7 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
+import { PageTransition } from "@/components/ui/page-transition";
 import { Separator } from "@/components/ui/separator";
 import {
   type EditorialCollectionSlug,
@@ -62,37 +63,39 @@ export async function EditorialIndex({
   const subjectCounts = getSubjectCounts(allPosts);
 
   return (
-    <div
-      className={cn(
-        "min-h-screen bg-background text-foreground",
-        !isPortalCollection && "pt-24",
-      )}
-    >
-      <section
+    <PageTransition>
+      <div
         className={cn(
-          "mx-auto w-full max-w-6xl px-4 sm:px-6",
-          isPortalCollection ? "pb-12" : "py-6 md:py-8",
+          "min-h-screen bg-background text-foreground",
+          !isPortalCollection && "pt-24",
         )}
       >
-        <EditorialIndexHeader
-          config={config}
-          subject={subject}
-          subjectCounts={subjectCounts}
-        />
+        <section
+          className={cn(
+            "mx-auto w-full max-w-6xl px-4",
+            isPortalCollection ? "pb-12" : "py-6 md:py-8",
+          )}
+        >
+          <EditorialIndexHeader
+            config={config}
+            subject={subject}
+            subjectCounts={subjectCounts}
+          />
 
-        {allPosts.length === 0 ? (
-          <EmptyState config={config} />
-        ) : (
-          <div className="min-w-0">
-            {posts.length === 0 ? (
-              <EmptyState config={config} />
-            ) : (
-              <EditorialPostShowcase config={config} posts={posts} />
-            )}
-          </div>
-        )}
-      </section>
-    </div>
+          {allPosts.length === 0 ? (
+            <EmptyState config={config} />
+          ) : (
+            <div className="min-w-0">
+              {posts.length === 0 ? (
+                <EmptyState config={config} />
+              ) : (
+                <EditorialPostShowcase config={config} posts={posts} />
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+    </PageTransition>
   );
 }
 
@@ -106,9 +109,12 @@ function EditorialIndexHeader({
   subjectCounts: SubjectCount[];
 }) {
   return (
-    <header className="mb-5 border-b border-border pb-4 md:mb-6">
+    <header className="relative mb-5 overflow-hidden border-b border-border pb-4 md:mb-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 lg:max-w-md">
+        <div className="min-w-0 border-l-2 border-elinsa-primary pl-4 sm:pl-5 lg:max-w-md">
+          <p className="text-[0.65rem] font-semibold tracking-[0.14em] text-elinsa-primary uppercase">
+            {config.eyebrow}
+          </p>
           <h1 className="max-w-2xl text-2xl font-black leading-tight tracking-normal text-elinsa-dark md:text-3xl dark:text-elinsa-sky">
             {config.title}
           </h1>
@@ -153,126 +159,128 @@ export async function EditorialArticlePage({
   const updatedDate = formatEditorialDate(post.updatedAt);
 
   return (
-    <div
-      className={cn(
-        "min-h-screen bg-background text-foreground",
-        !isPortalCollection && "pt-24",
-      )}
-    >
-      {isDraftMode && (
-        <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
-          Pré-visualização ativa
-        </div>
-      )}
-
-      <section
+    <PageTransition>
+      <div
         className={cn(
-          "mx-auto max-w-6xl px-4 sm:px-6 md:px-8",
-          !isPortalCollection && "py-6 md:py-8",
+          "min-h-screen bg-background text-foreground",
+          !isPortalCollection && "pt-24",
         )}
       >
-        <Button
-          asChild
-          className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"
-          variant="ghost"
+        {isDraftMode && (
+          <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
+            Pré-visualização ativa
+          </div>
+        )}
+
+        <section
+          className={cn(
+            "mx-auto w-full max-w-6xl px-4",
+            !isPortalCollection && "py-6 md:py-8",
+          )}
         >
-          <Link href={config.href}>
-            <ArrowLeft className="size-4" />
-            Voltar para {config.navLabel}
-          </Link>
-        </Button>
+          <Button
+            asChild
+            className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"
+            variant="ghost"
+          >
+            <Link href={config.href} transitionTypes={["nav-back"]}>
+              <ArrowLeft className="size-4" />
+              Voltar para {config.navLabel}
+            </Link>
+          </Button>
 
-        <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
-          <div className="min-w-0">
-            <div className="mb-8 max-w-4xl">
-              <h1 className="text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-4xl dark:text-elinsa-sky">
-                {post.title}
-              </h1>
+          <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="min-w-0">
+              <div className="mb-8 max-w-4xl">
+                <h1 className="text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-4xl dark:text-elinsa-sky">
+                  {post.title}
+                </h1>
 
-              {post.summary && (
-                <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
-                  {post.summary}
-                </p>
-              )}
-
-              <p
-                className={cn(
-                  "inline-flex items-center gap-2 text-sm font-medium text-muted-foreground",
-                  post.summary ? "mt-3" : "mt-5",
+                {post.summary && (
+                  <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+                    {post.summary}
+                  </p>
                 )}
-              >
-                <Clock3 className="size-4 text-elinsa-primary" />
-                {readingMinutes} min de leitura
-              </p>
 
-              <div className="mt-5 text-sm text-muted-foreground">
-                <Separator />
-                <div className="space-y-2 py-4">
-                  <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                    <span className="inline-flex items-center gap-2">
-                      <CalendarDays className="size-4 text-elinsa-primary" />
-                      Publicado em{" "}
-                      <time className="font-semibold text-foreground">
-                        {publishedDate}
-                      </time>
-                    </span>
+                <p
+                  className={cn(
+                    "inline-flex items-center gap-2 text-sm font-medium text-muted-foreground",
+                    post.summary ? "mt-3" : "mt-5",
+                  )}
+                >
+                  <Clock3 className="size-4 text-elinsa-primary" />
+                  {readingMinutes} min de leitura
+                </p>
 
-                    {updatedDate && (
+                <div className="mt-5 text-sm text-muted-foreground">
+                  <Separator />
+                  <div className="space-y-2 py-4">
+                    <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
                       <span className="inline-flex items-center gap-2">
-                        <RefreshCw className="size-4 text-elinsa-primary" />
-                        Atualizado em{" "}
+                        <CalendarDays className="size-4 text-elinsa-primary" />
+                        Publicado em{" "}
                         <time className="font-semibold text-foreground">
-                          {updatedDate}
+                          {publishedDate}
                         </time>
                       </span>
-                    )}
-                  </p>
 
-                  <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                    <span className="inline-flex items-center gap-2">
-                      <FileText className="size-4 text-elinsa-primary" />
-                      Assunto{" "}
-                      <span className="font-semibold text-foreground">
-                        {getEditorialSubjectLabel(getPostSubjectValue(post))}
-                      </span>
-                    </span>
+                      {updatedDate && (
+                        <span className="inline-flex items-center gap-2">
+                          <RefreshCw className="size-4 text-elinsa-primary" />
+                          Atualizado em{" "}
+                          <time className="font-semibold text-foreground">
+                            {updatedDate}
+                          </time>
+                        </span>
+                      )}
+                    </p>
 
-                    <span className="inline-flex items-center gap-2">
-                      <UserRound className="size-4 text-elinsa-primary" />
-                      Por{" "}
-                      <span className="font-semibold text-foreground">
-                        {getAuthorName(post.author)}
+                    <p className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                      <span className="inline-flex items-center gap-2">
+                        <FileText className="size-4 text-elinsa-primary" />
+                        Assunto{" "}
+                        <span className="font-semibold text-foreground">
+                          {getEditorialSubjectLabel(getPostSubjectValue(post))}
+                        </span>
                       </span>
-                    </span>
-                  </p>
+
+                      <span className="inline-flex items-center gap-2">
+                        <UserRound className="size-4 text-elinsa-primary" />
+                        Por{" "}
+                        <span className="font-semibold text-foreground">
+                          {getAuthorName(post.author)}
+                        </span>
+                      </span>
+                    </p>
+                  </div>
+                  <Separator />
                 </div>
-                <Separator />
               </div>
+
+              <article className="min-w-0 pb-12 lg:pr-8">
+                <MobileTopics headings={headings} />
+                <EditorialRichText data={post.content} />
+
+                <div className="mt-14 border-t border-border pt-6">
+                  <Button
+                    asChild
+                    className="gap-2 text-sm font-semibold hover:border-elinsa-primary hover:text-elinsa-primary"
+                    variant="outline"
+                  >
+                    <Link href={config.href} transitionTypes={["nav-back"]}>
+                      Ver todas
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </article>
             </div>
 
-            <article className="min-w-0 pb-12 lg:pr-8">
-              <MobileTopics headings={headings} />
-              <EditorialRichText data={post.content} />
-
-              <div className="mt-14 border-t border-border pt-6">
-                <Button
-                  asChild
-                  className="gap-2 text-sm font-semibold hover:border-elinsa-primary hover:text-elinsa-primary"
-                  variant="outline"
-                >
-                  <Link href={config.href}>
-                    Ver todas
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
-              </div>
-            </article>
+            <TopicsAside headings={headings} />
           </div>
-
-          <TopicsAside headings={headings} />
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </PageTransition>
   );
 }
 
@@ -334,7 +342,11 @@ function FeaturedPostCard({
   const card = getPostCardData(config, post);
 
   return (
-    <Link className="group block h-full min-w-0" href={card.href}>
+    <Link
+      className="group block h-full min-w-0"
+      href={card.href}
+      transitionTypes={["nav-forward"]}
+    >
       <Card
         className="relative h-full min-h-[30rem] overflow-hidden border-border/70 bg-elinsa-dark py-0 text-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/40 hover:shadow-xl hover:shadow-elinsa-primary/10 md:min-h-[34rem]"
         variant="editorial"
@@ -393,7 +405,11 @@ function CompactPostCard({
   const card = getPostCardData(config, post);
 
   return (
-    <Link className="group block h-full min-w-0" href={card.href}>
+    <Link
+      className="group block h-full min-w-0"
+      href={card.href}
+      transitionTypes={["nav-forward"]}
+    >
       <Card
         className="grid h-full overflow-hidden border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 sm:grid-cols-[12rem_minmax(0,1fr)] xl:grid-cols-[13rem_minmax(0,1fr)]"
         variant="editorial"

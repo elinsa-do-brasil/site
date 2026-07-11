@@ -2,8 +2,10 @@ import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContactsTable } from "@/app/(frontend)/portal/contatos/_components/contacts-table";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PageTransition } from "@/components/ui/page-transition";
 import { assertCanAccessContacts } from "@/lib/contacts/permissions";
 import { listContacts } from "@/lib/contacts/queries";
 import {
@@ -40,84 +42,87 @@ export default async function PortalContatosPage({
   const { pagination } = result;
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 pb-12">
-      <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Contatos recebidos
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Consulte e acompanhe mensagens enviadas pelo formulário público.
-          </p>
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/portal">Voltar ao portal</Link>
-        </Button>
-      </div>
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <PageHeader
+          description="Consulte e acompanhe mensagens enviadas pelo formulário público."
+          eyebrow="Relacionamento"
+          navigation={
+            <PageHeaderNavigation label="Navegação de contatos">
+              <Button className="shrink-0" size="sm" variant="outline" asChild>
+                <Link href="/portal" transitionTypes={["nav-back"]}>
+                  Voltar ao portal
+                </Link>
+              </Button>
+            </PageHeaderNavigation>
+          }
+          title="Contatos recebidos"
+        />
 
-      <form
-        action="/portal/contatos"
-        className="mb-5 grid gap-3 rounded-md border bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_12rem_auto_auto]"
-      >
-        <div className="relative">
-          <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground" />
-          <label className="sr-only" htmlFor="contacts-search">
-            Buscar contatos
+        <form
+          action="/portal/contatos"
+          className="mb-5 grid gap-3 rounded-md border bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_12rem_auto_auto]"
+        >
+          <div className="relative">
+            <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground" />
+            <label className="sr-only" htmlFor="contacts-search">
+              Buscar contatos
+            </label>
+            <Input
+              className="pl-8"
+              defaultValue={search}
+              id="contacts-search"
+              name="search"
+              placeholder="Buscar por nome, e-mail, empresa, assunto ou mensagem"
+            />
+          </div>
+          <label className="sr-only" htmlFor="contacts-status">
+            Filtrar por status
           </label>
-          <Input
-            className="pl-8"
-            defaultValue={search}
-            id="contacts-search"
-            name="search"
-            placeholder="Buscar por nome, e-mail, empresa, assunto ou mensagem"
+          <select
+            className="h-9 rounded-md border border-input bg-input/20 px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+            defaultValue={status ?? ""}
+            id="contacts-status"
+            name="status"
+          >
+            <option value="">Todos os status</option>
+            {CONTACT_STATUS_VALUES.map((value) => (
+              <option key={value} value={value}>
+                {contactStatusLabels[value]}
+              </option>
+            ))}
+          </select>
+          <Button type="submit">Filtrar</Button>
+          <Button variant="outline" asChild>
+            <Link href="/portal/contatos">Limpar</Link>
+          </Button>
+        </form>
+
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span>
+            {pagination.total} contato(s) encontrado(s) · página{" "}
+            {pagination.page} de {pagination.totalPages}
+          </span>
+          <Pagination
+            page={pagination.page}
+            search={search}
+            status={status}
+            totalPages={pagination.totalPages}
           />
         </div>
-        <label className="sr-only" htmlFor="contacts-status">
-          Filtrar por status
-        </label>
-        <select
-          className="h-9 rounded-md border border-input bg-input/20 px-3 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-          defaultValue={status ?? ""}
-          id="contacts-status"
-          name="status"
-        >
-          <option value="">Todos os status</option>
-          {CONTACT_STATUS_VALUES.map((value) => (
-            <option key={value} value={value}>
-              {contactStatusLabels[value]}
-            </option>
-          ))}
-        </select>
-        <Button type="submit">Filtrar</Button>
-        <Button variant="outline" asChild>
-          <Link href="/portal/contatos">Limpar</Link>
-        </Button>
-      </form>
 
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-        <span>
-          {pagination.total} contato(s) encontrado(s) · página {pagination.page}{" "}
-          de {pagination.totalPages}
-        </span>
-        <Pagination
-          page={pagination.page}
-          search={search}
-          status={status}
-          totalPages={pagination.totalPages}
-        />
+        <ContactsTable contacts={result.contacts} />
+
+        <div className="mt-4 flex justify-end">
+          <Pagination
+            page={pagination.page}
+            search={search}
+            status={status}
+            totalPages={pagination.totalPages}
+          />
+        </div>
       </div>
-
-      <ContactsTable contacts={result.contacts} />
-
-      <div className="mt-4 flex justify-end">
-        <Pagination
-          page={pagination.page}
-          search={search}
-          status={status}
-          totalPages={pagination.totalPages}
-        />
-      </div>
-    </div>
+    </PageTransition>
   );
 }
 

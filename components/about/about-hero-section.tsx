@@ -17,7 +17,7 @@ export function AboutHeroSection() {
   return (
     <section
       aria-labelledby="quem-somos-heading"
-      className="relative isolate overflow-hidden border-b border-border bg-background px-6 pb-10 pt-28 md:px-8 md:pb-14 md:pt-32"
+      className="relative isolate overflow-hidden border-b border-border bg-background pb-10 pt-28 md:pb-14 md:pt-32"
     >
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,var(--background)_0%,var(--background)_42%,transparent_82%)]" />
       <div className="absolute right-[-30rem] top-24 -z-20 w-[72rem] sm:right-[-26rem] md:right-[-22rem] lg:right-[-14rem] xl:right-[-9rem]">
@@ -28,7 +28,7 @@ export function AboutHeroSection() {
         />
       </div>
 
-      <div className="mx-auto flex min-h-[38rem] w-full max-w-6xl flex-col justify-end gap-12 md:min-h-[42rem] md:justify-center">
+      <div className="mx-auto flex min-h-[38rem] w-full max-w-6xl flex-col justify-end gap-12 px-4 md:min-h-[42rem] md:justify-center">
         <div className="max-w-2xl">
           <SectionEyebrow
             text="Espanha e Brasil conectados pela engenharia elétrica"

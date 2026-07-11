@@ -337,8 +337,8 @@ function LicenseList({
   description: string;
 }) {
   return (
-    <section className="px-6 py-16 md:px-8">
-      <div className="mx-auto max-w-6xl">
+    <section className="py-16">
+      <div className="mx-auto w-full max-w-6xl px-4">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-3xl font-black tracking-normal md:text-4xl">
@@ -397,8 +397,8 @@ function LicenseList({
 export default function LicencasPage() {
   return (
     <div className="bg-background text-foreground">
-      <section className="border-b border-border bg-background px-6 pb-16 pt-28 md:px-8 md:pb-20 md:pt-32">
-        <div className="mx-auto max-w-6xl">
+      <section className="border-b border-border bg-background pb-16 pt-28 md:pb-20 md:pt-32">
+        <div className="mx-auto w-full max-w-6xl px-4">
           <div className="max-w-4xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
               <Scale className="size-4" />
@@ -461,8 +461,8 @@ export default function LicencasPage() {
         </div>
       </section>
 
-      <section className="border-b border-border bg-muted/35 px-6 py-12 md:px-8">
-        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-[0.75fr_1.25fr] md:items-center">
+      <section className="border-b border-border bg-muted/35 py-12">
+        <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 md:grid-cols-[0.75fr_1.25fr] md:items-center">
           {/* <div className="inline-flex w-fit items-center gap-2 rounded-md bg-background px-3 py-2 text-sm font-semibold text-muted-foreground"> */}
           <div className="mb-4 w-fit inline-flex items-center gap-2 rounded-md border border-border bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-primary">
             <Code2 className="size-4 text-elinsa-primary" />

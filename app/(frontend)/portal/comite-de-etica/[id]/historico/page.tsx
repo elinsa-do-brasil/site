@@ -2,8 +2,10 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageTransition } from "@/components/ui/page-transition";
 import { auth } from "@/lib/auth";
 import {
   canReadReport,
@@ -44,35 +46,47 @@ export default async function ReportHistoryPage({
   const historyEntries = groupReportEvents(events);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <header className="mb-6 border-b pb-5">
-        <nav
-          aria-label="Navegação do histórico"
-          className="mb-3 flex flex-wrap gap-2"
-        >
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/portal/comite-de-etica/${report.id}`}>Voltar</Link>
-          </Button>
-        </nav>
-        <h1 className="text-2xl font-semibold tracking-tight">Histórico</h1>
-        <p className="mt-1 font-mono text-sm text-muted-foreground">
-          {report.protocol}
-        </p>
-      </header>
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <PageHeader
+          description="Linha do tempo das movimentações e decisões registradas no caso."
+          eyebrow="Caso em análise"
+          meta={
+            <span className="font-mono text-xs text-muted-foreground">
+              {report.protocol}
+            </span>
+          }
+          navigation={
+            <PageHeaderNavigation label="Navegação do histórico">
+              <Button className="shrink-0" size="sm" variant="outline" asChild>
+                <Link
+                  href={`/portal/comite-de-etica/${report.id}`}
+                  transitionTypes={["nav-back"]}
+                >
+                  Voltar ao caso
+                </Link>
+              </Button>
+            </PageHeaderNavigation>
+          }
+          title="Histórico"
+        />
 
-      <Card className="rounded-md border-border/80 py-0 shadow-sm">
-        <CardHeader className="border-b py-4">
-          <CardTitle className="text-base">Movimentações registradas</CardTitle>
-        </CardHeader>
-        <CardContent className="py-4">
-          <div className="flex flex-col gap-4">
-            {historyEntries.map((entry) => (
-              <HistoryEntryView key={entry.id} entry={entry} />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">
+              Movimentações registradas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="py-4">
+            <div className="flex flex-col gap-4">
+              {historyEntries.map((entry) => (
+                <HistoryEntryView key={entry.id} entry={entry} />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PageTransition>
   );
 }
 

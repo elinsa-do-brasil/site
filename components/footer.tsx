@@ -6,8 +6,8 @@ import { HeroImageCopyright } from "./hero-image-copyright";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/80 bg-background px-6 pt-12 md:px-8">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <footer className="border-t border-border/80 bg-background pt-12">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.95fr)]">
           <FooterBrand />
 

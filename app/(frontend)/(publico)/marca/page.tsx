@@ -297,8 +297,8 @@ function AssetCard({ asset }: { asset: BrandAsset }) {
 export default function MarcaPage() {
   return (
     <div className="bg-background text-foreground">
-      <section className="border-b border-border bg-background px-6 pb-14 pt-28 md:px-8 md:pb-16 md:pt-32 min-h-dvh">
-        <div className="mx-auto max-w-6xl">
+      <section className="min-h-dvh border-b border-border bg-background pb-14 pt-28 md:pb-16 md:pt-32">
+        <div className="mx-auto w-full max-w-6xl px-4">
           <div className="max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
               <SwatchBook className="size-4" />
@@ -363,8 +363,8 @@ export default function MarcaPage() {
         </div>
       </section>
 
-      <section id="cores" className="px-6 py-16 md:px-8">
-        <div className="mx-auto max-w-6xl">
+      <section id="cores" className="py-16">
+        <div className="mx-auto w-full max-w-6xl px-4">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-md bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">
@@ -389,11 +389,8 @@ export default function MarcaPage() {
         </div>
       </section>
 
-      <section
-        id="logos"
-        className="border-y border-border bg-muted/35 px-6 py-16 md:px-8"
-      >
-        <div className="mx-auto max-w-6xl">
+      <section id="logos" className="border-y border-border bg-muted/35 py-16">
+        <div className="mx-auto w-full max-w-6xl px-4">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="mb-5 inline-flex items-center gap-2 rounded-md border border-elinsa-primary/20 bg-elinsa-light px-3 py-2 text-sm font-semibold text-elinsa-dark">

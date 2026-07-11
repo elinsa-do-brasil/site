@@ -2,6 +2,7 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
 import { TimesAdmin } from "@/components/admin/TimesAdmin";
+import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -92,23 +93,26 @@ export default async function TimesAdminPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <GestaoPageHeader
-        active="equipes"
-        title="Equipes"
-        description="Agrupe pessoas, convites e permissões operacionais por área de trabalho."
-      />
-      <TimesAdmin
-        isOrgAdmin={context.isOrgAdmin}
-        registeredUsers={registeredUsers}
-        roleOptions={roleOptions}
-        teams={manageableTeams.map((item) => ({
-          ...item,
-          memberCount: memberCountByTeam.get(item.id) ?? 0,
-          pendingInvitationCount:
-            pendingInvitationCountByTeam.get(item.id) ?? 0,
-        }))}
-      />
-    </div>
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <GestaoPageHeader
+          active="equipes"
+          title="Equipes"
+          description="Agrupe pessoas, convites e permissões operacionais por área de trabalho."
+          isOrgAdmin={context.isOrgAdmin}
+        />
+        <TimesAdmin
+          isOrgAdmin={context.isOrgAdmin}
+          registeredUsers={registeredUsers}
+          roleOptions={roleOptions}
+          teams={manageableTeams.map((item) => ({
+            ...item,
+            memberCount: memberCountByTeam.get(item.id) ?? 0,
+            pendingInvitationCount:
+              pendingInvitationCountByTeam.get(item.id) ?? 0,
+          }))}
+        />
+      </div>
+    </PageTransition>
   );
 }

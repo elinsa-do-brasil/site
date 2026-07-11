@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, MessageCircle } from "lucide-react";
+import { ArrowRight, Building2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { AdaptativeLogo } from "@/components/adaptative-logo";
@@ -16,11 +16,11 @@ export function HomeHeroSection({ impactMetrics }: HomeHeroSectionProps) {
   return (
     <section
       aria-labelledby="home-hero-heading"
-      className="relative overflow-hidden px-6 pb-8 pt-28 md:px-8"
+      className="relative overflow-hidden pb-8 pt-28"
     >
       <HeroBackdrop />
 
-      <div className="relative z-10 mx-auto flex min-h-[34rem] w-full max-w-72 flex-col justify-end gap-10 sm:max-w-6xl md:min-h-168 lg:gap-12">
+      <div className="relative z-10 mx-auto flex min-h-[34rem] w-full max-w-6xl flex-col justify-end gap-10 px-4 md:min-h-168 lg:gap-12">
         <HeroCopy />
 
         <HeroMetrics metrics={impactMetrics} />
@@ -87,9 +87,7 @@ function HeroCopy() {
           className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
           asChild
         >
-          <Link href="/imprensa">
-            Conheça nossa operação
-          </Link>
+          <Link href="/imprensa">Conheça nossa operação</Link>
         </Button>
       </div>
     </div>
