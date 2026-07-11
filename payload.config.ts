@@ -145,7 +145,7 @@ export default buildConfig({
   },
 
   email: resendAdapter({
-    defaultFromAddress: "payload@amperelinsa.com.br",
+    defaultFromAddress: "payload@elinsadobrasil.com.br",
     defaultFromName: "CMS - Elinsa",
     apiKey: process.env.RESEND_API_KEY || "",
   }),

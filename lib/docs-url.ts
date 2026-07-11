@@ -1,4 +1,4 @@
-const DEFAULT_SITE_ORIGIN = "https://amperelinsa.com.br";
+const DEFAULT_SITE_ORIGIN = "https://elinsadobrasil.com.br";
 
 function normalizeOrigin(value: string | undefined) {
   if (!value) {
