@@ -76,8 +76,9 @@ export function AceitarConvite({
           <h1 className="text-lg font-semibold tracking-tight">
             Convite aceito
           </h1>
-          <CardDescription>
-            Convite aceito. Redirecionando para o portal...
+          <CardDescription className="flex items-center justify-center gap-2">
+            <Spinner />
+            Redirecionando para o portal...
           </CardDescription>
         </CardHeader>
       </Card>
@@ -112,16 +113,6 @@ export function AceitarConvite({
         >
           {isSubmitting ? <Spinner /> : "Aceitar convite"}
         </Button>
-
-        <p className="text-center text-xs text-muted-foreground">
-          Está em outra conta?{" "}
-          <Link
-            href="/entrar"
-            className="underline underline-offset-4 hover:text-primary"
-          >
-            Entrar novamente
-          </Link>
-        </p>
       </CardContent>
     </Card>
   );

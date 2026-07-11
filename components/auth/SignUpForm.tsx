@@ -103,7 +103,7 @@ export function CriarContaForm({
             Verifique seu e-mail
           </h1>
           <CardDescription>
-            Enviamos a verificação para <strong>{invitedEmail}</strong>.
+            Enviamos um e-mail de verificação para <strong>{invitedEmail}</strong>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-6 pb-6 text-center text-sm text-muted-foreground">
@@ -138,7 +138,7 @@ export function CriarContaForm({
 
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mb-6 flex flex-col gap-4"
+          className=" flex flex-col gap-4"
           noValidate
         >
           <FieldGroup>
@@ -251,7 +251,7 @@ export function CriarContaForm({
           </FieldGroup>
         </form>
 
-        <div className="mt-6 text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground">
           <span>Já possui uma conta? </span>
           <Link
             href={loginHref}
