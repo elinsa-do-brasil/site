@@ -36,7 +36,7 @@ export function sanitizePdfText(value: string, maxCharacters = 10_000) {
   const boundedOutput = outputCharacters.slice(0, outputLimit).join("");
 
   if (wasTruncated || outputCharacters.length > outputLimit) {
-    return `${boundedOutput.trimEnd()}… [conteúdo abreviado; consulte o portal]`;
+    return `${boundedOutput.trimEnd()}… [conteúdo abreviado na exportação]`;
   }
 
   return boundedOutput;

@@ -16,21 +16,12 @@ export type ReportPdfAttachment = {
   size: string;
 };
 
-export type ReportPdfEvent = {
-  createdAt: string;
-  key: string;
-  label: string;
-  message: string | null;
-};
-
 export type ReportPdfData = {
   attachments: ReportPdfAttachment[];
   category: string;
   contactInfo: string;
   contactPreference: string;
   description: string;
-  events: ReportPdfEvent[];
-  eventsOmitted: number;
   generatedAt: string;
   involvedPeople: string;
   location: string;
@@ -85,14 +76,8 @@ const styles = StyleSheet.create({
     right: 42,
     top: 28,
   },
-  brand: {
-    color: colors.dark,
-    fontSize: 20,
-    fontWeight: 700,
-    letterSpacing: -0.7,
-  },
-  brandDot: {
-    color: colors.blue,
+  logo: {
+    width: 54,
   },
   headerContext: {
     alignItems: "flex-end",
@@ -104,60 +89,64 @@ const styles = StyleSheet.create({
     letterSpacing: 1.25,
   },
   confidentialPill: {
+    alignItems: "center",
     backgroundColor: colors.blueSoft,
     borderColor: "#BDE5F5",
     borderRadius: 3,
     borderWidth: 1,
+    height: 20,
+    justifyContent: "center",
+    marginTop: 4,
+    paddingHorizontal: 8,
+  },
+  confidentialPillText: {
     color: colors.dark,
-    fontSize: 8,
+    fontSize: 7.5,
     fontWeight: 700,
     letterSpacing: 0.8,
-    marginTop: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    lineHeight: 1,
   },
   hero: {
     borderLeftColor: colors.blue,
     borderLeftWidth: 3,
-    marginBottom: 18,
-    paddingLeft: 14,
+    marginBottom: 12,
+    minHeight: 24,
+    paddingLeft: 10,
+    paddingVertical: 5,
   },
   overline: {
     color: colors.darkBlue,
     fontSize: 8,
     fontWeight: 700,
     letterSpacing: 1.4,
-    marginBottom: 6,
   },
-  title: {
-    color: colors.dark,
-    fontSize: 22,
-    fontWeight: 700,
-    letterSpacing: -0.35,
-    lineHeight: 1.16,
-  },
-  protocol: {
-    color: colors.muted,
-    fontFamily: "Courier",
-    fontSize: 8.5,
-    marginTop: 8,
-  },
-  summaryGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  summaryCard: {
-    backgroundColor: colors.surface,
+  caseTable: {
     borderColor: colors.border,
     borderRadius: 4,
     borderWidth: 1,
-    marginBottom: 8,
-    minHeight: 54,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    width: "48.8%",
+    marginBottom: 18,
+    overflow: "hidden",
+  },
+  tableRow: {
+    borderBottomColor: colors.border,
+    borderBottomWidth: 1,
+    flexDirection: "row",
+  },
+  tableRowLast: {
+    borderBottomWidth: 0,
+  },
+  tableCell: {
+    minHeight: 44,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    width: "50%",
+  },
+  tableCellDivider: {
+    borderLeftColor: colors.border,
+    borderLeftWidth: 1,
+  },
+  tableCellFull: {
+    width: "100%",
   },
   fieldLabel: {
     color: colors.muted,
@@ -168,28 +157,15 @@ const styles = StyleSheet.create({
   },
   fieldValue: {
     color: colors.ink,
-    fontSize: 9.5,
+    fontSize: 9,
     fontWeight: 700,
     lineHeight: 1.35,
   },
-  notice: {
-    backgroundColor: colors.blueSoft,
-    borderColor: "#BDE5F5",
-    borderRadius: 4,
-    borderWidth: 1,
+  tableTitleValue: {
     color: colors.dark,
-    marginBottom: 20,
-    paddingHorizontal: 11,
-    paddingVertical: 9,
-  },
-  noticeTitle: {
-    fontSize: 8.5,
+    fontSize: 11.5,
     fontWeight: 700,
-    marginBottom: 2,
-  },
-  noticeText: {
-    fontSize: 8,
-    lineHeight: 1.4,
+    lineHeight: 1.3,
   },
   section: {
     marginBottom: 17,
@@ -218,21 +194,6 @@ const styles = StyleSheet.create({
     color: colors.ink,
     fontSize: 9.5,
     lineHeight: 1.55,
-  },
-  detailsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  detailItem: {
-    marginBottom: 10,
-    paddingRight: 8,
-    width: "48.8%",
-  },
-  detailValue: {
-    color: colors.ink,
-    fontSize: 9,
-    lineHeight: 1.45,
   },
   listRow: {
     alignItems: "flex-start",
@@ -269,14 +230,10 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     fontStyle: "italic",
   },
-  eventLimitNotice: {
-    backgroundColor: colors.surface,
-    borderLeftColor: colors.blue,
-    borderLeftWidth: 2,
+  documentNote: {
     color: colors.muted,
-    marginBottom: 7,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    fontSize: 7.5,
+    marginTop: 2,
   },
   footer: {
     borderTopColor: colors.border,
@@ -312,67 +269,47 @@ export function ReportPdfDocument({ data }: { data: ReportPdfData }) {
 
         <View style={styles.hero}>
           <Text style={styles.overline}>RELATÓRIO DE DENÚNCIA</Text>
-          <Text style={styles.title} orphans={2} widows={2}>
-            {data.title}
-          </Text>
-          <Text style={styles.protocol}>PROTOCOLO {data.protocol}</Text>
         </View>
 
-        <View style={styles.summaryGrid} wrap={false}>
-          <SummaryCard label="STATUS" value={data.status} />
-          <SummaryCard label="CATEGORIA" value={data.category} />
-          <SummaryCard label="RECEBIDA EM" value={data.receivedAt} />
-          <SummaryCard label="IDENTIFICAÇÃO" value={data.reporter} />
-        </View>
+        <CaseSummaryTable data={data} />
 
-        <View style={styles.notice} wrap={false}>
-          <Text style={styles.noticeTitle}>Documento confidencial</Text>
-          <Text style={styles.noticeText}>
-            Uso restrito a pessoas autorizadas do Comitê de Ética. Os anexos são
-            listados neste relatório, mas permanecem protegidos e disponíveis
-            somente no portal. Para leitura com tecnologias assistivas e acesso
-            ao conteúdo original, consulte também o caso no portal. Caracteres
-            sem suporte tipográfico são identificados pelo código Unicode.
-          </Text>
-        </View>
-
-        <PdfSection number="01" title="Dados do caso">
-          <View style={styles.detailsGrid}>
-            <Detail label="Quando ocorreu" value={data.occurredAt} />
-            <Detail label="Onde ocorreu" value={data.location} />
-            <Detail
-              label="Preferência de contato"
-              value={data.contactPreference}
-            />
-            <Detail label="Contato informado" value={data.contactInfo} />
-          </View>
-        </PdfSection>
-
-        <PdfSection number="02" title="Relato">
+        <PdfSection number="01" title="Relato">
           <Text style={styles.bodyText} orphans={3} widows={3}>
             {data.description}
           </Text>
         </PdfSection>
 
-        <PdfSection number="03" title="Pessoas envolvidas">
+        <PdfSection
+          keepTogether={data.involvedPeople.length <= 1_200}
+          number="02"
+          title="Pessoas envolvidas"
+        >
           <Text style={styles.bodyText} orphans={3} widows={3}>
             {data.involvedPeople}
           </Text>
         </PdfSection>
 
-        <PdfSection number="04" title="Testemunhas">
+        <PdfSection
+          keepTogether={data.witnesses.length <= 1_200}
+          number="03"
+          title="Testemunhas"
+        >
           <Text style={styles.bodyText} orphans={3} widows={3}>
             {data.witnesses}
           </Text>
         </PdfSection>
 
-        <PdfSection number="05" title="Tentativas anteriores">
+        <PdfSection
+          keepTogether={data.previousAttempts.length <= 1_200}
+          number="04"
+          title="Tentativas anteriores"
+        >
           <Text style={styles.bodyText} orphans={3} widows={3}>
             {data.previousAttempts}
           </Text>
         </PdfSection>
 
-        <PdfSection number="06" title="Anexos">
+        <PdfSection number="05" title="Anexos">
           {data.attachments.length > 0 ? (
             data.attachments.map((attachment, index) => (
               <View key={attachment.key} style={styles.listRow}>
@@ -393,39 +330,8 @@ export function ReportPdfDocument({ data }: { data: ReportPdfData }) {
           )}
         </PdfSection>
 
-        <PdfSection number="07" title="Andamento do caso">
-          {data.eventsOmitted > 0 && (
-            <Text style={[styles.noticeText, styles.eventLimitNotice]}>
-              Esta exportação mostra as movimentações relevantes mais recentes.
-              {` ${formatOmittedEvents(data.eventsOmitted)}`}
-            </Text>
-          )}
-          {data.events.length > 0 ? (
-            data.events.map((event, index) => (
-              <View key={event.key} style={styles.listRow}>
-                <Text style={styles.listIndex}>
-                  {String(index + 1).padStart(2, "0")}
-                </Text>
-                <View style={styles.listContent}>
-                  <Text style={styles.listTitle}>{event.label}</Text>
-                  {event.message && (
-                    <Text style={styles.listMeta}>{event.message}</Text>
-                  )}
-                  <Text style={styles.listMeta}>{event.createdAt}</Text>
-                </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.emptyState}>
-              Nenhuma movimentação registrada.
-            </Text>
-          )}
-        </PdfSection>
-
-        <Text style={styles.listMeta}>
-          Documento gerado em {data.generatedAt}. A situação mais recente e os
-          anexos originais devem ser consultados no portal. Datas e horários
-          estão no horário de Brasília.
+        <Text style={styles.documentNote}>
+          Gerado em {data.generatedAt} (horário de Brasília).
         </Text>
       </Page>
     </Document>
@@ -435,12 +341,12 @@ export function ReportPdfDocument({ data }: { data: ReportPdfData }) {
 function PdfHeader() {
   return (
     <View style={styles.fixedHeader} fixed>
-      <Text style={styles.brand}>
-        <Image src="public/kit-de-marca/png/logo-colorido.png" style={{ width: 40, height: 40 }} />
-      </Text>
+      <Image src="public/kit-de-marca/png/logo-azul.png" style={styles.logo} />
       <View style={styles.headerContext}>
         <Text style={styles.headerLabel}>COMITÊ DE ÉTICA</Text>
-        <Text style={styles.confidentialPill}>CONFIDENCIAL</Text>
+        <View style={styles.confidentialPill}>
+          <Text style={styles.confidentialPillText}>CONFIDENCIAL</Text>
+        </View>
       </View>
     </View>
   );
@@ -458,27 +364,20 @@ function PdfFooter({ protocol }: { protocol: string }) {
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.summaryCard}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <Text style={styles.fieldValue}>{value}</Text>
-    </View>
-  );
-}
-
 function PdfSection({
   children,
+  keepTogether = false,
   number,
   title,
 }: {
   children: React.ReactNode;
+  keepTogether?: boolean;
   number: string;
   title: string;
 }) {
   return (
-    <View style={styles.section}>
-      <View minPresenceAhead={64} style={styles.sectionHeader}>
+    <View style={styles.section} wrap={!keepTogether}>
+      <View style={styles.sectionHeader}>
         <Text style={styles.sectionNumber}>{number}</Text>
         <Text style={styles.sectionTitle}>{title}</Text>
       </View>
@@ -487,19 +386,64 @@ function PdfSection({
   );
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function CaseSummaryTable({ data }: { data: ReportPdfData }) {
   return (
-    <View style={styles.detailItem}>
-      <Text style={styles.fieldLabel}>{label.toUpperCase()}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
+    <View style={styles.caseTable} wrap={false}>
+      <View style={styles.tableRow}>
+        <TableCell full label="Assunto" title value={data.title} />
+      </View>
+      <View style={styles.tableRow}>
+        <TableCell label="Protocolo" value={data.protocol} />
+        <TableCell divider label="Status" value={data.status} />
+      </View>
+      <View style={styles.tableRow}>
+        <TableCell label="Categoria" value={data.category} />
+        <TableCell divider label="Recebida em" value={data.receivedAt} />
+      </View>
+      <View style={styles.tableRow}>
+        <TableCell label="Identificação" value={data.reporter} />
+        <TableCell divider label="Quando ocorreu" value={data.occurredAt} />
+      </View>
+      <View style={styles.tableRow}>
+        <TableCell label="Onde ocorreu" value={data.location} />
+        <TableCell
+          divider
+          label="Preferência de contato"
+          value={data.contactPreference}
+        />
+      </View>
+      <View style={[styles.tableRow, styles.tableRowLast]}>
+        <TableCell full label="Contato informado" value={data.contactInfo} />
+      </View>
     </View>
   );
 }
 
-function formatOmittedEvents(total: number) {
-  if (total === 1) {
-    return "1 movimentação anterior permanece disponível no portal.";
-  }
+function TableCell({
+  divider = false,
+  full = false,
+  label,
+  title = false,
+  value,
+}: {
+  divider?: boolean;
+  full?: boolean;
+  label: string;
+  title?: boolean;
+  value: string;
+}) {
+  const cellStyles = [
+    styles.tableCell,
+    ...(divider ? [styles.tableCellDivider] : []),
+    ...(full ? [styles.tableCellFull] : []),
+  ];
 
-  return `${total} movimentações anteriores permanecem disponíveis no portal.`;
+  return (
+    <View style={cellStyles}>
+      <Text style={styles.fieldLabel}>{label.toUpperCase()}</Text>
+      <Text style={title ? styles.tableTitleValue : styles.fieldValue}>
+        {value}
+      </Text>
+    </View>
+  );
 }

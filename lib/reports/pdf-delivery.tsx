@@ -13,10 +13,9 @@ import {
   countRecentReportPdfExports,
   decryptReportRow,
   getReportById,
-  listReportPdfEvents,
   recordReportEvent,
 } from "./repository";
-import { getPublicReportEventLabel, getReportStatusLabel } from "./status";
+import { getReportStatusLabel } from "./status";
 
 const TIME_ZONE = "America/Sao_Paulo";
 const MAX_PDF_EXPORTS_PER_MINUTE = 5;
@@ -105,10 +104,7 @@ export async function renderReportPdfArtifact(report: ReportRecord) {
     throw new Error("REPORT_PAYLOAD_UNAVAILABLE");
   }
 
-  const [attachments, eventResult] = await Promise.all([
-    listReportAttachments(report.id),
-    listReportPdfEvents(report.id),
-  ]);
+  const attachments = await listReportAttachments(report.id);
   const data: ReportPdfData = {
     attachments: attachments.map((attachment) => ({
       createdAt: formatDate(attachment.createdAt),
@@ -125,13 +121,6 @@ export async function renderReportPdfArtifact(report: ReportRecord) {
     contactInfo: presentText(payload.contactInfo, "Não informado.", 600),
     contactPreference: contactPreferenceLabel(payload.contactPreference),
     description: presentText(payload.description, "Não informado.", 10_000),
-    events: eventResult.items.reverse().map((event) => ({
-      createdAt: formatDate(event.createdAt),
-      key: event.id,
-      label: formatEventLabel(event.type),
-      message: event.message ? sanitizePdfText(event.message, 800) : null,
-    })),
-    eventsOmitted: Math.max(eventResult.total - eventResult.items.length, 0),
     generatedAt: formatDate(new Date()),
     involvedPeople: presentText(
       payload.involvedPeople,
@@ -204,11 +193,6 @@ function contactPreferenceLabel(value: string) {
   };
 
   return labels[value] ?? "Não informado.";
-}
-
-function formatEventLabel(type: string) {
-  if (type === "report.attachment_uploaded") return "Anexo recebido";
-  return getPublicReportEventLabel(type);
 }
 
 function sanitizeFileName(value: string) {
