@@ -248,6 +248,8 @@ function formatEventType(type: string) {
     "report.created": "Denúncia recebida",
     "report.viewed": "Denúncia consultada",
     "report.attachment_uploaded": "Anexo recebido",
+    "report.pdf_exported": "PDF da denúncia exportado",
+    "report.pdf_generated": "PDF gerado para download",
   };
 
   return labels[type] ?? getPublicReportEventLabel(type);

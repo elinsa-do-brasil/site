@@ -70,6 +70,7 @@ import type { SubmitReportResult } from "@/lib/anonymous-report/types";
 import { uploadEncryptedReportAttachment } from "@/lib/anonymous-report/upload-encrypted-attachment";
 import {
   formatAttachmentSize,
+  MAX_REPORT_ATTACHMENT_NAME_BYTES,
   MAX_REPORT_ATTACHMENT_SIZE_BYTES,
   MAX_REPORT_ATTACHMENTS,
   MAX_REPORT_ATTACHMENTS_TOTAL_BYTES,
@@ -287,6 +288,14 @@ export function AnonymousReportForm() {
         continue;
       }
 
+      if (
+        new TextEncoder().encode(file.name || "arquivo").byteLength >
+        MAX_REPORT_ATTACHMENT_NAME_BYTES
+      ) {
+        rejected.push(file.name);
+        continue;
+      }
+
       if (totalBytes + file.size > MAX_REPORT_ATTACHMENTS_TOTAL_BYTES) {
         rejected.push(file.name);
         continue;
@@ -302,7 +311,7 @@ export function AnonymousReportForm() {
 
     const nextMessage =
       rejected.length > 0
-        ? "Alguns arquivos foram ignorados por excederem os limites."
+        ? "Alguns arquivos foram ignorados por excederem os limites de quantidade, tamanho ou nome."
         : null;
 
     setAttachments(next);

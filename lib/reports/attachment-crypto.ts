@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import type { ReportAttachment } from "@/lib/db/schema";
+import { MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH } from "./attachment-limits";
 
 const AES_GCM_ALGORITHM = "aes-256-gcm";
 const KEY_ENCRYPTION_INFO = "elinsa.report.attachments.ecdh-p384.v1";
@@ -28,6 +29,23 @@ export function decryptAttachmentOriginalName(attachment: ReportAttachment) {
   });
 
   return plaintext.toString("utf8");
+}
+
+export function decryptAttachmentOriginalNameSafely(
+  attachment: ReportAttachment,
+) {
+  if (
+    attachment.encryptedOriginalName.length >
+    MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH
+  ) {
+    return null;
+  }
+
+  try {
+    return decryptAttachmentOriginalName(attachment);
+  } catch {
+    return null;
+  }
 }
 
 function decryptAttachmentFileKey(attachment: ReportAttachment) {

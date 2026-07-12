@@ -4,8 +4,11 @@ import {
   count,
   desc,
   eq,
+  gte,
   ilike,
   inArray,
+  like,
+  or,
   type SQL,
 } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -28,6 +31,7 @@ import { toEncryptedPayload } from "./validation";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REPORT_SUMMARY_PAGE_SIZE = 20;
+const REPORT_PDF_EVENT_LIMIT = 100;
 const IN_PROGRESS_REPORT_STATUSES = [
   "opened",
   "triage",
@@ -252,6 +256,58 @@ export async function listReportEvents(reportId: string) {
     .leftJoin(user, eq(reportEvents.actorUserId, user.id))
     .where(eq(reportEvents.reportId, reportId))
     .orderBy(desc(reportEvents.createdAt));
+}
+
+export async function listReportPdfEvents(reportId: string) {
+  if (!isUuid(reportId)) {
+    return { items: [], total: 0 };
+  }
+
+  const where = and(
+    eq(reportEvents.reportId, reportId),
+    or(
+      eq(reportEvents.type, "report.created"),
+      eq(reportEvents.type, "report.attachment_uploaded"),
+      like(reportEvents.type, "report.status.%"),
+    ),
+  );
+  const [[totalRow], items] = await Promise.all([
+    db.select({ total: count() }).from(reportEvents).where(where),
+    db
+      .select({
+        id: reportEvents.id,
+        type: reportEvents.type,
+        message: reportEvents.message,
+        createdAt: reportEvents.createdAt,
+      })
+      .from(reportEvents)
+      .where(where)
+      .orderBy(desc(reportEvents.createdAt))
+      .limit(REPORT_PDF_EVENT_LIMIT),
+  ]);
+
+  return {
+    items,
+    total: Number(totalRow?.total ?? 0),
+  };
+}
+
+export async function countRecentReportPdfExports(input: {
+  actorUserId: string;
+  since: Date;
+}) {
+  const [row] = await db
+    .select({ total: count() })
+    .from(reportEvents)
+    .where(
+      and(
+        eq(reportEvents.actorUserId, input.actorUserId),
+        eq(reportEvents.type, "report.pdf_generated"),
+        gte(reportEvents.createdAt, input.since),
+      ),
+    );
+
+  return Number(row?.total ?? 0);
 }
 
 export function decryptReportRow(

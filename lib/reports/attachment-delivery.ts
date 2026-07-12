@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { canReadReport } from "@/lib/comite/access";
 import {
   decryptAttachmentBuffer,
-  decryptAttachmentOriginalName,
+  decryptAttachmentOriginalNameSafely,
 } from "./attachment-crypto";
 import { downloadEncryptedAttachmentFromStorage } from "./attachment-storage";
 import {
@@ -50,7 +50,7 @@ export async function createCommitteeAttachmentResponse(input: {
 
     const fileBuffer = decryptAttachmentBuffer(attachment, encryptedFileBuffer);
     const originalName = sanitizeFileName(
-      decryptAttachmentOriginalName(attachment),
+      decryptAttachmentOriginalNameSafely(attachment) ?? "anexo",
     );
     const dispositionType =
       input.action === "download" || !canRenderInline(attachment.mimeType)

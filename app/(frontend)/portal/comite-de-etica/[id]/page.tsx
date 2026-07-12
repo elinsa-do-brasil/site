@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { ExpandableReportText } from "@/components/reports/expandable-report-text";
+import { ReportPdfDownloadButton } from "@/components/reports/report-pdf-download-button";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { ReportStatusSelect } from "@/components/reports/report-status-select";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ import {
   requireCommitteeAccess,
   requireUserId,
 } from "@/lib/comite/access";
-import { decryptAttachmentOriginalName } from "@/lib/reports/attachment-crypto";
+import { decryptAttachmentOriginalNameSafely } from "@/lib/reports/attachment-crypto";
 import { formatAttachmentSize } from "@/lib/reports/attachment-limits";
 import { listReportAttachments } from "@/lib/reports/attachments";
 import {
@@ -83,7 +84,9 @@ export default async function ReportDetailPage({
   const attachments = (await listReportAttachments(report.id)).map(
     (attachment) => ({
       ...attachment,
-      originalName: decryptAttachmentOriginalName(attachment),
+      originalName:
+        decryptAttachmentOriginalNameSafely(attachment) ??
+        "Nome do anexo indisponível",
     }),
   );
   const reporterLabel =
@@ -98,7 +101,13 @@ export default async function ReportDetailPage({
       <div className="mx-auto w-full max-w-6xl px-4 pb-12">
         <PageHeader
           actions={
-            <ReportStatusSelect reportId={report.id} status={report.status} />
+            <>
+              <ReportPdfDownloadButton
+                protocol={report.protocol}
+                reportId={report.id}
+              />
+              <ReportStatusSelect reportId={report.id} status={report.status} />
+            </>
           }
           description={report.category}
           eyebrow="Caso em análise"
