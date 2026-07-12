@@ -107,18 +107,20 @@ const styles = StyleSheet.create({
     lineHeight: 1,
   },
   hero: {
+    alignItems: "flex-start",
     borderLeftColor: colors.blue,
     borderLeftWidth: 3,
+    height: 28,
+    justifyContent: "center",
     marginBottom: 12,
-    minHeight: 24,
     paddingLeft: 10,
-    paddingVertical: 5,
   },
   overline: {
     color: colors.darkBlue,
     fontSize: 8,
     fontWeight: 700,
     letterSpacing: 1.4,
+    lineHeight: 1,
   },
   caseTable: {
     borderColor: colors.border,
@@ -162,16 +164,16 @@ const styles = StyleSheet.create({
     lineHeight: 1.35,
   },
   tableTitleValue: {
-    color: colors.dark,
-    fontSize: 11.5,
-    fontWeight: 700,
-    lineHeight: 1.3,
+    color: colors.ink,
+    fontSize: 9,
+    fontWeight: 400,
+    lineHeight: 1.35,
   },
   section: {
     marginBottom: 17,
   },
   sectionHeader: {
-    alignItems: "center",
+    alignItems: "baseline",
     borderBottomColor: colors.border,
     borderBottomWidth: 1,
     flexDirection: "row",
@@ -183,12 +185,14 @@ const styles = StyleSheet.create({
     fontFamily: "Courier",
     fontSize: 8,
     fontWeight: 700,
-    marginRight: 8,
+    lineHeight: 1,
+    width: 24,
   },
   sectionTitle: {
     color: colors.dark,
     fontSize: 11,
     fontWeight: 700,
+    lineHeight: 1,
   },
   bodyText: {
     color: colors.ink,
@@ -341,7 +345,10 @@ export function ReportPdfDocument({ data }: { data: ReportPdfData }) {
 function PdfHeader() {
   return (
     <View style={styles.fixedHeader} fixed>
-      <Image src="public/kit-de-marca/png/logo-azul.png" style={styles.logo} />
+      <Image
+        src="public/kit-de-marca/png/logo-colorido.png"
+        style={styles.logo}
+      />
       <View style={styles.headerContext}>
         <Text style={styles.headerLabel}>COMITÊ DE ÉTICA</Text>
         <View style={styles.confidentialPill}>
