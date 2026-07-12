@@ -8,6 +8,7 @@ import {
   WandSparkles,
   X,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { normalizeSignatureName } from "../signature-name";
+import { getSuspiciousSignatureTextError } from "../signature-text";
 
 const EMAIL_DOMAIN = "@grupoamperelinsa.com";
 const SIGNATURE_LOGO_PATH = "/kit-de-marca/png/logo-colorido.png";
@@ -44,6 +47,10 @@ const SIGNATURE_CONTENT_CELL_PADDING = `${SIGNATURE_VERTICAL_GAP}px 30px ${SIGNA
 const SIGNATURE_SEPARATOR_HEIGHT = 96;
 const SIGNATURE_SEPARATOR_PADDING = "18px 0";
 const SIGNATURE_TO_LINKS_MARGIN = 12;
+const NAME_MAX_LENGTH = 100;
+const ROLE_MAX_LENGTH = 120;
+const LOCATION_MAX_LENGTH = 120;
+const EMAIL_USERNAME_MAX_LENGTH = 64;
 
 type PhoneDdi = "+34" | "+55";
 
@@ -62,6 +69,10 @@ type SignatureValues = {
 };
 
 type FormErrors = Partial<Record<keyof SignatureValues, string>>;
+
+export type SignatureInitialValues = Partial<
+  Pick<SignatureValues, "email" | "nome">
+>;
 
 type Recommendation = {
   field: "cargo" | "nome";
@@ -83,12 +94,18 @@ const SOCIAL_LINKS_HTML = `<strong>Elinsa do Brasil:</strong> <a href="https://w
 
 const TUTORIAL_URL = process.env.NEXT_PUBLIC_YT_LINK;
 
-export function EmailSignatureGenerator() {
+export function EmailSignatureGenerator({
+  initialValues,
+  socialLinks,
+}: {
+  initialValues?: SignatureInitialValues;
+  socialLinks: ReactNode;
+}) {
   const [values, setValues] = useState<SignatureValues>(() => ({
     cargo: "",
-    email: "",
+    email: initialValues?.email ?? "",
     local: "",
-    nome: "",
+    nome: initialValues?.nome ?? "",
     telefone: { ddi: "+55", numero: "" },
     telefone2: { ddi: "+55", numero: "" },
   }));
@@ -131,6 +148,13 @@ export function EmailSignatureGenerator() {
   );
 
   function handleBlur(field: keyof SignatureValues) {
+    if (field === "nome") {
+      setValues((current) => ({
+        ...current,
+        nome: normalizeSignatureName(current.nome),
+      }));
+    }
+
     setTouched((prev) => ({ ...prev, [field]: true }));
   }
 
@@ -142,29 +166,34 @@ export function EmailSignatureGenerator() {
       ...current,
       [field]: value,
     }));
+    setTouched((current) => ({ ...current, [field]: false }));
     setCopyState("idle");
   }
 
   async function handleCopy() {
-    const nextErrors = validateValues(values);
+    const normalizedValues = {
+      ...values,
+      nome: normalizeSignatureName(values.nome),
+    };
+    const nextErrors = validateValues(normalizedValues);
+
+    setValues(normalizedValues);
 
     if (Object.keys(nextErrors).length > 0) {
-      setTouched({
-        cargo: true,
-        email: true,
-        nome: true,
-        telefone: true,
-        telefone2: true,
-      });
+      setTouched(
+        Object.fromEntries(
+          Object.keys(nextErrors).map((field) => [field, true]),
+        ) as Partial<Record<keyof SignatureValues, boolean>>,
+      );
       setCopyState("error");
       return;
     }
 
     const html = buildSignatureHtml(
-      values,
+      normalizedValues,
       new URL(SIGNATURE_LOGO_PATH, window.location.origin).toString(),
     );
-    const plainText = buildSignaturePlainText(values);
+    const plainText = buildSignaturePlainText(normalizedValues);
 
     try {
       await copyRichSignature(html, plainText);
@@ -227,10 +256,11 @@ export function EmailSignatureGenerator() {
                   aria-invalid={!!displayErrors.nome}
                   autoComplete="name"
                   id="signature-name"
+                  maxLength={NAME_MAX_LENGTH}
                   name="name"
                   onBlur={() => handleBlur("nome")}
                   onChange={(event) => updateField("nome", event.target.value)}
-                  placeholder="Fulano de Tal"
+                  placeholder="Nome completo"
                   value={values.nome}
                 />
                 <FieldError>{displayErrors.nome}</FieldError>
@@ -242,6 +272,7 @@ export function EmailSignatureGenerator() {
                   aria-invalid={!!displayErrors.cargo}
                   autoComplete="organization-title"
                   id="signature-role"
+                  maxLength={ROLE_MAX_LENGTH}
                   name="organization-title"
                   onBlur={() => handleBlur("cargo")}
                   onChange={(event) => updateField("cargo", event.target.value)}
@@ -259,6 +290,7 @@ export function EmailSignatureGenerator() {
                     autoComplete="off"
                     className="rounded-r-none border-r-0"
                     id="signature-email"
+                    maxLength={EMAIL_USERNAME_MAX_LENGTH}
                     name="email-username"
                     onBlur={() => handleBlur("email")}
                     onChange={(event) =>
@@ -287,6 +319,7 @@ export function EmailSignatureGenerator() {
                 <Input
                   autoComplete="organization"
                   id="signature-location"
+                  maxLength={LOCATION_MAX_LENGTH}
                   name="organization"
                   onChange={(event) => updateField("local", event.target.value)}
                   placeholder="Base de Paragominas"
@@ -365,7 +398,7 @@ export function EmailSignatureGenerator() {
               Atenciosamente,
             </p>
             <SignatureCardPreview values={previewValues} />
-            <SocialLinksPreview />
+            {socialLinks}
           </div>
         </div>
 
@@ -515,21 +548,6 @@ function SignatureCardPreview({ values }: { values: SignatureValues }) {
   );
 }
 
-function SocialLinksPreview() {
-  return (
-    <div className="mt-3 text-base leading-tight text-neutral-950 [&_a]:text-blue-700 [&_a]:underline">
-      <strong>Elinsa do Brasil:</strong>{" "}
-      <a href="https://www.instagram.com/elinsadobrasil/">Instagram</a> •{" "}
-      <a href="https://www.linkedin.com/in/elinsadobrasil/">LinkedIn</a> •{" "}
-      <a href="https://elinsa.es/">Site</a>
-      <br />
-      <strong>Grupo Amper:</strong>{" "}
-      <a href="https://www.linkedin.com/company/amper-sa/">LinkedIn</a> •{" "}
-      <a href="https://www.grupoamper.com/">Site</a>
-    </div>
-  );
-}
-
 function SeparatorLine() {
   return (
     <table
@@ -628,16 +646,46 @@ function PhoneField({
 function validateValues(values: SignatureValues): FormErrors {
   const errors: FormErrors = {};
 
-  if (values.nome.trim().split(/\s+/).filter(Boolean).length < 2) {
+  const nameWords = normalizeSignatureName(values.nome)
+    .split(/\s+/)
+    .filter(Boolean);
+  const nameContentError = getSuspiciousSignatureTextError(
+    values.nome,
+    NAME_MAX_LENGTH,
+  );
+  const roleContentError = getSuspiciousSignatureTextError(
+    values.cargo,
+    ROLE_MAX_LENGTH,
+  );
+  const locationContentError = getSuspiciousSignatureTextError(
+    values.local,
+    LOCATION_MAX_LENGTH,
+  );
+  const emailContentError = getSuspiciousSignatureTextError(
+    values.email,
+    EMAIL_USERNAME_MAX_LENGTH,
+  );
+
+  if (nameContentError) {
+    errors.nome = nameContentError;
+  } else if (nameWords.length < 2) {
     errors.nome = "Informe nome e sobrenome.";
   }
 
   if (!values.cargo.trim()) {
     errors.cargo = "Cargo é obrigatório.";
+  } else if (roleContentError) {
+    errors.cargo = roleContentError;
   }
 
   if (!/^[^\s@]+$/.test(values.email.trim())) {
     errors.email = "Informe apenas o usuário do e-mail, sem @.";
+  } else if (emailContentError) {
+    errors.email = emailContentError;
+  }
+
+  if (values.local.trim() && locationContentError) {
+    errors.local = locationContentError;
   }
 
   const phoneError = validatePhone(values.telefone);
