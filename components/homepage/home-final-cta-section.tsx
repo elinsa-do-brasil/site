@@ -14,7 +14,12 @@ export function HomeFinalCtaSection() {
       containerClassName="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center"
     >
       <div className="max-w-3xl">
-        <SectionEyebrow text="Próximo passo" icon={MessageCircle} />
+        <SectionEyebrow
+          className="mb-5"
+          text="Próximo passo"
+          icon={MessageCircle}
+          variant="line"
+        />
         <h2
           id="home-final-cta-heading"
           className="text-3xl font-extrabold leading-tight tracking-normal md:text-4xl"

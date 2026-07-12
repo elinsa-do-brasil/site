@@ -25,6 +25,7 @@ export function OperationSection() {
           badge="Como a operação acontece"
           headingId="operacao-heading"
           icon={Factory}
+          marker="01"
           title="Do planejamento à execução, cada frente tem um caminho claro."
           description={
             <>
@@ -34,7 +35,7 @@ export function OperationSection() {
               contínua.
             </>
           }
-          className="lg:grid-cols-1"
+          variant="sequence"
         />
 
         <OperationServiceGrid />

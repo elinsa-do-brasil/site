@@ -205,9 +205,14 @@ export function CompanyValuesSection() {
 /** Introduces the official ENERGIA value set without changing the approved copy. */
 function CompanyValuesIntro() {
   return (
-    <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center">
+    <header className="relative mb-10 grid gap-8 overflow-hidden rounded-3xl border border-elinsa-primary/20 bg-card/70 p-5 shadow-sm md:p-7 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-center">
       <div className="max-w-xl">
-        <SectionEyebrow text={companyValuesContent.sectionLabel} icon={Heart} />
+        <SectionEyebrow
+          className="mb-5"
+          text={companyValuesContent.sectionLabel}
+          icon={Heart}
+          variant="signal"
+        />
         <h2
           id="valores-heading"
           className="max-w-2xl text-3xl font-extrabold tracking-normal md:text-4xl"
@@ -219,7 +224,7 @@ function CompanyValuesIntro() {
         </p>
       </div>
 
-      <div className="border-t-3 border-elinsa-primary pt-6 md:border-l-3 md:border-t-0 md:py-2 md:pl-10">
+      <div className="rounded-2xl border border-border/70 bg-background/80 p-5 shadow-sm">
         <p className="text-xs font-black uppercase leading-4 tracking-[0.18em] text-elinsa-primary">
           Acrônimo de valores
         </p>

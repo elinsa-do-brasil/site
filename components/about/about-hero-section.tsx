@@ -31,8 +31,10 @@ export function AboutHeroSection() {
       <div className="mx-auto flex min-h-[38rem] w-full max-w-6xl flex-col justify-end gap-12 px-4 md:min-h-[42rem] md:justify-center">
         <div className="max-w-2xl">
           <SectionEyebrow
+            className="mb-5"
             text="Espanha e Brasil conectados pela engenharia elétrica"
             icon={aboutIcons.globe}
+            variant="line"
           />
           <h1
             id="quem-somos-heading"

@@ -30,24 +30,36 @@ export function PressNewsSection({ posts }: PressNewsSectionProps) {
 
   return (
     <HomeSection headingId="imprensa-heading" tone="default">
-      <header className="mb-10 max-w-3xl">
-        <SectionEyebrow text="Notícias" icon={Activity} />
-        <h2
-          id="imprensa-heading"
-          className="text-3xl font-black leading-tight tracking-normal md:text-4xl"
-        >
-          Histórias que mostram a Elinsa em movimento.
-        </h2>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
-          Acompanhe novidades, comunicados e iniciativas que dão contexto ao
-          trabalho em campo e às decisões que sustentam a operação.
-        </p>
-        <Button variant="outline" size="xl" className="mt-6 bg-card" asChild>
-          <Link href="/imprensa">
-            Ver imprensa
-            <ArrowRight aria-hidden="true" data-icon="inline-end" />
-          </Link>
-        </Button>
+      <header className="relative mb-10 border-t-4 border-foreground pt-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.72fr)] lg:items-end">
+          <div className="max-w-4xl">
+            <SectionEyebrow
+              className="mb-5"
+              text="Notícias"
+              icon={Activity}
+              variant="editorial"
+            />
+            <h2
+              id="imprensa-heading"
+              className="text-balance text-4xl font-black leading-[1.05] tracking-normal md:text-5xl"
+            >
+              Histórias que mostram a Elinsa em movimento.
+            </h2>
+          </div>
+
+          <div className="flex flex-col items-start gap-5 lg:items-end lg:pb-1">
+            <p className="max-w-xl text-base leading-7 text-muted-foreground lg:text-right">
+              Acompanhe novidades, comunicados e iniciativas que dão contexto ao
+              trabalho em campo e às decisões que sustentam a operação.
+            </p>
+            <Button variant="outline" size="xl" asChild>
+              <Link href="/imprensa">
+                Ver imprensa
+                <ArrowRight aria-hidden="true" data-icon="inline-end" />
+              </Link>
+            </Button>
+          </div>
+        </div>
       </header>
 
       {featuredPost ? (

@@ -316,7 +316,12 @@ function BrandHero() {
 
       <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-center lg:gap-16">
         <div className="max-w-2xl">
-          <SectionEyebrow text="Identidade visual oficial" icon={SwatchBook} />
+          <SectionEyebrow
+            className="mb-5"
+            text="Identidade visual oficial"
+            icon={SwatchBook}
+            variant="stamp"
+          />
           <h1
             id="marca-heading"
             className="text-balance text-4xl font-black leading-none tracking-normal text-elinsa-dark sm:text-5xl md:text-6xl dark:text-white"
@@ -442,9 +447,11 @@ function UsageSection() {
         description="Defina o fundo antes de escolher o arquivo. Essa decisão garante contraste e evita adaptações improvisadas."
         headingId="uso-heading"
         icon={CheckCircle2}
+        marker="01"
         title={
           <span className="text-balance">Escolha primeiro pelo contraste.</span>
         }
+        variant="specification"
       />
 
       <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -502,11 +509,13 @@ function ColorsSection() {
         description="O azul identifica a Elinsa. Os cinzas sustentam textos, fundos e composições que pedem mais neutralidade."
         headingId="cores-heading"
         icon={Palette}
+        marker="02"
         title={
           <span className="text-balance">
             Três cores, uma identidade consistente.
           </span>
         }
+        variant="signal"
       />
 
       <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -575,11 +584,13 @@ function AssetsSection({
         description="Baixe cada versão em SVG, PNG, WebP ou AVIF. Escolha o arquivo adequado ao software e ao destino da peça."
         headingId="arquivos-heading"
         icon={FileImage}
+        marker="03"
         title={
           <span className="text-balance">
             Encontre a versão pronta para usar.
           </span>
         }
+        variant="editorial"
       />
 
       <AssetGroup
@@ -609,13 +620,14 @@ function FaqSection() {
     >
       <ContentSectionIntro
         badge="Perguntas frequentes"
-        className="lg:grid-cols-1"
         description="Respostas rápidas para escolher o arquivo certo, preservar a assinatura e aproveitar todos os formatos disponíveis."
         headingId="faq-heading"
         icon={CircleHelp}
+        marker="04"
         title={
           <span className="text-balance">Dúvidas sobre o kit de marca?</span>
         }
+        variant="compact"
       />
 
       <Accordion className="mt-10" collapsible type="single">

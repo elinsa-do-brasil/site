@@ -22,7 +22,7 @@ export function AboutPresenceSection() {
             e execução técnica para frentes de energia.
           </>
         }
-        className="lg:grid-cols-1"
+        variant="compact"
       />
 
       <Card className="rounded-xl border border-border/70 bg-card py-0 text-foreground shadow-sm shadow-elinsa-dark/5 ring-1 ring-border/60 dark:bg-card/80 dark:ring-border/40">
