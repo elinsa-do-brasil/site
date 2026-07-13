@@ -1,9 +1,7 @@
 "use client";
 
-import { Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { Zap, ZapOff } from "lucide-react";
 import { useTheme } from "next-themes";
-
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -28,16 +26,10 @@ export function ThemeToggle() {
           onClick={toggleTheme}
           type="button"
         >
-          <HugeiconsIcon
+          {/* usar o Zap como ícone de alternância de temas não é usual, mas considerando que somos uma empresa de energia,torna-se uma parte divertida da UI */}
+          <Zap className="scale-100 rotate-0 transition-[opacity,transform] duration-200 dark:scale-0 dark:-rotate-90" />
+          <ZapOff
             aria-hidden="true"
-            icon={Sun03Icon}
-            strokeWidth={2}
-            className="scale-100 rotate-0 transition-[opacity,transform] duration-200 dark:scale-0 dark:-rotate-90"
-          />
-          <HugeiconsIcon
-            aria-hidden="true"
-            icon={Moon02Icon}
-            strokeWidth={2}
             className="absolute scale-0 rotate-90 transition-[opacity,transform] duration-200 dark:scale-100 dark:rotate-0"
           />
           <span className="sr-only">Alternar tema</span>
