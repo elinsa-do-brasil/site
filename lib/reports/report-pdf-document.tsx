@@ -138,9 +138,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   tableCell: {
-    minHeight: 44,
+    minHeight: 36,
     paddingHorizontal: 9,
-    paddingVertical: 7,
+    paddingVertical: 5,
     width: "50%",
   },
   tableCellDivider: {
@@ -155,15 +155,9 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: 700,
     letterSpacing: 0.8,
-    marginBottom: 3,
+    marginBottom: 2,
   },
   fieldValue: {
-    color: colors.ink,
-    fontSize: 9,
-    fontWeight: 700,
-    lineHeight: 1.35,
-  },
-  tableTitleValue: {
     color: colors.ink,
     fontSize: 9,
     fontWeight: 400,
@@ -397,7 +391,7 @@ function CaseSummaryTable({ data }: { data: ReportPdfData }) {
   return (
     <View style={styles.caseTable} wrap={false}>
       <View style={styles.tableRow}>
-        <TableCell full label="Assunto" title value={data.title} />
+        <TableCell full label="Assunto" value={data.title} />
       </View>
       <View style={styles.tableRow}>
         <TableCell label="Protocolo" value={data.protocol} />
@@ -430,13 +424,11 @@ function TableCell({
   divider = false,
   full = false,
   label,
-  title = false,
   value,
 }: {
   divider?: boolean;
   full?: boolean;
   label: string;
-  title?: boolean;
   value: string;
 }) {
   const cellStyles = [
@@ -448,9 +440,7 @@ function TableCell({
   return (
     <View style={cellStyles}>
       <Text style={styles.fieldLabel}>{label.toUpperCase()}</Text>
-      <Text style={title ? styles.tableTitleValue : styles.fieldValue}>
-        {value}
-      </Text>
+      <Text style={styles.fieldValue}>{value}</Text>
     </View>
   );
 }
