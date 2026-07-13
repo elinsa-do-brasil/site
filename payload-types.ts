@@ -248,6 +248,7 @@ export interface Galeria {
    * Opcional para vídeos. Use um arquivo .vtt público para habilitar legendas no player.
    */
   captionsUrl?: string | null;
+  prefix?: string | null;
   createdBy?: {
     relationTo: 'users';
     value: number | User;
@@ -966,6 +967,7 @@ export interface GaleriaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   captionsUrl?: T;
+  prefix?: T;
   createdBy?: T;
   lastModifiedBy?: T;
   blurhash?: T;

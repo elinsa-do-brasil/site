@@ -30,10 +30,13 @@ export default async function EntrarPage({ searchParams }: EntrarPageProps) {
 
   return (
     <main
-      className="flex min-h-screen w-full items-center justify-center px-4 py-12"
+      className="flex flex-col min-h-screen w-full items-center justify-center px-4 py-12 gap-4"
       id="conteudo-principal"
     >
       <LoginForm redirectTo={safeRedirect} />
+      <p className="text-xs text-muted-foreground max-w-92 text-center">
+        O login com a Microsoft só está disponível para contas corporativas, isto é, contas que terminam com <strong>@grupoamperelinsa.com</strong>.
+      </p>
     </main>
   );
 }
