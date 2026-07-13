@@ -11,6 +11,8 @@ import {
   teamMember,
 } from "@/lib/db/schema";
 import {
+  ETHICS_COMMITTEE_ROLE,
+  ETHICS_COMMITTEE_TEAM,
   parseOrganizationRoleList,
   TEAM_LEADER_ROLE,
 } from "@/lib/organization/constants";
@@ -150,7 +152,7 @@ export async function getAvailableInternalTools(
   ]);
 
   const teamTools = configuredTools
-    .filter((tool) => context.isOrgAdmin || userTeamSet.has(tool.teamName))
+    .filter((tool) => canAccessConfiguredPortalTool(context, userTeamSet, tool))
     .filter((tool) => !builtinHrefs.has(tool.href))
     .map<InternalTool>((tool) => ({
       id: tool.id,
@@ -162,6 +164,40 @@ export async function getAvailableInternalTools(
     }));
 
   return [...BUILTIN_INTERNAL_TOOLS, ...teamTools];
+}
+
+/**
+ * The dashboard only exposes a tool when the current account can open its
+ * destination. Route-level authorization remains the source of truth; this
+ * prevents a visible portal card from leading to a deliberate 404.
+ */
+function canAccessConfiguredPortalTool(
+  context: InternalAccessContext,
+  userTeamSet: Set<string>,
+  tool: { href: string; teamName: string },
+) {
+  if (tool.href === "/portal/comite-de-etica") {
+    return (
+      userTeamSet.has(ETHICS_COMMITTEE_TEAM) &&
+      context.roles.includes(ETHICS_COMMITTEE_ROLE)
+    );
+  }
+
+  if (tool.href === "/portal/contatos") {
+    return [...userTeamSet].some(
+      (teamName) => normalizeTeamName(teamName) === "marketing",
+    );
+  }
+
+  return context.isOrgAdmin || userTeamSet.has(tool.teamName);
+}
+
+function normalizeTeamName(teamName: string) {
+  return teamName
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 async function listConfiguredPortalTools() {

@@ -15,18 +15,19 @@ function createRemotePattern(value: string | undefined) {
     return {
       protocol: url.protocol.replace(":", "") as "http" | "https",
       hostname: url.hostname,
-      pathname: "/**",
+      port: url.port,
+      pathname: `${url.pathname.replace(/\/$/, "") || ""}/**`,
+      search: "",
     };
   } catch {
     return null;
   }
 }
 
-const azureStorageBaseURL = getAzureStorageAccountBaseURL({
-  connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING,
-  explicitBaseURL: process.env.AZURE_STORAGE_ACCOUNT_BASEURL,
+const cmsStorageBaseURL = getAzureStorageAccountBaseURL({
+  connectionString: process.env.CMS_STORAGE_CONNECTION_STRING,
 });
-const azureRemotePatterns = [createRemotePattern(azureStorageBaseURL)].filter(
+const cmsRemotePatterns = [createRemotePattern(cmsStorageBaseURL)].filter(
   (pattern) => pattern !== null,
 );
 const payloadDevRemotePatterns =
@@ -46,7 +47,7 @@ const payloadDevRemotePatterns =
         },
       ] as const)
     : [];
-const payloadStoragePrefix = process.env.AZURE_PAYLOAD_PREFIX || "galeria";
+const cmsStoragePrefix = "galeria";
 const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
@@ -112,7 +113,7 @@ const nextConfig: NextConfig = {
     localPatterns: [
       {
         pathname: "/api/galeria/file/**",
-        search: `?prefix=${payloadStoragePrefix}`,
+        search: `?prefix=${cmsStoragePrefix}`,
       },
     ],
     remotePatterns: [
@@ -121,7 +122,7 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
-      ...azureRemotePatterns,
+      ...cmsRemotePatterns,
       ...payloadDevRemotePatterns,
     ],
   },
@@ -131,6 +132,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     globalNotFound: true,
+    viewTransition: true,
   },
 };
 

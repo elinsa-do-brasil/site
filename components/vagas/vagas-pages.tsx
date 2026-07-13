@@ -21,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PageTransition } from "@/components/ui/page-transition";
 import { Separator } from "@/components/ui/separator";
 import {
   formatVagaDate,
@@ -34,29 +35,34 @@ export async function VagasIndexPage() {
   const vagas = await getVagasAbertas();
 
   return (
-    <div className="min-h-screen bg-background pt-24 text-foreground">
-      <section className="mx-auto max-w-6xl px-6 py-8 md:px-8 md:py-10">
-        <div className="mb-6 max-w-3xl">
-          <h1 className="text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
-            Vagas
-          </h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground md:text-lg">
-            Oportunidades abertas para trabalhar com a Elinsa do Brasil nas
-            nossas frentes regionais.
-          </p>
-        </div>
-
-        {vagas.length === 0 ? (
-          <EmptyJobs />
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {vagas.map((vaga) => (
-              <VagaCard key={vaga.id} vaga={vaga} />
-            ))}
+    <PageTransition>
+      <div className="min-h-screen bg-background pt-24 text-foreground">
+        <section className="mx-auto w-full max-w-6xl px-4 py-8 md:py-10">
+          <div className="mb-6 max-w-3xl border-l-2 border-elinsa-primary pl-4 sm:pl-5">
+            <p className="text-[0.65rem] font-semibold tracking-[0.14em] text-elinsa-primary uppercase">
+              Carreiras
+            </p>
+            <h1 className="mt-3 text-4xl font-black leading-tight tracking-normal text-elinsa-dark md:text-5xl dark:text-elinsa-sky">
+              Vagas
+            </h1>
+            <p className="mt-4 text-base leading-7 text-muted-foreground md:text-lg">
+              Oportunidades abertas para trabalhar com a Elinsa do Brasil nas
+              nossas frentes regionais.
+            </p>
           </div>
-        )}
-      </section>
-    </div>
+
+          {vagas.length === 0 ? (
+            <EmptyJobs />
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {vagas.map((vaga) => (
+                <VagaCard key={vaga.id} vaga={vaga} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </PageTransition>
   );
 }
 
@@ -74,78 +80,80 @@ export async function VagaPage({ slug }: { slug: string }) {
   const publishedDate = formatVagaDate(vaga.publishedAt ?? vaga.createdAt);
 
   return (
-    <div className="min-h-screen bg-background pt-24 text-foreground">
-      {isDraftMode && (
-        <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
-          Pré-visualização ativa
-        </div>
-      )}
+    <PageTransition>
+      <div className="min-h-screen bg-background pt-24 text-foreground">
+        {isDraftMode && (
+          <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
+            Pré-visualização ativa
+          </div>
+        )}
 
-      <section className="mx-auto max-w-6xl px-6 py-6 md:px-8 md:py-8">
-        <Button
-          asChild
-          className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"
-          variant="ghost"
-        >
-          <Link href="/vagas">
-            <ArrowLeft className="size-4" />
-            Voltar para vagas
-          </Link>
-        </Button>
+        <section className="mx-auto w-full max-w-6xl px-4 py-6 md:py-8">
+          <Button
+            asChild
+            className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"
+            variant="ghost"
+          >
+            <Link href="/vagas" transitionTypes={["nav-back"]}>
+              <ArrowLeft className="size-4" />
+              Voltar para vagas
+            </Link>
+          </Button>
 
-        <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
-          <article className="min-w-0 pb-12 lg:pr-8">
-            <div className="mb-8 max-w-4xl">
-              <Badge className="rounded-md bg-elinsa-light px-2.5 py-1 text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
-                Vaga aberta
-              </Badge>
-              <h1 className="mt-4 text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-4xl dark:text-elinsa-sky">
-                {vaga.title}
-              </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
-                {vaga.summary}
-              </p>
-            </div>
+          <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem]">
+            <article className="min-w-0 pb-12 lg:pr-8">
+              <div className="mb-8 max-w-4xl border-l-2 border-elinsa-primary pl-4 sm:pl-5">
+                <Badge className="rounded-md bg-elinsa-light px-2.5 py-1 text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
+                  Vaga aberta
+                </Badge>
+                <h1 className="mt-4 text-3xl font-black leading-tight tracking-normal text-elinsa-dark md:text-4xl dark:text-elinsa-sky">
+                  {vaga.title}
+                </h1>
+                <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg">
+                  {vaga.summary}
+                </p>
+              </div>
 
-            <EditorialRichText data={vaga.content} />
-          </article>
+              <EditorialRichText data={vaga.content} />
+            </article>
 
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <Card className="rounded-md">
-              <CardHeader>
-                <CardTitle>Resumo da vaga</CardTitle>
-                <CardDescription>
-                  Informações principais cadastradas.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <JobMeta
-                  icon={<Building2 />}
-                  label="Setor"
-                  value={vaga.sector}
-                />
-                <Separator />
-                <JobMeta
-                  icon={<MapPin />}
-                  label="Cidade"
-                  value={getVagaLocationLabel(vaga)}
-                />
-                {publishedDate && (
-                  <>
-                    <Separator />
-                    <JobMeta
-                      icon={<CalendarDays />}
-                      label="Publicada em"
-                      value={publishedDate}
-                    />
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </aside>
-        </div>
-      </section>
-    </div>
+            <aside className="lg:sticky lg:top-28 lg:self-start">
+              <Card className="rounded-md">
+                <CardHeader>
+                  <CardTitle>Resumo da vaga</CardTitle>
+                  <CardDescription>
+                    Informações principais cadastradas.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <JobMeta
+                    icon={<Building2 />}
+                    label="Setor"
+                    value={vaga.sector}
+                  />
+                  <Separator />
+                  <JobMeta
+                    icon={<MapPin />}
+                    label="Cidade"
+                    value={getVagaLocationLabel(vaga)}
+                  />
+                  {publishedDate && (
+                    <>
+                      <Separator />
+                      <JobMeta
+                        icon={<CalendarDays />}
+                        label="Publicada em"
+                        value={publishedDate}
+                      />
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </aside>
+          </div>
+        </section>
+      </div>
+    </PageTransition>
   );
 }
 
@@ -154,7 +162,7 @@ function VagaCard({ vaga }: { vaga: Vaga }) {
   const publishedDate = formatVagaDate(vaga.publishedAt ?? vaga.createdAt);
 
   return (
-    <Card className="rounded-md transition-all hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-md">
+    <Card className="rounded-md transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-elinsa-primary/55 hover:shadow-md">
       <CardHeader>
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <Badge className="rounded-md bg-elinsa-light px-2.5 py-1 text-elinsa-dark dark:bg-elinsa-primary/15 dark:text-elinsa-sky">
@@ -188,7 +196,7 @@ function VagaCard({ vaga }: { vaga: Vaga }) {
 
       <CardFooter>
         <Button asChild className="gap-2" variant="outline">
-          <Link href={href}>
+          <Link href={href} transitionTypes={["nav-forward"]}>
             Ver detalhes
             <ArrowRight className="size-4" />
           </Link>

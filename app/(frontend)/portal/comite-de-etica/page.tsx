@@ -10,10 +10,12 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PageTransition } from "@/components/ui/page-transition";
 import { auth } from "@/lib/auth";
 import { requireCommitteeAccess, requireUserId } from "@/lib/comite/access";
 import {
@@ -66,169 +68,173 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
     (counts.completed ?? 0) + (counts.closed ?? 0) + (counts.archived ?? 0);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <header className="mb-5 border-b pb-5">
-        <nav
-          aria-label="Navegação do comitê"
-          className="mb-3 flex flex-wrap gap-2"
-        >
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/portal">Voltar ao portal</Link>
-          </Button>
-        </nav>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Comitê de Ética
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Central de triagem, análise e acompanhamento das denúncias recebidas.
-        </p>
-      </header>
-
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
-        <main className="min-w-0">
-          <form
-            action="/portal/comite-de-etica"
-            className="mb-4 grid gap-2 rounded-md border bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto]"
-          >
-            {statusFilter && (
-              <input name="status" type="hidden" value={statusFilter} />
-            )}
-            <div className="relative">
-              <HugeiconsIcon
-                icon={Search01Icon}
-                className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground"
-                strokeWidth={2}
-              />
-              <Input
-                className="h-9 pl-8 text-sm"
-                defaultValue={search}
-                name="q"
-                placeholder="Buscar por protocolo"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button className="h-9" type="submit">
-                Buscar
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <PageHeader
+          description="Central de triagem, análise e acompanhamento das denúncias recebidas."
+          eyebrow="Governança & ética"
+          navigation={
+            <PageHeaderNavigation label="Navegação do comitê">
+              <Button className="shrink-0" size="sm" variant="outline" asChild>
+                <Link href="/portal" transitionTypes={["nav-back"]}>
+                  Voltar ao portal
+                </Link>
               </Button>
-              {search && (
-                <Button className="h-9" variant="outline" asChild>
-                  <Link href={buildCommitteeHref({ statusFilter })}>
-                    Limpar
-                  </Link>
-                </Button>
+            </PageHeaderNavigation>
+          }
+          title="Comitê de Ética"
+        />
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-start">
+          <main className="min-w-0">
+            <form
+              action="/portal/comite-de-etica"
+              className="mb-4 grid gap-2 rounded-md border bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto]"
+            >
+              {statusFilter && (
+                <input name="status" type="hidden" value={statusFilter} />
               )}
-            </div>
-          </form>
-
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span>
-              {reportPage.total} denúncia(s) encontrada(s) · página{" "}
-              {reportPage.page} de {reportPage.totalPages}
-              {statusFilter
-                ? ` · filtro: ${STATUS_FILTER_LABELS[statusFilter]}`
-                : ""}
-            </span>
-            <Pagination
-              page={reportPage.page}
-              search={search}
-              statusFilter={statusFilter}
-              totalPages={reportPage.totalPages}
-            />
-          </div>
-
-          <section
-            aria-label="Denúncias recebidas"
-            className="overflow-hidden rounded-md border bg-card shadow-sm"
-          >
-            {reports.length > 0 ? (
-              <div className="divide-y">
-                {reports.map((report) => (
-                  <Link
-                    aria-label={`Ver denúncia ${report.protocol}`}
-                    key={report.id}
-                    href={`/portal/comite-de-etica/${report.id}`}
-                    className="group grid gap-3 px-4 py-4 text-left transition-colors hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-center"
-                  >
-                    <div className="min-w-0">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <ReportStatusBadge status={report.status} />
-                      </div>
-                      <p className="font-mono text-base font-semibold tracking-tight group-hover:text-elinsa-primary">
-                        {report.protocol}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {report.category}
-                      </p>
-                    </div>
-                    <dl className="flex flex-col gap-2 text-xs text-muted-foreground sm:grid sm:grid-cols-2 lg:flex">
-                      <ReportDate label="Recebida" value={report.createdAt} />
-                      <ReportDate label="Atualizada" value={report.updatedAt} />
-                    </dl>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="px-4 py-10 text-center">
+              <div className="relative">
                 <HugeiconsIcon
-                  icon={InboxIcon}
-                  className="mx-auto mb-3 size-8 text-muted-foreground/70"
+                  icon={Search01Icon}
+                  className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2.5 size-4 text-muted-foreground"
                   strokeWidth={2}
                 />
-                <p className="text-sm text-muted-foreground">
-                  {search || statusFilter
-                    ? "Nenhuma denúncia encontrada com esses filtros."
-                    : "Nenhuma denúncia recebida ainda."}
-                </p>
+                <Input
+                  className="h-9 pl-8 text-sm"
+                  defaultValue={search}
+                  name="q"
+                  placeholder="Buscar por protocolo"
+                />
               </div>
-            )}
-          </section>
+              <div className="flex gap-2">
+                <Button className="h-9" type="submit">
+                  Buscar
+                </Button>
+                {search && (
+                  <Button className="h-9" variant="outline" asChild>
+                    <Link href={buildCommitteeHref({ statusFilter })}>
+                      Limpar
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </form>
 
-          <div className="mt-4 flex justify-end">
-            <Pagination
-              page={reportPage.page}
-              search={search}
-              statusFilter={statusFilter}
-              totalPages={reportPage.totalPages}
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+              <span>
+                {reportPage.total} denúncia(s) encontrada(s) · página{" "}
+                {reportPage.page} de {reportPage.totalPages}
+                {statusFilter
+                  ? ` · filtro: ${STATUS_FILTER_LABELS[statusFilter]}`
+                  : ""}
+              </span>
+              <Pagination
+                page={reportPage.page}
+                search={search}
+                statusFilter={statusFilter}
+                totalPages={reportPage.totalPages}
+              />
+            </div>
+
+            <section
+              aria-label="Denúncias recebidas"
+              className="overflow-hidden rounded-md border bg-card shadow-sm"
+            >
+              {reports.length > 0 ? (
+                <div className="divide-y">
+                  {reports.map((report) => (
+                    <Link
+                      aria-label={`Ver denúncia ${report.protocol}`}
+                      key={report.id}
+                      href={`/portal/comite-de-etica/${report.id}`}
+                      transitionTypes={["nav-forward"]}
+                      className="group grid gap-3 px-4 py-4 text-left transition-colors hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-center"
+                    >
+                      <div className="min-w-0">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          <ReportStatusBadge status={report.status} />
+                        </div>
+                        <p className="font-mono text-base font-semibold tracking-tight group-hover:text-elinsa-primary">
+                          {report.protocol}
+                        </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {report.category}
+                        </p>
+                      </div>
+                      <dl className="flex flex-col gap-2 text-xs text-muted-foreground sm:grid sm:grid-cols-2 lg:flex">
+                        <ReportDate label="Recebida" value={report.createdAt} />
+                        <ReportDate
+                          label="Atualizada"
+                          value={report.updatedAt}
+                        />
+                      </dl>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="px-4 py-10 text-center">
+                  <HugeiconsIcon
+                    icon={InboxIcon}
+                    className="mx-auto mb-3 size-8 text-muted-foreground/70"
+                    strokeWidth={2}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    {search || statusFilter
+                      ? "Nenhuma denúncia encontrada com esses filtros."
+                      : "Nenhuma denúncia recebida ainda."}
+                  </p>
+                </div>
+              )}
+            </section>
+
+            <div className="mt-4 flex justify-end">
+              <Pagination
+                page={reportPage.page}
+                search={search}
+                statusFilter={statusFilter}
+                totalPages={reportPage.totalPages}
+              />
+            </div>
+          </main>
+
+          <aside className="grid gap-3 lg:sticky lg:top-24">
+            <MetricCard
+              active={statusFilter === "new"}
+              href={buildCommitteeHref({
+                search,
+                statusFilter: statusFilter === "new" ? undefined : "new",
+              })}
+              icon={<HugeiconsIcon icon={InboxIcon} strokeWidth={2} />}
+              label="Novas"
+              value={counts.new ?? 0}
             />
-          </div>
-        </main>
-
-        <aside className="grid gap-3 lg:sticky lg:top-24">
-          <MetricCard
-            active={statusFilter === "new"}
-            href={buildCommitteeHref({
-              search,
-              statusFilter: statusFilter === "new" ? undefined : "new",
-            })}
-            icon={<HugeiconsIcon icon={InboxIcon} strokeWidth={2} />}
-            label="Novas"
-            value={counts.new ?? 0}
-          />
-          <MetricCard
-            active={statusFilter === "in_progress"}
-            href={buildCommitteeHref({
-              search,
-              statusFilter:
-                statusFilter === "in_progress" ? undefined : "in_progress",
-            })}
-            icon={<HugeiconsIcon icon={Clock3Icon} strokeWidth={2} />}
-            label="Em andamento"
-            value={inProgressCount}
-          />
-          <MetricCard
-            active={statusFilter === "finished"}
-            href={buildCommitteeHref({
-              search,
-              statusFilter:
-                statusFilter === "finished" ? undefined : "finished",
-            })}
-            icon={<HugeiconsIcon icon={CheckListIcon} strokeWidth={2} />}
-            label="Finalizadas"
-            value={finishedCount}
-          />
-        </aside>
+            <MetricCard
+              active={statusFilter === "in_progress"}
+              href={buildCommitteeHref({
+                search,
+                statusFilter:
+                  statusFilter === "in_progress" ? undefined : "in_progress",
+              })}
+              icon={<HugeiconsIcon icon={Clock3Icon} strokeWidth={2} />}
+              label="Em andamento"
+              value={inProgressCount}
+            />
+            <MetricCard
+              active={statusFilter === "finished"}
+              href={buildCommitteeHref({
+                search,
+                statusFilter:
+                  statusFilter === "finished" ? undefined : "finished",
+              })}
+              icon={<HugeiconsIcon icon={CheckListIcon} strokeWidth={2} />}
+              label="Finalizadas"
+              value={finishedCount}
+            />
+          </aside>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }
 

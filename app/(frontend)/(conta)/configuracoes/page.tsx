@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
+import { PageTransition } from "@/components/ui/page-transition";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
@@ -110,53 +112,53 @@ export default async function AccountSettingsPage() {
   const canChangeEmail = hasPassword && socialProviders.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <header className="mb-5 border-b pb-5">
-        <nav
-          aria-label="Navegação da conta"
-          className="mb-3 flex flex-wrap gap-2"
-        >
-          <Button asChild variant="outline">
-            <Link href="/portal">Voltar ao portal</Link>
-          </Button>
-        </nav>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Configurações da conta
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Dados, acesso e sessões do Portal Interno Elinsa.
-        </p>
-      </header>
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <PageHeader
+          description="Dados, acesso e sessões do Portal Interno Elinsa."
+          eyebrow="Conta & segurança"
+          navigation={
+            <PageHeaderNavigation label="Navegação da conta">
+              <Button className="shrink-0" size="sm" variant="outline" asChild>
+                <Link href="/portal" transitionTypes={["nav-back"]}>
+                  Voltar ao portal
+                </Link>
+              </Button>
+            </PageHeaderNavigation>
+          }
+          title="Configurações da conta"
+        />
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <section className="space-y-5">
-          <AccountOverviewCard
-            user={currentUser}
-            hasPassword={hasPassword}
-            passkeysCount={normalizedPasskeys.length}
-            sessionsCount={normalizedSessions.length}
-          />
-          <SecurityCard
-            canChangeEmail={canChangeEmail}
-            hasPassword={hasPassword}
-            userEmail={currentUser.email}
-          />
-          <LoginMethodsCard
-            accounts={accounts}
-            hasPassword={hasPassword}
-            socialProviders={socialProviders}
-          />
-        </section>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <section className="space-y-5">
+            <AccountOverviewCard
+              user={currentUser}
+              hasPassword={hasPassword}
+              passkeysCount={normalizedPasskeys.length}
+              sessionsCount={normalizedSessions.length}
+            />
+            <SecurityCard
+              canChangeEmail={canChangeEmail}
+              hasPassword={hasPassword}
+              userEmail={currentUser.email}
+            />
+            <LoginMethodsCard
+              accounts={accounts}
+              hasPassword={hasPassword}
+              socialProviders={socialProviders}
+            />
+          </section>
 
-        <section className="space-y-5">
-          <ProfileCard user={currentUser} />
-          <PasskeysCard initialPasskeys={normalizedPasskeys} />
-          <ActiveSessionsCard
-            initialSessions={normalizedSessions}
-            currentSessionToken={currentSessionToken}
-          />
-        </section>
+          <section className="space-y-5">
+            <ProfileCard user={currentUser} />
+            <PasskeysCard initialPasskeys={normalizedPasskeys} />
+            <ActiveSessionsCard
+              initialSessions={normalizedSessions}
+              currentSessionToken={currentSessionToken}
+            />
+          </section>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

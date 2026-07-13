@@ -1,7 +1,7 @@
 import { Activity, ArrowRight, CalendarDays, Clock3 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/badge";
+import { EditorialCover } from "@/components/editorial/editorial-cover";
+import { SectionEyebrow } from "@/components/section-eyebrow";
 import { Badge as ShadcnBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,6 @@ import {
 } from "@/lib/editorial";
 import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
 import { cn } from "@/lib/utils";
-import Lampada from "@/public/images/lampada.webp";
 import { HomeSection } from "./home-section";
 
 type PressNewsSectionProps = {
@@ -31,24 +30,36 @@ export function PressNewsSection({ posts }: PressNewsSectionProps) {
 
   return (
     <HomeSection headingId="imprensa-heading" tone="default">
-      <header className="mb-10 max-w-3xl">
-        <Badge text="Notícias" icon={Activity} />
-        <h2
-          id="imprensa-heading"
-          className="text-3xl font-black leading-tight tracking-normal md:text-4xl"
-        >
-          Histórias que mostram a Elinsa em movimento.
-        </h2>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
-          Acompanhe novidades, comunicados e iniciativas que dão contexto ao
-          trabalho em campo e às decisões que sustentam a operação.
-        </p>
-        <Button variant="outline" size="xl" className="mt-6 bg-card" asChild>
-          <Link href="/imprensa">
-            Ver imprensa
-            <ArrowRight aria-hidden="true" data-icon="inline-end" />
-          </Link>
-        </Button>
+      <header className="relative mb-10 border-t-4 border-foreground pt-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.72fr)] lg:items-end">
+          <div className="max-w-4xl">
+            <SectionEyebrow
+              className="mb-5"
+              text="Notícias"
+              icon={Activity}
+              variant="editorial"
+            />
+            <h2
+              id="imprensa-heading"
+              className="text-balance text-4xl font-black leading-[1.05] tracking-normal md:text-5xl"
+            >
+              Histórias que mostram a Elinsa em movimento.
+            </h2>
+          </div>
+
+          <div className="flex flex-col items-start gap-5 lg:items-end lg:pb-1">
+            <p className="max-w-xl text-base leading-7 text-muted-foreground lg:text-right">
+              Acompanhe novidades, comunicados e iniciativas que dão contexto ao
+              trabalho em campo e às decisões que sustentam a operação.
+            </p>
+            <Button variant="outline" size="xl" asChild>
+              <Link href="/imprensa">
+                Ver imprensa
+                <ArrowRight aria-hidden="true" data-icon="inline-end" />
+              </Link>
+            </Button>
+          </div>
+        </div>
       </header>
 
       {featuredPost ? (
@@ -98,12 +109,12 @@ function FeaturedPressNewsCard({ post }: { post: EditorialPost }) {
   return (
     <Link className="group block h-full" href={card.href}>
       <ShadcnCard className="relative h-full min-h-[32rem] overflow-hidden rounded-3xl border-border/70 bg-elinsa-dark py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10">
-        <Image
-          src={card.coverImage?.url ?? Lampada}
+        <EditorialCover
           alt={card.coverImage?.alt ?? post.title}
-          fill
+          blurDataURL={card.coverImage?.blurDataUrl}
           className="object-cover object-center transition duration-700 group-hover:scale-105"
           sizes="(min-width: 1024px) 43rem, 100vw"
+          src={card.coverImage?.url}
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.08)_0%,rgba(4,14,22,0.48)_42%,rgba(4,14,22,0.92)_100%)]" />
 
@@ -145,12 +156,12 @@ function CompactPressNewsCard({ post }: { post: EditorialPost }) {
     <Link className="group block h-full" href={card.href}>
       <ShadcnCard className="grid h-full overflow-hidden rounded-3xl border-border/70 bg-card py-0 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-elinsa-primary/35 hover:shadow-xl hover:shadow-elinsa-primary/10 md:grid-cols-[13rem_minmax(0,1fr)] lg:grid-cols-1 xl:grid-cols-[12.5rem_minmax(0,1fr)]">
         <div className="relative min-h-48 overflow-hidden bg-elinsa-dark md:min-h-full lg:min-h-44 xl:min-h-full">
-          <Image
-            src={card.coverImage?.url ?? Lampada}
+          <EditorialCover
             alt={card.coverImage?.alt ?? post.title}
-            fill
+            blurDataURL={card.coverImage?.blurDataUrl}
             className="object-cover object-center transition duration-500 group-hover:scale-105"
             sizes="(min-width: 1280px) 13rem, (min-width: 1024px) 35vw, (min-width: 768px) 13rem, 100vw"
+            src={card.coverImage?.url}
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,22,0.06)_0%,rgba(4,14,22,0.64)_100%)]" />
         </div>

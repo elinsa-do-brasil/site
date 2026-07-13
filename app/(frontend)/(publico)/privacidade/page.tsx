@@ -78,7 +78,7 @@ export default function PrivacidadePage() {
   return (
     <div className="bg-background text-foreground">
       <section className="border-b border-border pb-14 pt-28 md:pb-16 md:pt-32">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto w-full max-w-6xl px-4">
           <div className="max-w-4xl">
             <h1 className="mt-4 text-2xl font-black tracking-normal text-elinsa-dark sm:text-2xl md:text-3xl dark:text-elinsa-sky">
               Política de Privacidade
@@ -97,7 +97,7 @@ export default function PrivacidadePage() {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 pb-16 md:px-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pb-16 lg:grid-cols-[minmax(0,1fr)_16rem]">
         <main>
           <Section id="dados-tratados" title="Dados que tratamos">
             <p>
@@ -237,12 +237,15 @@ export default function PrivacidadePage() {
             </p>
 
             <p>
-              <Button variant={"link"} size={"lg"} className="px-0 text-base" asChild>
-                <Link
-                  href="/contato"
-                >
+              <Button
+                variant={"link"}
+                size={"lg"}
+                className="px-0 text-base"
+                asChild
+              >
+                <Link href="/contato">
                   Acessar formulário de contato <ArrowRight />
-              </Link>
+                </Link>
               </Button>
             </p>
           </Section>

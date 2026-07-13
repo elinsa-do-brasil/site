@@ -77,7 +77,7 @@ const defaultFooterLinks: EmailSocialLink[] = [
     label: "Instagram",
   },
   {
-    href: "https://elinsa.com.br/",
+    href: "https://elinsadobrasil.com.br/",
     iconPath: "/email/globe.png",
     label: "Site",
   },

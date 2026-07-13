@@ -1,6 +1,9 @@
 "use client";
 
-import { REPORT_ATTACHMENT_KEY_ID } from "@/lib/reports/attachment-limits";
+import {
+  MAX_REPORT_ATTACHMENT_NAME_BYTES,
+  REPORT_ATTACHMENT_KEY_ID,
+} from "@/lib/reports/attachment-limits";
 
 const AES_GCM_IV_LENGTH = 12;
 const AES_GCM_AUTH_TAG_LENGTH = 16;
@@ -32,6 +35,12 @@ export type EncryptedReportAttachment = {
 export async function encryptReportAttachment(
   file: File,
 ): Promise<EncryptedReportAttachment> {
+  const originalNameBytes = new TextEncoder().encode(file.name || "arquivo");
+
+  if (originalNameBytes.byteLength > MAX_REPORT_ATTACHMENT_NAME_BYTES) {
+    throw new Error("REPORT_ATTACHMENT_NAME_TOO_LONG");
+  }
+
   const publicKey = await importReportsPublicKey();
   const fileKey = await crypto.subtle.generateKey(
     {
@@ -64,7 +73,7 @@ export async function encryptReportAttachment(
         iv: originalNameIv,
       },
       fileKey,
-      new TextEncoder().encode(file.name || "arquivo"),
+      originalNameBytes,
     ),
   );
 

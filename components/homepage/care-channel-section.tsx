@@ -42,6 +42,7 @@ export function CareChannelSection({ impactMetrics }: CareChannelSectionProps) {
         headingId="canal-cuidado-heading"
         icon={HeartHandshake}
         title="Valores só importam quando viram cuidado."
+        variant="signal"
         aside={
           <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
             Eles aparecem nas escolhas de todos os dias: no cuidado com quem

@@ -1,6 +1,9 @@
 export const MAX_REPORT_ATTACHMENTS = 10;
 export const MAX_REPORT_ATTACHMENT_SIZE_BYTES = 20 * 1024 * 1024;
 export const MAX_REPORT_ATTACHMENTS_TOTAL_BYTES = 100 * 1024 * 1024;
+export const MAX_REPORT_ATTACHMENT_NAME_BYTES = 512;
+export const MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH =
+  Math.ceil(MAX_REPORT_ATTACHMENT_NAME_BYTES / 3) * 4;
 export const REPORT_ATTACHMENT_KEY_ID = "reports-ecdh-p384-v1";
 
 export function formatAttachmentSize(bytes: number) {

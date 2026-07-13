@@ -9,6 +9,7 @@ import {
 import { TeamAdmin } from "@/components/admin/TeamAdmin";
 import { TeamInviteDialog } from "@/components/admin/TeamInviteDialog";
 import { Button } from "@/components/ui/button";
+import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -113,36 +114,39 @@ export default async function TeamAdminPage({ params }: TeamPageProps) {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <GestaoPageHeader
-        active="equipes"
-        title={formatAdminName(selectedTeam.name)}
-        description="Revise membros, convites e configurações desta equipe."
-        actions={
-          <TeamInviteDialog
-            isOrgAdmin={context.isOrgAdmin}
-            registeredUsers={registeredUsers}
-            roleOptions={roleOptions}
-            team={selectedTeam}
-            trigger={
-              <Button type="button">
-                <UserPlus data-icon="inline-start" />
-                Adicionar ou convidar
-              </Button>
-            }
-          />
-        }
-      />
-      <TeamAdmin
-        invitations={pendingInvitations.map((invite) => ({
-          ...invite,
-          expiresAt: invite.expiresAt?.toISOString() ?? null,
-        }))}
-        isOrgAdmin={context.isOrgAdmin}
-        members={members}
-        roleOptions={roleOptions}
-        team={selectedTeam}
-      />
-    </div>
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <GestaoPageHeader
+          active="equipes"
+          title={formatAdminName(selectedTeam.name)}
+          description="Revise membros, convites e configurações desta equipe."
+          isOrgAdmin={context.isOrgAdmin}
+          actions={
+            <TeamInviteDialog
+              isOrgAdmin={context.isOrgAdmin}
+              registeredUsers={registeredUsers}
+              roleOptions={roleOptions}
+              team={selectedTeam}
+              trigger={
+                <Button type="button">
+                  <UserPlus data-icon="inline-start" />
+                  Adicionar ou convidar
+                </Button>
+              }
+            />
+          }
+        />
+        <TeamAdmin
+          invitations={pendingInvitations.map((invite) => ({
+            ...invite,
+            expiresAt: invite.expiresAt?.toISOString() ?? null,
+          }))}
+          isOrgAdmin={context.isOrgAdmin}
+          members={members}
+          roleOptions={roleOptions}
+          team={selectedTeam}
+        />
+      </div>
+    </PageTransition>
   );
 }

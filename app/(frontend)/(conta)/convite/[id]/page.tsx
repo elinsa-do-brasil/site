@@ -122,15 +122,15 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
     return (
       <InvitePageShell>
         <InviteMessageCard
-          title="Entre para aceitar o convite"
-          description={`A conta ${invite.email} já existe no portal.`}
+          title="E-mail verificado"
+          description={`A conta de ${invite.email} foi criada e verificada.`}
         >
           <div className="rounded-md border border-border/80 bg-muted/40 p-3 text-sm">
             <p className="font-medium">{roleLabel}</p>
             <p className="text-muted-foreground">{invite.organizationName}</p>
           </div>
           <Button className="w-full" asChild>
-            <Link href={loginHref}>Entrar com este e-mail</Link>
+            <Link href={loginHref}>Entre para continuar</Link>
           </Button>
         </InviteMessageCard>
       </InvitePageShell>
@@ -160,7 +160,10 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
 
 function InvitePageShell({ children }: { children: ReactNode }) {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-4 py-12">
+    <main
+      className="flex min-h-screen w-full items-center justify-center px-4 py-12"
+      id="conteudo-principal"
+    >
       {children}
     </main>
   );

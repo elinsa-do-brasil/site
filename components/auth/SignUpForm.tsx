@@ -94,13 +94,16 @@ export function CriarContaForm({
 
   if (success) {
     return (
-      <Card className="w-full max-w-108">
+      <Card className="w-full max-w-108" variant="auth">
         <CardHeader className="px-6 text-center">
           <CardTitle className="mt-6 mb-3">
             <Logo className="mx-auto" />
           </CardTitle>
+          <h1 className="text-lg font-semibold tracking-tight">
+            Verifique seu e-mail
+          </h1>
           <CardDescription>
-            Enviamos a verificação para <strong>{invitedEmail}</strong>.
+            Enviamos um e-mail de verificação para <strong>{invitedEmail}</strong>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-6 pb-6 text-center text-sm text-muted-foreground">
@@ -117,12 +120,13 @@ export function CriarContaForm({
   }
 
   return (
-    <Card className="w-full max-w-108">
-      <CardHeader className="px-6">
+    <Card className="w-full max-w-108" variant="auth">
+      <CardHeader className="px-6 text-center">
         <CardTitle className="mt-6 mb-3">
           <Logo className="mx-auto" />
         </CardTitle>
-        <CardDescription className="text-center">
+        <h1 className="text-lg font-semibold tracking-tight">Criar conta</h1>
+        <CardDescription>
           Crie sua conta para aceitar o convite de {organizationName}.
         </CardDescription>
       </CardHeader>
@@ -134,7 +138,7 @@ export function CriarContaForm({
 
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mb-6 flex flex-col gap-4"
+          className=" flex flex-col gap-4"
           noValidate
         >
           <FieldGroup>
@@ -198,9 +202,9 @@ export function CriarContaForm({
                       disabled={disableShowPasswordButton}
                     >
                       {showPassword && !disableShowPasswordButton ? (
-                        <EyeIcon className="size-4" aria-hidden="true" />
+                        <EyeIcon aria-hidden="true" />
                       ) : (
-                        <EyeClosedIcon className="size-4" aria-hidden="true" />
+                        <EyeClosedIcon aria-hidden="true" />
                       )}
                       <span className="sr-only">
                         {showPassword ? "Esconder senha" : "Mostrar senha"}
@@ -247,7 +251,7 @@ export function CriarContaForm({
           </FieldGroup>
         </form>
 
-        <div className="mt-6 text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground">
           <span>Já possui uma conta? </span>
           <Link
             href={loginHref}

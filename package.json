@@ -15,7 +15,9 @@
     "db:seed": "tsx --env-file=.env lib/db/seed.ts",
     "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
     "reports:keys": "tsx scripts/generate-report-encryption-keys.ts",
-    "email:dev": "email dev"
+    "email:dev": "email dev",
+    "ai:crawl": "tsx scripts/ai/agent-browser-crawl.ts",
+    "ai:improve": "tsx scripts/ai/orchestrator.ts"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.33.0",
@@ -41,6 +43,7 @@
     "@payloadcms/storage-azure": "3.85.2",
     "@payloadcms/translations": "^3.85.2",
     "@payloadcms/ui": "3.85.2",
+    "@react-pdf/renderer": "^4.5.1",
     "@sentry/nextjs": "10.63.0",
     "@seshuk/payload-media-preview": "1.0.5",
     "@tabler/icons-react": "^3.44.0",
@@ -67,6 +70,7 @@
     "react-hook-form": "^7.81.0",
     "react-icons": "^5.7.0",
     "resend": "^6.17.1",
+    "server-only": "^0.0.1",
     "shadcn": "^4.13.0",
     "sharp": "0.34.5",
     "sonner": "^2.0.7",
@@ -75,7 +79,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.1079.0",
     "@biomejs/biome": "2.5.2",
     "@react-email/ui": "6.6.6",
     "@tailwindcss/postcss": "^4.3.2",

@@ -80,7 +80,7 @@ export default async function FollowReportPage({
   const wasSearched = protocol.length > 0;
 
   return (
-    <main className="mx-auto min-w-0 max-w-[min(64rem,100vw)] overflow-x-hidden px-4 pt-28 pb-16">
+    <main className="mx-auto w-full min-w-0 max-w-6xl overflow-x-hidden px-4 pt-28 pb-16">
       <div className="mb-8 flex max-w-2xl flex-col gap-3">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
           Consulta pública

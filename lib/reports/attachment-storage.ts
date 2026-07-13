@@ -45,22 +45,18 @@ export async function deleteEncryptedAttachmentFromStorage(key: string) {
 function getAttachmentStorageConfig() {
   if (storageConfig) return storageConfig;
 
-  const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+  const connectionString = process.env.DENUNCIAS_STORAGE_CONNECTION_STRING;
   const containerName =
-    process.env.AZURE_REPORTS_CONTAINER_NAME ||
-    process.env.AZURE_STORAGE_CONTAINER_NAME ||
-    "denuncias";
+    process.env.DENUNCIAS_STORAGE_CONTAINER || "denuncias-anexos";
 
   if (!connectionString) {
     throw new Error(
-      "Variavel AZURE_STORAGE_CONNECTION_STRING nao configurada.",
+      "Variavel DENUNCIAS_STORAGE_CONNECTION_STRING nao configurada.",
     );
   }
 
   storageConfig = {
-    allowContainerCreate: shouldCreateAzureContainers(
-      process.env.AZURE_STORAGE_ALLOW_CONTAINER_CREATE,
-    ),
+    allowContainerCreate: shouldCreateAzureContainers(),
     containerClient:
       BlobServiceClient.fromConnectionString(
         connectionString,

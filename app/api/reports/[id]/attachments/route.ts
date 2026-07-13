@@ -2,6 +2,8 @@ import crypto from "node:crypto";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH,
+  MAX_REPORT_ATTACHMENT_NAME_BYTES,
   MAX_REPORT_ATTACHMENT_SIZE_BYTES,
   REPORT_ATTACHMENT_KEY_ID,
 } from "@/lib/reports/attachment-limits";
@@ -21,19 +23,26 @@ export const dynamic = "force-dynamic";
 
 const MAX_MULTIPART_CONTENT_LENGTH =
   MAX_REPORT_ATTACHMENT_SIZE_BYTES + 1024 * 1024;
+const BASE64_PATTERN =
+  /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+const base64Field = (min: number, max: number) =>
+  z.string().min(min).max(max).regex(BASE64_PATTERN);
 
 const attachmentMetadataSchema = z.object({
-  uploadToken: z.string().min(20),
-  encryptedFileKey: z.string().min(20),
-  encryptedFileKeyIv: z.string().min(12),
-  encryptedFileKeyAuthTag: z.string().min(12),
-  keyEncryptionEphemeralPublicKey: z.string().min(80).max(500),
-  keyEncryptionSalt: z.string().min(20).max(200),
-  fileIv: z.string().min(12),
-  fileAuthTag: z.string().min(12),
-  encryptedOriginalName: z.string().min(1),
-  originalNameIv: z.string().min(12),
-  originalNameAuthTag: z.string().min(12),
+  uploadToken: z.string().min(20).max(2048),
+  encryptedFileKey: base64Field(20, 128),
+  encryptedFileKeyIv: base64Field(12, 64),
+  encryptedFileKeyAuthTag: base64Field(12, 64),
+  keyEncryptionEphemeralPublicKey: base64Field(80, 500),
+  keyEncryptionSalt: base64Field(20, 200),
+  fileIv: base64Field(12, 64),
+  fileAuthTag: base64Field(12, 64),
+  encryptedOriginalName: base64Field(
+    1,
+    MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH,
+  ),
+  originalNameIv: base64Field(12, 64),
+  originalNameAuthTag: base64Field(12, 64),
   mimeType: z.string().trim().min(1).max(255),
   sizeBytes: z.coerce
     .number()
@@ -87,6 +96,13 @@ export async function POST(
     const metadata = attachmentMetadataSchema.safeParse(metadataJson);
 
     if (!metadata.success) {
+      return attachmentResponse(400);
+    }
+
+    if (
+      Buffer.from(metadata.data.encryptedOriginalName, "base64").length >
+      MAX_REPORT_ATTACHMENT_NAME_BYTES
+    ) {
       return attachmentResponse(400);
     }
 

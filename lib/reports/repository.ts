@@ -4,6 +4,7 @@ import {
   count,
   desc,
   eq,
+  gte,
   ilike,
   inArray,
   type SQL,
@@ -252,6 +253,24 @@ export async function listReportEvents(reportId: string) {
     .leftJoin(user, eq(reportEvents.actorUserId, user.id))
     .where(eq(reportEvents.reportId, reportId))
     .orderBy(desc(reportEvents.createdAt));
+}
+
+export async function countRecentReportPdfExports(input: {
+  actorUserId: string;
+  since: Date;
+}) {
+  const [row] = await db
+    .select({ total: count() })
+    .from(reportEvents)
+    .where(
+      and(
+        eq(reportEvents.actorUserId, input.actorUserId),
+        eq(reportEvents.type, "report.pdf_generated"),
+        gte(reportEvents.createdAt, input.since),
+      ),
+    );
+
+  return Number(row?.total ?? 0);
 }
 
 export function decryptReportRow(

@@ -75,7 +75,9 @@ export function ProvidedServicesSection() {
         badge="Serviços que prestamos"
         headingId="servicos-heading"
         icon={BriefcaseBusiness}
+        marker="02"
         title="Frentes técnicas e comerciais para a energia chegar melhor."
+        variant="specification"
         aside={
           <div className="relative">
             <Zap

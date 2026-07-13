@@ -10,7 +10,9 @@ export function AboutTimelineSection() {
         badge="Trajetória"
         headingId="trajetoria-heading"
         icon={aboutIcons.calendar}
+        marker="1986"
         title="Crescimento construído etapa por etapa."
+        variant="sequence"
         aside={
           <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg md:leading-8">
             A história da ELINSA é marcada por expansão industrial,

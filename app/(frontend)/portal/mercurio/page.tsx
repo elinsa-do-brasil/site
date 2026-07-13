@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { PageTransition } from "@/components/ui/page-transition";
+import { auth } from "@/lib/auth";
+import { getInternalAccessContext } from "@/lib/organization/access";
 import { EmailSignatureGenerator } from "./_components/email-signature-generator";
+import { SocialLinksPreview } from "./_components/social-links-preview";
+import { normalizeSignatureName } from "./signature-name";
 
 export const metadata: Metadata = {
   title: "Gerador de assinatura de e-mail",
@@ -10,31 +20,61 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EmailSignaturePage() {
-  return (
-    <div className="bg-background text-foreground">
-      <section className="border-b bg-muted/25 px-4 pt-28 pb-8 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold tracking-[0.18em] text-elinsa-primary uppercase">
-              Identidade corporativa
-            </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              Gerador de assinatura de e-mail
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
-              Preencha seus dados e copie a assinatura no padrão visual da
-              Elinsa do Brasil.
-            </p>
-          </div>
-        </div>
-      </section>
+export default async function EmailSignaturePage() {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-      <section className="px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-6xl">
-          <EmailSignatureGenerator />
+  if (!session?.user.id) {
+    redirect("/entrar?redirectTo=/portal/mercurio");
+  }
+
+  const accessContext = await getInternalAccessContext(session.user.id);
+
+  if (!accessContext) {
+    redirect("/entrar?redirectTo=/portal/mercurio");
+  }
+
+  return (
+    <PageTransition>
+      <div className="bg-background text-foreground">
+        <div className="mx-auto w-full max-w-6xl px-4">
+          <PageHeader
+            description="Preencha seus dados e copie a assinatura no padrão visual da Elinsa do Brasil."
+            eyebrow="Identidade corporativa"
+            navigation={
+              <PageHeaderNavigation label="Navegação do gerador de assinatura">
+                <Button
+                  className="shrink-0"
+                  size="sm"
+                  variant="outline"
+                  asChild
+                >
+                  <Link href="/portal" transitionTypes={["nav-back"]}>
+                    Voltar ao portal
+                  </Link>
+                </Button>
+              </PageHeaderNavigation>
+            }
+            title="Gerador de assinatura de e-mail"
+            variant="feature"
+          />
+
+          <section className="pb-8">
+            <div className="w-full">
+              <EmailSignatureGenerator
+                initialValues={{
+                  email: getEmailUsername(session.user.email),
+                  nome: normalizeSignatureName(session.user.name),
+                }}
+                socialLinks={<SocialLinksPreview />}
+              />
+            </div>
+          </section>
         </div>
-      </section>
-    </div>
+      </div>
+    </PageTransition>
   );
+}
+
+function getEmailUsername(email: string) {
+  return (email.trim().split("@", 1)[0] ?? "").toLocaleLowerCase("en-US");
 }

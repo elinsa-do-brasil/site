@@ -141,7 +141,11 @@ export function BaseMapCard({
           <GeoJsonLayer url={geoJsonUrl} color={color} fillColor={fillColor} />
 
           {baseLocation && (
-            <MapMarker longitude={baseLocation.lng} latitude={baseLocation.lat}>
+            <MapMarker
+              ariaLabel={baseLocation.tooltip ?? "Base no mapa"}
+              longitude={baseLocation.lng}
+              latitude={baseLocation.lat}
+            >
               <MarkerContent>
                 <div className="relative flex h-5 w-5 cursor-pointer">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>

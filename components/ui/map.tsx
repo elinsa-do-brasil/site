@@ -1,10 +1,13 @@
+// biome-ignore-all lint/correctness/useExhaustiveDependencies: MapLibre instances are created once and then updated imperatively by the component wrappers.
 "use client";
 
-import MapLibreGL, { type PopupOptions, type MarkerOptions } from "maplibre-gl";
+import MapLibreGL, { type MarkerOptions, type PopupOptions } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { Loader2, Locate, Maximize, Minus, Plus, X } from "lucide-react";
 import {
   createContext,
   forwardRef,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -13,10 +16,8 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -167,7 +168,7 @@ function getViewport(map: MapLibreGL.Map): MapViewport {
   };
 }
 
-const Map = forwardRef<MapRef, MapProps>(function Map(
+const MapRoot = forwardRef<MapRef, MapProps>(function MapRoot(
   {
     children,
     className,
@@ -270,6 +271,28 @@ const Map = forwardRef<MapRef, MapProps>(function Map(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A map canvas does not automatically observe layout changes. This keeps its
+  // viewport correct when a responsive grid, sidebar or browser orientation
+  // changes size after the map has initialized.
+  useEffect(() => {
+    if (!mapInstance || !containerRef.current) return;
+
+    let frameId: number | null = null;
+    const resize = () => {
+      if (frameId !== null) cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => mapInstance.resize());
+    };
+    const observer = new ResizeObserver(resize);
+
+    observer.observe(containerRef.current);
+    resize();
+
+    return () => {
+      observer.disconnect();
+      if (frameId !== null) cancelAnimationFrame(frameId);
+    };
+  }, [mapInstance]);
+
   // Sync controlled viewport to map
   useEffect(() => {
     if (!mapInstance || !isControlled || !viewport) return;
@@ -370,12 +393,15 @@ type MapMarkerProps = {
   onDrag?: (lngLat: { lng: number; lat: number }) => void;
   /** Callback when marker drag ends (requires draggable: true) */
   onDragEnd?: (lngLat: { lng: number; lat: number }) => void;
-} & Omit<MarkerOptions, "element">;
+  /** Accessible label for the marker button */
+  ariaLabel?: string;
+} & Omit<MarkerOptions, "ariaLabel" | "element">;
 
 function MapMarker({
   longitude,
   latitude,
   children,
+  ariaLabel = "Marcador no mapa",
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -405,9 +431,12 @@ function MapMarker({
   };
 
   const marker = useMemo(() => {
+    const element = document.createElement("div");
+    element.setAttribute("aria-label", ariaLabel);
+
     const markerInstance = new MapLibreGL.Marker({
       ...markerOptions,
-      element: document.createElement("div"),
+      element,
       draggable,
     }).setLngLat([longitude, latitude]);
 
@@ -487,6 +516,9 @@ function MapMarker({
   if (marker.getPitchAlignment() !== markerOptions.pitchAlignment) {
     marker.setPitchAlignment(markerOptions.pitchAlignment ?? "auto");
   }
+  if (marker.getElement().getAttribute("aria-label") !== ariaLabel) {
+    marker.getElement().setAttribute("aria-label", ariaLabel);
+  }
 
   return (
     <MarkerContext.Provider value={{ marker, map }}>
@@ -524,7 +556,7 @@ function PopupCloseButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label="Close popup"
+      aria-label="Fechar janela do mapa"
       className="focus-visible:ring-ring hover:bg-muted text-foreground absolute top-0.5 right-0.5 z-10 inline-flex size-5 cursor-pointer items-center justify-center rounded-sm transition-colors focus:outline-none focus-visible:ring-2"
     >
       <X className="size-3.5" />
@@ -846,10 +878,10 @@ function MapControls({
     >
       {showZoom && (
         <ControlGroup>
-          <ControlButton onClick={handleZoomIn} label="Zoom in">
+          <ControlButton onClick={handleZoomIn} label="Aproximar mapa">
             <Plus className="size-4" />
           </ControlButton>
-          <ControlButton onClick={handleZoomOut} label="Zoom out">
+          <ControlButton onClick={handleZoomOut} label="Afastar mapa">
             <Minus className="size-4" />
           </ControlButton>
         </ControlGroup>
@@ -863,7 +895,7 @@ function MapControls({
         <ControlGroup>
           <ControlButton
             onClick={handleLocate}
-            label="Find my location"
+            label="Encontrar minha localização"
             disabled={waitingForLocation}
           >
             {waitingForLocation ? (
@@ -876,7 +908,7 @@ function MapControls({
       )}
       {showFullscreen && (
         <ControlGroup>
-          <ControlButton onClick={handleFullscreen} label="Toggle fullscreen">
+          <ControlButton onClick={handleFullscreen} label="Alternar tela cheia">
             <Maximize className="size-4" />
           </ControlButton>
         </ControlGroup>
@@ -911,8 +943,9 @@ function CompassButton({ onClick }: { onClick: () => void }) {
   }, [map]);
 
   return (
-    <ControlButton onClick={onClick} label="Reset bearing to north">
+    <ControlButton onClick={onClick} label="Redefinir orientação para o norte">
       <svg
+        aria-hidden="true"
         ref={compassRef}
         viewBox="0 0 24 24"
         className="size-5 transition-transform duration-200"
@@ -1120,7 +1153,7 @@ function MapRoute({
   }, [isLoaded, map, coordinates, sourceId]);
 
   useEffect(() => {
-    if (!isLoaded || !map || !map.getLayer(layerId)) return;
+    if (!isLoaded || !map?.getLayer(layerId)) return;
 
     map.setPaintProperty(layerId, "line-color", color);
     map.setPaintProperty(layerId, "line-width", width);
@@ -1425,7 +1458,7 @@ function MapArc<T extends MapArcDatum = MapArcDatum>({
 
   // Sync paint/layout when they change.
   useEffect(() => {
-    if (!isLoaded || !map || !map.getLayer(layerId)) return;
+    if (!isLoaded || !map?.getLayer(layerId)) return;
     for (const [key, value] of Object.entries(mergedPaint)) {
       map.setPaintProperty(
         layerId,
@@ -1827,19 +1860,18 @@ function MapClusterLayer<
   return null;
 }
 
+export type { MapArcDatum, MapArcEvent, MapRef, MapViewport };
 export {
-  Map,
-  useMap,
-  MapMarker,
-  MarkerContent,
-  MarkerPopup,
-  MarkerTooltip,
-  MarkerLabel,
-  MapPopup,
-  MapControls,
-  MapRoute,
   MapArc,
   MapClusterLayer,
+  MapControls,
+  MapMarker,
+  MapPopup,
+  MapRoot as Map,
+  MapRoute,
+  MarkerContent,
+  MarkerLabel,
+  MarkerPopup,
+  MarkerTooltip,
+  useMap,
 };
-
-export type { MapRef, MapViewport, MapArcDatum, MapArcEvent };

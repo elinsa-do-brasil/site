@@ -2,6 +2,7 @@ import { asc, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import { FerramentasTeamAdmin } from "@/components/admin/FerramentasTeamAdmin";
 import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
+import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import { portalTool } from "@/lib/db/schema";
 import {
@@ -34,20 +35,23 @@ export default async function FerramentasTeamAdminPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <GestaoPageHeader
-        active="ferramentas"
-        title="Ferramentas"
-        description="Configure os cards de acesso exibidos no portal interno de cada equipe."
-      />
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <GestaoPageHeader
+          active="ferramentas"
+          title="Ferramentas"
+          description="Configure os cards de acesso exibidos no portal interno de cada equipe."
+          isOrgAdmin={context.isOrgAdmin}
+        />
 
-      <FerramentasTeamAdmin
-        teams={manageableTeams.map((item) => ({
-          ...item,
-          tools: toolsByTeam.get(item.id) ?? [],
-        }))}
-      />
-    </div>
+        <FerramentasTeamAdmin
+          teams={manageableTeams.map((item) => ({
+            ...item,
+            tools: toolsByTeam.get(item.id) ?? [],
+          }))}
+        />
+      </div>
+    </PageTransition>
   );
 }
 

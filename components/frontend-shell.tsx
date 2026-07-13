@@ -31,14 +31,24 @@ export function FrontendShell({
 }) {
   const pathname = usePathname() ?? "/";
   const isMapRoute = pathname === "/mapas" || pathname.startsWith("/mapas/");
+  const skipLink = (
+    <a className="skip-link" data-skip-link href="#conteudo-principal">
+      Pular para o conteúdo
+    </a>
+  );
 
   if (pathname === "/portal" || pathname.startsWith("/portal/")) {
     return (
       <div className="min-h-screen bg-muted/30" data-frontend-shell="portal">
+        {skipLink}
         <div data-frontend-shell-header>
           <InternalHeader />
         </div>
-        <main className="pt-24" data-frontend-shell-main>
+        <main
+          className="pt-24"
+          data-frontend-shell-main
+          id="conteudo-principal"
+        >
           {children}
         </main>
         <Toaster />
@@ -49,10 +59,15 @@ export function FrontendShell({
   if (pathname === "/configuracoes") {
     return (
       <div className="min-h-screen bg-muted/30" data-frontend-shell="account">
+        {skipLink}
         <div data-frontend-shell-header>
           <InternalHeader />
         </div>
-        <main className="pt-24" data-frontend-shell-main>
+        <main
+          className="pt-24"
+          data-frontend-shell-main
+          id="conteudo-principal"
+        >
           {children}
         </main>
         <Toaster />
@@ -63,21 +78,35 @@ export function FrontendShell({
   if (isAccountRoute(pathname)) {
     return (
       <div className="min-h-screen bg-muted/30">
+        {skipLink}
         {children}
         <Toaster />
       </div>
     );
   }
 
+  if (isMapRoute) {
+    return (
+      <>
+        {skipLink}
+        <div data-frontend-shell-main id="conteudo-principal">
+          {children}
+        </div>
+        <Toaster />
+      </>
+    );
+  }
+
   return (
     <>
-      {!isMapRoute && (
-        <div data-frontend-shell-header>
-          <Header />
-        </div>
-      )}
-      <main data-frontend-shell-main>{children}</main>
-      {!isMapRoute && footer && <div data-frontend-shell-footer>{footer}</div>}
+      {skipLink}
+      <div data-frontend-shell-header>
+        <Header />
+      </div>
+      <main data-frontend-shell-main id="conteudo-principal">
+        {children}
+      </main>
+      {footer && <div data-frontend-shell-footer>{footer}</div>}
       <Toaster />
     </>
   );

@@ -2,6 +2,7 @@ import { asc, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
 import { OrganizacaoAdmin } from "@/components/admin/OrganizacaoAdmin";
+import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -87,26 +88,29 @@ export default async function OrganizacaoAdminPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-12">
-      <GestaoPageHeader
-        active="organizacao"
-        title="Organização"
-        description="Gerencie membros, vínculos e funções de acesso do Portal Interno Elinsa."
-      />
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <GestaoPageHeader
+          active="organizacao"
+          title="Organização"
+          description="Gerencie membros, vínculos e funções de acesso do Portal Interno Elinsa."
+          isOrgAdmin={context.isOrgAdmin}
+        />
 
-      <OrganizacaoAdmin
-        members={members.map((item) => ({
-          ...item,
-          createdAt: item.createdAt.toISOString(),
-          teams: teamsByUser.get(item.userId) ?? [],
-        }))}
-        pendingInvitationCount={
-          invitations.filter((item) => item.status === "pending").length
-        }
-        roleOptions={roleOptions}
-        roles={roles}
-        teams={teams}
-      />
-    </div>
+        <OrganizacaoAdmin
+          members={members.map((item) => ({
+            ...item,
+            createdAt: item.createdAt.toISOString(),
+            teams: teamsByUser.get(item.userId) ?? [],
+          }))}
+          pendingInvitationCount={
+            invitations.filter((item) => item.status === "pending").length
+          }
+          roleOptions={roleOptions}
+          roles={roles}
+          teams={teams}
+        />
+      </div>
+    </PageTransition>
   );
 }

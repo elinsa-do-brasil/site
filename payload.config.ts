@@ -42,20 +42,17 @@ if (!process.env.API_KEY_PEXELS && process.env.PEXELS_API_KEY) {
   process.env.API_KEY_PEXELS = process.env.PEXELS_API_KEY;
 }
 
-const azureConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const azurePayloadContainerName =
-  process.env.AZURE_PAYLOAD_CONTAINER_NAME || "galeria";
-const azurePayloadPrefix = process.env.AZURE_PAYLOAD_PREFIX || "galeria";
-const azureStorageBaseURL = getAzureStorageAccountBaseURL({
-  connectionString: azureConnectionString,
-  explicitBaseURL: process.env.AZURE_STORAGE_ACCOUNT_BASEURL,
+const cmsStorageConnectionString = process.env.CMS_STORAGE_CONNECTION_STRING;
+const cmsStorageContainerName =
+  process.env.CMS_STORAGE_CONTAINER || "cms-media";
+const cmsStoragePrefix = "galeria";
+const cmsStorageBaseURL = getAzureStorageAccountBaseURL({
+  connectionString: cmsStorageConnectionString,
 });
-const isAzurePayloadStorageConfigured = Boolean(
-  azureConnectionString && azureStorageBaseURL && azurePayloadContainerName,
+const isCmsStorageConfigured = Boolean(
+  cmsStorageConnectionString && cmsStorageBaseURL && cmsStorageContainerName,
 );
-const allowAzureContainerCreate = shouldCreateAzureContainers(
-  process.env.AZURE_STORAGE_ALLOW_CONTAINER_CREATE,
-);
+const allowCmsContainerCreate = shouldCreateAzureContainers();
 const siteURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
 const usersCollectionSlug = Users.slug as CollectionSlug;
@@ -154,17 +151,17 @@ export default buildConfig({
 
   plugins: [
     azureStorage({
-      enabled: isAzurePayloadStorageConfigured,
+      enabled: isCmsStorageConfigured,
       collections: {
         galeria: {
           generateFileURL: generatePayloadFileURL,
-          prefix: azurePayloadPrefix,
+          prefix: cmsStoragePrefix,
         },
       },
-      allowContainerCreate: allowAzureContainerCreate,
-      baseURL: azureStorageBaseURL,
-      connectionString: azureConnectionString || "",
-      containerName: azurePayloadContainerName,
+      allowContainerCreate: allowCmsContainerCreate,
+      baseURL: cmsStorageBaseURL,
+      connectionString: cmsStorageConnectionString || "",
+      containerName: cmsStorageContainerName,
     }),
     auditFieldsPlugin({
       createdByLabel: "Criado por",
