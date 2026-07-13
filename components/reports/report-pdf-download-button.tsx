@@ -94,7 +94,7 @@ export function ReportPdfDownloadButton({
         />
       )}
       <span aria-live="polite">
-        {isGenerating ? "Gerando PDF…" : "Exportar PDF"}
+        {isGenerating ? "Gerando PDF" : "Exportar PDF"}
       </span>
     </Button>
   );

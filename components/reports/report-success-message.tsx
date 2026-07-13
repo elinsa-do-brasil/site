@@ -134,7 +134,7 @@ export function ReportSuccessMessage({
               </Button>
               <p className="mt-2 text-xs leading-relaxed text-emerald-900/75 dark:text-emerald-200/75">
                 Guarde este código em um local seguro. Ele é necessário para
-                acompanhar o andamento público sem expor os dados enviados.
+                acompanhar o andamento da sua denúncia.
               </p>
             </div>
           )}
@@ -144,7 +144,7 @@ export function ReportSuccessMessage({
 
         <CardFooter className="flex flex-col items-stretch gap-3 px-5 pb-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Você já pode acompanhar o andamento público, fechar esta página ou
+            Você já pode acompanhar o andamento da sua denúncia, fechar esta página ou
             iniciar um novo envio.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">

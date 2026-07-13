@@ -84,7 +84,7 @@ export function ReportWritingHelp() {
                 data-icon="inline-start"
                 strokeWidth={2}
               />
-              Baixar guia de IA
+              Baixar guia
             </a>
           </Button>
 
