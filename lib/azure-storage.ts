@@ -44,7 +44,7 @@ export function getAzureStorageAccountBaseURL(input: {
   return `${protocol}://${accountName}.blob.${endpointSuffix}`;
 }
 
-export function shouldCreateAzureContainers(value: string | undefined) {
+export function shouldCreateAzureContainers(value?: string) {
   if (value) {
     return value === "true";
   }
