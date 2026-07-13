@@ -16,11 +16,11 @@ export function HomeHeroSection({ impactMetrics }: HomeHeroSectionProps) {
   return (
     <section
       aria-labelledby="home-hero-heading"
-      className="relative overflow-hidden pb-8 pt-28"
+      className="relative flex min-h-dvh overflow-hidden pb-8 pt-28"
     >
       <HeroBackdrop />
 
-      <div className="relative z-10 mx-auto flex min-h-[34rem] w-full max-w-6xl flex-col justify-end gap-10 px-4 md:min-h-168 lg:gap-12">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col justify-end gap-10 px-4 lg:gap-12">
         <HeroCopy />
 
         <HeroMetrics metrics={impactMetrics} />

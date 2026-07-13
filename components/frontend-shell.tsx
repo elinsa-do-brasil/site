@@ -31,16 +31,10 @@ export function FrontendShell({
 }) {
   const pathname = usePathname() ?? "/";
   const isMapRoute = pathname === "/mapas" || pathname.startsWith("/mapas/");
-  const skipLink = (
-    <a className="skip-link" data-skip-link href="#conteudo-principal">
-      Pular para o conteúdo
-    </a>
-  );
 
   if (pathname === "/portal" || pathname.startsWith("/portal/")) {
     return (
       <div className="min-h-screen bg-muted/30" data-frontend-shell="portal">
-        {skipLink}
         <div data-frontend-shell-header>
           <InternalHeader />
         </div>
@@ -59,7 +53,6 @@ export function FrontendShell({
   if (pathname === "/configuracoes") {
     return (
       <div className="min-h-screen bg-muted/30" data-frontend-shell="account">
-        {skipLink}
         <div data-frontend-shell-header>
           <InternalHeader />
         </div>
@@ -78,7 +71,6 @@ export function FrontendShell({
   if (isAccountRoute(pathname)) {
     return (
       <div className="min-h-screen bg-muted/30">
-        {skipLink}
         {children}
         <Toaster />
       </div>
@@ -88,7 +80,6 @@ export function FrontendShell({
   if (isMapRoute) {
     return (
       <>
-        {skipLink}
         <div data-frontend-shell-main id="conteudo-principal">
           {children}
         </div>
@@ -99,7 +90,6 @@ export function FrontendShell({
 
   return (
     <>
-      {skipLink}
       <div data-frontend-shell-header>
         <Header />
       </div>

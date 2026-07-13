@@ -364,31 +364,6 @@
     outline-offset: 3px;
     box-shadow: var(--focus-ring-shadow);
   }
-
-  .skip-link,
-  [data-skip-link] {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 100;
-    transform: translateY(calc(-100% - 1.5rem));
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-control);
-    background: var(--popover);
-    color: var(--popover-foreground);
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-    font-weight: 700;
-    box-shadow: var(--elevation-panel);
-    transition: transform 160ms ease;
-  }
-
-  .skip-link:focus-visible,
-  [data-skip-link]:focus-visible {
-    transform: translateY(0);
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 3px;
-  }
 }
 
 @layer components {
