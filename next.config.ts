@@ -37,6 +37,18 @@ const payloadDevRemotePatterns =
           protocol: "http",
           hostname: "localhost",
           port: "3000",
+          pathname: "/api/media/file/**",
+        },
+        {
+          protocol: "http",
+          hostname: "127.0.0.1",
+          port: "3000",
+          pathname: "/api/media/file/**",
+        },
+        {
+          protocol: "http",
+          hostname: "localhost",
+          port: "3000",
           pathname: "/api/galeria/file/**",
         },
         {
@@ -47,7 +59,8 @@ const payloadDevRemotePatterns =
         },
       ] as const)
     : [];
-const cmsStoragePrefix = "galeria";
+const mediaStoragePrefix = "galeria";
+const galleryStoragePrefix = "galeria-publica";
 const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
@@ -112,8 +125,20 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     localPatterns: [
       {
+        pathname: "/api/media/file/**",
+        search: "",
+      },
+      {
+        pathname: "/api/media/file/**",
+        search: `?prefix=${mediaStoragePrefix}`,
+      },
+      {
         pathname: "/api/galeria/file/**",
-        search: `?prefix=${cmsStoragePrefix}`,
+        search: "",
+      },
+      {
+        pathname: "/api/galeria/file/**",
+        search: `?prefix=${galleryStoragePrefix}`,
       },
     ],
     remotePatterns: [

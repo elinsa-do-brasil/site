@@ -25,6 +25,7 @@ export const footerLinkGroups: FooterLinkGroup[] = [
       { href: "/", label: "Início" },
       { href: "/quem-somos", label: "Quem somos" },
       { href: "/imprensa", label: "Imprensa" },
+      { href: "/galeria", label: "Galeria" },
       { href: "/marca", label: "Kit de marca" },
     ],
   },

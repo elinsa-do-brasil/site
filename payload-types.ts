@@ -71,6 +71,7 @@ export interface Config {
     imprensa: Imprensa;
     blog: Blog;
     vagas: Vagas;
+    media: Media;
     galeria: Galeria;
     redirects: Redirect;
     'cms-search': CmsSearch;
@@ -86,7 +87,7 @@ export interface Config {
   };
   collectionsJoins: {
     'payload-folders': {
-      documentsAndFolders: 'payload-folders' | 'imprensa' | 'blog' | 'vagas' | 'galeria';
+      documentsAndFolders: 'payload-folders' | 'imprensa' | 'blog' | 'vagas' | 'media' | 'galeria';
     };
   };
   collectionsSelect: {
@@ -94,6 +95,7 @@ export interface Config {
     imprensa: ImprensaSelect<false> | ImprensaSelect<true>;
     blog: BlogSelect<false> | BlogSelect<true>;
     vagas: VagasSelect<false> | VagasSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     galeria: GaleriaSelect<false> | GaleriaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'cms-search': CmsSearchSelect<false> | CmsSearchSelect<true>;
@@ -209,12 +211,12 @@ export interface Imprensa {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (number | null) | Galeria;
+    image?: (number | null) | Media;
   };
   publishedAt: string;
   subject: 'institucional' | 'operacao' | 'seguranca' | 'pessoas' | 'recrutamento' | 'eventos' | 'comunicados';
   author: number | User;
-  coverImage?: (number | null) | Galeria;
+  coverImage?: (number | null) | Media;
   /**
    * Gerado automaticamente a partir do título se deixado em branco.
    */
@@ -235,9 +237,9 @@ export interface Imprensa {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "galeria".
+ * via the `definition` "media".
  */
-export interface Galeria {
+export interface Media {
   id: number;
   /**
    * Para imagens, descreva o conteúdo. Para vídeos, use um título curto.
@@ -326,6 +328,10 @@ export interface FolderInterface {
           value: number | Vagas;
         }
       | {
+          relationTo?: 'media';
+          value: number | Media;
+        }
+      | {
           relationTo?: 'galeria';
           value: number | Galeria;
         }
@@ -333,7 +339,7 @@ export interface FolderInterface {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  folderType?: ('imprensa' | 'blog' | 'vagas' | 'galeria')[] | null;
+  folderType?: ('imprensa' | 'blog' | 'vagas' | 'media' | 'galeria')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -369,12 +375,12 @@ export interface Blog {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (number | null) | Galeria;
+    image?: (number | null) | Media;
   };
   publishedAt: string;
   subject: 'institucional' | 'operacao' | 'seguranca' | 'pessoas' | 'recrutamento' | 'eventos' | 'comunicados';
   author: number | User;
-  coverImage?: (number | null) | Galeria;
+  coverImage?: (number | null) | Media;
   /**
    * Gerado automaticamente a partir do título se deixado em branco.
    */
@@ -425,7 +431,7 @@ export interface Vagas {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (number | null) | Galeria;
+    image?: (number | null) | Media;
   };
   /**
    * A página /vagas exibe apenas vagas abertas.
@@ -502,6 +508,43 @@ export interface Vagas {
   createdAt: string;
   deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galeria".
+ */
+export interface Galeria {
+  id: number;
+  /**
+   * Texto curto que substitui a imagem para quem não consegue vê-la. Descreva o conteúdo sem começar com “imagem de”.
+   */
+  alt: string;
+  /**
+   * Conte em uma ou duas frases o que acontece, quem aparece e o contexto da cena. Este texto será exibido abaixo da foto.
+   */
+  description: string;
+  prefix?: string | null;
+  createdBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  lastModifiedBy?: {
+    relationTo: 'users';
+    value: number | User;
+  } | null;
+  blurhash?: string | null;
+  blurDataUrl?: string | null;
+  folder?: (number | null) | FolderInterface;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -791,6 +834,10 @@ export interface PayloadLockedDocument {
         value: number | Vagas;
       } | null)
     | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
         relationTo: 'galeria';
         value: number | Galeria;
       } | null)
@@ -961,9 +1008,9 @@ export interface VagasSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "galeria_select".
+ * via the `definition` "media_select".
  */
-export interface GaleriaSelect<T extends boolean = true> {
+export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   captionsUrl?: T;
@@ -1019,6 +1066,30 @@ export interface GaleriaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galeria_select".
+ */
+export interface GaleriaSelect<T extends boolean = true> {
+  alt?: T;
+  description?: T;
+  prefix?: T;
+  createdBy?: T;
+  lastModifiedBy?: T;
+  blurhash?: T;
+  blurDataUrl?: T;
+  folder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  deletedAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1228,6 +1299,7 @@ export interface TaskCreateCollectionExport {
       | 'imprensa'
       | 'blog'
       | 'vagas'
+      | 'media'
       | 'galeria'
       | 'redirects'
       | 'cms-search'

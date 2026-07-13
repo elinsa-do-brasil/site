@@ -141,7 +141,7 @@ const createEditorialCollection = ({
     {
       name: "coverImage",
       type: "upload",
-      relationTo: "galeria",
+      relationTo: "media",
       label: "Imagem de capa",
       filterOptions: {
         mimeType: {

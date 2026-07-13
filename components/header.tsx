@@ -3,6 +3,7 @@ import {
   Alert01Icon,
   Building01Icon,
   GoogleDocIcon,
+  Image01Icon,
   InstagramIcon,
   LayoutGridIcon,
   LegalDocument01Icon,
@@ -104,6 +105,12 @@ export function Header() {
                           icon={Megaphone01Icon}
                           title="Imprensa"
                           description="Comunicados sobre a empresa"
+                        />
+                        <DropdownItem
+                          href="/galeria"
+                          icon={Image01Icon}
+                          title="Galeria"
+                          description="Fotos da operação em campo"
                         />
                         <DropdownItem
                           href="/marca"
@@ -269,6 +276,12 @@ function MobileMenu() {
               icon={Megaphone01Icon}
               title="Imprensa"
               description="Comunicados sobre a empresa"
+            />
+            <MobileNavLink
+              href="/galeria"
+              icon={Image01Icon}
+              title="Galeria"
+              description="Fotos da operação em campo"
             />
             <MobileNavLink
               href="/vagas"

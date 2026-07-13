@@ -24,6 +24,7 @@ import sharp from "sharp";
 
 import { Blog, Imprensa } from "./collections/Editorial.ts";
 import { Galeria } from "./collections/Galeria.ts";
+import { Media } from "./collections/Media.ts";
 import { Users } from "./collections/Users.ts";
 import { Vagas } from "./collections/Vagas.ts";
 import {
@@ -45,7 +46,9 @@ if (!process.env.API_KEY_PEXELS && process.env.PEXELS_API_KEY) {
 const cmsStorageConnectionString = process.env.CMS_STORAGE_CONNECTION_STRING;
 const cmsStorageContainerName =
   process.env.CMS_STORAGE_CONTAINER || "cms-media";
-const cmsStoragePrefix = "galeria";
+// A biblioteca de mídia mantém o prefixo legado para não mover blobs existentes.
+const mediaStoragePrefix = "galeria";
+const galleryStoragePrefix = "galeria-publica";
 const cmsStorageBaseURL = getAzureStorageAccountBaseURL({
   connectionString: cmsStorageConnectionString,
 });
@@ -57,6 +60,7 @@ const siteURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
 const usersCollectionSlug = Users.slug as CollectionSlug;
 const galleryCollectionSlug = Galeria.slug as CollectionSlug;
+const mediaCollectionSlug = Media.slug as CollectionSlug;
 const imageSearchConfigured = Boolean(
   process.env.API_KEY_UNSPLASH ||
     process.env.API_KEY_PEXELS ||
@@ -147,15 +151,19 @@ export default buildConfig({
     apiKey: process.env.RESEND_API_KEY || "",
   }),
 
-  collections: [Users, Imprensa, Blog, Vagas, Galeria],
+  collections: [Users, Imprensa, Blog, Vagas, Media, Galeria],
 
   plugins: [
     azureStorage({
       enabled: isCmsStorageConfigured,
       collections: {
+        media: {
+          generateFileURL: generatePayloadFileURL,
+          prefix: mediaStoragePrefix,
+        },
         galeria: {
           generateFileURL: generatePayloadFileURL,
-          prefix: cmsStoragePrefix,
+          prefix: galleryStoragePrefix,
         },
       },
       allowContainerCreate: allowCmsContainerCreate,
@@ -170,12 +178,12 @@ export default buildConfig({
       showInSidebar: true,
     }),
     computeBlurhash({
-      collections: [Galeria.slug],
+      collections: [Media.slug, Galeria.slug],
       mimeTypePattern: "image/*",
     }),
     blurDataUrlsPlugin({
       enabled: true,
-      collections: [{ slug: Galeria.slug }],
+      collections: [{ slug: Media.slug }, { slug: Galeria.slug }],
       blurOptions: {
         width: 32,
         height: "auto",
@@ -184,6 +192,15 @@ export default buildConfig({
     }),
     mediaPreview({
       collections: {
+        media: {
+          contentMode: {
+            audio: "inline",
+            document: "newTab",
+            image: "inline",
+            video: "inline",
+          },
+          mode: "auto",
+        },
         galeria: {
           contentMode: {
             audio: "inline",
@@ -202,7 +219,7 @@ export default buildConfig({
     }),
     seoPlugin({
       collections: [...publicContentCollections],
-      uploadsCollection: Galeria.slug,
+      uploadsCollection: Media.slug,
       tabbedUI: true,
       generateTitle: ({ doc }) =>
         typeof doc?.title === "string" ? doc.title : "Elinsa do Brasil",
@@ -244,6 +261,7 @@ export default buildConfig({
         blog: {},
         galeria: {},
         imprensa: {},
+        media: {},
         vagas: {},
       },
       enableDraftAutosaveLogging: false,
@@ -269,6 +287,11 @@ export default buildConfig({
         },
         {
           slug: galleryCollectionSlug,
+          import: true,
+          export: true,
+        },
+        {
+          slug: mediaCollectionSlug,
           import: true,
           export: true,
         },

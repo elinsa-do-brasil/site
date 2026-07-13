@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import GalleryImage from "@/public/images/eletricista.webp";
 
-/** Highlights field imagery and sends visitors to published company updates. */
+/** Highlights field imagery and sends visitors to the public photo gallery. */
 export function GalleryCard() {
   return (
     <Link
-      href="/imprensa"
+      href="/galeria"
       className="group relative min-h-88 overflow-hidden rounded-2xl border border-white/10 bg-elinsa-dark text-white shadow-xl shadow-elinsa-dark/12 lg:min-h-0"
     >
       <Image
@@ -16,7 +16,6 @@ export function GalleryCard() {
         fill
         className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
         sizes="(min-width: 1024px) 31vw, 100vw"
-        priority={false}
       />
 
       {/* gradiente base: preserva imagem, mas garante leitura no fundo */}
@@ -42,7 +41,7 @@ export function GalleryCard() {
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-white">
-            Ver imprensa
+            Ver galeria
             <ArrowUpRight
               aria-hidden="true"
               className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

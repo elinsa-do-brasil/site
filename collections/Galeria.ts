@@ -2,61 +2,25 @@ import type { CollectionConfig } from "payload";
 
 export const Galeria: CollectionConfig = {
   slug: "galeria",
-  dbName: "media",
   labels: {
-    singular: "Mídia da galeria",
-    plural: "Galeria",
+    singular: "Foto da galeria",
+    plural: "Galeria pública",
   },
   admin: {
     group: "Conteúdo",
     useAsTitle: "alt",
-    defaultColumns: ["alt", "filename", "mimeType", "updatedAt"],
+    defaultColumns: ["alt", "description", "filename", "updatedAt"],
   },
   access: {
     read: () => true,
   },
   upload: {
-    staticDir: "galeria",
-    imageSizes: [
-      {
-        name: "thumbnail",
-        width: 400,
-        height: undefined,
-        position: "centre",
-      },
-      {
-        name: "card",
-        width: 768,
-        height: undefined,
-        position: "centre",
-      },
-      {
-        name: "hero",
-        width: 1440,
-        height: undefined,
-        position: "centre",
-      },
-    ],
-    adminThumbnail: "thumbnail",
-    // Os plugins de blur ignoram MIME não-imagem, então vídeos podem viver na mesma coleção.
-    mimeTypes: [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "video/mp4",
-      "video/quicktime",
-      "video/webm",
-      "video/ogg",
-    ],
-    formatOptions: {
-      format: "webp",
-      options: {
-        quality: 100,
-        effort: 4,
-      },
-    },
-    crop: true,
-    focalPoint: true,
+    staticDir: "galeria-publica",
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/avif"],
+    // Não gere derivados nem reprocesse o arquivo enviado: imagens ficam
+    // armazenadas somente em seu tamanho e formato originais.
+    crop: false,
+    focalPoint: false,
   },
   folders: true,
   trash: true,
@@ -64,25 +28,27 @@ export const Galeria: CollectionConfig = {
     {
       name: "alt",
       type: "text",
-      label: "Texto alternativo ou título",
+      label: "Texto alternativo",
       required: true,
+      validate: (value: unknown) =>
+        (typeof value === "string" && value.trim().length > 0) ||
+        "Informe um texto alternativo que descreva a foto.",
       admin: {
         description:
-          "Para imagens, descreva o conteúdo. Para vídeos, use um título curto.",
+          "Texto curto que substitui a imagem para quem não consegue vê-la. Descreva o conteúdo sem começar com “imagem de”.",
       },
     },
     {
-      name: "caption",
-      type: "text",
-      label: "Legenda",
-    },
-    {
-      name: "captionsUrl",
-      type: "text",
-      label: "URL da legenda VTT",
+      name: "description",
+      type: "textarea",
+      label: "Descrição do que acontece",
+      required: true,
+      validate: (value: unknown) =>
+        (typeof value === "string" && value.trim().length > 0) ||
+        "Descreva o que acontece na foto.",
       admin: {
         description:
-          "Opcional para vídeos. Use um arquivo .vtt público para habilitar legendas no player.",
+          "Conte em uma ou duas frases o que acontece, quem aparece e o contexto da cena. Este texto será exibido abaixo da foto.",
       },
     },
   ],

@@ -12,10 +12,10 @@ export const createContentEditor = () =>
     features: ({ defaultFeatures }) => [
       ...defaultFeatures.filter((feature) => feature.key !== "relationship"),
       FixedToolbarFeature(),
-      // O UploadFeature continua apontando para a galeria; o renderer separa imagem e vídeo.
+      // A biblioteca compartilhada aceita imagens e vídeos; o renderer separa os formatos.
       UploadFeature({
         collections: {
-          galeria: {
+          media: {
             fields: [
               {
                 name: "size",
