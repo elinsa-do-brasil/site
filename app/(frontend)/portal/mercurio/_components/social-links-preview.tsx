@@ -4,7 +4,7 @@ export function SocialLinksPreview() {
       <strong>Elinsa do Brasil:</strong>{" "}
       <a href="https://www.instagram.com/elinsadobrasil/">Instagram</a> •{" "}
       <a href="https://www.linkedin.com/in/elinsadobrasil/">LinkedIn</a> •{" "}
-      <a href="https://elinsadobrasil.com/">Site</a>
+      <a href="https://elinsadobrasil.com.br/">Site</a>
       <br />
       <strong>Grupo Amper:</strong>{" "}
       <a href="https://www.linkedin.com/company/amper-sa/">LinkedIn</a> •{" "}
