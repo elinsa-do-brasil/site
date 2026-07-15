@@ -4,10 +4,9 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Cancel01Icon,
-  Download02Icon,
-  Maximize01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Download, MousePointerClick } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { getDocsUrl } from "@/lib/docs-url";
 import type { GalleryPage, GalleryPhoto } from "@/lib/gallery";
 
 const GALLERY_GRID_SIZES =
@@ -259,7 +259,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
     >
       <ol
         aria-label="Fotos da galeria"
-        className="columns-1 gap-3 sm:columns-2 lg:columns-3 lg:gap-4"
+        className="columns-1 gap-3 sm:columns-2 lg:columns-3 lg:gap-4 max-w-6xl mx-auto px-4"
       >
         {photos.map((photo, index) => (
           <li className="mb-3 break-inside-avoid lg:mb-4" key={photo.id}>
@@ -293,10 +293,10 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
               />
               <Badge
                 aria-hidden="true"
-                className="pointer-events-none absolute right-3 bottom-3 translate-y-1 border-white/20 bg-black/55 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-md transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-reduce:transition-none"
+                className="pointer-events-none absolute right-3 bottom-3 translate-y-1 border-white/20 bg-black/55 p-4 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-md transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-reduce:transition-none"
                 variant="outline"
               >
-                <HugeiconsIcon icon={Maximize01Icon} strokeWidth={2} />
+                <MousePointerClick size={24} />
                 Abrir
               </Badge>
             </button>
@@ -369,7 +369,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
 
               <Badge
                 aria-hidden="true"
-                className="absolute top-3 left-3 z-20 h-auto border-white/15 bg-black/55 px-3 py-2 text-xs font-semibold text-white backdrop-blur-md sm:top-4 sm:left-4"
+                className="absolute top-3 left-3 z-20 h-8 border-white/15 bg-black/55 px-3 py-2 text-xs font-semibold text-white backdrop-blur-md sm:top-4 sm:left-4"
                 variant="outline"
               >
                 {selectedIndex + 1} de {totalPhotoCount}
@@ -379,20 +379,15 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
                 <Button
                   asChild
                   className="rounded-full shadow-lg"
-                  size="xl"
-                  variant="secondary"
+                  size="icon-sm"
+                  variant="outline"
                 >
                   <a
                     aria-label={`Baixar foto ${selectedIndex + 1} de ${totalPhotoCount} no tamanho original`}
                     download
                     href={selectedPhoto.url}
                   >
-                    <HugeiconsIcon
-                      data-icon="inline-start"
-                      icon={Download02Icon}
-                      strokeWidth={2}
-                    />
-                    Baixar
+                    <Download />
                   </a>
                 </Button>
 
@@ -400,7 +395,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
                   <Button
                     aria-label="Fechar visualização"
                     className="rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50"
-                    size="icon-lg"
+                    size="icon-sm"
                     type="button"
                     variant="ghost"
                   >
@@ -417,7 +412,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
                     className="absolute top-1/2 left-3 z-20 -translate-y-1/2 rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50 sm:left-4"
                     disabled={!canShowPrevious}
                     onClick={showPreviousPhoto}
-                    size="icon-lg"
+                    size="icon-sm"
                     type="button"
                     variant="ghost"
                   >
@@ -448,8 +443,8 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
               data-slot="gallery-description-panel"
             >
               <div className="p-5 sm:p-7 lg:p-8">
-                <DialogTitle className="mt-2 text-xl font-bold text-elinsa-dark sm:text-2xl dark:text-elinsa-sky">
-                  Nesta foto
+                <DialogTitle className="mt-2 text-lg font-bold text-elinsa-dark dark:text-elinsa-sky">
+                  Na imagem
                   <span className="sr-only">: {selectedPhoto.alt}</span>
                 </DialogTitle>
                 <DialogDescription className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
@@ -462,12 +457,16 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
                 </p>
               </div>
 
-              {totalPhotoCount > 1 ? (
-                <p className="mt-auto hidden border-t border-border px-8 py-5 text-xs leading-5 text-muted-foreground lg:block">
-                  Use as setas esquerda e direita do teclado para navegar entre
-                  as fotos.
-                </p>
-              ) : null}
+              <p className="mt-auto hidden border-t border-border px-8 py-5 text-xs leading-5 text-muted-foreground lg:block">
+                Pretende usar esta imagem? Por favor, confira a nossa{" "}
+                <a
+                  className="font-semibold text-elinsa-dark underline decoration-elinsa-dark/30 underline-offset-4 transition-colors hover:text-elinsa-sky hover:decoration-elinsa-sky/50 dark:text-elinsa-sky dark:decoration-elinsa-sky/30 dark:hover:text-white/80 dark:hover:decoration-text-white/80"
+                  href={getDocsUrl("/pt/licencas/licenca-de-uso-imagens")}
+                >
+                  licença de uso de imagens
+                </a>{" "}
+                para mais informações.
+              </p>
             </figcaption>
           </figure>
         </DialogContent>
