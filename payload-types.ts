@@ -520,7 +520,7 @@ export interface Galeria {
    */
   alt: string;
   /**
-   * Conte em uma ou duas frases o que acontece, quem aparece e o contexto da cena. Este texto será exibido abaixo da foto.
+   * Conte em uma ou duas frases o que acontece, quem aparece e o contexto da cena. Este texto será exibido ao abrir a foto na galeria.
    */
   description: string;
   prefix?: string | null;

@@ -48,7 +48,7 @@ export const Galeria: CollectionConfig = {
         "Descreva o que acontece na foto.",
       admin: {
         description:
-          "Conte em uma ou duas frases o que acontece, quem aparece e o contexto da cena. Este texto será exibido abaixo da foto.",
+          "Conte em uma ou duas frases o que acontece, quem aparece e o contexto da cena. Este texto será exibido ao abrir a foto na galeria.",
       },
     },
   ],
