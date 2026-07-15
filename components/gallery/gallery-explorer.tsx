@@ -134,15 +134,21 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
 
       {selectedPhoto && selectedIndex !== null ? (
         <DialogContent
-          className="z-[120] h-[calc(100dvh-1rem)] max-h-[64rem] w-[calc(100%-1rem)] max-w-[96rem] gap-0 overflow-hidden rounded-xl border-white/10 bg-neutral-950 p-0 text-white shadow-2xl sm:h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:rounded-2xl"
+          className="z-[120] isolate h-[calc(100dvh-1rem)] max-h-[64rem] w-[calc(100%-1rem)] max-w-[96rem] gap-0 overflow-hidden rounded-xl border-border-strong bg-[#080a0c] p-0 text-white shadow-2xl sm:h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:rounded-2xl dark:bg-surface-panel"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
           }}
           overlayClassName="z-[110] bg-black/90 backdrop-blur-md"
           showCloseButton={false}
         >
-          <figure className="grid h-full min-h-0 grid-rows-[minmax(10rem,1fr)_minmax(10rem,42dvh)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-1">
-            <div className="relative min-h-0 overflow-hidden bg-[#080a0c] ring-1 ring-inset ring-border-strong dark:bg-surface-panel">
+          <figure
+            className="grid h-full min-h-0 grid-rows-[minmax(10rem,1fr)_minmax(10rem,42dvh)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-1"
+            data-slot="gallery-viewer"
+          >
+            <div
+              className="relative min-h-0 overflow-hidden bg-[#080a0c] dark:bg-surface-panel"
+              data-slot="gallery-photo-stage"
+            >
               <Image
                 alt={selectedPhoto.alt}
                 blurDataURL={selectedPhoto.blurDataUrl}
@@ -153,11 +159,6 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
                 placeholder={selectedPhoto.blurDataUrl ? "blur" : "empty"}
                 sizes="(min-width: 1024px) calc(100vw - 24rem), 100vw"
                 src={selectedPhoto.url}
-              />
-
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-linear-to-b from-black/70 to-transparent"
               />
 
               <p
@@ -219,7 +220,10 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
               ) : null}
             </div>
 
-            <figcaption className="flex min-h-0 flex-col overflow-y-auto bg-[#dce6ea] text-foreground ring-1 ring-inset ring-border-strong dark:bg-surface-panel">
+            <figcaption
+              className="flex min-h-0 flex-col overflow-y-auto border-border-strong border-t bg-[#dce6ea] text-foreground lg:border-t-0 lg:border-l dark:bg-surface-panel"
+              data-slot="gallery-description-panel"
+            >
               <div className="p-5 sm:p-7 lg:p-8">
                 <DialogTitle className="mt-2 text-xl font-bold text-elinsa-dark sm:text-2xl dark:text-elinsa-sky">
                   Nesta foto
