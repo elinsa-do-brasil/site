@@ -43,22 +43,14 @@ export default async function GaleriaPage() {
         <div className="mx-auto w-full max-w-6xl px-4">
           <PageHeader
             description={GALLERY_DESCRIPTION}
-            eyebrow="Operação em campo"
-            meta={
-              initialPage.totalDocs > 0 ? (
-                <Badge variant="outline">
-                  {initialPage.totalDocs}{" "}
-                  {initialPage.totalDocs === 1 ? "registro" : "registros"}
-                </Badge>
-              ) : undefined
-            }
+            eyebrow="Elinsa em ação"
             title="Galeria de fotos"
           />
         </div>
 
         <section
           aria-label="Fotos da galeria"
-          className="mx-auto w-full max-w-[96rem] px-3 pb-12 sm:px-4 lg:px-6"
+          className="mx-auto w-full max-w-384 px-3 pb-12 sm:px-4 lg:px-6"
         >
           {initialPage.photos.length > 0 ? (
             <GalleryExplorer initialPage={initialPage} />
