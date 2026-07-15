@@ -142,7 +142,7 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
           showCloseButton={false}
         >
           <figure className="grid h-full min-h-0 grid-rows-[minmax(10rem,1fr)_minmax(10rem,42dvh)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-1">
-            <div className="relative min-h-0 overflow-hidden bg-[#080a0c] ring-1 ring-inset ring-white/10 dark:bg-surface-panel dark:ring-white/15">
+            <div className="relative min-h-0 overflow-hidden bg-[#080a0c] ring-1 ring-inset ring-border-strong dark:bg-surface-panel">
               <Image
                 alt={selectedPhoto.alt}
                 blurDataURL={selectedPhoto.blurDataUrl}
@@ -219,7 +219,7 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
               ) : null}
             </div>
 
-            <figcaption className="flex min-h-0 flex-col overflow-y-auto bg-background text-foreground">
+            <figcaption className="flex min-h-0 flex-col overflow-y-auto bg-[#dce6ea] text-foreground ring-1 ring-inset ring-border-strong dark:bg-surface-panel">
               <div className="p-5 sm:p-7 lg:p-8">
                 <DialogTitle className="mt-2 text-xl font-bold text-elinsa-dark sm:text-2xl dark:text-elinsa-sky">
                   Nesta foto
