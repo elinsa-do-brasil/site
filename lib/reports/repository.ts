@@ -76,6 +76,8 @@ export async function createReport(input: CreateReportInput) {
             reportKeyAuthTag: encrypted.encryptedReportKey.authTag,
           })
           .returning({
+            category: reports.category,
+            createdAt: reports.createdAt,
             id: reports.id,
             protocol: reports.protocol,
           });

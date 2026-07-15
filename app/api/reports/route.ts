@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createReportUploadToken } from "@/lib/reports/attachment-token";
+import { maybeSendReportNotificationEmail } from "@/lib/reports/email";
 import { createReport } from "@/lib/reports/repository";
 import { createReportSchema } from "@/lib/reports/validation";
 
@@ -48,6 +49,14 @@ export async function POST(request: NextRequest) {
     }
 
     const report = await createReport(parsed.data);
+    const notification = await maybeSendReportNotificationEmail(report);
+
+    if (!notification.sent && !notification.skipped) {
+      console.error(
+        "Nao foi possivel enviar o aviso de nova denuncia.",
+        notification.error,
+      );
+    }
 
     return jsonResponse(201, {
       ok: true,
