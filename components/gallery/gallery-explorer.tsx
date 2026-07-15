@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Expand, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -142,7 +142,7 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
           showCloseButton={false}
         >
           <figure className="grid h-full min-h-0 grid-rows-[minmax(10rem,1fr)_minmax(10rem,42dvh)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-1">
-            <div className="relative min-h-0 overflow-hidden bg-[#080a0c]">
+            <div className="relative min-h-0 overflow-hidden bg-[#080a0c] ring-1 ring-inset ring-white/10 dark:bg-surface-panel dark:ring-white/15">
               <Image
                 alt={selectedPhoto.alt}
                 blurDataURL={selectedPhoto.blurDataUrl}
@@ -167,17 +167,29 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
                 {selectedIndex + 1} de {photos.length}
               </p>
 
-              <DialogClose asChild>
-                <Button
-                  aria-label="Fechar visualização"
-                  className="absolute top-3 right-3 z-20 size-11 rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50 sm:top-4 sm:right-4"
-                  size="icon-lg"
-                  type="button"
-                  variant="ghost"
+              <div className="absolute top-3 right-3 z-20 flex items-center gap-2 sm:top-4 sm:right-4">
+                <a
+                  aria-label={`Baixar foto ${selectedIndex + 1} de ${photos.length} no tamanho original`}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/95 px-4 text-sm font-semibold text-elinsa-dark shadow-lg outline-none backdrop-blur-md transition-colors hover:bg-elinsa-light hover:text-elinsa-dark focus-visible:border-white focus-visible:ring-2 focus-visible:ring-white/60"
+                  download
+                  href={selectedPhoto.url}
                 >
-                  <X aria-hidden="true" className="size-5" />
-                </Button>
-              </DialogClose>
+                  <Download aria-hidden="true" className="size-4" />
+                  Baixar
+                </a>
+
+                <DialogClose asChild>
+                  <Button
+                    aria-label="Fechar visualização"
+                    className="size-11 rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50"
+                    size="icon-lg"
+                    type="button"
+                    variant="ghost"
+                  >
+                    <X aria-hidden="true" className="size-5" />
+                  </Button>
+                </DialogClose>
+              </div>
 
               {photos.length > 1 ? (
                 <>
