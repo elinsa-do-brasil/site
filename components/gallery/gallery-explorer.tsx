@@ -209,11 +209,8 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
 
             <figcaption className="flex min-h-0 flex-col overflow-y-auto bg-background text-foreground">
               <div className="p-5 sm:p-7 lg:p-8">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-elinsa-primary">
-                  Registro {String(selectedIndex + 1).padStart(2, "0")}
-                </p>
                 <DialogTitle className="mt-2 text-xl font-bold text-elinsa-dark sm:text-2xl dark:text-elinsa-sky">
-                  Sobre esta foto
+                  Nesta foto
                   <span className="sr-only">: {selectedPhoto.alt}</span>
                 </DialogTitle>
                 <DialogDescription className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">
