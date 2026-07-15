@@ -13,14 +13,39 @@ export type GalleryPhoto = {
   width: number;
 };
 
-export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
+export type GalleryPage = {
+  hasNextPage: boolean;
+  nextPage: number | null;
+  page: number;
+  photos: GalleryPhoto[];
+  totalDocs: number;
+  totalPages: number;
+};
+
+export const GALLERY_PAGE_SIZE = 10;
+
+export async function getGalleryPage(page = 1): Promise<GalleryPage> {
   const payload = await getPayload({ config: configPromise });
-  const { docs } = await payload.find({
+  const result = await payload.find({
     collection: "galeria",
     depth: 0,
+    limit: GALLERY_PAGE_SIZE,
     overrideAccess: false,
-    pagination: false,
-    sort: "-createdAt",
+    page,
+    pagination: true,
+    // Payload derives upload URLs from these metadata fields after querying.
+    select: {
+      alt: true,
+      blurDataUrl: true,
+      description: true,
+      filename: true,
+      height: true,
+      mimeType: true,
+      prefix: true,
+      url: true,
+      width: true,
+    },
+    sort: ["-createdAt", "-id"],
     where: {
       mimeType: {
         contains: "image/",
@@ -28,9 +53,10 @@ export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
     },
   });
 
-  return docs.flatMap((doc) => {
+  const photos = result.docs.flatMap((doc) => {
     const alt = typeof doc.alt === "string" ? doc.alt.trim() : "";
-    const description = doc.description.trim();
+    const description =
+      typeof doc.description === "string" ? doc.description.trim() : "";
     const height = doc.height;
     const url = doc.url;
     const width = doc.width;
@@ -60,4 +86,13 @@ export async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
       },
     ];
   });
+
+  return {
+    hasNextPage: result.hasNextPage,
+    nextPage: result.nextPage ?? null,
+    page: result.page ?? page,
+    photos,
+    totalDocs: result.totalDocs,
+    totalPages: result.totalPages,
+  };
 }

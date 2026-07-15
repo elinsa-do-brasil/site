@@ -38,24 +38,28 @@ const payloadDevRemotePatterns =
           hostname: "localhost",
           port: "3000",
           pathname: "/api/media/file/**",
+          search: "",
         },
         {
           protocol: "http",
           hostname: "127.0.0.1",
           port: "3000",
           pathname: "/api/media/file/**",
+          search: "",
         },
         {
           protocol: "http",
           hostname: "localhost",
           port: "3000",
           pathname: "/api/galeria/file/**",
+          search: "",
         },
         {
           protocol: "http",
           hostname: "127.0.0.1",
           port: "3000",
           pathname: "/api/galeria/file/**",
+          search: "",
         },
       ] as const)
     : [];
@@ -123,6 +127,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    imageSizes: [32, 48, 64, 96, 128, 256, 384, 512],
     localPatterns: [
       {
         pathname: "/api/media/file/**",
@@ -150,6 +155,7 @@ const nextConfig: NextConfig = {
       ...cmsRemotePatterns,
       ...payloadDevRemotePatterns,
     ],
+    qualities: [75, 100],
   },
   reactCompiler: true,
   sassOptions: {

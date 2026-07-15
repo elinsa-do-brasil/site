@@ -1,8 +1,16 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Download, Expand, X } from "lucide-react";
+import {
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  Cancel01Icon,
+  Download02Icon,
+  Maximize01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,17 +19,155 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { GalleryPhoto } from "@/lib/gallery";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import type { GalleryPage, GalleryPhoto } from "@/lib/gallery";
+
+const GALLERY_GRID_SIZES =
+  "(min-width: 1536px) 486px, (min-width: 1024px) calc(33.333vw - 1.667rem), (min-width: 640px) calc(50vw - 1.375rem), calc(100vw - 1.5rem)";
+const GALLERY_LIGHTBOX_SIZES =
+  "(min-width: 1568px) 1152px, (min-width: 1024px) calc(100vw - 26rem), (min-width: 640px) calc(100vw - 2rem), calc(100vw - 1rem)";
 
 type GalleryExplorerProps = {
-  photos: GalleryPhoto[];
+  initialPage: GalleryPage;
 };
 
-export function GalleryExplorer({ photos }: GalleryExplorerProps) {
+type LoadState = "error" | "idle" | "loading";
+
+type PaginationState = Pick<
+  GalleryPage,
+  "hasNextPage" | "nextPage" | "totalDocs"
+>;
+
+export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
+  const [photos, setPhotos] = useState(initialPage.photos);
+  const [pagination, setPagination] = useState<PaginationState>({
+    hasNextPage: initialPage.hasNextPage,
+    nextPage: initialPage.nextPage,
+    totalDocs: initialPage.totalDocs,
+  });
+  const [loadState, setLoadState] = useState<LoadState>("idle");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const loadedIdsRef = useRef(
+    new Set(initialPage.photos.map((photo) => String(photo.id))),
+  );
+  const loadMorePromiseRef = useRef<Promise<GalleryPhoto[]> | null>(null);
+  const paginationRef = useRef<PaginationState>(pagination);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+
   const selectedPhoto =
     selectedIndex === null ? undefined : photos[selectedIndex];
+  const totalPhotoCount = Math.max(pagination.totalDocs, photos.length);
+
+  const loadMore = useCallback(() => {
+    if (loadMorePromiseRef.current) {
+      return loadMorePromiseRef.current;
+    }
+
+    const currentPagination = paginationRef.current;
+
+    if (!currentPagination.hasNextPage || currentPagination.nextPage === null) {
+      return Promise.resolve<GalleryPhoto[]>([]);
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    setLoadState("loading");
+
+    const request = fetch(`/api/gallery?page=${currentPagination.nextPage}`, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+      },
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Não foi possível carregar a próxima página.");
+        }
+
+        const data: unknown = await response.json();
+
+        if (!isGalleryPage(data)) {
+          throw new Error("A resposta da galeria é inválida.");
+        }
+
+        return data;
+      })
+      .then((page) => {
+        const newPhotos = page.photos.filter((photo) => {
+          const id = String(photo.id);
+
+          if (loadedIdsRef.current.has(id)) {
+            return false;
+          }
+
+          loadedIdsRef.current.add(id);
+          return true;
+        });
+        const nextPagination = {
+          hasNextPage: page.hasNextPage,
+          nextPage: page.nextPage,
+          totalDocs: page.totalDocs,
+        };
+
+        if (newPhotos.length > 0) {
+          setPhotos((currentPhotos) => [...currentPhotos, ...newPhotos]);
+        }
+
+        paginationRef.current = nextPagination;
+        setPagination(nextPagination);
+        setLoadState("idle");
+
+        return newPhotos;
+      })
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          setLoadState("error");
+        }
+
+        return [];
+      })
+      .finally(() => {
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+        }
+
+        loadMorePromiseRef.current = null;
+      });
+
+    loadMorePromiseRef.current = request;
+    return request;
+  }, []);
+
+  useEffect(() => {
+    return () => abortControllerRef.current?.abort();
+  }, []);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+
+    if (!sentinel || !pagination.hasNextPage || loadState !== "idle") {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          void loadMore();
+        }
+      },
+      {
+        rootMargin: "300px 0px",
+      },
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [loadMore, loadState, pagination.hasNextPage]);
 
   const closePhoto = useCallback(() => {
     setSelectedIndex(null);
@@ -33,26 +179,43 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
 
   const showPreviousPhoto = useCallback(() => {
     setSelectedIndex((currentIndex) => {
-      if (currentIndex === null || photos.length < 2) {
+      if (currentIndex === null || currentIndex <= 0) {
         return currentIndex;
       }
 
-      return (currentIndex - 1 + photos.length) % photos.length;
+      return currentIndex - 1;
     });
-  }, [photos.length]);
+  }, []);
 
   const showNextPhoto = useCallback(() => {
-    setSelectedIndex((currentIndex) => {
-      if (currentIndex === null || photos.length < 2) {
-        return currentIndex;
+    if (selectedIndex === null) {
+      return;
+    }
+
+    if (selectedIndex < photos.length - 1) {
+      setSelectedIndex(selectedIndex + 1);
+      return;
+    }
+
+    if (!pagination.hasNextPage) {
+      return;
+    }
+
+    const lastLoadedIndex = photos.length - 1;
+
+    void loadMore().then((newPhotos) => {
+      if (newPhotos.length === 0) {
+        return;
       }
 
-      return (currentIndex + 1) % photos.length;
+      setSelectedIndex((currentIndex) =>
+        currentIndex === lastLoadedIndex ? currentIndex + 1 : currentIndex,
+      );
     });
-  }, [photos.length]);
+  }, [loadMore, pagination.hasNextPage, photos.length, selectedIndex]);
 
   useEffect(() => {
-    if (selectedIndex === null || photos.length < 2) {
+    if (selectedIndex === null || totalPhotoCount < 2) {
       return;
     }
 
@@ -71,12 +234,19 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [photos.length, selectedIndex, showNextPhoto, showPreviousPhoto]);
+  }, [selectedIndex, showNextPhoto, showPreviousPhoto, totalPhotoCount]);
 
   const openPhoto = (index: number, trigger: HTMLButtonElement) => {
     triggerRef.current = trigger;
     setSelectedIndex(index);
   };
+
+  const canShowPrevious = selectedIndex !== null && selectedIndex > 0;
+  const canShowNext =
+    selectedIndex !== null &&
+    (selectedIndex < photos.length - 1 || pagination.hasNextPage);
+  const isLoadingNext =
+    loadState === "loading" && selectedIndex === photos.length - 1;
 
   return (
     <Dialog
@@ -95,7 +265,7 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
           <li className="mb-3 break-inside-avoid lg:mb-4" key={photo.id}>
             <button
               aria-haspopup="dialog"
-              aria-label={`Abrir foto ${index + 1} de ${photos.length}: ${photo.alt}`}
+              aria-label={`Abrir foto ${index + 1} de ${totalPhotoCount}: ${photo.alt}`}
               className="group relative block w-full overflow-hidden rounded-xl bg-muted text-left shadow-sm outline-none ring-offset-2 ring-offset-background transition-[transform,box-shadow] duration-300 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-elinsa-primary motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none"
               data-orientation={
                 photo.height > photo.width ? "vertical" : "horizontal"
@@ -107,11 +277,12 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
                 alt={photo.alt}
                 blurDataURL={photo.blurDataUrl}
                 className="h-auto w-full"
-                decoding="async"
+                fetchPriority={index === 0 ? "high" : undefined}
                 height={photo.height}
+                loading={index === 0 ? "eager" : "lazy"}
                 placeholder={photo.blurDataUrl ? "blur" : "empty"}
-                preload={index === 0}
-                sizes="(min-width: 1536px) 500px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                quality={100}
+                sizes={GALLERY_GRID_SIZES}
                 src={photo.url}
                 width={photo.width}
               />
@@ -120,17 +291,50 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/55 via-black/5 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
               />
-              <span
+              <Badge
                 aria-hidden="true"
-                className="pointer-events-none absolute right-3 bottom-3 flex translate-y-1 items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-md transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-reduce:transition-none"
+                className="pointer-events-none absolute right-3 bottom-3 translate-y-1 border-white/20 bg-black/55 px-3 py-1.5 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-md transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-reduce:transition-none"
+                variant="outline"
               >
-                <Expand className="size-3.5" />
+                <HugeiconsIcon icon={Maximize01Icon} strokeWidth={2} />
                 Abrir
-              </span>
+              </Badge>
             </button>
           </li>
         ))}
       </ol>
+
+      {pagination.hasNextPage ? (
+        <div aria-hidden="true" className="h-px" ref={sentinelRef} />
+      ) : null}
+
+      {loadState === "loading" ? (
+        <div className="mt-4" data-slot="gallery-loading-more">
+          <p aria-live="polite" className="sr-only">
+            Carregando mais fotos.
+          </p>
+          <GalleryLoadingSkeleton />
+        </div>
+      ) : null}
+
+      {loadState === "error" ? (
+        <div
+          className="mt-5 flex flex-col items-center gap-3 rounded-lg border border-dashed bg-muted/25 px-4 py-5 text-center sm:flex-row sm:justify-center sm:text-left"
+          role="alert"
+        >
+          <p className="text-sm text-muted-foreground">
+            Não foi possível carregar mais fotos.
+          </p>
+          <Button
+            onClick={() => void loadMore()}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      ) : null}
 
       {selectedPhoto && selectedIndex !== null ? (
         <DialogContent
@@ -153,68 +357,87 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
                 alt={selectedPhoto.alt}
                 blurDataURL={selectedPhoto.blurDataUrl}
                 className="object-contain"
+                fetchPriority="high"
                 fill
                 key={selectedPhoto.id}
                 loading="eager"
                 placeholder={selectedPhoto.blurDataUrl ? "blur" : "empty"}
-                sizes="(min-width: 1024px) calc(100vw - 24rem), 100vw"
+                quality={100}
+                sizes={GALLERY_LIGHTBOX_SIZES}
                 src={selectedPhoto.url}
               />
 
-              <p
+              <Badge
                 aria-hidden="true"
-                className="absolute top-3 left-3 z-20 rounded-full border border-white/15 bg-black/55 px-3 py-2 text-xs font-semibold text-white backdrop-blur-md sm:top-4 sm:left-4"
+                className="absolute top-3 left-3 z-20 h-auto border-white/15 bg-black/55 px-3 py-2 text-xs font-semibold text-white backdrop-blur-md sm:top-4 sm:left-4"
+                variant="outline"
               >
-                {selectedIndex + 1} de {photos.length}
-              </p>
+                {selectedIndex + 1} de {totalPhotoCount}
+              </Badge>
 
               <div className="absolute top-3 right-3 z-20 flex items-center gap-2 sm:top-4 sm:right-4">
-                <a
-                  aria-label={`Baixar foto ${selectedIndex + 1} de ${photos.length} no tamanho original`}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/95 px-4 text-sm font-semibold text-elinsa-dark shadow-lg outline-none backdrop-blur-md transition-colors hover:bg-elinsa-light hover:text-elinsa-dark focus-visible:border-white focus-visible:ring-2 focus-visible:ring-white/60"
-                  download
-                  href={selectedPhoto.url}
+                <Button
+                  asChild
+                  className="rounded-full shadow-lg"
+                  size="xl"
+                  variant="secondary"
                 >
-                  <Download aria-hidden="true" className="size-4" />
-                  Baixar
-                </a>
+                  <a
+                    aria-label={`Baixar foto ${selectedIndex + 1} de ${totalPhotoCount} no tamanho original`}
+                    download
+                    href={selectedPhoto.url}
+                  >
+                    <HugeiconsIcon
+                      data-icon="inline-start"
+                      icon={Download02Icon}
+                      strokeWidth={2}
+                    />
+                    Baixar
+                  </a>
+                </Button>
 
                 <DialogClose asChild>
                   <Button
                     aria-label="Fechar visualização"
-                    className="size-11 rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50"
+                    className="rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50"
                     size="icon-lg"
                     type="button"
                     variant="ghost"
                   >
-                    <X aria-hidden="true" className="size-5" />
+                    <HugeiconsIcon icon={Cancel01Icon} strokeWidth={2} />
                   </Button>
                 </DialogClose>
               </div>
 
-              {photos.length > 1 ? (
+              {totalPhotoCount > 1 ? (
                 <>
                   <Button
                     aria-keyshortcuts="ArrowLeft"
                     aria-label="Foto anterior"
-                    className="absolute top-1/2 left-3 z-20 size-11 -translate-y-1/2 rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50 sm:left-4"
+                    className="absolute top-1/2 left-3 z-20 -translate-y-1/2 rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50 sm:left-4"
+                    disabled={!canShowPrevious}
                     onClick={showPreviousPhoto}
                     size="icon-lg"
                     type="button"
                     variant="ghost"
                   >
-                    <ChevronLeft aria-hidden="true" className="size-6" />
+                    <HugeiconsIcon icon={ArrowLeft01Icon} strokeWidth={2} />
                   </Button>
                   <Button
                     aria-keyshortcuts="ArrowRight"
                     aria-label="Próxima foto"
-                    className="absolute top-1/2 right-3 z-20 size-11 -translate-y-1/2 rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50 sm:right-4"
+                    className="absolute top-1/2 right-3 z-20 -translate-y-1/2 rounded-full border border-white/15 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50 sm:right-4"
+                    disabled={!canShowNext || isLoadingNext}
                     onClick={showNextPhoto}
                     size="icon-lg"
                     type="button"
                     variant="ghost"
                   >
-                    <ChevronRight aria-hidden="true" className="size-6" />
+                    {isLoadingNext ? (
+                      <Spinner aria-hidden="true" />
+                    ) : (
+                      <HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} />
+                    )}
                   </Button>
                 </>
               ) : null}
@@ -234,12 +457,12 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
                 </DialogDescription>
 
                 <p aria-atomic="true" aria-live="polite" className="sr-only">
-                  Foto {selectedIndex + 1} de {photos.length}:{" "}
+                  Foto {selectedIndex + 1} de {totalPhotoCount}:{" "}
                   {selectedPhoto.alt}
                 </p>
               </div>
 
-              {photos.length > 1 ? (
+              {totalPhotoCount > 1 ? (
                 <p className="mt-auto hidden border-t border-border px-8 py-5 text-xs leading-5 text-muted-foreground lg:block">
                   Use as setas esquerda e direita do teclado para navegar entre
                   as fotos.
@@ -250,5 +473,35 @@ export function GalleryExplorer({ photos }: GalleryExplorerProps) {
         </DialogContent>
       ) : null}
     </Dialog>
+  );
+}
+
+function GalleryLoadingSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      className="columns-1 gap-3 sm:columns-2 lg:columns-3 lg:gap-4"
+    >
+      <Skeleton className="mb-3 aspect-[4/3] w-full rounded-xl lg:mb-4" />
+      <Skeleton className="mb-3 aspect-[3/4] w-full rounded-xl lg:mb-4" />
+      <Skeleton className="mb-3 aspect-[16/10] w-full rounded-xl lg:mb-4" />
+    </div>
+  );
+}
+
+function isGalleryPage(value: unknown): value is GalleryPage {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const page = value as Partial<GalleryPage>;
+
+  return (
+    Array.isArray(page.photos) &&
+    typeof page.hasNextPage === "boolean" &&
+    (page.nextPage === null || typeof page.nextPage === "number") &&
+    typeof page.page === "number" &&
+    typeof page.totalDocs === "number" &&
+    typeof page.totalPages === "number"
   );
 }
