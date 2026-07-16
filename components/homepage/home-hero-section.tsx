@@ -89,6 +89,13 @@ function HeroCopy() {
         >
           <Link href="/imprensa">Conheça nossa operação</Link>
         </Button>
+        <Button
+          size="xl"
+          className="w-full border border-border bg-white/85 text-foreground hover:bg-white sm:w-auto dark:bg-background/70 dark:hover:bg-background"
+          asChild
+        >
+          <Link href="/denunciar">Denunciar</Link>
+        </Button>
       </div>
     </div>
   );
