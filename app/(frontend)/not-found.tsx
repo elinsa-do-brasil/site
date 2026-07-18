@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { NotFoundView } from "@/components/not-found-view";
 
 export const metadata: Metadata = {
-  title: "404",
-  description: "A página que você está procurando não foi encontrada.",
+  title: "Página não encontrada",
+  description:
+    "O endereço acessado não foi encontrado. Volte à página inicial ou continue navegando pelo site da Elinsa.",
 };
 
 export default function NotFound() {
