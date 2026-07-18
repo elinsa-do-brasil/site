@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { AnonymousReportForm } from "@/components/reports/anonymous-report-form";
-import { ReportAnonymizationInfo } from "@/components/reports/report-anonymization-info";
-import { ReportPrivacyNotice } from "@/components/reports/report-privacy-notice";
-import { ReportWritingHelp } from "@/components/reports/report-writing-help";
+import { ReportIntroduction } from "@/components/reports/report-introduction";
 
 export const metadata: Metadata = {
   title: "Canal de denúncias",
   description:
-    "Canal de denúncias da Elinsa disponível para colaboradores e público externo.",
+    "Tire dúvidas sobre o Canal de Denúncias da Elinsa, saiba o que pode ser relatado e acesse o formulário com segurança.",
   robots: {
     index: false,
     follow: false,
@@ -15,44 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function DenunciarPage() {
-  return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-28 pb-16">
-      {/* ── Grid geral: conteúdo + sidebar ── */}
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
-        {/* ── Coluna esquerda ── */}
-        <div className="flex flex-col gap-8">
-          {/* Heading */}
-          <section className="flex flex-col gap-3">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Canal de denúncias
-            </h1>
-            <p className="text-base leading-relaxed text-muted-foreground">
-              Use este formulário para enviar uma denúncia ao Comitê de Ética.
-            </p>
-          </section>
-
-          {/* A ajuda aparece antes do campo de relato no mobile, quando é mais útil. */}
-          <div className="lg:hidden">
-            <ReportWritingHelp />
-          </div>
-
-          {/* Formulário */}
-          <AnonymousReportForm />
-
-          {/* Cards mobile (abaixo do form) */}
-          <div className="flex flex-col gap-5 lg:hidden">
-            <ReportPrivacyNotice />
-            <ReportAnonymizationInfo />
-          </div>
-        </div>
-
-        {/* ── Coluna direita — sidebar sticky ── */}
-        <aside className="hidden lg:flex lg:flex-col lg:gap-5 lg:sticky lg:top-28">
-          <ReportPrivacyNotice />
-          <ReportAnonymizationInfo />
-          <ReportWritingHelp />
-        </aside>
-      </div>
-    </div>
-  );
+  return <ReportIntroduction />;
 }
