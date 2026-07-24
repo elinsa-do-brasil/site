@@ -17,7 +17,6 @@ import { en } from "@payloadcms/translations/languages/en";
 import { es } from "@payloadcms/translations/languages/es";
 import { pt } from "@payloadcms/translations/languages/pt";
 import * as Sentry from "@sentry/nextjs";
-import { mediaPreview } from "@seshuk/payload-media-preview";
 import { buildConfig, type CollectionSlug } from "payload";
 import computeBlurhash from "payload-blurhash-plugin";
 import sharp from "sharp";
@@ -188,28 +187,6 @@ export default buildConfig({
         width: 32,
         height: "auto",
         blur: 18,
-      },
-    }),
-    mediaPreview({
-      collections: {
-        media: {
-          contentMode: {
-            audio: "inline",
-            document: "newTab",
-            image: "inline",
-            video: "inline",
-          },
-          mode: "auto",
-        },
-        galeria: {
-          contentMode: {
-            audio: "inline",
-            document: "newTab",
-            image: "inline",
-            video: "inline",
-          },
-          mode: "auto",
-        },
       },
     }),
     imageSearchPlugin({

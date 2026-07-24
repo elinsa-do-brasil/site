@@ -91,9 +91,6 @@ importers:
       '@sentry/nextjs':
         specifier: 10.63.0
         version: 10.63.0(@opentelemetry/core@2.7.1(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.2.11(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))(react@19.2.8)(webpack@5.107.2(esbuild@0.25.12))
-      '@seshuk/payload-media-preview':
-        specifier: 1.0.5
-        version: 1.0.5(@payloadcms/translations@3.85.2)(@payloadcms/ui@3.85.2(@types/react@19.2.17)(monaco-editor@0.55.1)(next@16.2.11(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))(payload@3.85.2(graphql@16.13.2)(typescript@6.0.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@6.0.3))(payload@3.85.2(graphql@16.13.2)(typescript@6.0.3))
       '@tabler/icons-react':
         specifier: ^3.45.0
         version: 3.45.0(react@19.2.8)
@@ -2950,15 +2947,6 @@ packages:
     engines: {node: '>= 18'}
     peerDependencies:
       webpack: '>=5.0.0'
-
-  '@seshuk/payload-media-preview@1.0.5':
-    resolution: {integrity: sha512-KhMvw7oDdNMHTwUqFJagLie7p8QtMoG3RgquyploPotmp0jGdTP5WDSwj/p/T7NDHUuhnRiLhHntiO0rV4fZoQ==}
-    engines: {node: ^18.20.2 || >=20.9.0}
-    deprecated: 'Renamed to @seshuk/payload-plugin-media-preview — please migrate: npm i @seshuk/payload-plugin-media-preview'
-    peerDependencies:
-      '@payloadcms/translations': ^3.53.0
-      '@payloadcms/ui': ^3.53.0
-      payload: ^3.53.0
 
   '@simplewebauthn/browser@13.3.0':
     resolution: {integrity: sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==}
@@ -9295,12 +9283,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
-
-  '@seshuk/payload-media-preview@1.0.5(@payloadcms/translations@3.85.2)(@payloadcms/ui@3.85.2(@types/react@19.2.17)(monaco-editor@0.55.1)(next@16.2.11(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))(payload@3.85.2(graphql@16.13.2)(typescript@6.0.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@6.0.3))(payload@3.85.2(graphql@16.13.2)(typescript@6.0.3))':
-    dependencies:
-      '@payloadcms/translations': 3.85.2
-      '@payloadcms/ui': 3.85.2(@types/react@19.2.17)(monaco-editor@0.55.1)(next@16.2.11(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(sass@1.77.4))(payload@3.85.2(graphql@16.13.2)(typescript@6.0.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@6.0.3)
-      payload: 3.85.2(graphql@16.13.2)(typescript@6.0.3)
 
   '@simplewebauthn/browser@13.3.0': {}
 
