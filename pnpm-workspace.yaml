@@ -13,8 +13,8 @@ peerDependencyRules:
 ignoredBuiltDependencies:
   - unrs-resolver
 patchedDependencies:
-  '@payload-bites/fullscreen-editor@1.7.2': patches/@payload-bites__fullscreen-editor@1.7.2.patch
-  '@payload-bites/image-search@3.4.2': patches/@payload-bites__image-search@3.4.2.patch
+  '@payload-bites/fullscreen-editor@1.8.0': patches/@payload-bites__fullscreen-editor@1.8.0.patch
+  '@payload-bites/image-search@3.5.0': patches/@payload-bites__image-search@3.5.0.patch
 minimumReleaseAgeExclude:
   - '@better-auth/passkey@1.6.25'
   - '@react-email/ui@6.9.1'
