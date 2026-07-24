@@ -2,7 +2,7 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   CheckListIcon,
-  Clock3Icon,
+  Clock03Icon,
   InboxIcon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
@@ -216,7 +216,7 @@ export default async function ComitePage({ searchParams }: ComitePageProps) {
                 statusFilter:
                   statusFilter === "in_progress" ? undefined : "in_progress",
               })}
-              icon={<HugeiconsIcon icon={Clock3Icon} strokeWidth={2} />}
+              icon={<HugeiconsIcon icon={Clock03Icon} strokeWidth={2} />}
               label="Em andamento"
               value={inProgressCount}
             />
