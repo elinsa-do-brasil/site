@@ -92,7 +92,6 @@ function getSiteOrigin() {
   const origin =
     process.env.NEXT_PUBLIC_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_SERVER_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
     "https://elinsa-nine.vercel.app";
 

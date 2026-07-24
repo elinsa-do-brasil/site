@@ -52,8 +52,7 @@ const createEditorialCollection = ({
     listSearchableFields: ["title", "summary"],
     livePreview: {
       url: ({ data }) => {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
         const path =
           slug === "blog"
             ? `/portal/blog/${data?.slug}`

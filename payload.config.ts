@@ -55,7 +55,7 @@ const isCmsStorageConfigured = Boolean(
   cmsStorageConnectionString && cmsStorageBaseURL && cmsStorageContainerName,
 );
 const allowCmsContainerCreate = shouldCreateAzureContainers();
-const siteURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+const siteURL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
 const usersCollectionSlug = Users.slug as CollectionSlug;
 const galleryCollectionSlug = Galeria.slug as CollectionSlug;

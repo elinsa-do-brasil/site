@@ -39,8 +39,7 @@ export const Vagas: CollectionConfig = {
     listSearchableFields: ["title", "summary", "sector"],
     livePreview: {
       url: ({ data }) => {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
         return `${baseUrl}/vagas/${data?.slug}`;
       },
     },
