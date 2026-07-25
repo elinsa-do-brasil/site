@@ -1,4 +1,11 @@
 import type { CollectionConfig } from "payload";
+import {
+  canWriteCollection,
+  deleteAccess,
+  publicAssetReadAccess,
+  writeAccess,
+} from "../lib/payload/rbac.ts";
+import { createTrashRestoreGuard } from "../lib/payload/rbac-hooks.ts";
 
 export const Galeria: CollectionConfig = {
   slug: "galeria",
@@ -10,9 +17,18 @@ export const Galeria: CollectionConfig = {
     group: "Conteúdo",
     useAsTitle: "alt",
     defaultColumns: ["alt", "description", "filename", "updatedAt"],
+    hidden: ({ user }) => !canWriteCollection(user, "galeria"),
   },
   access: {
-    read: () => true,
+    admin: ({ req }) => canWriteCollection(req.user, "galeria"),
+    create: writeAccess("galeria"),
+    delete: deleteAccess("galeria"),
+    read: publicAssetReadAccess("galeria"),
+    unlock: writeAccess("galeria"),
+    update: writeAccess("galeria"),
+  },
+  hooks: {
+    beforeValidate: [createTrashRestoreGuard("galeria")],
   },
   upload: {
     staticDir: "galeria-publica",

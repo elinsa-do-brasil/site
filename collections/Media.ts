@@ -1,4 +1,11 @@
 import type { CollectionConfig, PayloadRequest } from "payload";
+import {
+  canWriteCollection,
+  deleteAccess,
+  publicAssetReadAccess,
+  writeAccess,
+} from "../lib/payload/rbac.ts";
+import { createTrashRestoreGuard } from "../lib/payload/rbac-hooks.ts";
 
 type BeforeChangeHook = NonNullable<
   NonNullable<CollectionConfig["hooks"]>["beforeChange"]
@@ -38,12 +45,19 @@ export const Media: CollectionConfig = {
     group: "Conteúdo",
     useAsTitle: "alt",
     defaultColumns: ["alt", "filename", "mimeType", "updatedAt"],
+    hidden: ({ user }) => !canWriteCollection(user, "media"),
   },
   access: {
-    read: () => true,
+    admin: ({ req }) => canWriteCollection(req.user, "media"),
+    create: writeAccess("media"),
+    delete: deleteAccess("media"),
+    read: publicAssetReadAccess("media"),
+    unlock: writeAccess("media"),
+    update: writeAccess("media"),
   },
   hooks: {
     beforeChange: [preventUploadEditsReplay],
+    beforeValidate: [createTrashRestoreGuard("media")],
   },
   upload: {
     staticDir: "galeria",

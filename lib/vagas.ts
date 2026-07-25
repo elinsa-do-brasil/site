@@ -26,6 +26,7 @@ export async function getVagasAbertas(): Promise<Vaga[]> {
     depth: 0,
     draft: false,
     limit: 100,
+    overrideAccess: false,
     sort: "-publishedAt",
     where: {
       jobStatus: {
@@ -72,6 +73,7 @@ export async function getVagaBySlug({
     depth: 0,
     draft,
     limit: 1,
+    overrideAccess: false,
     where,
   });
 

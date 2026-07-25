@@ -160,6 +160,10 @@ export interface User {
    * Nome exibido publicamente nas notícias.
    */
   name?: string | null;
+  /**
+   * Define as áreas e operações disponíveis no painel administrativo.
+   */
+  role: 'admin' | 'publisher' | 'editor' | 'recruiter';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -905,6 +909,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
