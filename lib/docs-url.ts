@@ -15,11 +15,7 @@ function normalizeOrigin(value: string | undefined) {
 }
 
 function getConfiguredSiteOrigin() {
-  return (
-    normalizeOrigin(process.env.NEXT_PUBLIC_URL) ??
-    normalizeOrigin(process.env.NEXT_PUBLIC_SERVER_URL) ??
-    DEFAULT_SITE_ORIGIN
-  );
+  return normalizeOrigin(process.env.NEXT_PUBLIC_URL) ?? DEFAULT_SITE_ORIGIN;
 }
 
 export function getDocsOrigin(origin = getConfiguredSiteOrigin()) {

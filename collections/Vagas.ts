@@ -1,4 +1,16 @@
 import type { CollectionConfig, FieldHook } from "payload";
+import {
+  canWriteCollection,
+  deleteAccess,
+  draftWriterUpdateAccess,
+  publicPublishedReadAccess,
+  publisherOrAdmin,
+  writeAccess,
+} from "../lib/payload/rbac.ts";
+import {
+  createDraftOnlyWorkflowHook,
+  preventAuthorVersionRestore,
+} from "../lib/payload/rbac-hooks.ts";
 import { vagaCidadeOptions } from "../lib/vaga-options.ts";
 import { createContentEditor } from "./fields/contentEditor.ts";
 
@@ -35,18 +47,47 @@ export const Vagas: CollectionConfig = {
   admin: {
     useAsTitle: "title",
     group: "Conteúdo",
-    defaultColumns: ["title", "jobStatus", "sector", "city", "publishedAt"],
+    defaultColumns: [
+      "title",
+      "_status",
+      "jobStatus",
+      "sector",
+      "city",
+      "publishedAt",
+    ],
+    hidden: ({ user }) => !canWriteCollection(user, "vagas"),
     listSearchableFields: ["title", "summary", "sector"],
+    components: {
+      edit: {
+        PublishButton:
+          "/components/payload/RolePublishButton#RolePublishButton",
+        UnpublishButton:
+          "/components/payload/RoleUnpublishButton#RoleUnpublishButton",
+      },
+    },
     livePreview: {
       url: ({ data }) => {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
         return `${baseUrl}/vagas/${data?.slug}`;
       },
     },
   },
   versions: {
     drafts: true,
+  },
+  disableBulkEdit: true,
+  access: {
+    admin: ({ req }) => canWriteCollection(req.user, "vagas"),
+    create: writeAccess("vagas"),
+    delete: deleteAccess("vagas"),
+    read: publicPublishedReadAccess("vagas"),
+    readVersions: publisherOrAdmin,
+    unlock: writeAccess("vagas"),
+    update: draftWriterUpdateAccess("vagas"),
+  },
+  hooks: {
+    beforeOperation: [preventAuthorVersionRestore],
+    beforeValidate: [createDraftOnlyWorkflowHook("vagas")],
   },
   timestamps: true,
   trash: true,

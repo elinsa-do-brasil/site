@@ -30,8 +30,9 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
-import { ExportListMenuItem as ExportListMenuItem_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
-import { ImportListMenuItem as ImportListMenuItem_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
+import { RoleImportExportMenuItems as RoleImportExportMenuItems_a283ebd75f148ae5e272640fe7a3a8fb } from '../../../components/payload/RoleImportExportMenuItems'
+import { RolePublishButton as RolePublishButton_811888d70c1c6c483c2e95b9948e5979 } from '../../../components/payload/RolePublishButton'
+import { RoleUnpublishButton as RoleUnpublishButton_e045161bffaf9e7a6f0b620f20589847 } from '../../../components/payload/RoleUnpublishButton'
 import { ImageSearch as ImageSearch_18763abdf72285ba4b0ce56755000778 } from '@payload-bites/image-search/client'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
@@ -48,8 +49,11 @@ import { ExportSaveButton as ExportSaveButton_cdf7e044479f899a31f804427d568b36 }
 import { ImportPreview as ImportPreview_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { ImportSaveButton as ImportSaveButton_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { EditorialReviewDashboardCard as EditorialReviewDashboardCard_fdf2e91c0a72d95837504ffcf2ea6c05 } from '../../../components/payload/editorial-review/EditorialReviewDashboardCard'
+import { EditorialReviewNav as EditorialReviewNav_0120b6adf7a65a5e57b4fd6166f5345b } from '../../../components/payload/editorial-review/EditorialReviewNav'
 import { AzureClientUploadHandler as AzureClientUploadHandler_635fb302eaf52f6baca4f9f8ad9ce104 } from '@payloadcms/storage-azure/client'
 import { ImportExportProvider as ImportExportProvider_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
+import { EditorialReviewView as EditorialReviewView_25cda9624b6a22bd9fd7183d67c6e1f6 } from '../../../components/payload/editorial-review/EditorialReviewView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -86,8 +90,9 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
-  "@payloadcms/plugin-import-export/rsc#ExportListMenuItem": ExportListMenuItem_cdf7e044479f899a31f804427d568b36,
-  "@payloadcms/plugin-import-export/rsc#ImportListMenuItem": ImportListMenuItem_cdf7e044479f899a31f804427d568b36,
+  "/components/payload/RoleImportExportMenuItems#RoleImportExportMenuItems": RoleImportExportMenuItems_a283ebd75f148ae5e272640fe7a3a8fb,
+  "/components/payload/RolePublishButton#RolePublishButton": RolePublishButton_811888d70c1c6c483c2e95b9948e5979,
+  "/components/payload/RoleUnpublishButton#RoleUnpublishButton": RoleUnpublishButton_e045161bffaf9e7a6f0b620f20589847,
   "@payload-bites/image-search/client#ImageSearch": ImageSearch_18763abdf72285ba4b0ce56755000778,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
@@ -104,7 +109,10 @@ export const importMap = {
   "@payloadcms/plugin-import-export/rsc#ImportPreview": ImportPreview_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#ImportSaveButton": ImportSaveButton_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
+  "/components/payload/editorial-review/EditorialReviewDashboardCard#EditorialReviewDashboardCard": EditorialReviewDashboardCard_fdf2e91c0a72d95837504ffcf2ea6c05,
+  "/components/payload/editorial-review/EditorialReviewNav#EditorialReviewNav": EditorialReviewNav_0120b6adf7a65a5e57b4fd6166f5345b,
   "@payloadcms/storage-azure/client#AzureClientUploadHandler": AzureClientUploadHandler_635fb302eaf52f6baca4f9f8ad9ce104,
   "@payloadcms/plugin-import-export/rsc#ImportExportProvider": ImportExportProvider_cdf7e044479f899a31f804427d568b36,
+  "/components/payload/editorial-review/EditorialReviewView#EditorialReviewView": EditorialReviewView_25cda9624b6a22bd9fd7183d67c6e1f6,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

@@ -30,6 +30,7 @@ export async function GET(req: Request) {
     collection: "redirects",
     depth: 1,
     limit: 1,
+    overrideAccess: false,
     pagination: false,
     where: {
       or: [
@@ -97,6 +98,7 @@ async function resolveDestination(redirect: RedirectDoc) {
     collection: relationTo,
     depth: 0,
     id: value,
+    overrideAccess: false,
   });
 
   return getDocumentPath(relationTo, (doc as { slug?: null | string }).slug);

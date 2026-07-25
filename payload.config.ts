@@ -30,6 +30,19 @@ import {
   getAzureStorageAccountBaseURL,
   shouldCreateAzureContainers,
 } from "./lib/azure-storage.ts";
+import {
+  canManageAdminTools,
+  canPublish,
+  canWriteCollection,
+  getWritableCollections,
+  isPayloadUser,
+} from "./lib/payload/rbac.ts";
+import { validateFolderTypes } from "./lib/payload/rbac-hooks.ts";
+import {
+  restrictAdminToolCollection,
+  restrictImportExportCollection,
+  restrictImportExportMenuItems,
+} from "./lib/payload/rbac-plugins.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -55,7 +68,7 @@ const isCmsStorageConfigured = Boolean(
   cmsStorageConnectionString && cmsStorageBaseURL && cmsStorageContainerName,
 );
 const allowCmsContainerCreate = shouldCreateAzureContainers();
-const siteURL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+const siteURL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
 const usersCollectionSlug = Users.slug as CollectionSlug;
 const galleryCollectionSlug = Galeria.slug as CollectionSlug;
@@ -139,6 +152,25 @@ export default buildConfig({
 
   admin: {
     user: Users.slug,
+    components: {
+      beforeDashboard: [
+        "/components/payload/editorial-review/EditorialReviewDashboardCard#EditorialReviewDashboardCard",
+      ],
+      beforeNavLinks: [
+        "/components/payload/editorial-review/EditorialReviewNav#EditorialReviewNav",
+      ],
+      views: {
+        editorialReview: {
+          Component:
+            "/components/payload/editorial-review/EditorialReviewView#EditorialReviewView",
+          exact: true,
+          meta: {
+            title: "Pendências editoriais",
+          },
+          path: "/pendencias-editoriais",
+        },
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -192,7 +224,7 @@ export default buildConfig({
     imageSearchPlugin({
       enabled: imageSearchConfigured,
       enablePreview: true,
-      providerAccess: ({ req }) => Boolean(req.user),
+      providerAccess: ({ req }) => canWriteCollection(req.user, "media"),
     }),
     seoPlugin({
       collections: [...publicContentCollections],
@@ -212,8 +244,29 @@ export default buildConfig({
       collections: [...publicContentCollections],
       redirectTypes: ["301", "302", "307", "308"],
       overrides: {
+        labels: {
+          singular: {
+            en: "Redirect",
+            es: "Redirección",
+            pt: "Redirecionamento",
+          },
+          plural: {
+            en: "Redirects",
+            es: "Redirecciones",
+            pt: "Redirecionamentos",
+          },
+        },
+        access: {
+          admin: ({ req }) => canManageAdminTools(req.user),
+          create: ({ req }) => canManageAdminTools(req.user),
+          delete: ({ req }) => canManageAdminTools(req.user),
+          read: () => true,
+          unlock: ({ req }) => canManageAdminTools(req.user),
+          update: ({ req }) => canManageAdminTools(req.user),
+        },
         admin: {
           group: "Administração",
+          hidden: ({ user }) => !canManageAdminTools(user),
         },
       },
     }),
@@ -227,13 +280,19 @@ export default buildConfig({
         },
         admin: {
           group: "Conteúdo",
+          hidden: ({ user }) => !canManageAdminTools(user),
+        },
+        access: {
+          admin: ({ req }) => canManageAdminTools(req.user),
+          create: ({ req }) => canManageAdminTools(req.user),
+          delete: ({ req }) => canManageAdminTools(req.user),
+          read: ({ req }) => canManageAdminTools(req.user),
+          unlock: ({ req }) => canManageAdminTools(req.user),
+          update: ({ req }) => canManageAdminTools(req.user),
         },
       },
     }),
     activityLogPlugin({
-      admin: {
-        group: "Administração",
-      },
       collections: {
         blog: {},
         galeria: {},
@@ -243,6 +302,26 @@ export default buildConfig({
       },
       enableDraftAutosaveLogging: false,
       globals: {},
+      overrideActivityLogCollection: (collection) => ({
+        ...restrictAdminToolCollection(collection, { readOnly: true }),
+        labels: {
+          singular: {
+            en: "Activity Log",
+            es: "Registro de actividad",
+            pt: "Log de atividade",
+          },
+          plural: {
+            en: "Activity Logs",
+            es: "Registros de actividad",
+            pt: "Logs de atividade",
+          },
+        },
+        admin: {
+          ...collection.admin,
+          group: "Administração",
+          hidden: ({ user }) => !canManageAdminTools(user),
+        },
+      }),
     }),
     importExportPlugin({
       batchSize: 50,
@@ -274,7 +353,18 @@ export default buildConfig({
         },
       ],
       defaultVersionStatus: "draft",
+      overrideExportCollection: ({ collection }) =>
+        restrictImportExportCollection(collection),
+      overrideImportCollection: ({ collection }) =>
+        restrictImportExportCollection(collection),
     }),
+    restrictImportExportMenuItems([
+      "imprensa",
+      "blog",
+      "vagas",
+      galleryCollectionSlug,
+      mediaCollectionSlug,
+    ]),
     sentryPlugin({
       enabled: payloadSentryEnabled,
       Sentry,
@@ -287,6 +377,73 @@ export default buildConfig({
 
   secret: process.env.PAYLOAD_SECRET || "",
   serverURL: siteURL,
+  folders: {
+    collectionOverrides: [
+      ({ collection }) => ({
+        ...collection,
+        access: {
+          ...collection.access,
+          admin: ({ req }) => isPayloadUser(req.user),
+          create: ({ req }) => isPayloadUser(req.user),
+          delete: ({ req }) => canPublish(req.user),
+          read: ({ req }) => {
+            if (canPublish(req.user)) {
+              return true;
+            }
+
+            const writableCollections = getWritableCollections(req.user);
+            return writableCollections.length
+              ? {
+                  folderType: {
+                    in: [...writableCollections],
+                  },
+                }
+              : false;
+          },
+          unlock: ({ req }) => isPayloadUser(req.user),
+          update: ({ req }) => {
+            if (canPublish(req.user)) {
+              return true;
+            }
+
+            const writableCollections = getWritableCollections(req.user);
+            return writableCollections.length
+              ? {
+                  folderType: {
+                    in: [...writableCollections],
+                  },
+                }
+              : false;
+          },
+        },
+        hooks: {
+          ...collection.hooks,
+          beforeValidate: [
+            ...(collection.hooks?.beforeValidate ?? []),
+            validateFolderTypes,
+          ],
+        },
+      }),
+    ],
+  },
+  jobs: {
+    access: {
+      cancel: ({ req }) => canManageAdminTools(req.user),
+      queue: ({ req }) => canManageAdminTools(req.user),
+      run: ({ req }) => canManageAdminTools(req.user),
+    },
+    jobsCollectionOverrides: ({ defaultJobsCollection }) => {
+      const jobsCollection = restrictAdminToolCollection(defaultJobsCollection);
+
+      return {
+        ...jobsCollection,
+        admin: {
+          ...jobsCollection.admin,
+          hidden: true,
+        },
+      };
+    },
+  },
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },

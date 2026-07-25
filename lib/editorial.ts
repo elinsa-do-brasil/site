@@ -121,6 +121,10 @@ export async function getEditorialPosts(
     depth: 1,
     draft: false,
     limit: options.limit ?? 100,
+    // Blog is intentionally privileged here: the portal is protected by
+    // Better Auth, whose session is separate from the Payload user session.
+    // Public Imprensa reads must continue through Payload access control.
+    overrideAccess: collection === "blog",
     sort: "-publishedAt",
   });
 
@@ -143,6 +147,9 @@ export async function getEditorialPost({
     depth: 1,
     draft,
     limit: 1,
+    // See getEditorialPosts: only the Better Auth-protected Blog portal uses
+    // a privileged server-side read.
+    overrideAccess: collection === "blog",
     where: {
       slug: {
         equals: slug,

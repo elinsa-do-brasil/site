@@ -3,6 +3,19 @@ import {
   defaultEditorialSubject,
   editorialSubjects,
 } from "../lib/editorial-subjects.ts";
+import {
+  canWriteCollection,
+  deleteAccess,
+  draftWriterUpdateAccess,
+  privateBlogReadAccess,
+  publicPublishedReadAccess,
+  publisherOrAdmin,
+  writeAccess,
+} from "../lib/payload/rbac.ts";
+import {
+  createDraftOnlyWorkflowHook,
+  preventAuthorVersionRestore,
+} from "../lib/payload/rbac-hooks.ts";
 import { createContentEditor } from "./fields/contentEditor.ts";
 
 const format = (val: string): string =>
@@ -48,12 +61,27 @@ const createEditorialCollection = ({
   admin: {
     useAsTitle: "title",
     group,
-    defaultColumns: ["title", "subject", "author", "publishedAt", "updatedAt"],
+    defaultColumns: [
+      "title",
+      "_status",
+      "subject",
+      "author",
+      "publishedAt",
+      "updatedAt",
+    ],
+    hidden: ({ user }) => !canWriteCollection(user, slug),
     listSearchableFields: ["title", "summary"],
+    components: {
+      edit: {
+        PublishButton:
+          "/components/payload/RolePublishButton#RolePublishButton",
+        UnpublishButton:
+          "/components/payload/RoleUnpublishButton#RoleUnpublishButton",
+      },
+    },
     livePreview: {
       url: ({ data }) => {
-        const baseUrl =
-          process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
         const path =
           slug === "blog"
             ? `/portal/blog/${data?.slug}`
@@ -65,6 +93,23 @@ const createEditorialCollection = ({
   },
   versions: {
     drafts: true,
+  },
+  disableBulkEdit: true,
+  access: {
+    admin: ({ req }) => canWriteCollection(req.user, slug),
+    create: writeAccess(slug),
+    delete: deleteAccess(slug),
+    read:
+      slug === "blog"
+        ? privateBlogReadAccess
+        : publicPublishedReadAccess("imprensa"),
+    readVersions: publisherOrAdmin,
+    unlock: writeAccess(slug),
+    update: draftWriterUpdateAccess(slug),
+  },
+  hooks: {
+    beforeOperation: [preventAuthorVersionRestore],
+    beforeValidate: [createDraftOnlyWorkflowHook(slug)],
   },
   timestamps: true,
   trash: true,
