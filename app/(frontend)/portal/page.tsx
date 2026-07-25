@@ -16,8 +16,7 @@ import type { ReactNode } from "react";
 import { formatAdminName } from "@/components/admin/GestaoPageHeader";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button-variants";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
