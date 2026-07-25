@@ -152,6 +152,25 @@ export default buildConfig({
 
   admin: {
     user: Users.slug,
+    components: {
+      beforeDashboard: [
+        "/components/payload/editorial-review/EditorialReviewDashboardCard#EditorialReviewDashboardCard",
+      ],
+      beforeNavLinks: [
+        "/components/payload/editorial-review/EditorialReviewNav#EditorialReviewNav",
+      ],
+      views: {
+        editorialReview: {
+          Component:
+            "/components/payload/editorial-review/EditorialReviewView#EditorialReviewView",
+          exact: true,
+          meta: {
+            title: "Pendências editoriais",
+          },
+          path: "/pendencias-editoriais",
+        },
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

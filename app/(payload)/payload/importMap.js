@@ -49,8 +49,11 @@ import { ExportSaveButton as ExportSaveButton_cdf7e044479f899a31f804427d568b36 }
 import { ImportPreview as ImportPreview_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { ImportSaveButton as ImportSaveButton_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { EditorialReviewDashboardCard as EditorialReviewDashboardCard_fdf2e91c0a72d95837504ffcf2ea6c05 } from '../../../components/payload/editorial-review/EditorialReviewDashboardCard'
+import { EditorialReviewNav as EditorialReviewNav_0120b6adf7a65a5e57b4fd6166f5345b } from '../../../components/payload/editorial-review/EditorialReviewNav'
 import { AzureClientUploadHandler as AzureClientUploadHandler_635fb302eaf52f6baca4f9f8ad9ce104 } from '@payloadcms/storage-azure/client'
 import { ImportExportProvider as ImportExportProvider_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
+import { EditorialReviewView as EditorialReviewView_25cda9624b6a22bd9fd7183d67c6e1f6 } from '../../../components/payload/editorial-review/EditorialReviewView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -106,7 +109,10 @@ export const importMap = {
   "@payloadcms/plugin-import-export/rsc#ImportPreview": ImportPreview_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#ImportSaveButton": ImportSaveButton_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
+  "/components/payload/editorial-review/EditorialReviewDashboardCard#EditorialReviewDashboardCard": EditorialReviewDashboardCard_fdf2e91c0a72d95837504ffcf2ea6c05,
+  "/components/payload/editorial-review/EditorialReviewNav#EditorialReviewNav": EditorialReviewNav_0120b6adf7a65a5e57b4fd6166f5345b,
   "@payloadcms/storage-azure/client#AzureClientUploadHandler": AzureClientUploadHandler_635fb302eaf52f6baca4f9f8ad9ce104,
   "@payloadcms/plugin-import-export/rsc#ImportExportProvider": ImportExportProvider_cdf7e044479f899a31f804427d568b36,
+  "/components/payload/editorial-review/EditorialReviewView#EditorialReviewView": EditorialReviewView_25cda9624b6a22bd9fd7183d67c6e1f6,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
