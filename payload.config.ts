@@ -225,6 +225,18 @@ export default buildConfig({
       collections: [...publicContentCollections],
       redirectTypes: ["301", "302", "307", "308"],
       overrides: {
+        labels: {
+          singular: {
+            en: "Redirect",
+            es: "Redirección",
+            pt: "Redirecionamento",
+          },
+          plural: {
+            en: "Redirects",
+            es: "Redirecciones",
+            pt: "Redirecionamentos",
+          },
+        },
         access: {
           admin: ({ req }) => canManageAdminTools(req.user),
           create: ({ req }) => canManageAdminTools(req.user),
@@ -273,6 +285,18 @@ export default buildConfig({
       globals: {},
       overrideActivityLogCollection: (collection) => ({
         ...restrictAdminToolCollection(collection, { readOnly: true }),
+        labels: {
+          singular: {
+            en: "Activity Log",
+            es: "Registro de actividad",
+            pt: "Log de atividade",
+          },
+          plural: {
+            en: "Activity Logs",
+            es: "Registros de actividad",
+            pt: "Logs de atividade",
+          },
+        },
         admin: {
           ...collection.admin,
           group: "Administração",
@@ -389,8 +413,17 @@ export default buildConfig({
       queue: ({ req }) => canManageAdminTools(req.user),
       run: ({ req }) => canManageAdminTools(req.user),
     },
-    jobsCollectionOverrides: ({ defaultJobsCollection }) =>
-      restrictAdminToolCollection(defaultJobsCollection),
+    jobsCollectionOverrides: ({ defaultJobsCollection }) => {
+      const jobsCollection = restrictAdminToolCollection(defaultJobsCollection);
+
+      return {
+        ...jobsCollection,
+        admin: {
+          ...jobsCollection.admin,
+          hidden: true,
+        },
+      };
+    },
   },
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),

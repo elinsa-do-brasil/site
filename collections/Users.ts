@@ -26,6 +26,10 @@ async function countAdmins(req: PayloadRequest): Promise<number> {
 
 export const Users: CollectionConfig = {
   slug: "users",
+  labels: {
+    singular: { en: "User", es: "Usuario", pt: "Usuário" },
+    plural: { en: "Users", es: "Usuarios", pt: "Usuários" },
+  },
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "email", "role", "createdAt"],
