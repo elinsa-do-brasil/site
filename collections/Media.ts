@@ -1,4 +1,25 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, PayloadRequest } from "payload";
+
+type BeforeChangeHook = NonNullable<
+  NonNullable<CollectionConfig["hooks"]>["beforeChange"]
+>[number];
+
+/**
+ * Payload already applies `uploadEdits` before collection hooks run. Remove
+ * them here so the Azure adapter's internal metadata update does not try to
+ * retrieve and process the freshly uploaded file a second time.
+ */
+export function clearProcessedUploadEdits(query: PayloadRequest["query"]) {
+  if (query && typeof query === "object" && "uploadEdits" in query) {
+    delete query.uploadEdits;
+  }
+}
+
+const preventUploadEditsReplay: BeforeChangeHook = ({ data, req }) => {
+  clearProcessedUploadEdits(req.query);
+
+  return data;
+};
 
 /**
  * Shared media library for editorial covers and rich-text uploads.
@@ -20,6 +41,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    beforeChange: [preventUploadEditsReplay],
   },
   upload: {
     staticDir: "galeria",
