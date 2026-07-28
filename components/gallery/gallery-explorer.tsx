@@ -4,11 +4,14 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Cancel01Icon,
+  Download04Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Download, MousePointerClick } from "lucide-react";
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  GalleryFeedPhoto,
+  GalleryViewerImage,
+} from "@/components/gallery/gallery-images";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +25,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { getDocsUrl } from "@/lib/docs-url";
 import type { GalleryPage, GalleryPhoto } from "@/lib/gallery";
-
-const GALLERY_GRID_SIZES =
-  "(min-width: 1536px) 486px, (min-width: 1024px) calc(33.333vw - 1.667rem), (min-width: 640px) calc(50vw - 1.375rem), calc(100vw - 1.5rem)";
-const GALLERY_LIGHTBOX_SIZES =
-  "(min-width: 1568px) 1152px, (min-width: 1024px) calc(100vw - 26rem), (min-width: 640px) calc(100vw - 2rem), calc(100vw - 1rem)";
 
 type GalleryExplorerProps = {
   initialPage: GalleryPage;
@@ -49,6 +47,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
   const [loadState, setLoadState] = useState<LoadState>("idle");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const feedSourcesRef = useRef(new Map<string, string>());
   const loadedIdsRef = useRef(
     new Set(initialPage.photos.map((photo) => String(photo.id))),
   );
@@ -60,6 +59,12 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
   const selectedPhoto =
     selectedIndex === null ? undefined : photos[selectedIndex];
   const totalPhotoCount = Math.max(pagination.totalDocs, photos.length);
+  const adjacentPhotos =
+    selectedIndex === null
+      ? []
+      : [photos[selectedIndex - 1], photos[selectedIndex + 1]].filter(
+          (photo): photo is GalleryPhoto => Boolean(photo),
+        );
 
   const loadMore = useCallback(() => {
     if (loadMorePromiseRef.current) {
@@ -241,6 +246,10 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
     setSelectedIndex(index);
   };
 
+  const rememberFeedSource = useCallback((photoId: string, source: string) => {
+    feedSourcesRef.current.set(photoId, source);
+  }, []);
+
   const canShowPrevious = selectedIndex !== null && selectedIndex > 0;
   const canShowNext =
     selectedIndex !== null &&
@@ -263,43 +272,13 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
       >
         {photos.map((photo, index) => (
           <li className="mb-3 break-inside-avoid lg:mb-4" key={photo.id}>
-            <button
-              aria-haspopup="dialog"
-              aria-label={`Abrir foto ${index + 1} de ${totalPhotoCount}: ${photo.alt}`}
-              className="group relative block w-full overflow-hidden rounded-xl bg-muted text-left shadow-sm outline-none ring-offset-2 ring-offset-background transition-[transform,box-shadow] duration-300 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-elinsa-primary motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none"
-              data-orientation={
-                photo.height > photo.width ? "vertical" : "horizontal"
-              }
-              onClick={(event) => openPhoto(index, event.currentTarget)}
-              type="button"
-            >
-              <Image
-                alt={photo.alt}
-                blurDataURL={photo.blurDataUrl}
-                className="h-auto w-full"
-                fetchPriority={index === 0 ? "high" : undefined}
-                height={photo.height}
-                loading={index === 0 ? "eager" : "lazy"}
-                placeholder={photo.blurDataUrl ? "blur" : "empty"}
-                quality={100}
-                sizes={GALLERY_GRID_SIZES}
-                src={photo.url}
-                width={photo.width}
-              />
-
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/55 via-black/5 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
-              />
-              <Badge
-                aria-hidden="true"
-                className="pointer-events-none absolute right-3 bottom-3 translate-y-1 border-white/20 bg-black/55 p-4 text-xs font-semibold text-white opacity-0 shadow-sm backdrop-blur-md transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 motion-reduce:transition-none"
-                variant="outline"
-              >
-                <MousePointerClick size={24} />
-                Abrir
-              </Badge>
-            </button>
+            <GalleryFeedPhoto
+              index={index}
+              onOpen={(trigger) => openPhoto(index, trigger)}
+              onSourceReady={rememberFeedSource}
+              photo={photo}
+              totalPhotoCount={totalPhotoCount}
+            />
           </li>
         ))}
       </ol>
@@ -353,18 +332,13 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
               className="relative min-h-0 overflow-hidden bg-[#080a0c] dark:bg-surface-panel"
               data-slot="gallery-photo-stage"
             >
-              <Image
-                alt={selectedPhoto.alt}
-                blurDataURL={selectedPhoto.blurDataUrl}
-                className="object-contain"
-                fetchPriority="high"
-                fill
+              <GalleryViewerImage
+                adjacentPhotos={adjacentPhotos}
                 key={selectedPhoto.id}
-                loading="eager"
-                placeholder={selectedPhoto.blurDataUrl ? "blur" : "empty"}
-                quality={100}
-                sizes={GALLERY_LIGHTBOX_SIZES}
-                src={selectedPhoto.url}
+                photo={selectedPhoto}
+                previewSrc={feedSourcesRef.current.get(
+                  String(selectedPhoto.id),
+                )}
               />
 
               <Badge
@@ -387,7 +361,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
                     download
                     href={selectedPhoto.url}
                   >
-                    <Download />
+                    <HugeiconsIcon icon={Download04Icon} strokeWidth={2} />
                   </a>
                 </Button>
 
