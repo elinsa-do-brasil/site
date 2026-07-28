@@ -329,7 +329,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
             data-slot="gallery-viewer"
           >
             <div
-              className="relative min-h-0 overflow-hidden bg-[#080a0c] dark:bg-surface-panel"
+              className="relative min-h-0 overflow-hidden bg-[#c6ced1] dark:bg-surface-panel"
               data-slot="gallery-photo-stage"
             >
               <GalleryViewerImage
@@ -352,9 +352,8 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
               <div className="absolute top-3 right-3 z-20 flex items-center gap-2 sm:top-4 sm:right-4">
                 <Button
                   asChild
-                  className="rounded-full shadow-lg"
+                  className="rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/80 hover:text-white focus-visible:border-white focus-visible:ring-white/50"
                   size="icon-sm"
-                  variant="outline"
                 >
                   <a
                     aria-label={`Baixar foto ${selectedIndex + 1} de ${totalPhotoCount} no tamanho original`}
@@ -413,7 +412,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
             </div>
 
             <figcaption
-              className="flex min-h-0 flex-col overflow-y-auto border-border-strong border-t bg-[#dce6ea] text-foreground lg:border-t-0 lg:border-l dark:bg-surface-panel"
+              className="flex min-h-0 flex-col overflow-y-auto border-border-strong border-t bg-[#c6ced1] text-foreground lg:border-t-0 lg:border-l dark:bg-surface-panel"
               data-slot="gallery-description-panel"
             >
               <div className="p-5 sm:p-7 lg:p-8">
