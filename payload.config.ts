@@ -8,7 +8,6 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { resendAdapter } from "@payloadcms/email-resend";
 import { importExportPlugin } from "@payloadcms/plugin-import-export";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
-import { searchPlugin } from "@payloadcms/plugin-search";
 import { sentryPlugin } from "@payloadcms/plugin-sentry";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
@@ -267,28 +266,6 @@ export default buildConfig({
         admin: {
           group: "Administração",
           hidden: ({ user }) => !canManageAdminTools(user),
-        },
-      },
-    }),
-    searchPlugin({
-      collections: [...publicContentCollections],
-      searchOverrides: {
-        slug: "cms-search",
-        labels: {
-          singular: "Resultado de busca do CMS",
-          plural: "Resultados de busca do CMS",
-        },
-        admin: {
-          group: "Conteúdo",
-          hidden: ({ user }) => !canManageAdminTools(user),
-        },
-        access: {
-          admin: ({ req }) => canManageAdminTools(req.user),
-          create: ({ req }) => canManageAdminTools(req.user),
-          delete: ({ req }) => canManageAdminTools(req.user),
-          read: ({ req }) => canManageAdminTools(req.user),
-          unlock: ({ req }) => canManageAdminTools(req.user),
-          update: ({ req }) => canManageAdminTools(req.user),
         },
       },
     }),

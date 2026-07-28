@@ -74,7 +74,6 @@ export interface Config {
     media: Media;
     galeria: Galeria;
     redirects: Redirect;
-    'cms-search': CmsSearch;
     'activity-log': ActivityLog;
     exports: Export;
     imports: Import;
@@ -98,7 +97,6 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     galeria: GaleriaSelect<false> | GaleriaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    'cms-search': CmsSearchSelect<false> | CmsSearchSelect<true>;
     'activity-log': ActivityLogSelect<false> | ActivityLogSelect<true>;
     exports: ExportsSelect<false> | ExportsSelect<true>;
     imports: ImportsSelect<false> | ImportsSelect<true>;
@@ -579,32 +577,6 @@ export interface Redirect {
   createdAt: string;
 }
 /**
- * This is a collection of automatically created search results. These results are used by the global site search and will be updated automatically as documents in the CMS are created or updated.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "cms-search".
- */
-export interface CmsSearch {
-  id: number;
-  title?: string | null;
-  priority?: number | null;
-  doc:
-    | {
-        relationTo: 'imprensa';
-        value: number | Imprensa;
-      }
-    | {
-        relationTo: 'blog';
-        value: number | Blog;
-      }
-    | {
-        relationTo: 'vagas';
-        value: number | Vagas;
-      };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "activity-log".
  */
@@ -848,10 +820,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
-      } | null)
-    | ({
-        relationTo: 'cms-search';
-        value: number | CmsSearch;
       } | null)
     | ({
         relationTo: 'activity-log';
@@ -1115,17 +1083,6 @@ export interface RedirectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "cms-search_select".
- */
-export interface CmsSearchSelect<T extends boolean = true> {
-  title?: T;
-  priority?: T;
-  doc?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "activity-log_select".
  */
 export interface ActivityLogSelect<T extends boolean = true> {
@@ -1307,7 +1264,6 @@ export interface TaskCreateCollectionExport {
       | 'media'
       | 'galeria'
       | 'redirects'
-      | 'cms-search'
       | 'activity-log'
       | 'exports'
       | 'imports';

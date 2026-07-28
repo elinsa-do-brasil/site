@@ -40,7 +40,6 @@
     "@payloadcms/next": "^3.86.0",
     "@payloadcms/plugin-import-export": "3.86.0",
     "@payloadcms/plugin-redirects": "3.86.0",
-    "@payloadcms/plugin-search": "3.86.0",
     "@payloadcms/plugin-sentry": "3.86.0",
     "@payloadcms/plugin-seo": "3.86.0",
     "@payloadcms/richtext-lexical": "^3.86.0",

@@ -118,6 +118,8 @@ async function main() {
   const payload = await getPayload({ config: configPromise });
 
   try {
+    assert.equal(Object.hasOwn(payload.collections, "cms-search"), false);
+
     const adminResult = await payload.find({
       collection: "users",
       limit: 1,
@@ -506,10 +508,6 @@ async function main() {
     assert.equal(Boolean(editorAccess.collections?.galeria?.delete), false);
     assert.equal(Boolean(editorAccess.collections?.redirects?.create), false);
     assert.equal(
-      Boolean(editorAccess.collections?.["cms-search"]?.read),
-      false,
-    );
-    assert.equal(
       Boolean(editorAccess.collections?.["activity-log"]?.read),
       false,
     );
@@ -525,7 +523,6 @@ async function main() {
       req: publisherReq,
     });
     assert.equal(publisherAccess.collections?.redirects?.create, true);
-    assert.equal(publisherAccess.collections?.["cms-search"]?.read, true);
     assert.equal(publisherAccess.collections?.["activity-log"]?.read, true);
     assert.equal(publisherAccess.collections?.imports?.read, true);
 

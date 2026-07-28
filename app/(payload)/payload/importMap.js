@@ -34,8 +34,6 @@ import { RoleImportExportMenuItems as RoleImportExportMenuItems_a283ebd75f148ae5
 import { RolePublishButton as RolePublishButton_811888d70c1c6c483c2e95b9948e5979 } from '../../../components/payload/RolePublishButton'
 import { RoleUnpublishButton as RoleUnpublishButton_e045161bffaf9e7a6f0b620f20589847 } from '../../../components/payload/RoleUnpublishButton'
 import { ImageSearch as ImageSearch_18763abdf72285ba4b0ce56755000778 } from '@payload-bites/image-search/client'
-import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
-import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { FormatField as FormatField_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { LimitField as LimitField_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
 import { Page as Page_cdf7e044479f899a31f804427d568b36 } from '@payloadcms/plugin-import-export/rsc'
@@ -94,8 +92,6 @@ export const importMap = {
   "/components/payload/RolePublishButton#RolePublishButton": RolePublishButton_811888d70c1c6c483c2e95b9948e5979,
   "/components/payload/RoleUnpublishButton#RoleUnpublishButton": RoleUnpublishButton_e045161bffaf9e7a6f0b620f20589847,
   "@payload-bites/image-search/client#ImageSearch": ImageSearch_18763abdf72285ba4b0ce56755000778,
-  "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
-  "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-import-export/rsc#FormatField": FormatField_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#LimitField": LimitField_cdf7e044479f899a31f804427d568b36,
   "@payloadcms/plugin-import-export/rsc#Page": Page_cdf7e044479f899a31f804427d568b36,
