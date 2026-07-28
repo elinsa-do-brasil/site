@@ -317,11 +317,11 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
 
       {selectedPhoto && selectedIndex !== null ? (
         <DialogContent
-          className="z-[120] isolate h-[calc(100dvh-1rem)] max-h-[64rem] w-[calc(100%-1rem)] max-w-[96rem] gap-0 overflow-hidden rounded-xl border-border-strong bg-[#080a0c] p-0 text-white shadow-2xl sm:h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:rounded-2xl dark:bg-surface-panel"
+          className="isolate h-[calc(100dvh-1rem)] max-h-[64rem] w-[calc(100%-1rem)] max-w-[96rem] gap-0 overflow-hidden rounded-xl border-border-strong bg-[#080a0c] p-0 text-white shadow-2xl sm:h-[calc(100dvh-2rem)] sm:w-[calc(100%-2rem)] sm:rounded-2xl dark:bg-surface-panel"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
           }}
-          overlayClassName="z-[110] bg-black/90 backdrop-blur-md"
+          overlayClassName="bg-black/90 backdrop-blur-md"
           showCloseButton={false}
         >
           <figure

@@ -10,17 +10,19 @@ import {
   useRef,
   useState,
 } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { GalleryPhoto } from "@/lib/gallery";
 import { cn } from "@/lib/utils";
 
@@ -29,10 +31,13 @@ const GALLERY_GRID_SIZES =
 const GALLERY_LIGHTBOX_SIZES =
   "(min-width: 1568px) 1152px, (min-width: 1024px) calc(100vw - 26rem), (min-width: 640px) calc(100vw - 2rem), calc(100vw - 1rem)";
 const IMAGE_DECODE_TIMEOUT_MS = 1000;
+const IMAGE_RETRY_BASE_DELAY_MS = 400;
+const IMAGE_STATUS_DELAY_MS = 250;
 const INTENT_WARMUP_DELAY_MS = 150;
-const VIEWER_SPINNER_DELAY_MS = 250;
+const MAX_IMAGE_LOAD_ATTEMPTS = 3;
 
 type ImageLoadState = "error" | "loading" | "ready";
+type ViewerImageLoadState = ImageLoadState | "fallback";
 type WarmupPriority = "high" | "low";
 type NetworkInformation = {
   effectiveType?: string;
@@ -58,18 +63,16 @@ export function GalleryFeedPhoto({
   totalPhotoCount,
 }: GalleryFeedPhotoProps) {
   const [loadState, setLoadState] = useState<ImageLoadState>("loading");
+  const [loadAttempt, setLoadAttempt] = useState(1);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const failedAttemptRef = useRef<number | null>(null);
   const lastReportedSourceRef = useRef<string | null>(null);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const warmupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showLoadingStatus = useDelayedLoadingStatus(loadState === "loading");
 
-  const reportLoadedImage = useCallback(
+  const reportCurrentSource = useCallback(
     (image: HTMLImageElement) => {
-      if (!(image.complete && image.naturalWidth > 0)) {
-        return;
-      }
-
-      setLoadState("ready");
-
       const source = image.currentSrc || image.src;
 
       if (source && source !== lastReportedSourceRef.current) {
@@ -78,6 +81,18 @@ export function GalleryFeedPhoto({
       }
     },
     [onSourceReady, photo.id],
+  );
+
+  const reportLoadedImage = useCallback(
+    (image: HTMLImageElement) => {
+      if (!(image.complete && image.naturalWidth > 0)) {
+        return;
+      }
+
+      setLoadState("ready");
+      reportCurrentSource(image);
+    },
+    [reportCurrentSource],
   );
 
   const setImageRef = useCallback(
@@ -98,6 +113,13 @@ export function GalleryFeedPhoto({
     }
   }, []);
 
+  const cancelRetry = useCallback(() => {
+    if (retryTimerRef.current !== null) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+  }, []);
+
   const scheduleWarmup = useCallback(() => {
     cancelWarmup();
 
@@ -111,7 +133,31 @@ export function GalleryFeedPhoto({
     }, INTENT_WARMUP_DELAY_MS);
   }, [cancelWarmup, photo]);
 
-  useEffect(() => cancelWarmup, [cancelWarmup]);
+  useEffect(
+    () => () => {
+      cancelRetry();
+      cancelWarmup();
+    },
+    [cancelRetry, cancelWarmup],
+  );
+
+  const handleError = useCallback(() => {
+    if (failedAttemptRef.current === loadAttempt) {
+      return;
+    }
+
+    failedAttemptRef.current = loadAttempt;
+
+    if (loadAttempt >= MAX_IMAGE_LOAD_ATTEMPTS) {
+      setLoadState("error");
+      return;
+    }
+
+    retryTimerRef.current = setTimeout(() => {
+      retryTimerRef.current = null;
+      setLoadAttempt((currentAttempt) => currentAttempt + 1);
+    }, IMAGE_RETRY_BASE_DELAY_MS * loadAttempt);
+  }, [loadAttempt]);
 
   const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     if (event.pointerType === "touch") {
@@ -125,6 +171,7 @@ export function GalleryFeedPhoto({
     cancelWarmup();
 
     if (imageRef.current) {
+      reportCurrentSource(imageRef.current);
       reportLoadedImage(imageRef.current);
     }
 
@@ -156,26 +203,16 @@ export function GalleryFeedPhoto({
       onPointerLeave={cancelWarmup}
       type="button"
     >
-      <Skeleton
-        aria-hidden="true"
-        className={cn(
-          "pointer-events-none absolute inset-0 size-full rounded-none transition-opacity duration-200 motion-reduce:transition-none",
-          loadState !== "loading" && "opacity-0",
-        )}
-      />
-
       <Image
         alt={photo.alt}
         blurDataURL={photo.blurDataUrl}
-        className={cn(
-          "h-auto w-full transition-opacity duration-300 motion-reduce:transition-none",
-          loadState === "loading" && !photo.blurDataUrl && "opacity-0",
-          imageUnavailable && "invisible",
-        )}
+        className={cn("h-auto w-full", imageUnavailable && "invisible")}
+        data-load-attempt={loadAttempt}
         fetchPriority={index === 0 ? "high" : undefined}
         height={photo.height}
+        key={`${photo.id}:${loadAttempt}`}
         loading={index === 0 ? "eager" : "lazy"}
-        onError={() => setLoadState("error")}
+        onError={handleError}
         onLoad={(event) => reportLoadedImage(event.currentTarget)}
         placeholder={photo.blurDataUrl ? "blur" : "empty"}
         quality={100}
@@ -184,6 +221,16 @@ export function GalleryFeedPhoto({
         src={photo.url}
         width={photo.width}
       />
+
+      {showLoadingStatus ? (
+        <GalleryImageStatus
+          className="top-3 right-3"
+          dataSlot="gallery-feed-loading"
+          focusable={false}
+          label={`Carregando foto ${index + 1}`}
+          state="loading"
+        />
+      ) : null}
 
       {imageUnavailable ? (
         <Empty
@@ -229,33 +276,26 @@ export function GalleryViewerImage({
   photo,
   previewSrc,
 }: GalleryViewerImageProps) {
-  const [loadState, setLoadState] = useState<ImageLoadState>("loading");
-  const [retryCount, setRetryCount] = useState(0);
-  const [showSpinner, setShowSpinner] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(1);
+  const [loadState, setLoadState] = useState<ViewerImageLoadState>("loading");
   const decodedImageRef = useRef<HTMLImageElement | null>(null);
+  const failedAttemptRef = useRef<number | null>(null);
   const highResolutionContainerRef = useRef<HTMLDivElement | null>(null);
   const mountedRef = useRef(true);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showLoadingStatus = useDelayedLoadingStatus(loadState === "loading");
 
   useEffect(() => {
     mountedRef.current = true;
 
     return () => {
       mountedRef.current = false;
+
+      if (retryTimerRef.current !== null) {
+        clearTimeout(retryTimerRef.current);
+      }
     };
   }, []);
-
-  useEffect(() => {
-    if (loadState !== "loading") {
-      return;
-    }
-
-    const timer = setTimeout(
-      () => setShowSpinner(true),
-      VIEWER_SPINNER_DELAY_MS,
-    );
-
-    return () => clearTimeout(timer);
-  }, [loadState]);
 
   useEffect(() => {
     if (
@@ -301,14 +341,32 @@ export function GalleryViewerImage({
       return;
     }
 
-    setShowSpinner(false);
     setLoadState("ready");
   }, []);
 
   const handleError = useCallback(() => {
-    setShowSpinner(false);
-    setLoadState("error");
-  }, []);
+    if (failedAttemptRef.current === loadAttempt) {
+      return;
+    }
+
+    failedAttemptRef.current = loadAttempt;
+    decodedImageRef.current = null;
+
+    if (loadAttempt >= MAX_IMAGE_LOAD_ATTEMPTS) {
+      setLoadState(previewSrc ? "fallback" : "error");
+      return;
+    }
+
+    retryTimerRef.current = setTimeout(() => {
+      retryTimerRef.current = null;
+
+      if (!mountedRef.current) {
+        return;
+      }
+
+      setLoadAttempt((currentAttempt) => currentAttempt + 1);
+    }, IMAGE_RETRY_BASE_DELAY_MS * loadAttempt);
+  }, [loadAttempt, previewSrc]);
 
   useEffect(() => {
     if (loadState !== "loading") {
@@ -337,12 +395,6 @@ export function GalleryViewerImage({
 
     return () => clearInterval(interval);
   }, [handleError, handleLoad, loadState]);
-
-  const retry = () => {
-    setShowSpinner(false);
-    setLoadState("loading");
-    setRetryCount((currentRetryCount) => currentRetryCount + 1);
-  };
 
   const showHighResolutionImage =
     loadState === "ready" || (!previewSrc && loadState === "loading");
@@ -376,10 +428,11 @@ export function GalleryViewerImage({
           alt={photo.alt}
           blurDataURL={photo.blurDataUrl}
           className="object-contain"
+          data-load-attempt={loadAttempt}
           data-image-state={loadState}
           fetchPriority="high"
           fill
-          key={`${photo.id}:${retryCount}`}
+          key={`${photo.id}:${loadAttempt}`}
           loading="eager"
           onError={handleError}
           onLoad={(event) => void handleLoad(event.currentTarget)}
@@ -390,39 +443,102 @@ export function GalleryViewerImage({
         />
       </div>
 
-      {loadState === "loading" && showSpinner ? (
-        <Badge
-          className="absolute top-1/2 left-1/2 -translate-1/2 shadow-lg"
-          data-slot="gallery-viewer-loading"
-          role="status"
-          variant="secondary"
-        >
-          <Spinner aria-hidden="true" />
-          Carregando imagem em alta resolução
-        </Badge>
+      {loadState === "loading" && showLoadingStatus ? (
+        <GalleryImageStatus
+          className="top-16 right-3 sm:top-18 sm:right-4"
+          dataSlot="gallery-viewer-loading"
+          label="Carregando imagem em alta resolução."
+          state="loading"
+        />
+      ) : null}
+
+      {loadState === "fallback" ? (
+        <GalleryImageStatus
+          className="top-16 right-3 sm:top-18 sm:right-4"
+          dataSlot="gallery-viewer-fallback"
+          label="A imagem em alta resolução não pôde ser carregada. Exibindo a versão qualidade padrão."
+          state="fallback"
+        />
       ) : null}
 
       {loadState === "error" ? (
-        <Alert
-          className="absolute top-1/2 left-1/2 w-[calc(100%-2rem)] max-w-sm -translate-1/2 shadow-xl"
+        <Empty
+          className="absolute inset-0 rounded-none border-0 bg-transparent p-4 text-white"
           data-slot="gallery-viewer-error"
+          role="status"
         >
-          <AlertTitle>Não foi possível carregar a imagem completa</AlertTitle>
-          <AlertDescription>
-            A prévia permanece disponível. Tente carregar novamente.
-          </AlertDescription>
-          <Button
-            className="mt-2 w-fit"
-            onClick={retry}
-            size="sm"
-            type="button"
-          >
-            Tentar novamente
-          </Button>
-        </Alert>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={Image01Icon} strokeWidth={2} />
+            </EmptyMedia>
+            <EmptyTitle>Imagem indisponível</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       ) : null}
     </>
   );
+}
+
+type GalleryImageStatusProps = {
+  className?: string;
+  dataSlot: string;
+  focusable?: boolean;
+  label: string;
+  state: "fallback" | "loading";
+};
+
+function GalleryImageStatus({
+  className,
+  dataSlot,
+  focusable = true,
+  label,
+  state,
+}: GalleryImageStatusProps) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Badge
+          aria-label={label}
+          aria-live="polite"
+          className={cn(
+            "absolute z-20 size-7 border-white/15 bg-black/55 p-0 text-white shadow-sm backdrop-blur-md",
+            className,
+          )}
+          data-slot={dataSlot}
+          role="status"
+          tabIndex={focusable ? 0 : undefined}
+          variant="outline"
+        >
+          {state === "loading" ? (
+            <Spinner aria-hidden="true" role="presentation" />
+          ) : (
+            <HugeiconsIcon icon={Image01Icon} strokeWidth={2} />
+          )}
+        </Badge>
+      </TooltipTrigger>
+      <TooltipContent side="left">{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function useDelayedLoadingStatus(
+  isLoading: boolean,
+  delay = IMAGE_STATUS_DELAY_MS,
+) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsVisible(false);
+      return;
+    }
+
+    const timer = setTimeout(() => setIsVisible(true), delay);
+
+    return () => clearTimeout(timer);
+  }, [delay, isLoading]);
+
+  return isVisible;
 }
 
 function canSpeculativelyWarmGalleryImages() {

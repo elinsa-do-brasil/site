@@ -150,8 +150,13 @@ async def _test_cached_preview_and_loading_state():
 
 
 @pytest.mark.browser
-def test_gallery_preserves_preview_and_allows_retry_after_image_error():
-    asyncio.run(_test_viewer_error_and_retry())
+def test_gallery_retries_automatically_and_keeps_preview_after_third_error():
+    asyncio.run(_test_viewer_automatic_retry_and_fallback())
+
+
+@pytest.mark.browser
+def test_gallery_uses_discrete_feed_loading_state_without_skeleton_overlay():
+    asyncio.run(_test_discrete_feed_loading_state())
 
 
 @pytest.mark.browser
@@ -199,7 +204,48 @@ async def _test_hover_warmup_is_reused_on_open():
         await browser.close()
 
 
-async def _test_viewer_error_and_retry():
+async def _test_discrete_feed_loading_state():
+    base_url = os.environ.get("PAYLOAD_TEST_BASE_URL", "http://localhost:3000")
+
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        context = await browser.new_context(
+            base_url=base_url,
+            device_scale_factor=1,
+            viewport={"width": 1280, "height": 900},
+        )
+        page = await context.new_page()
+
+        async def delay_optimized_images(route):
+            await asyncio.sleep(3)
+            await route.continue_()
+
+        await page.route("**/_next/image*", delay_optimized_images)
+        await page.goto("/galeria", wait_until="domcontentloaded")
+        feed_photo = page.locator('[data-slot="gallery-feed-photo"]').first
+
+        if await feed_photo.count() == 0:
+            await context.close()
+            await browser.close()
+            pytest.skip("A galeria precisa ter ao menos uma imagem publicada")
+
+        loading_status = feed_photo.locator('[data-slot="gallery-feed-loading"]')
+        await expect(loading_status).to_be_visible(timeout=10_000)
+        assert await feed_photo.locator('[data-slot="skeleton"]').count() == 0
+
+        await loading_status.hover()
+        await expect(page.get_by_role("tooltip")).to_contain_text(
+            "Carregando foto 1"
+        )
+        await expect(feed_photo).to_have_attribute(
+            "data-image-state", "ready", timeout=120_000
+        )
+
+        await context.close()
+        await browser.close()
+
+
+async def _test_viewer_automatic_retry_and_fallback():
     base_url = os.environ.get("PAYLOAD_TEST_BASE_URL", "http://localhost:3000")
 
     async with async_playwright() as playwright:
@@ -230,13 +276,19 @@ async def _test_viewer_error_and_retry():
 
         preview = page.locator('[data-slot="gallery-cached-preview"]')
         await expect(preview).to_have_attribute("src", feed_source)
-        error_alert = page.locator('[data-slot="gallery-viewer-error"]')
-        await expect(error_alert).to_be_visible(timeout=30_000)
+        fallback_status = page.locator('[data-slot="gallery-viewer-fallback"]')
+        await expect(fallback_status).to_be_visible(timeout=30_000)
         await expect(preview).to_be_visible()
+        await expect(
+            page.locator('[data-slot="gallery-photo-stage"] img[data-image-state]')
+        ).to_have_attribute("data-image-state", "fallback")
+        assert await page.get_by_role("button", name="Tentar novamente").count() == 0
+        assert failed_requests == 3
 
-        await error_alert.get_by_role("button", name="Tentar novamente").click()
-        await expect(error_alert).to_be_visible(timeout=30_000)
-        assert failed_requests >= 2
+        await fallback_status.hover()
+        await expect(page.get_by_role("tooltip")).to_contain_text(
+            "Exibindo a prévia em baixa resolução"
+        )
 
         await context.close()
         await browser.close()
