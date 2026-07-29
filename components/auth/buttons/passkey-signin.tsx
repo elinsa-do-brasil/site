@@ -1,4 +1,4 @@
-import { Key } from "lucide-react";
+import { FingerprintPattern } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -39,7 +39,7 @@ export function PasskeySignInButton() {
         <Spinner />
       ) : (
         <>
-          <Key /> Entrar com Passkey
+          <FingerprintPattern /> Entrar com Passkey
         </>
       )}
     </Button>
