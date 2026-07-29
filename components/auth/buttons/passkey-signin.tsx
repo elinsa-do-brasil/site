@@ -1,4 +1,7 @@
-import { FingerprintPattern } from "lucide-react";
+"use client";
+
+import { FingerprintPatternIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -17,7 +20,7 @@ export function PasskeySignInButton({
   return (
     <Button
       variant="outline"
-      size={"lg"}
+      size="xl"
       type="button"
       disabled={isPending}
       onClick={async () =>
@@ -41,10 +44,15 @@ export function PasskeySignInButton({
       }
     >
       {isPending ? (
-        <Spinner />
+        <Spinner data-icon="inline-start" />
       ) : (
         <>
-          <FingerprintPattern /> Entrar com Passkey
+          <HugeiconsIcon
+            data-icon="inline-start"
+            icon={FingerprintPatternIcon}
+            strokeWidth={2}
+          />
+          Entrar com Passkey
         </>
       )}
     </Button>

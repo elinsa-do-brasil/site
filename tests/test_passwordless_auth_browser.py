@@ -122,6 +122,78 @@ def test_microsoft_oauth_uses_corporate_tenant_callback_and_hint():
     asyncio.run(_test_microsoft_oauth_initialization())
 
 
+@pytest.mark.browser
+def test_login_otp_uses_accessible_fields_and_six_digit_control():
+    asyncio.run(_test_login_otp_form())
+
+
+async def _test_login_otp_form():
+    base_url = os.environ.get("AUTH_TEST_BASE_URL", "http://localhost:3000")
+
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        context = await browser.new_context(base_url=base_url)
+        page = await context.new_page()
+        otp_requests: list[dict] = []
+
+        async def capture_otp_request(route):
+            otp_requests.append(route.request.post_data_json)
+            await route.fulfill(
+                body='{"success":true}',
+                content_type="application/json",
+                status=200,
+            )
+
+        await page.route(
+            "**/api/auth/email-otp/send-verification-otp",
+            capture_otp_request,
+        )
+
+        try:
+            await page.goto("/entrar", wait_until="networkidle")
+
+            microsoft_button = page.get_by_role(
+                "button", name="Entrar com a Microsoft"
+            )
+            passkey_button = page.get_by_role("button", name="Entrar com Passkey")
+            await expect(microsoft_button).to_be_visible()
+            await expect(passkey_button).to_be_visible()
+
+            await page.get_by_label("E-mail", exact=True).fill("email-invalido")
+            await page.get_by_role("button", name="Enviar código").click()
+            await expect(page.get_by_text("Informe um e-mail válido.")).to_be_visible()
+            assert otp_requests == []
+
+            await page.get_by_label("E-mail", exact=True).fill(
+                "raave.aires@grupoamperelinsa.com"
+            )
+            await page.get_by_role("button", name="Enviar código").click()
+
+            await expect(page.get_by_label("Código", exact=True)).to_be_visible()
+            await expect(page.locator('[data-slot="input-otp"]')).to_have_count(1)
+            await expect(page.locator('[data-slot="input-otp-slot"]')).to_have_count(6)
+            await expect(microsoft_button).to_have_count(0)
+            await expect(passkey_button).to_have_count(0)
+            assert otp_requests == [
+                {
+                    "email": "raave.aires@grupoamperelinsa.com",
+                    "type": "sign-in",
+                }
+            ]
+
+            await page.get_by_label("Código", exact=True).fill("123")
+            await page.get_by_role("button", name="Entrar", exact=True).click()
+            await expect(page.get_by_text("Digite os 6 dígitos.")).to_be_visible()
+
+            await page.get_by_role("button", name="Alterar e-mail").click()
+            await expect(page.get_by_label("E-mail", exact=True)).to_be_visible()
+            await expect(microsoft_button).to_be_visible()
+            await expect(passkey_button).to_be_visible()
+        finally:
+            await context.close()
+            await browser.close()
+
+
 async def _test_microsoft_oauth_initialization():
     base_url = os.environ.get("AUTH_TEST_BASE_URL", "http://localhost:3000")
 

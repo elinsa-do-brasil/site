@@ -1,8 +1,12 @@
 "use client";
 
-import { Check, Mail, RotateCcw } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail01Icon, RefreshIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -14,34 +18,79 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/lib/errors";
 
-const emailSchema = z.email("Informe um e-mail válido.");
 const INVITATION_ID_HEADER = "x-elinsa-invitation-id";
+
+const otpFormSchema = z.object({
+  otp: z.string().regex(/^\d{6}$/, "Digite os 6 dígitos."),
+});
+
+function createIdentityFormSchema(nameRequired: boolean) {
+  return z.object({
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .pipe(z.email("Informe um e-mail válido.")),
+    name: nameRequired
+      ? z
+          .string()
+          .trim()
+          .min(2, "Informe seu nome completo.")
+          .max(120, "O nome deve ter no máximo 120 caracteres.")
+      : z.string().trim().max(120),
+  });
+}
+
+type IdentityFormValues = z.infer<ReturnType<typeof createIdentityFormSchema>>;
+type OtpFormValues = z.infer<typeof otpFormSchema>;
+
+export type EmailOtpStep = "identity" | "otp";
 
 type EmailOtpFormProps = {
   fixedEmail?: string;
+  identitySubmitVariant?: "default" | "secondary";
   invitationId?: string;
   nameRequired?: boolean;
+  onStepChange?: (step: EmailOtpStep) => void;
   redirectTo?: string;
 };
 
 export function EmailOtpForm({
   fixedEmail,
+  identitySubmitVariant = "default",
   invitationId,
   nameRequired = false,
+  onStepChange,
   redirectTo = "/portal",
 }: EmailOtpFormProps) {
   const router = useRouter();
-  const [email, setEmail] = useState(fixedEmail ?? "");
-  const [name, setName] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<"email" | "otp">("email");
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
+  const identityFormSchema = useMemo(
+    () => createIdentityFormSchema(nameRequired),
+    [nameRequired],
+  );
+  const identityForm = useForm<IdentityFormValues>({
+    defaultValues: {
+      email: fixedEmail?.trim().toLowerCase() ?? "",
+      name: "",
+    },
+    resolver: zodResolver(identityFormSchema),
+  });
+  const otpForm = useForm<OtpFormValues>({
+    defaultValues: { otp: "" },
+    resolver: zodResolver(otpFormSchema),
+  });
+  const [step, setStep] = useState<EmailOtpStep>("identity");
   const [resendIn, setResendIn] = useState(0);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     if (resendIn <= 0) return;
@@ -53,25 +102,15 @@ export function EmailOtpForm({
     return () => window.clearInterval(timer);
   }, [resendIn]);
 
-  const normalizedEmail = email.trim().toLowerCase();
+  async function requestOtp(
+    values: IdentityFormValues,
+    errorTarget: "identity" | "otp",
+  ) {
+    identityForm.clearErrors("root.server");
+    otpForm.clearErrors("root.server");
 
-  async function sendOtp() {
-    setError(null);
-
-    const emailResult = emailSchema.safeParse(normalizedEmail);
-    if (!emailResult.success) {
-      setError(emailResult.error.issues[0]?.message ?? "E-mail inválido.");
-      return;
-    }
-
-    if (nameRequired && name.trim().length < 2) {
-      setError("Informe seu nome completo.");
-      return;
-    }
-
-    setIsPending(true);
     const result = await authClient.emailOtp.sendVerificationOtp({
-      email: normalizedEmail,
+      email: values.email,
       type: "sign-in",
       ...(invitationId
         ? {
@@ -81,45 +120,55 @@ export function EmailOtpForm({
           }
         : {}),
     });
-    setIsPending(false);
 
     if (result.error) {
-      setError(getErrorMessage(result.error.code ?? ""));
-      return;
+      const message = getErrorMessage(result.error.code ?? "");
+
+      if (errorTarget === "otp") {
+        otpForm.setError("root.server", { message });
+      } else {
+        identityForm.setError("root.server", { message });
+      }
+
+      return false;
     }
 
+    return true;
+  }
+
+  async function handleSend(values: IdentityFormValues) {
+    if (!(await requestOtp(values, "identity"))) return;
+
+    identityForm.reset(values);
+    otpForm.reset();
     setStep("otp");
+    onStepChange?.("otp");
     setResendIn(60);
-    toast.success(
-      "Se a conta estiver habilitada, o código chegará em instantes.",
-    );
   }
 
-  async function handleSend(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    await sendOtp();
+  async function handleResend() {
+    setIsResending(true);
+    const sent = await requestOtp(identityForm.getValues(), "otp");
+    setIsResending(false);
+
+    if (sent) setResendIn(60);
   }
 
-  async function handleVerify(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
+  async function handleVerify(values: OtpFormValues) {
+    otpForm.clearErrors();
 
-    if (!/^\d{6}$/.test(otp)) {
-      setError("Digite o código de 6 dígitos enviado por e-mail.");
-      return;
-    }
-
-    setIsPending(true);
+    const identity = identityForm.getValues();
     const result = await authClient.signIn.emailOtp({
-      email: normalizedEmail,
-      otp,
-      ...(nameRequired ? { name: name.trim() } : {}),
+      email: identity.email,
+      otp: values.otp,
+      ...(nameRequired ? { name: identity.name } : {}),
       ...(invitationId ? { invitationId } : {}),
     });
 
     if (result.error) {
-      setIsPending(false);
-      setError(getErrorMessage(result.error.code ?? ""));
+      otpForm.setError("otp", {
+        message: getErrorMessage(result.error.code ?? ""),
+      });
       return;
     }
 
@@ -129,11 +178,11 @@ export function EmailOtpForm({
       });
 
       if (invitationResult.error) {
-        setIsPending(false);
-        setError(
-          invitationResult.error.message ||
+        otpForm.setError("root.server", {
+          message:
+            invitationResult.error.message ||
             "A conta foi criada, mas não foi possível aceitar o convite.",
-        );
+        });
         return;
       }
     }
@@ -143,110 +192,195 @@ export function EmailOtpForm({
     router.refresh();
   }
 
+  function handleChangeEmail() {
+    otpForm.reset();
+    setStep("identity");
+    onStepChange?.("identity");
+    setResendIn(0);
+  }
+
   if (step === "otp") {
+    const email = identityForm.getValues("email");
+    const isVerifying = otpForm.formState.isSubmitting;
+    const isBusy = isVerifying || isResending;
+
     return (
-      <form className="flex flex-col gap-4" onSubmit={handleVerify} noValidate>
+      <form onSubmit={otpForm.handleSubmit(handleVerify)} noValidate>
         <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="email-otp-code">Código de acesso</FieldLabel>
-            <Input
-              autoComplete="one-time-code"
-              autoFocus
-              id="email-otp-code"
-              inputMode="numeric"
-              maxLength={6}
-              onChange={(event) =>
-                setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
-              }
-              pattern="[0-9]{6}"
-              placeholder="000000"
-              value={otp}
-            />
-            <FieldDescription>
-              Enviado para {normalizedEmail}. O código expira em 10 minutos.
-            </FieldDescription>
-          </Field>
+          <Controller
+            control={otpForm.control}
+            name="otp"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="email-otp-code">Código</FieldLabel>
+                <InputOTP
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  autoComplete="one-time-code"
+                  autoFocus
+                  containerClassName="w-full"
+                  id="email-otp-code"
+                  inputMode="numeric"
+                  maxLength={6}
+                  pattern={REGEXP_ONLY_DIGITS}
+                >
+                  <InputOTPGroup className="w-full gap-1.5">
+                    {[0, 1, 2, 3, 4, 5].map((index) => (
+                      <InputOTPSlot
+                        aria-invalid={fieldState.invalid}
+                        className="h-12 w-auto min-w-0 flex-1 rounded-md border border-input bg-background font-mono text-lg tabular-nums first:rounded-md first:border-l last:rounded-md"
+                        index={index}
+                        key={index}
+                      />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+                <FieldDescription className="grid gap-2 rounded-lg border border-border/60 bg-muted/30 px-3.5 py-3">
+                  <span className="grid min-w-0 gap-0.5 @sm/field-group:flex @sm/field-group:items-baseline @sm/field-group:justify-between @sm/field-group:gap-4">
+                    <span>Enviado para</span>
+                    <span className="min-w-0 break-all font-medium text-foreground @sm/field-group:text-right">
+                      {email}
+                    </span>
+                  </span>
+                  <span className="flex items-baseline justify-between gap-4 border-t border-border/60 pt-2">
+                    <span>Válido por</span>
+                    <span className="font-mono text-foreground tabular-nums">
+                      10 min
+                    </span>
+                  </span>
+                </FieldDescription>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
 
-          {error ? <FieldError>{error}</FieldError> : null}
+          <FieldError errors={[otpForm.formState.errors.root?.server]} />
 
-          <Button disabled={isPending} size="lg" type="submit">
-            {isPending ? <Spinner /> : <Check />}
-            Confirmar código
+          <Button disabled={isBusy} size="xl" type="submit">
+            {isVerifying ? <Spinner data-icon="inline-start" /> : "Entrar"}
           </Button>
 
-          <div className="grid gap-2 sm:grid-cols-2">
+          <Field orientation="horizontal">
             <Button
-              disabled={isPending || resendIn > 0}
-              onClick={sendOtp}
+              className="flex-1"
+              disabled={isBusy || resendIn > 0}
+              onClick={handleResend}
               type="button"
               variant="outline"
             >
-              <RotateCcw />
-              {resendIn > 0 ? `Reenviar em ${resendIn}s` : "Reenviar código"}
+              {isResending ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <HugeiconsIcon
+                  data-icon="inline-start"
+                  icon={RefreshIcon}
+                  strokeWidth={2}
+                />
+              )}
+              {resendIn > 0 ? (
+                <>
+                  Reenviar em
+                  <span
+                    className="font-mono tabular-nums"
+                    data-slot="resend-countdown"
+                  >
+                    {resendIn}s
+                  </span>
+                </>
+              ) : (
+                "Reenviar"
+              )}
             </Button>
-            {!fixedEmail ? (
+            {!fixedEmail && (
               <Button
-                disabled={isPending}
-                onClick={() => {
-                  setError(null);
-                  setOtp("");
-                  setStep("email");
-                }}
+                className="flex-1"
+                disabled={isBusy}
+                onClick={handleChangeEmail}
                 type="button"
                 variant="ghost"
               >
                 Alterar e-mail
               </Button>
-            ) : null}
-          </div>
+            )}
+          </Field>
         </FieldGroup>
       </form>
     );
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSend} noValidate>
+    <form onSubmit={identityForm.handleSubmit(handleSend)} noValidate>
       <FieldGroup>
-        {nameRequired ? (
-          <Field>
-            <FieldLabel htmlFor="email-otp-name">Nome completo</FieldLabel>
-            <Input
-              autoComplete="name"
-              id="email-otp-name"
-              maxLength={120}
-              onChange={(event) => setName(event.target.value)}
-              required
-              value={name}
-            />
-          </Field>
-        ) : null}
-
-        <Field>
-          <FieldLabel htmlFor="email-otp-email">
-            {fixedEmail ? "E-mail do convite" : "E-mail"}
-          </FieldLabel>
-          <Input
-            autoComplete="email username webauthn"
-            id="email-otp-email"
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="voce@exemplo.com"
-            readOnly={Boolean(fixedEmail)}
-            required
-            type="email"
-            value={email}
+        {nameRequired && (
+          <Controller
+            control={identityForm.control}
+            name="name"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="email-otp-name">Nome completo</FieldLabel>
+                <Input
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  autoComplete="name"
+                  className="h-11"
+                  id="email-otp-name"
+                  maxLength={120}
+                  required
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
-          <FieldDescription>
-            {fixedEmail
-              ? "O endereço vem do convite e não pode ser alterado."
-              : "Disponível para contas já ativadas ou convidadas."}
-          </FieldDescription>
-        </Field>
+        )}
 
-        {error ? <FieldError>{error}</FieldError> : null}
+        <Controller
+          control={identityForm.control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="email-otp-email">
+                {fixedEmail ? "E-mail do convite" : "E-mail"}
+              </FieldLabel>
+              <Input
+                {...field}
+                aria-invalid={fieldState.invalid}
+                autoComplete="email username webauthn"
+                className="h-11"
+                id="email-otp-email"
+                placeholder="email@grupoamperelinsa.com"
+                readOnly={Boolean(fixedEmail)}
+                required
+                type="email"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-        <Button disabled={isPending} size="lg" type="submit">
-          {isPending ? <Spinner /> : <Mail />}
-          Enviar código
+        <FieldError errors={[identityForm.formState.errors.root?.server]} />
+
+        <Button
+          disabled={identityForm.formState.isSubmitting}
+          size="xl"
+          type="submit"
+          variant={identitySubmitVariant}
+        >
+          {identityForm.formState.isSubmitting ? (
+            <Spinner data-icon="inline-start" />
+          ) : (
+            <>
+              <HugeiconsIcon
+                data-icon="inline-start"
+                icon={Mail01Icon}
+                strokeWidth={2}
+              />
+              Enviar código
+            </>
+          )}
         </Button>
       </FieldGroup>
     </form>

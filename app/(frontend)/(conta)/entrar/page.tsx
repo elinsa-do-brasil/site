@@ -30,15 +30,10 @@ export default async function EntrarPage({ searchParams }: EntrarPageProps) {
 
   return (
     <main
-      className="flex flex-col min-h-screen w-full items-center justify-center px-4 py-12 gap-4"
+      className="flex min-h-dvh w-full items-center justify-center bg-muted/20 px-4 py-8 sm:py-12"
       id="conteudo-principal"
     >
       <LoginForm redirectTo={safeRedirect} />
-      <p className="text-xs text-muted-foreground max-w-92 text-center">
-        O primeiro acesso de contas <strong>@grupoamperelinsa.com</strong> é
-        feito pela Microsoft. O código por e-mail fica disponível depois que a
-        conta é ativada ou para convidados externos.
-      </p>
     </main>
   );
 }

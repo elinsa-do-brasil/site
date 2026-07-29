@@ -71,10 +71,14 @@ export function OAuthButtonBase({
       className={className}
       onClick={handleClick}
       disabled={loading}
-      size={"lg"}
+      size="xl"
       type="button"
     >
-      {loading ? <Spinner /> : <Icon />}
+      {loading ? (
+        <Spinner data-icon="inline-start" />
+      ) : (
+        <Icon data-icon="inline-start" />
+      )}
       {label}
     </Button>
   );
