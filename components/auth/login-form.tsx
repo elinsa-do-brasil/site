@@ -111,7 +111,7 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
                 <FieldLabel htmlFor="login-email">E-mail</FieldLabel>
                 <Input
                   id="login-email"
-                  placeholder="você@alguma-coisa.com"
+                  placeholder="email@grupoamperelinsa.com"
                   autoComplete="email username webauthn"
                   aria-invalid={fieldState.invalid}
                   {...field}
