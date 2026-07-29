@@ -11,8 +11,6 @@ import {
 type LoginMethodAccount = {
   id: string;
   providerId: string;
-  accountId: string;
-  password: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -20,11 +18,7 @@ type LoginMethodAccount = {
 function getProviderLabel(providerId: string) {
   const normalizedProviderId = providerId.trim().toLowerCase();
 
-  if (normalizedProviderId === "credential") return "E-mail e senha";
   if (normalizedProviderId === "microsoft") return "Microsoft";
-  if (normalizedProviderId === "google") return "Google";
-  if (normalizedProviderId === "github") return "GitHub";
-
   return normalizedProviderId || "Provedor externo";
 }
 
@@ -37,12 +31,12 @@ function formatDate(value: Date) {
 
 export function LoginMethodsCard({
   accounts,
-  hasPassword,
-  socialProviders,
+  hasMicrosoft,
+  passkeysCount,
 }: {
   accounts: LoginMethodAccount[];
-  hasPassword: boolean;
-  socialProviders: string[];
+  hasMicrosoft: boolean;
+  passkeysCount: number;
 }) {
   return (
     <Card className="rounded-md border-border/80 py-0 shadow-sm ring-1 ring-foreground/5">
@@ -51,35 +45,35 @@ export function LoginMethodsCard({
           <KeyRound className="size-4 text-elinsa-primary" />
           Métodos de acesso
         </CardTitle>
-        <CardDescription>Logins vinculados a esta conta.</CardDescription>
+        <CardDescription>
+          Formas habilitadas para entrar nesta conta.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 py-4">
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-3">
           <StatusTile
             icon={MailCheck}
-            label="Senha local"
-            value={hasPassword ? "Configurada" : "Não configurada"}
-            active={hasPassword}
+            label="Código por e-mail"
+            value="Disponível"
+            active
           />
           <StatusTile
             icon={Link2}
-            label="Login social"
-            value={
-              socialProviders.length > 0
-                ? socialProviders.map(getProviderLabel).join(", ")
-                : "Não conectado"
-            }
-            active={socialProviders.length > 0}
+            label="Microsoft"
+            value={hasMicrosoft ? "Vinculada" : "Não vinculada"}
+            active={hasMicrosoft}
+          />
+          <StatusTile
+            icon={Fingerprint}
+            label="Passkeys"
+            value={`${passkeysCount} cadastrada${passkeysCount === 1 ? "" : "s"}`}
+            active={passkeysCount > 0}
           />
         </div>
 
-        <div className="space-y-2">
-          {accounts.length === 0 ? (
-            <p className="rounded-md border border-border/80 bg-background/70 p-3 text-muted-foreground">
-              Nenhum método de login foi encontrado.
-            </p>
-          ) : (
-            accounts.map((account) => (
+        {accounts.length > 0 ? (
+          <div className="space-y-2">
+            {accounts.map((account) => (
               <div
                 className="flex items-center justify-between gap-3 rounded-md border border-border/80 bg-background/70 p-3"
                 key={account.id}
@@ -89,17 +83,17 @@ export function LoginMethodsCard({
                     {getProviderLabel(account.providerId)}
                   </p>
                   <p className="text-muted-foreground">
-                    Atualizado em {formatDate(account.updatedAt)}
+                    Atualizada em {formatDate(account.updatedAt)}
                   </p>
                 </div>
                 <Badge variant="outline">
-                  <Fingerprint className="size-3" />
-                  {account.providerId === "credential" ? "Credencial" : "OAuth"}
+                  <Link2 className="size-3" />
+                  OAuth
                 </Badge>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );

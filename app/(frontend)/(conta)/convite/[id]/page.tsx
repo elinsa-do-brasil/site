@@ -5,7 +5,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { AceitarConvite } from "@/components/auth/AcceptInvite";
 import { BotaoSair } from "@/components/auth/LogoutButton";
-import { CriarContaForm } from "@/components/auth/SignUpForm";
+import {
+  CorporateInviteSignIn,
+  CriarContaForm,
+} from "@/components/auth/SignUpForm";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
+import { isCorporateEmail } from "@/lib/auth-policy";
 import { db } from "@/lib/db";
 import { invitation, organization, user } from "@/lib/db/schema";
 import { formatOrganizationRole } from "@/lib/organization/constants";
@@ -97,6 +101,10 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
   const sessionEmail = currentSession?.user.email?.trim().toLowerCase() ?? null;
   const isSessionForInvite = sessionEmail === normalizedEmail;
   const roleLabel = formatOrganizationRole(invite.role);
+  const isCorporateInvitation = isCorporateEmail(
+    normalizedEmail,
+    process.env.MICROSOFT_ALLOWED_DOMAIN,
+  );
 
   if (currentSession?.user && !isSessionForInvite) {
     return (
@@ -143,6 +151,13 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
         <AceitarConvite
           invitationEmail={invite.email}
           invitationId={id}
+          organizationName={invite.organizationName}
+          roleLabel={roleLabel}
+        />
+      ) : isCorporateInvitation ? (
+        <CorporateInviteSignIn
+          invitationId={id}
+          invitedEmail={invite.email}
           organizationName={invite.organizationName}
           roleLabel={roleLabel}
         />

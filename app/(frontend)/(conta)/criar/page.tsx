@@ -44,20 +44,21 @@ export default async function CriarContaPage({
             <Logo className="mx-auto" />
           </CardTitle>
           <h1 className="text-lg font-semibold tracking-tight">
-            Criação de conta por convite
+            Acesso ao Portal Interno
           </h1>
           <CardDescription>
-            Seu acesso ao Portal Interno começa por um convite válido.
+            Colaboradores entram pela Microsoft; convidados externos usam um
+            convite válido.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-6 pb-6">
           <p className="text-center text-sm">
-            Para criar uma conta no Portal Interno da Elinsa você precisa de um
-            convite.
+            Se você possui uma conta @grupoamperelinsa.com, use a Microsoft na
+            tela de login para fazer o primeiro acesso.
           </p>
           <p className="text-center text-sm">
-            Se você recebeu um convite por e-mail, clique no link do convite
-            para abrir o formulário de criação de conta.
+            Se recebeu um convite externo, abra o link enviado por e-mail para
+            confirmar o endereço com um código de uso único.
           </p>
           <Or />
           <Button variant="link" className="w-full text-sm" asChild>

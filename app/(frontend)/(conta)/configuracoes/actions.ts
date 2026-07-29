@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { passkey, session as sessionTable, user } from "@/lib/db/schema";
+import { session as sessionTable, user } from "@/lib/db/schema";
 
 type ActionResult<T = undefined> = T extends undefined
   ? { error?: string; success?: boolean }
@@ -79,21 +79,6 @@ export async function updateAccountProfileAction(input: {
         updatedAt: new Date(),
       })
       .where(eq(user.id, userId));
-
-    revalidatePath("/configuracoes");
-    return { success: true };
-  } catch (error) {
-    return { error: getActionError(error) };
-  }
-}
-
-export async function deletePasskeyAction(id: string): Promise<ActionResult> {
-  try {
-    const { userId } = await requireCurrentAccount();
-
-    await db
-      .delete(passkey)
-      .where(and(eq(passkey.id, id), eq(passkey.userId, userId)));
 
     revalidatePath("/configuracoes");
     return { success: true };

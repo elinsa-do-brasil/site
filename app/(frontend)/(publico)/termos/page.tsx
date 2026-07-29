@@ -129,9 +129,9 @@ export default function TermosPage() {
               comunicar suspeitas de acesso indevido.
             </p>
             <p>
-              O portal pode usar senha, verificação de e-mail, passkey, provedor
-              corporativo e registros de sessão para proteger contas e fluxos
-              internos.
+              O portal pode usar códigos de uso único por e-mail, Passkeys,
+              provedor corporativo e registros de sessão para proteger contas e
+              fluxos internos.
             </p>
           </Section>
 

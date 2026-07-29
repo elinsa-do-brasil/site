@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   index,
   integer,
@@ -120,6 +121,17 @@ export const verification = pgTable(
       .defaultNow(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
+
+export const rateLimit = pgTable(
+  "rate_limit",
+  {
+    id: text("id").primaryKey(),
+    key: text("key").notNull().unique(),
+    count: integer("count").notNull(),
+    lastRequest: bigint("last_request", { mode: "number" }).notNull(),
+  },
+  (table) => [uniqueIndex("rate_limit_key_idx").on(table.key)],
 );
 
 export const organization = pgTable(

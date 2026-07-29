@@ -1,32 +1,30 @@
-import type { authClient } from "@/lib/auth-client";
-
-type ErrorTypes = Partial<
-	Record<
-		keyof typeof authClient.$ERROR_CODES,
-		{
-			pt_br: string;
-		}
-	>
->;
- 
-const errorCodes = {
-	USER_ALREADY_EXISTS: {
-		pt_br: "Esse e-mail já está registrado."
-	},
-  INVALID_EMAIL_OR_PASSWORD: {
-    pt_br: "Login ou senha inválidos."
+const errorCodes: Record<string, { pt_br: string }> = {
+  EMAIL_MANAGED_BY_MICROSOFT: {
+    pt_br: "E-mails corporativos são administrados pela Microsoft.",
   },
-	EMAIL_NOT_VERIFIED: {
-		pt_br: "Verifique seu e-mail antes de continuar."
-	},
-	USER_EMAIL_NOT_FOUND: {
-		pt_br: "Nenhum usuário encontrado com esse e-mail."
-	},
-} satisfies ErrorTypes;
- 
+  INVALID_EMAIL: {
+    pt_br: "O e-mail informado não é válido.",
+  },
+  INVALID_OTP: {
+    pt_br: "O código é inválido ou expirou.",
+  },
+  OTP_EXPIRED: {
+    pt_br: "O código expirou. Solicite um novo.",
+  },
+  PASSWORD_AUTH_DISABLED: {
+    pt_br: "Use Microsoft, código por e-mail ou Passkey para entrar.",
+  },
+  RATE_LIMITED: {
+    pt_br: "Muitas tentativas. Aguarde antes de tentar novamente.",
+  },
+  TOO_MANY_ATTEMPTS: {
+    pt_br: "O limite de tentativas foi atingido. Solicite um novo código.",
+  },
+};
+
 export const getErrorMessage = (code: string, lang: "pt_br" = "pt_br") => {
-	if (code in errorCodes) {
-		return errorCodes[code as keyof typeof errorCodes][lang];
-	}
-	return "Ocorreu um erro inesperado. Por favor, tente novamente.";
+  return (
+    errorCodes[code]?.[lang] ||
+    "Não foi possível concluir a ação. Tente novamente."
+  );
 };

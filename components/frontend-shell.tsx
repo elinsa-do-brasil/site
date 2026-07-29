@@ -6,15 +6,7 @@ import { Header } from "@/components/header";
 import { InternalHeader } from "@/components/internal/internal-header";
 import { Toaster } from "@/components/ui/sonner";
 
-const accountRoutes = [
-  "/configuracoes",
-  "/convite",
-  "/criar",
-  "/entrar",
-  "/recuperar-senha",
-  "/redefinir-senha",
-  "/verificar-email",
-];
+const accountRoutes = ["/configuracoes", "/convite", "/criar", "/entrar"];
 
 function isAccountRoute(pathname: string) {
   return accountRoutes.some(

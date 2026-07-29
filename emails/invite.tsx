@@ -22,8 +22,8 @@ export const InviteEmail = ({
       description={
         <>
           Você recebeu um convite para acessar o Portal Interno da Elinsa.
-          <br />O link abaixo abre o aceite do convite e, se necessário, a
-          criação da sua conta.
+          <br />O link abaixo abre o aceite e orienta o acesso pela Microsoft ou
+          por um código enviado ao e-mail convidado.
         </>
       }
       details={[

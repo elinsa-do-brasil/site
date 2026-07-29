@@ -2,7 +2,7 @@
 
 import { Fingerprint, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
-import { deletePasskeyAction } from "../actions";
 
 type PasskeyRecord = {
   id: string;
@@ -61,6 +60,10 @@ export function PasskeysCard({
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    setPasskeys(initialPasskeys);
+  }, [initialPasskeys]);
+
   async function handleAddPasskey() {
     setIsAdding(true);
     const result = await authClient.passkey.addPasskey({
@@ -80,11 +83,13 @@ export function PasskeysCard({
 
   async function handleDeletePasskey(id: string) {
     setDeletingId(id);
-    const result = await deletePasskeyAction(id);
+    const result = await authClient.passkey.deletePasskey({ id });
     setDeletingId(null);
 
     if (result.error) {
-      toast.error(result.error);
+      toast.error(
+        result.error.message || "Não foi possível remover a Passkey.",
+      );
       return;
     }
 

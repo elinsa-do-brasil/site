@@ -5,6 +5,11 @@ import { icons } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import { createElement } from "react";
 import InviteEmail from "@/emails/invite";
+import { isCorporateEmail } from "@/lib/auth-policy";
+import {
+  consumeDatabaseRateLimit,
+  createHashedRateLimitKey,
+} from "@/lib/database-rate-limit";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -225,6 +230,26 @@ export async function enviarConviteAdmin(
     return { error: "O e-mail é obrigatório." };
   }
 
+  const [adminRateAllowed, recipientRateAllowed] = await Promise.all([
+    consumeDatabaseRateLimit({
+      key: createHashedRateLimitKey("invitation/admin", context.userId),
+      max: 20,
+      windowSeconds: 60 * 60,
+    }),
+    consumeDatabaseRateLimit({
+      key: createHashedRateLimitKey("invitation/recipient", email),
+      max: 5,
+      windowSeconds: 60 * 60,
+    }),
+  ]);
+
+  if (!adminRateAllowed || !recipientRateAllowed) {
+    return {
+      error:
+        "Muitos convites foram solicitados. Aguarde antes de tentar novamente.",
+    };
+  }
+
   const selectedTeam = teamId
     ? teams.find((item) => item.id === teamId)
     : undefined;
@@ -294,7 +319,9 @@ export async function enviarConviteAdmin(
     "Para aceitar o convite e liberar seu acesso, utilize o link abaixo:",
     inviteLink,
     "",
-    "Caso ainda não possua conta, este mesmo link abrirá a criação com o e-mail do convite.",
+    isCorporateEmail(email, process.env.MICROSOFT_ALLOWED_DOMAIN)
+      ? "No primeiro acesso, entre com sua conta Microsoft corporativa."
+      : "No primeiro acesso, confirme o e-mail do convite com um código de uso único.",
     "",
     `Este convite expira em ${DEFAULT_INVITATION_DAYS} dias.`,
   ].filter((line) => line !== "");
@@ -304,19 +331,27 @@ export async function enviarConviteAdmin(
     .where(eq(user.id, context.userId))
     .limit(1);
 
-  await sendInternalAuthEmail({
-    to: email,
-    subject: `Convite de acesso: Portal Interno ${org.name}`,
-    text: linhasEmail.join("\n"),
-    idempotencyKey: `invite-admin/${inviteId}/${Date.now()}`,
-    react: createElement(InviteEmail, {
-      inviteLink,
-      inviteeEmail: email,
-      inviterEmail: inviter?.email,
-      organizationName: org.name,
-      role,
-    }),
-  });
+  try {
+    await sendInternalAuthEmail({
+      to: email,
+      subject: `Convite de acesso: Portal Interno ${org.name}`,
+      text: linhasEmail.join("\n"),
+      idempotencyKey: `invite-admin/${inviteId}/${expiresAt.getTime()}`,
+      react: createElement(InviteEmail, {
+        inviteLink,
+        inviteeEmail: email,
+        inviterEmail: inviter?.email,
+        organizationName: org.name,
+        role,
+      }),
+    });
+  } catch {
+    revalidateAdminPortal(selectedTeam?.name);
+    return {
+      error:
+        "O convite foi criado, mas o e-mail não pôde ser enviado. Tente reenviar em instantes.",
+    };
+  }
 
   revalidateAdminPortal(selectedTeam?.name);
   return { success: true };

@@ -35,7 +35,9 @@ export default async function EntrarPage({ searchParams }: EntrarPageProps) {
     >
       <LoginForm redirectTo={safeRedirect} />
       <p className="text-xs text-muted-foreground max-w-92 text-center">
-        O login com a Microsoft só está disponível para contas corporativas, isto é, contas que terminam com <strong>@grupoamperelinsa.com</strong>.
+        O primeiro acesso de contas <strong>@grupoamperelinsa.com</strong> é
+        feito pela Microsoft. O código por e-mail fica disponível depois que a
+        conta é ativada ou para convidados externos.
       </p>
     </main>
   );

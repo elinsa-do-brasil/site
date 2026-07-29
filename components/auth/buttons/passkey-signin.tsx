@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
-export function PasskeySignInButton() {
+export function PasskeySignInButton({
+  redirectTo = "/portal",
+}: {
+  redirectTo?: string;
+}) {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
@@ -23,7 +27,8 @@ export function PasskeySignInButton() {
             onSuccess(context) {
               setIsPending(false);
               toast.success(`Bem-vindo(a), ${context.data.user.name}!`);
-              router.push("/portal");
+              router.push(redirectTo);
+              router.refresh();
             },
             onError(context) {
               setIsPending(false);

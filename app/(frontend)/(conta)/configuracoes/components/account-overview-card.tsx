@@ -52,12 +52,12 @@ function formatSessionsCount(count: number) {
 
 export function AccountOverviewCard({
   user,
-  hasPassword,
+  hasMicrosoft,
   passkeysCount,
   sessionsCount,
 }: {
   user: AccountOverviewUser;
-  hasPassword: boolean;
+  hasMicrosoft: boolean;
   passkeysCount: number;
   sessionsCount: number;
 }) {
@@ -96,8 +96,8 @@ export function AccountOverviewCard({
           <InfoTile
             icon={ShieldCheck}
             label="Acesso"
-            value={hasPassword ? "Senha ativa" : "Sem senha local"}
-            active={hasPassword}
+            value={hasMicrosoft ? "Microsoft e OTP" : "Código por e-mail"}
+            active
           />
           <InfoTile
             icon={CheckCircle2}

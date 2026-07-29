@@ -15,6 +15,7 @@ export function MicrosoftOauthButton(props: ProviderButtonProps) {
       provider="microsoft"
       icon={CgMicrosoft}
       label="Entrar com a Microsoft"
+      variant="default"
       {...props}
     />
   );

@@ -22,6 +22,20 @@
       "when": 1782950140671,
       "tag": "0002_pretty_mariko_yashida",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1785348643051,
+      "tag": "0003_groovy_weapon_omega",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785351577085,
+      "tag": "0004_reconcile_missing_baseline_objects",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,7 @@ import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { PageTransition } from "@/components/ui/page-transition";
 import { auth } from "@/lib/auth";
+import { isCorporateEmail } from "@/lib/auth-policy";
 import { db } from "@/lib/db";
 import {
   account as accountTable,
@@ -46,8 +47,6 @@ export default async function AccountSettingsPage() {
       .select({
         id: accountTable.id,
         providerId: accountTable.providerId,
-        accountId: accountTable.accountId,
-        password: accountTable.password,
         createdAt: accountTable.createdAt,
         updatedAt: accountTable.updatedAt,
       })
@@ -103,13 +102,15 @@ export default async function AccountSettingsPage() {
     ipAddress: activeSession.ipAddress ?? null,
     userAgent: activeSession.userAgent ?? null,
   }));
-  const hasPassword = accounts.some(
-    (account) => account.providerId === "credential" && account.password,
+  const loginAccounts = accounts.filter(
+    (account) => account.providerId !== "credential",
   );
-  const socialProviders = accounts
-    .map((account) => account.providerId)
-    .filter((providerId) => providerId !== "credential");
-  const canChangeEmail = hasPassword && socialProviders.length === 0;
+  const hasMicrosoft = loginAccounts.some(
+    (account) => account.providerId === "microsoft",
+  );
+  const canChangeEmail =
+    loginAccounts.length === 0 &&
+    !isCorporateEmail(currentUser.email, process.env.MICROSOFT_ALLOWED_DOMAIN);
 
   return (
     <PageTransition>
@@ -133,19 +134,18 @@ export default async function AccountSettingsPage() {
           <section className="space-y-5">
             <AccountOverviewCard
               user={currentUser}
-              hasPassword={hasPassword}
+              hasMicrosoft={hasMicrosoft}
               passkeysCount={normalizedPasskeys.length}
               sessionsCount={normalizedSessions.length}
             />
             <SecurityCard
               canChangeEmail={canChangeEmail}
-              hasPassword={hasPassword}
               userEmail={currentUser.email}
             />
             <LoginMethodsCard
-              accounts={accounts}
-              hasPassword={hasPassword}
-              socialProviders={socialProviders}
+              accounts={loginAccounts}
+              hasMicrosoft={hasMicrosoft}
+              passkeysCount={normalizedPasskeys.length}
             />
           </section>
 
