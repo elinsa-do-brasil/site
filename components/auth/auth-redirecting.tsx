@@ -13,9 +13,8 @@ export function AuthRedirecting() {
       </div>
       <div className="grid gap-1">
         <p className="font-heading text-base font-semibold">
-          Acesso confirmado
+          Bem-vindo(a)!
         </p>
-        <p className="text-xs text-muted-foreground">Abrindo sua área…</p>
       </div>
     </div>
   );
