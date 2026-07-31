@@ -205,7 +205,7 @@ function SingleEvent({ event }: { event: PsychologicalCareEvent }) {
         <p className="mt-1 text-sm text-muted-foreground">{event.message}</p>
       )}
       <p className="mt-1 text-xs text-muted-foreground">
-        {formatActor(event.actorUserId, event.actorName)}
+        {formatActor(event.actorUserId, event.actorName, event.type)}
       </p>
     </div>
   );
@@ -242,6 +242,7 @@ function formatViewedGroupDate(latest: Date, oldest: Date) {
 function formatEventType(type: string) {
   const labels: Record<string, string> = {
     "psychological_care.created": "Solicitação recebida",
+    "psychological_care.created_public": "Solicitação recebida pelo AmperCuida",
     "psychological_care.viewed": "Solicitação consultada",
     "psychological_care.status.new": "Solicitação marcada como nova",
     "psychological_care.status.triage": "Triagem iniciada",
@@ -254,7 +255,14 @@ function formatEventType(type: string) {
   return labels[type] ?? "Atualização registrada";
 }
 
-function formatActor(actorUserId: string | null, actorName: string | null) {
+function formatActor(
+  actorUserId: string | null,
+  actorName: string | null,
+  eventType?: string,
+) {
+  if (eventType === "psychological_care.created_public") {
+    return "Origem: canal público AmperCuida";
+  }
   if (!actorUserId) return "Origem: sistema";
   if (actorName) return `Por ${actorName}`;
   return "Por usuário autenticado";

@@ -43,6 +43,13 @@
       "when": 1785523736737,
       "tag": "0005_colorful_dorian_gray",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785530793608,
+      "tag": "0006_curved_spirit",
+      "breakpoints": true
     }
   ]
 }

@@ -15,7 +15,10 @@ export const psychologicalCareRequests = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     protocol: varchar("protocol", { length: 40 }).notNull(),
     submissionId: uuid("submission_id").notNull(),
-    requesterUserId: text("requester_user_id").notNull(),
+    submissionSource: varchar("submission_source", { length: 40 })
+      .notNull()
+      .default("portal_leader"),
+    requesterUserId: text("requester_user_id"),
     status: varchar("status", { length: 40 }).notNull().default("new"),
     encryptedPayload: text("encrypted_payload").notNull(),
     payloadIv: text("payload_iv").notNull(),

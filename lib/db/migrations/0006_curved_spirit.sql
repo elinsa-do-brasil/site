@@ -1,0 +1,2 @@
+ALTER TABLE "psychological_care_requests" ALTER COLUMN "requester_user_id" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "psychological_care_requests" ADD COLUMN "submission_source" varchar(40) DEFAULT 'portal_leader' NOT NULL;

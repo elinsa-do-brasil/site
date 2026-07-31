@@ -32,15 +32,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { submitPsychologicalCareRequestAction } from "@/lib/psychological-care/actions";
+import { submitPublicPsychologicalCareRequestAction } from "@/lib/psychological-care/public-actions";
 import {
   type PsychologicalCareRequestFormField,
-  type PsychologicalCareRequestFormInput,
-  psychologicalCareRequestFormSchema,
+  type PublicPsychologicalCareRequestFormInput,
+  publicPsychologicalCareRequestFormSchema,
 } from "@/lib/psychological-care/validation";
 
 type PsychologicalCareRequestFormValues = z.input<
-  typeof psychologicalCareRequestFormSchema
+  typeof publicPsychologicalCareRequestFormSchema
 >;
 
 const DEFAULT_FORM_VALUES: PsychologicalCareRequestFormValues = {
@@ -53,6 +53,7 @@ const DEFAULT_FORM_VALUES: PsychologicalCareRequestFormValues = {
   jobTitle: "",
   management: "",
   reason: "",
+  website: "",
 };
 
 const VISIBLE_FIELD_ORDER: FieldPath<PsychologicalCareRequestFormValues>[] = [
@@ -79,10 +80,10 @@ export function PsychologicalCareRequestForm() {
   const form = useForm<
     PsychologicalCareRequestFormValues,
     unknown,
-    PsychologicalCareRequestFormInput
+    PublicPsychologicalCareRequestFormInput
   >({
     defaultValues: DEFAULT_FORM_VALUES,
-    resolver: standardSchemaResolver(psychologicalCareRequestFormSchema),
+    resolver: standardSchemaResolver(publicPsychologicalCareRequestFormSchema),
     shouldFocusError: false,
   });
 
@@ -115,12 +116,12 @@ export function PsychologicalCareRequestForm() {
   }
 
   async function handleValidSubmission(
-    values: PsychologicalCareRequestFormInput,
+    values: PublicPsychologicalCareRequestFormInput,
   ) {
     setSubmissionError(null);
 
     try {
-      const result = await submitPsychologicalCareRequestAction(values);
+      const result = await submitPublicPsychologicalCareRequestAction(values);
 
       if (!result.success) {
         setSubmissionError(result.message);
@@ -464,6 +465,17 @@ export function PsychologicalCareRequestForm() {
               )}
             />
           </FieldGroup>
+
+          <div aria-hidden="true" className="hidden">
+            <label htmlFor="psychological-care-website">Website</label>
+            <input
+              autoComplete="off"
+              id="psychological-care-website"
+              tabIndex={-1}
+              type="text"
+              {...form.register("website")}
+            />
+          </div>
         </CardContent>
 
         <CardFooter className="flex flex-col items-stretch gap-2 border-t sm:flex-row sm:justify-end">

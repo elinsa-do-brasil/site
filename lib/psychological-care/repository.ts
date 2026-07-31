@@ -33,12 +33,23 @@ export const PSYCHOLOGICAL_CARE_PAGE_SIZE = 20;
 export const PSYCHOLOGICAL_CARE_SUBMISSION_PAYLOAD_CONFLICT =
   "PSYCHOLOGICAL_CARE_SUBMISSION_PAYLOAD_CONFLICT";
 
+type PortalPsychologicalCareRequester = {
+  submissionSource: "portal_leader";
+  requesterUserId: string;
+  requesterName: string;
+  requesterEmail: string;
+};
+
+type PublicPsychologicalCareRequester = {
+  submissionSource: "ampercuida";
+  requesterUserId: null;
+  requesterName: null;
+  requesterEmail: null;
+};
+
 export type CreatePsychologicalCareRequestInput =
-  PsychologicalCareRequestFormInput & {
-    requesterUserId: string;
-    requesterName: string;
-    requesterEmail: string;
-  };
+  PsychologicalCareRequestFormInput &
+    (PortalPsychologicalCareRequester | PublicPsychologicalCareRequester);
 
 export type ListPsychologicalCareRequestSummariesOptions = {
   page?: number;
@@ -63,6 +74,7 @@ export async function createPsychologicalCareRequest(
           .values({
             protocol,
             submissionId: input.submissionId,
+            submissionSource: input.submissionSource,
             requesterUserId: input.requesterUserId,
             encryptedPayload: encrypted.encryptedPayload.ciphertext,
             payloadIv: encrypted.encryptedPayload.iv,
@@ -82,11 +94,17 @@ export async function createPsychologicalCareRequest(
           });
 
         if (request) {
+          const isPublicSubmission = input.submissionSource === "ampercuida";
+
           await tx.insert(psychologicalCareRequestEvents).values({
             requestId: request.id,
             actorUserId: input.requesterUserId,
-            type: "psychological_care.created",
-            message: "Solicitação de atendimento psicológico recebida.",
+            type: isPublicSubmission
+              ? "psychological_care.created_public"
+              : "psychological_care.created",
+            message: isPublicSubmission
+              ? "Solicitação de atendimento psicológico recebida pelo canal público."
+              : "Solicitação de atendimento psicológico recebida.",
           });
 
           return { ...request, wasCreated: true };
@@ -96,6 +114,7 @@ export async function createPsychologicalCareRequest(
           .select({
             id: psychologicalCareRequests.id,
             protocol: psychologicalCareRequests.protocol,
+            submissionSource: psychologicalCareRequests.submissionSource,
             requesterUserId: psychologicalCareRequests.requesterUserId,
             status: psychologicalCareRequests.status,
             encryptedPayload: psychologicalCareRequests.encryptedPayload,
@@ -117,6 +136,10 @@ export async function createPsychologicalCareRequest(
 
         if (existing.requesterUserId !== input.requesterUserId) {
           throw new Error("PSYCHOLOGICAL_CARE_SUBMISSION_ID_CONFLICT");
+        }
+
+        if (existing.submissionSource !== input.submissionSource) {
+          throw new Error("PSYCHOLOGICAL_CARE_SUBMISSION_SOURCE_CONFLICT");
         }
 
         const existingPayload = decryptPsychologicalCareRequestRow(existing);
@@ -266,6 +289,7 @@ export async function getDecryptedPsychologicalCareRequestById(id: string) {
     id: request.id,
     protocol: request.protocol,
     submissionId: request.submissionId,
+    submissionSource: request.submissionSource,
     requesterUserId: request.requesterUserId,
     status: normalizePsychologicalCareStatus(request.status),
     createdAt: request.createdAt,

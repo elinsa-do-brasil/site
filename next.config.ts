@@ -96,6 +96,14 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/ampercuida",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
         source: "/portal/:path*",
         headers: noIndexHeaders,
       },

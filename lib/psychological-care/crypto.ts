@@ -3,6 +3,8 @@ import crypto from "node:crypto";
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
 const KEY_LENGTH = 32;
+const PUBLIC_RATE_LIMIT_HMAC_CONTEXT =
+  "psychological-care/public-rate-limit/v1";
 
 export type PsychologicalCareEncryptedBlob = {
   ciphertext: string;
@@ -19,8 +21,8 @@ export type PsychologicalCareEncryptedPayload = {
   jobTitle: string | null;
   management: string;
   reason: string;
-  requesterName: string;
-  requesterEmail: string;
+  requesterName: string | null;
+  requesterEmail: string | null;
 };
 
 const PSYCHOLOGICAL_CARE_PAYLOAD_FIELDS = [
@@ -61,6 +63,15 @@ export function getPsychologicalCareMasterKey() {
   }
 
   return key;
+}
+
+export function createPsychologicalCarePublicRateLimitDigest(subject: string) {
+  return crypto
+    .createHmac("sha256", getPsychologicalCareMasterKey())
+    .update(PUBLIC_RATE_LIMIT_HMAC_CONTEXT)
+    .update("\0")
+    .update(subject)
+    .digest("hex");
 }
 
 export function encryptPsychologicalCarePayload(

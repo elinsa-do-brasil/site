@@ -26,6 +26,18 @@ export const psychologicalCareRequestFormSchema = z
   })
   .strict();
 
+export const publicPsychologicalCareRequestFormSchema =
+  psychologicalCareRequestFormSchema
+    .extend({
+      website: z
+        .string()
+        .trim()
+        .max(200, "Campo inválido.")
+        .optional()
+        .default(""),
+    })
+    .strict();
+
 export type PsychologicalCareRequestFormInput = z.infer<
   typeof psychologicalCareRequestFormSchema
 >;
@@ -33,6 +45,23 @@ export type PsychologicalCareRequestFormData =
   PsychologicalCareRequestFormInput;
 export type PsychologicalCareRequestFormField =
   keyof PsychologicalCareRequestFormInput;
+export type PublicPsychologicalCareRequestFormInput = z.infer<
+  typeof publicPsychologicalCareRequestFormSchema
+>;
+
+export function isPsychologicalCareHoneypotFilled(input: unknown) {
+  if (!input || typeof input !== "object" || !("website" in input)) {
+    return false;
+  }
+
+  const value = input.website;
+
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+
+  return value !== undefined && value !== null;
+}
 
 function requiredText(min: number, max: number) {
   return z

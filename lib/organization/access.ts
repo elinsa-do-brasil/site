@@ -141,6 +141,7 @@ const BUILTIN_INTERNAL_TOOLS: InternalTool[] = [
 const LEGACY_BUILTIN_TOOL_HREFS = new Set([
   "/assinatura-de-email",
   "/portal/assinatura-de-email",
+  "/portal/atendimento-psicologico/solicitar",
 ]);
 
 export async function getAvailableInternalTools(
@@ -184,7 +185,7 @@ function getContextualBuiltinTools(
       label: "Solicitar atendimento psicológico",
       description:
         "Encaminhe, com confidencialidade, uma solicitação de apoio para um colaborador.",
-      href: "/portal/atendimento-psicologico/solicitar",
+      href: "/ampercuida",
       icon: "HeartHandshake",
     });
   }
@@ -217,7 +218,10 @@ function canAccessConfiguredPortalTool(
   userTeamSet: Set<string>,
   tool: { href: string; teamName: string },
 ) {
-  if (tool.href === "/portal/atendimento-psicologico/solicitar") {
+  if (
+    tool.href === "/ampercuida" ||
+    tool.href === "/portal/atendimento-psicologico/solicitar"
+  ) {
     return context.isTeamLeader;
   }
 

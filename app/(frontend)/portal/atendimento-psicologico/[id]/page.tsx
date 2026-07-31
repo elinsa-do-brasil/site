@@ -49,6 +49,7 @@ export default async function PsychologicalCareDetailPage({
   }
 
   const receivedAt = formatDate(request.createdAt);
+  const isPublicSubmission = request.submissionSource === "ampercuida";
 
   return (
     <PageTransition>
@@ -103,7 +104,7 @@ export default async function PsychologicalCareDetailPage({
               <a href="#lotacao">Lotação</a>
             </Button>
             <Button className="shrink-0" size="sm" variant="outline" asChild>
-              <a href="#solicitante">Solicitante</a>
+              <a href="#solicitante">Origem</a>
             </Button>
           </PageHeaderNavigation>
         </PageHeader>
@@ -179,16 +180,33 @@ export default async function PsychologicalCareDetailPage({
             id="solicitante"
           >
             <CardHeader className="border-b py-4">
-              <CardTitle className="text-base">Liderança solicitante</CardTitle>
+              <CardTitle className="text-base">Origem da solicitação</CardTitle>
             </CardHeader>
             <CardContent className="py-4">
-              <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                <DetailItem label="Nome" value={payload.requesterName} />
-                <DetailItem label="E-mail" value={payload.requesterEmail} />
-              </dl>
-              <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
-                Solicitação registrada por usuário autenticado do portal.
-              </p>
+              {isPublicSubmission ? (
+                <>
+                  <dl className="text-sm">
+                    <DetailItem
+                      label="Canal"
+                      value="AmperCuida — formulário público"
+                    />
+                  </dl>
+                  <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
+                    O canal público não comprova a identidade da pessoa que
+                    realizou o envio.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                    <DetailItem label="Nome" value={payload.requesterName} />
+                    <DetailItem label="E-mail" value={payload.requesterEmail} />
+                  </dl>
+                  <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
+                    Solicitação registrada por usuário autenticado do portal.
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
