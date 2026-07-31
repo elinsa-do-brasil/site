@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Logo } from "@/components/logo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { AuthRedirecting } from "./auth-redirecting";
 import { MicrosoftOauthButton } from "./buttons/oauth-buttons";
 import { PasskeySignInButton } from "./buttons/passkey-signin";
 import { EmailOtpForm, type EmailOtpStep } from "./email-otp-form";
@@ -11,6 +12,7 @@ import { Or } from "./or";
 
 export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
   const [emailOtpStep, setEmailOtpStep] = useState<EmailOtpStep>("identity");
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   return (
     <Card
@@ -24,21 +26,31 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
         <h1 className="sr-only">Entrar no portal</h1>
       </CardHeader>
       <CardContent className="flex flex-col gap-4 px-5 pb-1 sm:px-7">
-        {emailOtpStep === "identity" && (
-          <FieldGroup>
-            <Field>
-              <MicrosoftOauthButton callbackURL={redirectTo} />
-              <PasskeySignInButton redirectTo={redirectTo} />
-            </Field>
-            <Or texto="ou" />
-          </FieldGroup>
-        )}
+        {isRedirecting ? (
+          <AuthRedirecting />
+        ) : (
+          <>
+            {emailOtpStep === "identity" && (
+              <FieldGroup>
+                <Field>
+                  <MicrosoftOauthButton callbackURL={redirectTo} />
+                  <PasskeySignInButton
+                    onAuthenticated={() => setIsRedirecting(true)}
+                    redirectTo={redirectTo}
+                  />
+                </Field>
+                <Or texto="ou" />
+              </FieldGroup>
+            )}
 
-        <EmailOtpForm
-          identitySubmitVariant="secondary"
-          onStepChange={setEmailOtpStep}
-          redirectTo={redirectTo}
-        />
+            <EmailOtpForm
+              identitySubmitVariant="secondary"
+              onAuthenticated={() => setIsRedirecting(true)}
+              onStepChange={setEmailOtpStep}
+              redirectTo={redirectTo}
+            />
+          </>
+        )}
       </CardContent>
     </Card>
   );

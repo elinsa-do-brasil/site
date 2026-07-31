@@ -135,6 +135,8 @@ async def _test_login_otp_form():
         context = await browser.new_context(base_url=base_url)
         page = await context.new_page()
         otp_requests: list[dict] = []
+        sign_in_requests: list[dict] = []
+        release_portal_navigation = asyncio.Event()
 
         async def capture_otp_request(route):
             otp_requests.append(route.request.post_data_json)
@@ -144,10 +146,31 @@ async def _test_login_otp_form():
                 status=200,
             )
 
+        async def capture_sign_in_request(route):
+            sign_in_requests.append(route.request.post_data_json)
+            await route.fulfill(
+                body=(
+                    '{"token":"test-session","user":{'
+                    '"id":"test-user","name":"Raave Aires",'
+                    '"email":"raave.aires@grupoamperelinsa.com",'
+                    '"emailVerified":true,'
+                    '"createdAt":"2026-07-31T00:00:00.000Z",'
+                    '"updatedAt":"2026-07-31T00:00:00.000Z"}}'
+                ),
+                content_type="application/json",
+                status=200,
+            )
+
+        async def hold_portal_navigation(route):
+            await release_portal_navigation.wait()
+            await route.abort()
+
         await page.route(
             "**/api/auth/email-otp/send-verification-otp",
             capture_otp_request,
         )
+        await page.route("**/api/auth/sign-in/email-otp", capture_sign_in_request)
+        await page.route("**/portal**", hold_portal_navigation)
 
         try:
             await page.goto("/entrar", wait_until="networkidle")
@@ -189,7 +212,23 @@ async def _test_login_otp_form():
             await expect(page.get_by_label("E-mail", exact=True)).to_be_visible()
             await expect(microsoft_button).to_be_visible()
             await expect(passkey_button).to_be_visible()
+
+            await page.get_by_role("button", name="Enviar código").click()
+            await page.get_by_label("Código", exact=True).fill("123456")
+            await page.get_by_role("button", name="Entrar", exact=True).click()
+
+            await expect(page.get_by_text("Acesso confirmado")).to_be_visible()
+            await expect(page.get_by_text("Abrindo sua área…")).to_be_visible()
+            await expect(microsoft_button).to_have_count(0)
+            await expect(passkey_button).to_have_count(0)
+            assert sign_in_requests == [
+                {
+                    "email": "raave.aires@grupoamperelinsa.com",
+                    "otp": "123456",
+                }
+            ]
         finally:
+            release_portal_navigation.set()
             await context.close()
             await browser.close()
 

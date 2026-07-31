@@ -10,8 +10,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/auth-client";
 
 export function PasskeySignInButton({
+  onAuthenticated,
   redirectTo = "/portal",
 }: {
+  onAuthenticated?: () => void;
   redirectTo?: string;
 }) {
   const [isPending, setIsPending] = useState(false);
@@ -28,10 +30,9 @@ export function PasskeySignInButton({
           fetchOptions: {
             onRequest: () => setIsPending(true),
             onSuccess(context) {
-              setIsPending(false);
+              onAuthenticated?.();
               toast.success(`Bem-vindo(a), ${context.data.user.name}!`);
-              router.push(redirectTo);
-              router.refresh();
+              router.replace(redirectTo);
             },
             onError(context) {
               setIsPending(false);

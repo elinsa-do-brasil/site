@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { AuthRedirecting } from "@/components/auth/auth-redirecting";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -60,6 +61,7 @@ type EmailOtpFormProps = {
   identitySubmitVariant?: "default" | "secondary";
   invitationId?: string;
   nameRequired?: boolean;
+  onAuthenticated?: () => void;
   onStepChange?: (step: EmailOtpStep) => void;
   redirectTo?: string;
 };
@@ -69,6 +71,7 @@ export function EmailOtpForm({
   identitySubmitVariant = "default",
   invitationId,
   nameRequired = false,
+  onAuthenticated,
   onStepChange,
   redirectTo = "/portal",
 }: EmailOtpFormProps) {
@@ -91,6 +94,7 @@ export function EmailOtpForm({
   const [step, setStep] = useState<EmailOtpStep>("identity");
   const [resendIn, setResendIn] = useState(0);
   const [isResending, setIsResending] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (resendIn <= 0) return;
@@ -187,9 +191,10 @@ export function EmailOtpForm({
       }
     }
 
+    setIsRedirecting(true);
+    onAuthenticated?.();
     toast.success(`Bem-vindo(a), ${result.data.user.name}!`);
-    router.push(redirectTo);
-    router.refresh();
+    router.replace(redirectTo);
   }
 
   function handleChangeEmail() {
@@ -197,6 +202,10 @@ export function EmailOtpForm({
     setStep("identity");
     onStepChange?.("identity");
     setResendIn(0);
+  }
+
+  if (isRedirecting) {
+    return <AuthRedirecting />;
   }
 
   if (step === "otp") {
