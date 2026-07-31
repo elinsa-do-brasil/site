@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   formatBrazilianPhone,
+  isPsychologicalCareHoneypotFilled,
   isValidBrazilianPhone,
   psychologicalCareRequestFormSchema,
+  publicPsychologicalCareRequestFormSchema,
 } from "./validation";
 
 const validInput = {
@@ -67,6 +69,41 @@ describe("psychological care request validation", () => {
         requesterEmail: "nao-confiar@example.com",
       }).success,
       false,
+    );
+  });
+
+  it("accepts the empty public honeypot and keeps the schema strict", () => {
+    const parsed = publicPsychologicalCareRequestFormSchema.parse({
+      ...validInput,
+      website: "   ",
+    });
+
+    assert.equal(parsed.website, "");
+    assert.equal(
+      publicPsychologicalCareRequestFormSchema.safeParse({
+        ...validInput,
+        unexpected: "value",
+      }).success,
+      false,
+    );
+  });
+
+  it("detects filled honeypots before processing the public request", () => {
+    assert.equal(isPsychologicalCareHoneypotFilled(validInput), false);
+    assert.equal(
+      isPsychologicalCareHoneypotFilled({ ...validInput, website: "" }),
+      false,
+    );
+    assert.equal(
+      isPsychologicalCareHoneypotFilled({
+        ...validInput,
+        website: "https://spam.example",
+      }),
+      true,
+    );
+    assert.equal(
+      isPsychologicalCareHoneypotFilled({ ...validInput, website: 1 }),
+      true,
     );
   });
 });

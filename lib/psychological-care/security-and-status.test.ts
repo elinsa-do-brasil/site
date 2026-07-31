@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   arePsychologicalCarePayloadsEqual,
+  createPsychologicalCarePublicRateLimitDigest,
   decryptPsychologicalCarePayload,
   encryptPsychologicalCarePayload,
   getPsychologicalCareMasterKey,
@@ -83,6 +84,38 @@ describe("psychological care encryption", () => {
       }),
       false,
     );
+  });
+
+  it("round-trips public submissions without requester identity", () => {
+    withMasterKey(Buffer.alloc(32, 11), () => {
+      const publicPayload: PsychologicalCareEncryptedPayload = {
+        ...payload,
+        requesterName: null,
+        requesterEmail: null,
+      };
+      const encrypted = encryptPsychologicalCarePayload(publicPayload);
+
+      assert.deepEqual(
+        decryptPsychologicalCarePayload(encrypted),
+        publicPayload,
+      );
+    });
+  });
+
+  it("derives a stable keyed digest without exposing the source IP", () => {
+    const ip = "203.0.113.10";
+
+    withMasterKey(Buffer.alloc(32, 13), () => {
+      const first = createPsychologicalCarePublicRateLimitDigest(ip);
+      const second = createPsychologicalCarePublicRateLimitDigest(ip);
+      const otherIp =
+        createPsychologicalCarePublicRateLimitDigest("203.0.113.11");
+
+      assert.match(first, /^[0-9a-f]{64}$/);
+      assert.equal(first, second);
+      assert.notEqual(first, otherIp);
+      assert.equal(first.includes(ip), false);
+    });
   });
 });
 
