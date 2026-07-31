@@ -1,0 +1,261 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageTransition } from "@/components/ui/page-transition";
+import { requirePsychologicalCarePanelAccess } from "@/lib/psychological-care/access";
+import {
+  getPsychologicalCareRequestById,
+  listPsychologicalCareRequestEvents,
+} from "@/lib/psychological-care/repository";
+
+export const dynamic = "force-dynamic";
+
+type PsychologicalCareHistoryPageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export default async function PsychologicalCareHistoryPage({
+  params,
+}: PsychologicalCareHistoryPageProps) {
+  await requirePsychologicalCarePanelAccess();
+
+  const { id } = await params;
+  const [request, events] = await Promise.all([
+    getPsychologicalCareRequestById(id),
+    listPsychologicalCareRequestEvents(id),
+  ]);
+
+  if (!request) {
+    notFound();
+  }
+
+  const historyEntries = groupPsychologicalCareEvents(events);
+
+  return (
+    <PageTransition>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-12">
+        <PageHeader
+          description="Linha do tempo dos acessos e das alterações realizadas pela equipe responsável."
+          eyebrow="Solicitação da liderança"
+          meta={
+            <span className="font-mono text-xs text-muted-foreground">
+              {request.protocol}
+            </span>
+          }
+          navigation={
+            <PageHeaderNavigation label="Navegação do histórico">
+              <Button className="shrink-0" size="sm" variant="outline" asChild>
+                <Link
+                  href={`/portal/atendimento-psicologico/${request.id}`}
+                  prefetch={false}
+                  transitionTypes={["nav-back"]}
+                >
+                  Voltar à solicitação
+                </Link>
+              </Button>
+            </PageHeaderNavigation>
+          }
+          title="Histórico"
+        />
+
+        <Card className="rounded-md border-border/80 py-0 shadow-sm">
+          <CardHeader className="border-b py-4">
+            <CardTitle className="text-base">
+              Movimentações registradas
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="py-4">
+            {historyEntries.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                {historyEntries.map((entry) => (
+                  <HistoryEntryView entry={entry} key={entry.id} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Nenhuma movimentação foi registrada nesta solicitação.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </PageTransition>
+  );
+}
+
+type PsychologicalCareEvent = Awaited<
+  ReturnType<typeof listPsychologicalCareRequestEvents>
+>[number];
+
+type HistoryEntry =
+  | {
+      event: PsychologicalCareEvent;
+      id: string;
+      kind: "single";
+    }
+  | {
+      actorName: string | null;
+      actorUserId: string | null;
+      dateKey: string;
+      events: PsychologicalCareEvent[];
+      id: string;
+      kind: "viewed-group";
+    };
+
+function groupPsychologicalCareEvents(
+  events: PsychologicalCareEvent[],
+): HistoryEntry[] {
+  const entries: HistoryEntry[] = [];
+
+  for (const event of events) {
+    if (event.type !== "psychological_care.viewed") {
+      entries.push({ event, id: event.id, kind: "single" });
+      continue;
+    }
+
+    const dateKey = formatDateKey(event.createdAt);
+    const lastEntry = entries.at(-1);
+
+    if (
+      lastEntry?.kind === "viewed-group" &&
+      lastEntry.actorUserId === event.actorUserId &&
+      lastEntry.actorName === event.actorName &&
+      lastEntry.dateKey === dateKey
+    ) {
+      lastEntry.events.push(event);
+      continue;
+    }
+
+    entries.push({
+      actorName: event.actorName,
+      actorUserId: event.actorUserId,
+      dateKey,
+      events: [event],
+      id: `viewed-${event.actorUserId ?? "system"}-${dateKey}-${event.id}`,
+      kind: "viewed-group",
+    });
+  }
+
+  return entries;
+}
+
+function HistoryEntryView({ entry }: { entry: HistoryEntry }) {
+  if (entry.kind === "single") {
+    return <SingleEvent event={entry.event} />;
+  }
+
+  const latestEvent = entry.events[0];
+
+  if (!latestEvent) return null;
+
+  const oldestEvent = entry.events.at(-1) ?? latestEvent;
+
+  return (
+    <div className="border-b pb-4 last:border-0">
+      <EventHeader
+        date={formatViewedGroupDate(
+          latestEvent.createdAt,
+          oldestEvent.createdAt,
+        )}
+        title={`Solicitação consultada ${entry.events.length} ${
+          entry.events.length === 1 ? "vez" : "vezes"
+        }`}
+      />
+      <p className="mt-1 text-sm text-muted-foreground">
+        Acessos autorizados agrupados para facilitar a leitura do histórico.
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {formatActor(entry.actorUserId, entry.actorName)}
+      </p>
+
+      {entry.events.length > 1 && (
+        <details className="mt-3 rounded-md border bg-muted/20 px-3 py-2">
+          <summary className="cursor-pointer text-xs font-medium">
+            Ver acessos individuais
+          </summary>
+          <div className="mt-3 flex flex-col gap-2">
+            {entry.events.map((event) => (
+              <p
+                className="font-mono text-xs text-muted-foreground"
+                key={event.id}
+              >
+                {formatDate(event.createdAt)}
+              </p>
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function SingleEvent({ event }: { event: PsychologicalCareEvent }) {
+  return (
+    <div className="border-b pb-4 last:border-0">
+      <EventHeader
+        date={formatDate(event.createdAt)}
+        title={formatEventType(event.type)}
+      />
+      {event.message && (
+        <p className="mt-1 text-sm text-muted-foreground">{event.message}</p>
+      )}
+      <p className="mt-1 text-xs text-muted-foreground">
+        {formatActor(event.actorUserId, event.actorName)}
+      </p>
+    </div>
+  );
+}
+
+function EventHeader({ date, title }: { date: ReactNode; title: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="font-medium">{title}</span>
+      <span className="text-xs text-muted-foreground">{date}</span>
+    </div>
+  );
+}
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
+}
+
+function formatDateKey(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(date);
+}
+
+function formatViewedGroupDate(latest: Date, oldest: Date) {
+  if (latest.getTime() === oldest.getTime()) {
+    return formatDate(latest);
+  }
+
+  return `${formatDate(oldest)} até ${formatDate(latest)}`;
+}
+
+function formatEventType(type: string) {
+  const labels: Record<string, string> = {
+    "psychological_care.created": "Solicitação recebida",
+    "psychological_care.viewed": "Solicitação consultada",
+    "psychological_care.status.new": "Solicitação marcada como nova",
+    "psychological_care.status.triage": "Triagem iniciada",
+    "psychological_care.status.contact_in_progress": "Contato em andamento",
+    "psychological_care.status.scheduled": "Atendimento agendado",
+    "psychological_care.status.completed": "Atendimento concluído",
+    "psychological_care.status.cancelled": "Solicitação cancelada",
+  };
+
+  return labels[type] ?? "Atualização registrada";
+}
+
+function formatActor(actorUserId: string | null, actorName: string | null) {
+  if (!actorUserId) return "Origem: sistema";
+  if (actorName) return `Por ${actorName}`;
+  return "Por usuário autenticado";
+}

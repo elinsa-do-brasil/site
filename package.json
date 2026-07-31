@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx --test collections/*.test.ts lib/*.test.ts lib/payload/*.test.ts",
+    "test": "tsx --test collections/*.test.ts lib/*.test.ts lib/organization/*.test.ts lib/payload/*.test.ts lib/psychological-care/*.test.ts",
     "test:payload:integration": "pnpm test:payload:rbac && pnpm test:payload:editorial-review",
     "test:payload:rbac": "tsx --env-file=.env scripts/test-payload-rbac.ts",
     "test:payload:editorial-review": "tsx --env-file=.env scripts/test-payload-editorial-review.ts",

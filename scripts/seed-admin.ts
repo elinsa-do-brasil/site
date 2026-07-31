@@ -29,10 +29,14 @@ async function main() {
       org = newOrg;
     }
 
-    // 2. Garantir times: comite_etica e ti
+    // 2. Garantir times institucionais
     console.log("Verificando times institucionais...");
     const requiredTeams = [
       { id: "team_elinsa_comite_etica", name: "comite_etica" },
+      {
+        id: "team_elinsa_atendimento_psicologico",
+        name: "atendimento_psicologico",
+      },
       { id: "team_elinsa_ti", name: "ti" },
     ];
 
@@ -42,9 +46,7 @@ async function main() {
       let [t] = await db
         .select()
         .from(team)
-        .where(
-          and(eq(team.organizationId, org.id), eq(team.name, rt.name)),
-        );
+        .where(and(eq(team.organizationId, org.id), eq(team.name, rt.name)));
 
       if (!t) {
         console.log(`Criando time '${rt.name}'...`);
@@ -125,8 +127,8 @@ async function main() {
       console.log(`Usuário já possui papel adequado: ${existingMember.role}`);
     }
 
-    // 5. Garantir vínculo a ambos os times
-    console.log("Garantindo vínculo aos times do Comitê de Ética e de TI...");
+    // 5. Garantir vínculo aos times institucionais
+    console.log("Garantindo vínculo aos times institucionais...");
     for (const [teamName, teamId] of teamMap.entries()) {
       const [existingTm] = await db
         .select()

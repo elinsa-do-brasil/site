@@ -25,6 +25,11 @@ async function main() {
         name: "comite_etica",
         organizationId: "org_elinsa",
       },
+      {
+        id: "team_elinsa_atendimento_psicologico",
+        name: "atendimento_psicologico",
+        organizationId: "org_elinsa",
+      },
       { id: "team_elinsa_rh", name: "rh", organizationId: "org_elinsa" },
       {
         id: "team_elinsa_administrativo",

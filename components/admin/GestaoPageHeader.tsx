@@ -106,6 +106,7 @@ export function formatAdminName(value: string) {
     cms: "CMS",
     comite: "Comitê",
     etica: "Ética",
+    psicologico: "Psicológico",
     ti: "TI",
   };
 

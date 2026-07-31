@@ -13,6 +13,8 @@ import {
 import {
   ETHICS_COMMITTEE_ROLE,
   ETHICS_COMMITTEE_TEAM,
+  PSYCHOLOGICAL_CARE_ROLE,
+  PSYCHOLOGICAL_CARE_TEAM,
   parseOrganizationRoleList,
   TEAM_LEADER_ROLE,
 } from "@/lib/organization/constants";
@@ -145,9 +147,13 @@ export async function getAvailableInternalTools(
   context: InternalAccessContext,
 ) {
   const userTeamSet = new Set(context.teams);
+  const contextualBuiltinTools = getContextualBuiltinTools(
+    context,
+    userTeamSet,
+  );
   const configuredTools = await listConfiguredPortalTools();
   const builtinHrefs = new Set([
-    ...BUILTIN_INTERNAL_TOOLS.map((tool) => tool.href),
+    ...contextualBuiltinTools.map((tool) => tool.href),
     ...LEGACY_BUILTIN_TOOL_HREFS,
   ]);
 
@@ -163,7 +169,42 @@ export async function getAvailableInternalTools(
       teamName: tool.teamName,
     }));
 
-  return [...BUILTIN_INTERNAL_TOOLS, ...teamTools];
+  return [...contextualBuiltinTools, ...teamTools];
+}
+
+function getContextualBuiltinTools(
+  context: InternalAccessContext,
+  userTeamSet: Set<string>,
+) {
+  const tools = [...BUILTIN_INTERNAL_TOOLS];
+
+  if (context.isTeamLeader) {
+    tools.push({
+      id: "psychological-care-request",
+      label: "Solicitar atendimento psicológico",
+      description:
+        "Encaminhe, com confidencialidade, uma solicitação de apoio para um colaborador.",
+      href: "/portal/atendimento-psicologico/solicitar",
+      icon: "HeartHandshake",
+    });
+  }
+
+  if (
+    userTeamSet.has(PSYCHOLOGICAL_CARE_TEAM) &&
+    context.roles.includes(PSYCHOLOGICAL_CARE_ROLE)
+  ) {
+    tools.push({
+      id: "psychological-care-panel",
+      label: "Atendimento psicológico",
+      description:
+        "Consulte e acompanhe as solicitações encaminhadas pelas lideranças.",
+      href: "/portal/atendimento-psicologico",
+      icon: "HeartPulse",
+      teamName: PSYCHOLOGICAL_CARE_TEAM,
+    });
+  }
+
+  return tools;
 }
 
 /**
@@ -176,6 +217,17 @@ function canAccessConfiguredPortalTool(
   userTeamSet: Set<string>,
   tool: { href: string; teamName: string },
 ) {
+  if (tool.href === "/portal/atendimento-psicologico/solicitar") {
+    return context.isTeamLeader;
+  }
+
+  if (tool.href === "/portal/atendimento-psicologico") {
+    return (
+      userTeamSet.has(PSYCHOLOGICAL_CARE_TEAM) &&
+      context.roles.includes(PSYCHOLOGICAL_CARE_ROLE)
+    );
+  }
+
   if (tool.href === "/portal/comite-de-etica") {
     return (
       userTeamSet.has(ETHICS_COMMITTEE_TEAM) &&

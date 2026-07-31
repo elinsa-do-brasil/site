@@ -31,10 +31,8 @@ import {
   enviarConviteAdmin,
 } from "@/lib/organization/actions";
 import {
-  ETHICS_COMMITTEE_ROLE,
-  ETHICS_COMMITTEE_TEAM,
   formatOrganizationRole,
-  parseOrganizationRoleList,
+  getRequiredTeamForOrganizationRoleList,
 } from "@/lib/organization/constants";
 import { cn } from "@/lib/utils";
 
@@ -79,7 +77,6 @@ export function TeamInviteDialog({
     registeredUsers.find(
       (user) => user.email.toLowerCase() === normalizedEmail,
     );
-  const canAssignCommitteeRole = team.name === ETHICS_COMMITTEE_TEAM;
   const matches = useMemo(() => {
     const query = normalizedEmail;
     if (query.length < 2) return [];
@@ -240,11 +237,11 @@ export function TeamInviteDialog({
                   </SelectTrigger>
                   <SelectContent>
                     {roleOptions.map((role) => {
-                      const isCommitteeRole = parseOrganizationRoleList(
-                        role,
-                      ).includes(ETHICS_COMMITTEE_ROLE);
-                      const isDisabled =
-                        isCommitteeRole && !canAssignCommitteeRole;
+                      const requiredTeam =
+                        getRequiredTeamForOrganizationRoleList(role);
+                      const isDisabled = Boolean(
+                        requiredTeam && requiredTeam !== team.name,
+                      );
 
                       return (
                         <SelectItem
@@ -253,8 +250,8 @@ export function TeamInviteDialog({
                           value={role}
                         >
                           {formatOrganizationRole(role)}
-                          {isDisabled
-                            ? ` (exige equipe ${formatTeamName(ETHICS_COMMITTEE_TEAM)})`
+                          {isDisabled && requiredTeam
+                            ? ` (exige equipe ${formatTeamName(requiredTeam)})`
                             : ""}
                         </SelectItem>
                       );

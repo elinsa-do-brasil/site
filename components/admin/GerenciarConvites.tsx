@@ -43,11 +43,9 @@ import {
   enviarConviteAdmin,
 } from "@/lib/organization/actions";
 import {
-  ETHICS_COMMITTEE_ROLE,
-  ETHICS_COMMITTEE_TEAM,
   formatInvitationStatus,
   formatOrganizationRole,
-  parseOrganizationRoleList,
+  getRequiredTeamForOrganizationRoleList,
 } from "@/lib/organization/constants";
 
 type TeamOption = {
@@ -270,7 +268,6 @@ function InviteDialog({
   const [selectedTeamId, setSelectedTeamId] = useState("none");
   const [isPending, startTransition] = useTransition();
   const selectedTeam = teams.find((team) => team.id === selectedTeamId);
-  const canAssignCommitteeRole = selectedTeam?.name === ETHICS_COMMITTEE_TEAM;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -359,17 +356,17 @@ function InviteDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {roleOptions.map((role) => {
-                    const isCommitteeRole = parseOrganizationRoleList(
-                      role,
-                    ).includes(ETHICS_COMMITTEE_ROLE);
-                    const isDisabled =
-                      isCommitteeRole && !canAssignCommitteeRole;
+                    const requiredTeam =
+                      getRequiredTeamForOrganizationRoleList(role);
+                    const isDisabled = Boolean(
+                      requiredTeam && requiredTeam !== selectedTeam?.name,
+                    );
 
                     return (
                       <SelectItem disabled={isDisabled} key={role} value={role}>
                         {formatOrganizationRole(role)}
-                        {isDisabled
-                          ? ` (exige equipe ${formatAdminName(ETHICS_COMMITTEE_TEAM)})`
+                        {isDisabled && requiredTeam
+                          ? ` (exige equipe ${formatAdminName(requiredTeam)})`
                           : ""}
                       </SelectItem>
                     );

@@ -41,8 +41,11 @@ import {
   ETHICS_COMMITTEE_ROLE,
   ETHICS_COMMITTEE_TEAM,
   formatOrganizationRole,
+  getRequiredTeamsForOrganizationRoleList,
   INVITATION_STATUS_OPTIONS,
   type InvitationStatus,
+  PSYCHOLOGICAL_CARE_ROLE,
+  PSYCHOLOGICAL_CARE_TEAM,
   TEAM_LEADER_ROLE,
 } from "@/lib/organization/constants";
 
@@ -144,31 +147,35 @@ async function canManageTeamId(teamId: string) {
   return { context, selectedTeam };
 }
 
-function roleIncludesCommitteeAccess(role: string) {
-  return parseRoleList(role).includes(ETHICS_COMMITTEE_ROLE);
-}
+const RESERVED_ROLE_TEAMS = new Map([
+  [ETHICS_COMMITTEE_TEAM, ETHICS_COMMITTEE_ROLE],
+  [PSYCHOLOGICAL_CARE_TEAM, PSYCHOLOGICAL_CARE_ROLE],
+]);
 
-function isCommitteeTeamName(teamName: string | null | undefined) {
-  return teamName === ETHICS_COMMITTEE_TEAM;
-}
-
-function validateCommitteeRoleWithSelectedTeam(input: {
+function validateRestrictedRoleWithSelectedTeam(input: {
   role: string;
   selectedTeam?: { name: string } | null;
 }) {
-  if (!roleIncludesCommitteeAccess(input.role)) {
+  const requiredTeams = getRequiredTeamsForOrganizationRoleList(input.role);
+
+  if (requiredTeams.length === 0) {
     return null;
   }
 
-  if (isCommitteeTeamName(input.selectedTeam?.name)) {
+  if (
+    requiredTeams.length === 1 &&
+    requiredTeams[0] === input.selectedTeam?.name
+  ) {
     return null;
   }
 
-  return "A função do Comitê de Ética só pode ser atribuída junto da equipe Comitê Ética.";
+  const teamLabels = requiredTeams.map(formatTeamName).join(" e ");
+  return `A função selecionada só pode ser atribuída junto da equipe ${teamLabels}.`;
 }
 
-async function userBelongsToCommitteeTeam(input: {
+async function userBelongsToTeam(input: {
   organizationId: string;
+  teamName: string;
   userId: string;
 }) {
   const [link] = await db
@@ -178,7 +185,7 @@ async function userBelongsToCommitteeTeam(input: {
     .where(
       and(
         eq(team.organizationId, input.organizationId),
-        eq(team.name, ETHICS_COMMITTEE_TEAM),
+        eq(team.name, input.teamName),
         eq(teamMember.userId, input.userId),
       ),
     )
@@ -187,12 +194,19 @@ async function userBelongsToCommitteeTeam(input: {
   return Boolean(link);
 }
 
-function removeCommitteeRole(role: string) {
+function removeRoleRestrictedToTeam(role: string, teamName: string) {
+  const restrictedRole = RESERVED_ROLE_TEAMS.get(teamName);
+  if (!restrictedRole) return role;
+
   const nextRoles = parseRoleList(role).filter(
-    (item) => item !== ETHICS_COMMITTEE_ROLE,
+    (item) => item !== restrictedRole,
   );
 
   return nextRoles.join(",") || "member";
+}
+
+function formatTeamName(teamName: string) {
+  return teamName.replaceAll("_", " ");
 }
 
 async function isLastOwner(input: {
@@ -263,13 +277,13 @@ export async function enviarConviteAdmin(
   }
 
   const role = context.isOrgAdmin ? requestedRole : "member";
-  const committeeRoleError = validateCommitteeRoleWithSelectedTeam({
+  const restrictedRoleError = validateRestrictedRoleWithSelectedTeam({
     role,
     selectedTeam,
   });
 
-  if (committeeRoleError) {
-    return { error: committeeRoleError };
+  if (restrictedRoleError) {
+    return { error: restrictedRoleError };
   }
 
   await db
@@ -465,13 +479,13 @@ export async function adicionarMembroExistente(
   }
 
   const role = context.isOrgAdmin ? requestedRole : "member";
-  const committeeRoleError = validateCommitteeRoleWithSelectedTeam({
+  const restrictedRoleError = validateRestrictedRoleWithSelectedTeam({
     role,
     selectedTeam,
   });
 
-  if (committeeRoleError) {
-    return { error: committeeRoleError };
+  if (restrictedRoleError) {
+    return { error: restrictedRoleError };
   }
 
   const [existingMembership] = await db
@@ -542,17 +556,18 @@ export async function atualizarFuncaoMembro(
     };
   }
 
-  if (
-    roleIncludesCommitteeAccess(role) &&
-    !(await userBelongsToCommitteeTeam({
+  for (const requiredTeam of getRequiredTeamsForOrganizationRoleList(role)) {
+    const belongsToRequiredTeam = await userBelongsToTeam({
       organizationId: targetMember.organizationId,
+      teamName: requiredTeam,
       userId: targetMember.userId,
-    }))
-  ) {
-    return {
-      error:
-        "Adicione a pessoa à equipe Comitê Ética antes de atribuir a função do Comitê.",
-    };
+    });
+
+    if (!belongsToRequiredTeam) {
+      return {
+        error: `Adicione a pessoa à equipe ${formatTeamName(requiredTeam)} antes de atribuir esta função.`,
+      };
+    }
   }
 
   await db.update(member).set({ role }).where(eq(member.id, memberId));
@@ -800,11 +815,11 @@ export async function atualizarTimeOrganizacao(
   }
 
   if (
-    isCommitteeTeamName(selectedTeam.name) &&
-    name !== ETHICS_COMMITTEE_TEAM
+    RESERVED_ROLE_TEAMS.has(selectedTeam.name) &&
+    name !== selectedTeam.name
   ) {
     return {
-      error: "A equipe Comitê Ética é reservada e não pode ser renomeada.",
+      error: `A equipe ${formatTeamName(selectedTeam.name)} é reservada e não pode ser renomeada.`,
     };
   }
 
@@ -839,9 +854,9 @@ export async function removerTimeOrganizacao(
     return { error: "Equipe não encontrada." };
   }
 
-  if (isCommitteeTeamName(selectedTeam.name)) {
+  if (RESERVED_ROLE_TEAMS.has(selectedTeam.name)) {
     return {
-      error: "A equipe Comitê Ética é reservada e não pode ser removida.",
+      error: `A equipe ${formatTeamName(selectedTeam.name)} é reservada e não pode ser removida.`,
     };
   }
 
@@ -933,14 +948,15 @@ export async function removerMembroDoTime(
     };
   }
 
-  if (
-    selectedTeam.name === ETHICS_COMMITTEE_TEAM &&
-    targetMembership &&
-    roleIncludesCommitteeAccess(targetMembership.role)
-  ) {
+  if (RESERVED_ROLE_TEAMS.has(selectedTeam.name) && targetMembership) {
     await db
       .update(member)
-      .set({ role: removeCommitteeRole(targetMembership.role) })
+      .set({
+        role: removeRoleRestrictedToTeam(
+          targetMembership.role,
+          selectedTeam.name,
+        ),
+      })
       .where(eq(member.id, targetMembership.id));
   }
 

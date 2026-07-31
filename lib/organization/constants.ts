@@ -1,6 +1,8 @@
 export const TEAM_LEADER_ROLE = "team_leader";
 export const ETHICS_COMMITTEE_ROLE = "ethics";
 export const ETHICS_COMMITTEE_TEAM = "comite_etica";
+export const PSYCHOLOGICAL_CARE_ROLE = "psychological_care";
+export const PSYCHOLOGICAL_CARE_TEAM = "atendimento_psicologico";
 
 export const ORGANIZATION_ROLE_LABELS = {
   member: "Membro",
@@ -8,6 +10,7 @@ export const ORGANIZATION_ROLE_LABELS = {
   owner: "Proprietário",
   [TEAM_LEADER_ROLE]: "Líder de equipe",
   [ETHICS_COMMITTEE_ROLE]: "Membro do comitê",
+  [PSYCHOLOGICAL_CARE_ROLE]: "Atendimento psicológico",
 } as const;
 
 export const BUILTIN_ORG_ROLES = [
@@ -16,7 +19,13 @@ export const BUILTIN_ORG_ROLES = [
   "owner",
   TEAM_LEADER_ROLE,
   ETHICS_COMMITTEE_ROLE,
+  PSYCHOLOGICAL_CARE_ROLE,
 ] as const;
+
+const ROLE_REQUIRED_TEAMS: Record<string, string> = {
+  [ETHICS_COMMITTEE_ROLE]: ETHICS_COMMITTEE_TEAM,
+  [PSYCHOLOGICAL_CARE_ROLE]: PSYCHOLOGICAL_CARE_TEAM,
+};
 
 export const INVITATION_STATUS_OPTIONS = [
   "pending",
@@ -71,4 +80,22 @@ export function getOrganizationRoleLabel(role: string) {
   }
 
   return normalized.charAt(0).toLocaleUpperCase("pt-BR") + normalized.slice(1);
+}
+
+export function getRequiredTeamForOrganizationRole(role: string) {
+  return ROLE_REQUIRED_TEAMS[role] ?? null;
+}
+
+export function getRequiredTeamForOrganizationRoleList(role: string) {
+  return getRequiredTeamsForOrganizationRoleList(role)[0] ?? null;
+}
+
+export function getRequiredTeamsForOrganizationRoleList(role: string) {
+  return Array.from(
+    new Set(
+      parseOrganizationRoleList(role)
+        .map(getRequiredTeamForOrganizationRole)
+        .filter((team): team is string => Boolean(team)),
+    ),
+  );
 }

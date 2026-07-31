@@ -41,10 +41,8 @@ import {
   removerTimeOrganizacao,
 } from "@/lib/organization/actions";
 import {
-  ETHICS_COMMITTEE_ROLE,
-  ETHICS_COMMITTEE_TEAM,
   formatOrganizationRole,
-  parseOrganizationRoleList,
+  getRequiredTeamForOrganizationRoleList,
 } from "@/lib/organization/constants";
 
 type TeamMemberRow = {
@@ -227,12 +225,8 @@ export function TeamAdmin({
                           suppressHydrationWarning
                         />
                         <RoleSelect
+                          allowedTeamNames={[team.name]}
                           currentRole={member.role}
-                          disabledRoles={
-                            team.name === ETHICS_COMMITTEE_TEAM
-                              ? undefined
-                              : [ETHICS_COMMITTEE_ROLE]
-                          }
                           label={`Função de ${member.email}`}
                           roles={roleOptions}
                         />
@@ -359,13 +353,13 @@ function formatTeamName(value: string) {
 }
 
 function RoleSelect({
+  allowedTeamNames,
   currentRole,
-  disabledRoles = [],
   label,
   roles,
 }: {
+  allowedTeamNames: string[];
   currentRole: string;
-  disabledRoles?: string[];
   label: string;
   roles: string[];
 }) {
@@ -378,15 +372,16 @@ function RoleSelect({
       </SelectTrigger>
       <SelectContent>
         {options.map((role) => {
-          const isDisabled = disabledRoles.some((disabledRole) =>
-            parseOrganizationRoleList(role).includes(disabledRole),
+          const requiredTeam = getRequiredTeamForOrganizationRoleList(role);
+          const isDisabled = Boolean(
+            requiredTeam && !allowedTeamNames.includes(requiredTeam),
           );
 
           return (
             <SelectItem disabled={isDisabled} key={role} value={role}>
               {formatOrganizationRole(role)}
-              {isDisabled
-                ? ` (exige equipe ${formatTeamName(ETHICS_COMMITTEE_TEAM)})`
+              {isDisabled && requiredTeam
+                ? ` (exige equipe ${formatTeamName(requiredTeam)})`
                 : ""}
             </SelectItem>
           );

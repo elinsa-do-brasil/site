@@ -175,6 +175,7 @@ function isPageTransitionTarget(href: string) {
     "/configuracoes",
     "/imprensa",
     "/portal/blog",
+    "/portal/atendimento-psicologico",
     "/portal/comite-de-etica",
     "/portal/contatos",
     "/portal/gestao/convites",

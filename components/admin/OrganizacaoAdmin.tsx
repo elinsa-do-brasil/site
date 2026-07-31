@@ -52,10 +52,8 @@ import {
   salvarRoleOrganizacao,
 } from "@/lib/organization/actions";
 import {
-  ETHICS_COMMITTEE_ROLE,
-  ETHICS_COMMITTEE_TEAM,
   formatOrganizationRole,
-  parseOrganizationRoleList,
+  getRequiredTeamsForOrganizationRoleList,
 } from "@/lib/organization/constants";
 import { cn } from "@/lib/utils";
 
@@ -302,10 +300,9 @@ function MemberItem({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const isCommitteeTeamMember = member.teams.includes(ETHICS_COMMITTEE_TEAM);
-  const hasCommitteeRole = parseOrganizationRoleList(member.role).includes(
-    ETHICS_COMMITTEE_ROLE,
-  );
+  const missingRequiredTeams = getRequiredTeamsForOrganizationRoleList(
+    member.role,
+  ).filter((requiredTeam) => !member.teams.includes(requiredTeam));
 
   function handleRoleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -343,12 +340,16 @@ function MemberItem({
             <span className="text-xs text-muted-foreground">Sem equipe</span>
           )}
         </div>
-        {hasCommitteeRole && !isCommitteeTeamMember && (
-          <p className="mt-2 text-xs text-destructive" role="alert">
-            A função do Comitê exige vínculo com a equipe{" "}
-            {formatAdminName(ETHICS_COMMITTEE_TEAM)}.
+        {missingRequiredTeams.map((requiredTeam) => (
+          <p
+            className="mt-2 text-xs text-destructive"
+            key={requiredTeam}
+            role="alert"
+          >
+            A função atribuída exige vínculo com a equipe{" "}
+            {formatAdminName(requiredTeam)}.
           </p>
-        )}
+        ))}
       </div>
 
       <div className="flex min-w-0 flex-col gap-3 lg:items-end">
@@ -364,10 +365,8 @@ function MemberItem({
             suppressHydrationWarning
           />
           <RoleSelect
+            allowedTeamNames={member.teams}
             currentRole={member.role}
-            disabledRoles={
-              isCommitteeTeamMember ? undefined : [ETHICS_COMMITTEE_ROLE]
-            }
             label={`Função de ${member.email}`}
             roles={roleOptions}
           />
@@ -433,7 +432,6 @@ function AddExistingMemberDialog({
   const [selectedTeamId, setSelectedTeamId] = useState("none");
   const [isPending, startTransition] = useTransition();
   const selectedTeam = teams.find((team) => team.id === selectedTeamId);
-  const canAssignCommitteeRole = selectedTeam?.name === ETHICS_COMMITTEE_TEAM;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -498,9 +496,7 @@ function AddExistingMemberDialog({
               value={selectedTeamId}
             />
             <RoleSelect
-              disabledRoles={
-                canAssignCommitteeRole ? undefined : [ETHICS_COMMITTEE_ROLE]
-              }
+              allowedTeamNames={selectedTeam ? [selectedTeam.name] : []}
               id="member-role"
               roles={roleOptions}
             />
@@ -620,16 +616,16 @@ function RoleItem({ role }: { role: RoleRow }) {
 }
 
 function RoleSelect({
+  allowedTeamNames = [],
   className,
   currentRole = "member",
-  disabledRoles = [],
   id,
   label = "Função",
   roles,
 }: {
+  allowedTeamNames?: string[];
   className?: string;
   currentRole?: string;
-  disabledRoles?: string[];
   id?: string;
   label?: string;
   roles: string[];
@@ -647,15 +643,16 @@ function RoleSelect({
       </SelectTrigger>
       <SelectContent>
         {options.map((role) => {
-          const isDisabled = disabledRoles.some((disabledRole) =>
-            parseOrganizationRoleList(role).includes(disabledRole),
-          );
+          const missingTeams = getRequiredTeamsForOrganizationRoleList(
+            role,
+          ).filter((requiredTeam) => !allowedTeamNames.includes(requiredTeam));
+          const isDisabled = missingTeams.length > 0;
 
           return (
             <SelectItem disabled={isDisabled} key={role} value={role}>
               {formatOrganizationRole(role)}
               {isDisabled
-                ? ` (exige equipe ${formatAdminName(ETHICS_COMMITTEE_TEAM)})`
+                ? ` (exige equipe ${missingTeams.map(formatAdminName).join(" e ")})`
                 : ""}
             </SelectItem>
           );
