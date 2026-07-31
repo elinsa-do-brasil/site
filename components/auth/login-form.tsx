@@ -7,6 +7,7 @@ import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field";
 import { MicrosoftOauthButton } from "./buttons/oauth-buttons";
 import { PasskeySignInButton } from "./buttons/passkey-signin";
 import { EmailOtpForm, type EmailOtpStep } from "./email-otp-form";
+import { Or } from "./or";
 
 export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
   const [emailOtpStep, setEmailOtpStep] = useState<EmailOtpStep>("identity");
@@ -29,7 +30,7 @@ export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
               <MicrosoftOauthButton callbackURL={redirectTo} />
               <PasskeySignInButton redirectTo={redirectTo} />
             </Field>
-            <FieldSeparator>ou</FieldSeparator>
+            <Or texto="ou" />
           </FieldGroup>
         )}
 
