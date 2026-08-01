@@ -65,6 +65,20 @@ def test_psychological_care_public_form_and_protected_panel():
             expect(
                 page.get_by_role("heading", name="Solicitação", exact=True)
             ).to_be_visible()
+            immediate_help = page.locator("aside")
+            expect(
+                immediate_help.get_by_text(
+                    "Precisa de ajuda imediata?", exact=True
+                )
+            ).to_be_visible()
+            expect(
+                immediate_help.get_by_role("link", name="Ligar para o CVV no número 188")
+            ).to_have_attribute("href", "tel:188")
+            cvv_chat = immediate_help.get_by_role(
+                "link", name="Acessar o chat do CVV", exact=True
+            )
+            expect(cvv_chat).to_have_attribute("href", "https://cvv.org.br/chat/")
+            expect(cvv_chat).to_have_attribute("target", "_blank")
             expect(
                 page.get_by_role("textbox", name="Base", exact=True)
             ).to_be_visible()
