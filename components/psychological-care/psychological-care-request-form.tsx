@@ -382,7 +382,7 @@ export function PsychologicalCareRequestForm() {
                     disabled={isSubmitting}
                     id="psychological-care-base"
                     maxLength={120}
-                    placeholder="Ex.: Base São Luís"
+                    placeholder="Ex.: Paragominas"
                     required
                   />
                   {fieldState.invalid && (
@@ -409,7 +409,7 @@ export function PsychologicalCareRequestForm() {
                     disabled={isSubmitting}
                     id="psychological-care-city"
                     maxLength={120}
-                    placeholder="Ex.: São Luís"
+                    placeholder="Ex.: Mãe do Rio"
                     required
                   />
                   {fieldState.invalid && (
@@ -480,16 +480,8 @@ export function PsychologicalCareRequestForm() {
           />
         </PsychologicalCareFormSection>
 
-        <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
-          <Button
-            disabled={isSubmitting}
-            onClick={handleClear}
-            size="lg"
-            type="button"
-            variant="outline"
-          >
-            Limpar formulário
-          </Button>
+        <div className="">
+
           <Button
             className="w-full"
             disabled={isSubmitting}
@@ -499,15 +491,10 @@ export function PsychologicalCareRequestForm() {
             {isSubmitting ? (
               <>
                 <Spinner data-icon="inline-start" />
-                Enviando…
+                Enviando
               </>
             ) : (
               <>
-                <HugeiconsIcon
-                  data-icon="inline-start"
-                  icon={Sent02Icon}
-                  strokeWidth={2}
-                />
                 Enviar solicitação
               </>
             )}
