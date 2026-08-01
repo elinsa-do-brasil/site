@@ -147,13 +147,7 @@ export function Header() {
                           href={getDocsUrl()}
                           icon={LighthouseIcon}
                           title="Ajuda ao colaborador"
-                          description="Orientações e materiais úteis"
-                        />
-                        <DropdownItem
-                          href={getDocsUrl()}
-                          icon={GoogleDocIcon}
-                          title="Documentação"
-                          description="Guias, políticas institucionais"
+                          description="Orientações, guias e materiais úteis"
                         />
                       </ul>
                     </div>
