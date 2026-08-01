@@ -40,7 +40,9 @@ export default function ReportFormPage() {
               Rever as orientações
             </Link>
           </header>
-
+          <p className="text-sm text-muted-foreground">
+            Campos marcados com * são obrigatórios.
+          </p>
           <div className="lg:hidden">
             <ReportWritingHelp />
           </div>
