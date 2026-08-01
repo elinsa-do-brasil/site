@@ -41,7 +41,7 @@ export default async function PsychologicalCareHistoryPage({
       <div className="mx-auto w-full max-w-6xl px-4 pb-12">
         <PageHeader
           description="Linha do tempo dos acessos e das alterações realizadas pela equipe responsável."
-          eyebrow="Solicitação da liderança"
+          eyebrow="Atendimento psicológico"
           meta={
             <span className="font-mono text-xs text-muted-foreground">
               {request.protocol}
@@ -242,7 +242,8 @@ function formatViewedGroupDate(latest: Date, oldest: Date) {
 function formatEventType(type: string) {
   const labels: Record<string, string> = {
     "psychological_care.created": "Solicitação recebida",
-    "psychological_care.created_public": "Solicitação recebida pelo AmperCuida",
+    "psychological_care.created_public":
+      "Solicitação recebida pelo formulário público AmperCuida",
     "psychological_care.viewed": "Solicitação consultada",
     "psychological_care.status.new": "Solicitação marcada como nova",
     "psychological_care.status.triage": "Triagem iniciada",
@@ -261,7 +262,7 @@ function formatActor(
   eventType?: string,
 ) {
   if (eventType === "psychological_care.created_public") {
-    return "Origem: canal público AmperCuida";
+    return "Origem: formulário público AmperCuida";
   }
   if (!actorUserId) return "Origem: sistema";
   if (actorName) return `Por ${actorName}`;

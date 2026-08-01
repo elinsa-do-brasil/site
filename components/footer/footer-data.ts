@@ -44,6 +44,7 @@ export const footerLinkGroups: FooterLinkGroup[] = [
     title: "Apoio e ética",
     links: [
       { href: getDocsUrl(), label: "Ajuda ao colaborador" },
+      { href: "/ampercuida", label: "AmperCuida" },
       {
         href: getDocsUrl("/etica/codigo-de-conduta"),
         label: "Código de conduta",

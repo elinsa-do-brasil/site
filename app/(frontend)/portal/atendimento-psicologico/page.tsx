@@ -70,7 +70,7 @@ export default async function PsychologicalCarePage({
     <PageTransition>
       <div className="mx-auto w-full max-w-6xl px-4 pb-12">
         <PageHeader
-          description="Central restrita para acolhimento, encaminhamento e acompanhamento das solicitações feitas pela liderança."
+          description="Central restrita para análise e acompanhamento das solicitações de atendimento psicológico."
           eyebrow="Saúde & acolhimento"
           navigation={
             <PageHeaderNavigation label="Navegação do atendimento psicológico">

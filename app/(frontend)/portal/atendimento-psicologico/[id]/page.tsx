@@ -62,7 +62,7 @@ export default async function PsychologicalCareDetailPage({
             />
           }
           description="Dados confidenciais para acolhimento e encaminhamento pela equipe responsável."
-          eyebrow="Solicitação da liderança"
+          eyebrow="Atendimento psicológico"
           meta={
             <>
               <PsychologicalCareStatusBadge status={request.status} />
@@ -152,7 +152,10 @@ export default async function PsychologicalCareDetailPage({
                   label="Nome completo"
                   value={payload.employeeName}
                 />
-                <DetailItem label="Telefone/WhatsApp" value={payload.phone} />
+                <DetailItem
+                  label="Telefone ou WhatsApp"
+                  value={payload.phone}
+                />
                 <DetailItem label="Matrícula" value={payload.registration} />
                 <DetailItem label="Função" value={payload.jobTitle} />
               </dl>
@@ -188,12 +191,11 @@ export default async function PsychologicalCareDetailPage({
                   <dl className="text-sm">
                     <DetailItem
                       label="Canal"
-                      value="AmperCuida — formulário público"
+                      value="Formulário público AmperCuida"
                     />
                   </dl>
                   <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
-                    O canal público não comprova a identidade da pessoa que
-                    realizou o envio.
+                    A identidade de quem enviou não foi verificada.
                   </p>
                 </>
               ) : (

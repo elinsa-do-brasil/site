@@ -45,7 +45,7 @@ export async function submitPublicPsychologicalCareRequestAction(
 
     return {
       success: false,
-      message: "Verifique os campos e tente novamente.",
+      message: "Revise os campos destacados.",
       fieldErrors,
     };
   }
@@ -59,14 +59,14 @@ export async function submitPublicPsychologicalCareRequestAction(
     ) {
       return {
         success: false,
-        message: "Muitas tentativas de envio. Tente novamente mais tarde.",
+        message: "Limite de envios atingido. Tente novamente mais tarde.",
       };
     }
 
     return {
       success: false,
       message:
-        "Não foi possível enviar a solicitação agora. Tente novamente em alguns minutos.",
+        "Não foi possível enviar agora. Tente novamente em alguns minutos.",
     };
   }
 
@@ -107,14 +107,14 @@ export async function submitPublicPsychologicalCareRequestAction(
       return {
         success: false,
         message:
-          "Este envio já foi processado com outros dados. Limpe o formulário e faça uma nova solicitação.",
+          "Não foi possível concluir este envio. Limpe o formulário e tente novamente.",
       };
     }
 
     return {
       success: false,
       message:
-        "Não foi possível enviar a solicitação agora. Tente novamente em alguns minutos.",
+        "Não foi possível enviar agora. Tente novamente em alguns minutos.",
     };
   }
 }

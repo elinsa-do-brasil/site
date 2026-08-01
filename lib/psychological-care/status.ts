@@ -63,7 +63,8 @@ export const PSYCHOLOGICAL_CARE_STATUS_GROUPS: Record<
 
 export const psychologicalCareEventLabels: Record<string, string> = {
   "psychological_care.created": "Solicitação recebida",
-  "psychological_care.created_public": "Solicitação recebida pelo AmperCuida",
+  "psychological_care.created_public":
+    "Solicitação recebida pelo formulário público AmperCuida",
   "psychological_care.viewed": "Solicitação consultada",
   "psychological_care.status.new": "Solicitação marcada como nova",
   "psychological_care.status.triage": "Triagem iniciada",

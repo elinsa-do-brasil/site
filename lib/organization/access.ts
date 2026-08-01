@@ -179,16 +179,13 @@ function getContextualBuiltinTools(
 ) {
   const tools = [...BUILTIN_INTERNAL_TOOLS];
 
-  if (context.isTeamLeader) {
-    tools.push({
-      id: "psychological-care-request",
-      label: "Solicitar atendimento psicológico",
-      description:
-        "Encaminhe, com confidencialidade, uma solicitação de apoio para um colaborador.",
-      href: "/ampercuida",
-      icon: "HeartHandshake",
-    });
-  }
+  tools.push({
+    id: "psychological-care-request",
+    label: "Solicitar atendimento psicológico",
+    description: "Solicite apoio psicológico para um colaborador da Elinsa.",
+    href: "/ampercuida",
+    icon: "HeartHandshake",
+  });
 
   if (
     userTeamSet.has(PSYCHOLOGICAL_CARE_TEAM) &&
@@ -197,8 +194,7 @@ function getContextualBuiltinTools(
     tools.push({
       id: "psychological-care-panel",
       label: "Atendimento psicológico",
-      description:
-        "Consulte e acompanhe as solicitações encaminhadas pelas lideranças.",
+      description: "Consulte e acompanhe as solicitações recebidas.",
       href: "/portal/atendimento-psicologico",
       icon: "HeartPulse",
       teamName: PSYCHOLOGICAL_CARE_TEAM,
@@ -222,7 +218,7 @@ function canAccessConfiguredPortalTool(
     tool.href === "/ampercuida" ||
     tool.href === "/portal/atendimento-psicologico/solicitar"
   ) {
-    return context.isTeamLeader;
+    return true;
   }
 
   if (tool.href === "/portal/atendimento-psicologico") {

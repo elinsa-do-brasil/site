@@ -1,9 +1,21 @@
 "use client";
 
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { Alert02Icon, Sent02Icon } from "@hugeicons/core-free-icons";
+import {
+  Alert02Icon,
+  Contact01Icon,
+  FileEditIcon,
+  Location01Icon,
+  Sent02Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { type FormEvent, useRef, useState } from "react";
+import {
+  type ComponentProps,
+  type FormEvent,
+  type ReactNode,
+  useRef,
+  useState,
+} from "react";
 import {
   Controller,
   type FieldErrors,
@@ -15,16 +27,7 @@ import { PsychologicalCareSuccessMessage } from "@/components/psychological-care
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -43,6 +46,11 @@ type PsychologicalCareRequestFormValues = z.input<
   typeof publicPsychologicalCareRequestFormSchema
 >;
 
+type PsychologicalCareFormError = {
+  message: string;
+  title: string;
+};
+
 const DEFAULT_FORM_VALUES: PsychologicalCareRequestFormValues = {
   submissionId: "",
   base: "",
@@ -57,12 +65,12 @@ const DEFAULT_FORM_VALUES: PsychologicalCareRequestFormValues = {
 };
 
 const VISIBLE_FIELD_ORDER: FieldPath<PsychologicalCareRequestFormValues>[] = [
-  "base",
-  "city",
   "employeeName",
   "phone",
   "registration",
   "jobTitle",
+  "base",
+  "city",
   "management",
   "reason",
 ];
@@ -70,7 +78,8 @@ const VISIBLE_FIELD_ORDER: FieldPath<PsychologicalCareRequestFormValues>[] = [
 const FIXED_NAV_SCROLL_OFFSET = 112;
 
 export function PsychologicalCareRequestForm() {
-  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [submissionError, setSubmissionError] =
+    useState<PsychologicalCareFormError | null>(null);
   const [submittedProtocol, setSubmittedProtocol] = useState<string | null>(
     null,
   );
@@ -124,7 +133,12 @@ export function PsychologicalCareRequestForm() {
       const result = await submitPublicPsychologicalCareRequestAction(values);
 
       if (!result.success) {
-        setSubmissionError(result.message);
+        setSubmissionError({
+          message: result.message,
+          title: result.fieldErrors
+            ? "Revise o formulário"
+            : "Não foi possível enviar",
+        });
         applyServerFieldErrors(result.fieldErrors);
         return;
       }
@@ -133,9 +147,11 @@ export function PsychologicalCareRequestForm() {
       submissionIdRef.current = null;
       setSubmittedProtocol(result.protocol);
     } catch {
-      setSubmissionError(
-        "Não foi possível enviar a solicitação. Verifique sua conexão e tente novamente.",
-      );
+      setSubmissionError({
+        message:
+          "Não foi possível enviar agora. Verifique sua conexão e tente novamente.",
+        title: "Não foi possível enviar",
+      });
     }
   }
 
@@ -162,9 +178,10 @@ export function PsychologicalCareRequestForm() {
   function handleInvalidSubmission(
     errors: FieldErrors<PsychologicalCareRequestFormValues>,
   ) {
-    setSubmissionError(
-      "Revise os campos destacados antes de enviar a solicitação.",
-    );
+    setSubmissionError({
+      message: "Revise os campos destacados.",
+      title: "Revise o formulário",
+    });
     focusFirstInvalidField(errors);
   }
 
@@ -174,7 +191,9 @@ export function PsychologicalCareRequestForm() {
     setSubmissionError(null);
 
     window.requestAnimationFrame(() => {
-      document.querySelector<HTMLInputElement>('[name="base"]')?.focus();
+      document
+        .querySelector<HTMLInputElement>('[name="employeeName"]')
+        ?.focus();
     });
   }
 
@@ -183,7 +202,9 @@ export function PsychologicalCareRequestForm() {
     setSubmissionError(null);
 
     window.requestAnimationFrame(() => {
-      document.querySelector<HTMLInputElement>('[name="base"]')?.focus();
+      document
+        .querySelector<HTMLInputElement>('[name="employeeName"]')
+        ?.focus();
     });
   }
 
@@ -199,92 +220,34 @@ export function PsychologicalCareRequestForm() {
   return (
     <form
       aria-busy={isSubmitting}
-      aria-labelledby="request-form-title"
+      aria-label="Solicitação de atendimento psicológico"
       autoComplete="off"
+      className="[&_[data-slot=field-label]]:text-sm [&_[data-slot=field-error]]:text-sm [&_[data-slot=textarea]]:text-sm [&_[data-slot=input]]:text-sm"
       noValidate
       onSubmit={handleFormSubmit}
     >
-      <Card variant="form">
-        <CardHeader>
-          <CardTitle>
-            <h2 className="text-lg tracking-tight" id="request-form-title">
-              Dados da solicitação
-            </h2>
-          </CardTitle>
-          <CardDescription>
-            Preencha os dados do colaborador e descreva o motivo principal de
-            forma objetiva. Campos marcados com * são obrigatórios.
-          </CardDescription>
-        </CardHeader>
+      {submissionError && (
+        <Alert className="mb-5" variant="destructive">
+          <HugeiconsIcon
+            aria-hidden="true"
+            icon={Alert02Icon}
+            strokeWidth={2}
+          />
+          <AlertTitle>{submissionError.title}</AlertTitle>
+          <AlertDescription>{submissionError.message}</AlertDescription>
+        </Alert>
+      )}
 
-        <CardContent>
-          {submissionError && (
-            <Alert className="mb-5" variant="destructive">
-              <HugeiconsIcon
-                aria-hidden="true"
-                icon={Alert02Icon}
-                strokeWidth={2}
-              />
-              <AlertTitle>Não foi possível concluir o envio</AlertTitle>
-              <AlertDescription>{submissionError}</AlertDescription>
-            </Alert>
-          )}
+      <p className="mb-3 text-sm text-muted-foreground">
+        Campos marcados com * são obrigatórios.
+      </p>
 
-          <FieldGroup className="grid gap-5 sm:grid-cols-2">
-            <Controller
-              control={form.control}
-              name="base"
-              render={({ field, fieldState }) => (
-                <Field
-                  data-disabled={isSubmitting || undefined}
-                  data-invalid={fieldState.invalid || undefined}
-                >
-                  <FieldLabel htmlFor="psychological-care-base">
-                    Base <span aria-hidden="true">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    disabled={isSubmitting}
-                    id="psychological-care-base"
-                    maxLength={120}
-                    placeholder="Ex.: Base São Luís"
-                    required
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              control={form.control}
-              name="city"
-              render={({ field, fieldState }) => (
-                <Field
-                  data-disabled={isSubmitting || undefined}
-                  data-invalid={fieldState.invalid || undefined}
-                >
-                  <FieldLabel htmlFor="psychological-care-city">
-                    Cidade de lotação <span aria-hidden="true">*</span>
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    disabled={isSubmitting}
-                    id="psychological-care-city"
-                    maxLength={120}
-                    placeholder="Ex.: São Luís"
-                    required
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
+      <FieldGroup className="gap-5">
+        <PsychologicalCareFormSection
+          icon={Contact01Icon}
+          title="Quem precisa de apoio"
+        >
+          <div className="grid gap-5 sm:grid-cols-2">
             <Controller
               control={form.control}
               name="employeeName"
@@ -294,8 +257,7 @@ export function PsychologicalCareRequestForm() {
                   data-invalid={fieldState.invalid || undefined}
                 >
                   <FieldLabel htmlFor="psychological-care-employee-name">
-                    Nome completo do colaborador{" "}
-                    <span aria-hidden="true">*</span>
+                    Nome completo <span aria-hidden="true">*</span>
                   </FieldLabel>
                   <Input
                     {...field}
@@ -322,7 +284,7 @@ export function PsychologicalCareRequestForm() {
                   data-invalid={fieldState.invalid || undefined}
                 >
                   <FieldLabel htmlFor="psychological-care-phone">
-                    Telefone/WhatsApp <span aria-hidden="true">*</span>
+                    Telefone ou WhatsApp <span aria-hidden="true">*</span>
                   </FieldLabel>
                   <Input
                     {...field}
@@ -339,9 +301,6 @@ export function PsychologicalCareRequestForm() {
                     required
                     type="tel"
                   />
-                  <FieldDescription>
-                    Informe o DDD e um número brasileiro com 10 ou 11 dígitos.
-                  </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -401,6 +360,64 @@ export function PsychologicalCareRequestForm() {
                 </Field>
               )}
             />
+          </div>
+        </PsychologicalCareFormSection>
+
+        <PsychologicalCareFormSection icon={Location01Icon} title="Lotação">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Controller
+              control={form.control}
+              name="base"
+              render={({ field, fieldState }) => (
+                <Field
+                  data-disabled={isSubmitting || undefined}
+                  data-invalid={fieldState.invalid || undefined}
+                >
+                  <FieldLabel htmlFor="psychological-care-base">
+                    Base <span aria-hidden="true">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    disabled={isSubmitting}
+                    id="psychological-care-base"
+                    maxLength={120}
+                    placeholder="Ex.: Base São Luís"
+                    required
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="city"
+              render={({ field, fieldState }) => (
+                <Field
+                  data-disabled={isSubmitting || undefined}
+                  data-invalid={fieldState.invalid || undefined}
+                >
+                  <FieldLabel htmlFor="psychological-care-city">
+                    Cidade <span aria-hidden="true">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    disabled={isSubmitting}
+                    id="psychological-care-city"
+                    maxLength={120}
+                    placeholder="Ex.: São Luís"
+                    required
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
             <Controller
               control={form.control}
@@ -429,69 +446,60 @@ export function PsychologicalCareRequestForm() {
                 </Field>
               )}
             />
-
-            <Controller
-              control={form.control}
-              name="reason"
-              render={({ field, fieldState }) => (
-                <Field
-                  className="sm:col-span-2"
-                  data-disabled={isSubmitting || undefined}
-                  data-invalid={fieldState.invalid || undefined}
-                >
-                  <FieldLabel htmlFor="psychological-care-reason">
-                    Motivo principal da solicitação{" "}
-                    <span aria-hidden="true">*</span>
-                  </FieldLabel>
-                  <Textarea
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                    className="min-h-36 resize-y"
-                    disabled={isSubmitting}
-                    id="psychological-care-reason"
-                    maxLength={5000}
-                    placeholder="Descreva de forma objetiva o que motivou a solicitação de suporte."
-                    required
-                    rows={7}
-                  />
-                  <FieldDescription>
-                    Registre apenas as informações necessárias para a equipe
-                    compreender a solicitação.
-                  </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <div aria-hidden="true" className="hidden">
-            <label htmlFor="psychological-care-website">Website</label>
-            <input
-              autoComplete="off"
-              id="psychological-care-website"
-              tabIndex={-1}
-              type="text"
-              {...form.register("website")}
-            />
           </div>
-        </CardContent>
+        </PsychologicalCareFormSection>
 
-        <CardFooter className="flex flex-col items-stretch gap-2 border-t sm:flex-row sm:justify-end">
+        <PsychologicalCareFormSection icon={FileEditIcon} title="Solicitação">
+          <Controller
+            control={form.control}
+            name="reason"
+            render={({ field, fieldState }) => (
+              <Field
+                data-disabled={isSubmitting || undefined}
+                data-invalid={fieldState.invalid || undefined}
+              >
+                <FieldLabel htmlFor="psychological-care-reason">
+                  Motivo da solicitação <span aria-hidden="true">*</span>
+                </FieldLabel>
+                <Textarea
+                  {...field}
+                  aria-invalid={fieldState.invalid}
+                  className="min-h-36 resize-y"
+                  disabled={isSubmitting}
+                  id="psychological-care-reason"
+                  maxLength={5000}
+                  placeholder="Conte brevemente o que motivou esta solicitação."
+                  required
+                  rows={7}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </PsychologicalCareFormSection>
+
+        <div className="grid gap-2 sm:grid-cols-[auto_minmax(0,1fr)]">
           <Button
             disabled={isSubmitting}
             onClick={handleClear}
+            size="lg"
             type="button"
             variant="outline"
           >
             Limpar formulário
           </Button>
-          <Button disabled={isSubmitting} type="submit">
+          <Button
+            className="w-full"
+            disabled={isSubmitting}
+            size="lg"
+            type="submit"
+          >
             {isSubmitting ? (
               <>
                 <Spinner data-icon="inline-start" />
-                Enviando solicitação
+                Enviando…
               </>
             ) : (
               <>
@@ -504,9 +512,47 @@ export function PsychologicalCareRequestForm() {
               </>
             )}
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </FieldGroup>
+
+      <div aria-hidden="true" className="hidden">
+        <label htmlFor="psychological-care-website">Website</label>
+        <input
+          autoComplete="off"
+          id="psychological-care-website"
+          tabIndex={-1}
+          type="text"
+          {...form.register("website")}
+        />
+      </div>
     </form>
+  );
+}
+
+function PsychologicalCareFormSection({
+  children,
+  icon,
+  title,
+}: {
+  children: ReactNode;
+  icon: ComponentProps<typeof HugeiconsIcon>["icon"];
+  title: string;
+}) {
+  return (
+    <section className="rounded-lg border bg-card p-5 shadow-sm sm:p-6">
+      <div className="mb-5 flex items-center gap-3">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <HugeiconsIcon
+            aria-hidden="true"
+            className="size-5"
+            icon={icon}
+            strokeWidth={2}
+          />
+        </span>
+        <h2 className="text-base leading-tight font-semibold">{title}</h2>
+      </div>
+      <FieldGroup className="gap-5">{children}</FieldGroup>
+    </section>
   );
 }
 

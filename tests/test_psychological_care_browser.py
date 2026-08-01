@@ -34,7 +34,6 @@ def test_psychological_care_public_form_and_protected_panel():
             response = page.goto("/ampercuida", wait_until="domcontentloaded")
             assert response is not None
             assert response.ok
-            page.wait_for_load_state("networkidle")
             assert "no-store" in response.headers.get("cache-control", "")
             assert response.headers.get("referrer-policy") == "no-referrer"
             assert response.headers.get("x-robots-tag") == "noindex, nofollow"
@@ -42,13 +41,37 @@ def test_psychological_care_public_form_and_protected_panel():
             expect(
                 page.get_by_role(
                     "heading",
-                    name="Atendimento psicológico — Solicitação da liderança",
+                    name="Solicitação de atendimento psicológico",
                     exact=True,
                 )
             ).to_be_visible()
-            expect(page.get_by_label("Base", exact=True)).to_be_visible()
+            page.get_by_role("button", name="Apoio", exact=True).click()
             expect(
-                page.get_by_label("Motivo principal da solicitação", exact=True)
+                page.get_by_text("Recursos de apoio", exact=True)
+            ).to_be_visible()
+            expect(
+                page.locator("header")
+                .get_by_role("link", name=re.compile(r"^AmperCuida"))
+                .first
+            ).to_be_visible()
+            page.keyboard.press("Escape")
+            expect(page.locator("main")).not_to_contain_text(
+                re.compile(r"lideran", re.IGNORECASE)
+            )
+            expect(
+                page.get_by_role("heading", name="Quem precisa de apoio")
+            ).to_be_visible()
+            expect(page.get_by_role("heading", name="Lotação")).to_be_visible()
+            expect(
+                page.get_by_role("heading", name="Solicitação", exact=True)
+            ).to_be_visible()
+            expect(
+                page.get_by_role("textbox", name="Base", exact=True)
+            ).to_be_visible()
+            expect(
+                page.get_by_role(
+                    "textbox", name="Motivo da solicitação", exact=True
+                )
             ).to_be_visible()
             expect(
                 page.get_by_role("button", name="Enviar solicitação")
@@ -57,18 +80,23 @@ def test_psychological_care_public_form_and_protected_panel():
             page.get_by_role("button", name="Enviar solicitação").click()
             expect(
                 page.get_by_text(
-                    "Revise os campos destacados antes de enviar a solicitação."
+                    "Revise os campos destacados."
                 )
             ).to_be_visible()
-            expect(page.get_by_label("Base", exact=True)).to_be_focused()
+            person_name = page.get_by_role(
+                "textbox", name="Nome completo", exact=True
+            )
+            expect(person_name).to_be_focused()
 
-            page.get_by_label("Base", exact=True).fill("Base São Luís")
-            phone = page.get_by_label("Telefone/WhatsApp", exact=True)
+            person_name.fill("Maria da Silva")
+            phone = page.get_by_role(
+                "textbox", name="Telefone ou WhatsApp", exact=True
+            )
             phone.fill("98987654321")
             expect(phone).to_have_value("(98) 98765-4321")
 
             page.get_by_role("button", name="Limpar formulário").click()
-            expect(page.get_by_label("Base", exact=True)).to_have_value("")
+            expect(person_name).to_have_value("")
             expect(phone).to_have_value("")
 
             page.goto(
@@ -80,9 +108,7 @@ def test_psychological_care_public_form_and_protected_panel():
             for route, expected_redirect in protected_routes:
                 page.goto(route, wait_until="domcontentloaded")
                 expect(page).to_have_url(re.compile(expected_redirect))
-                expect(page.get_by_text("Motivo principal da solicitação")).to_have_count(
-                    0
-                )
+                expect(page.locator('[name="reason"]')).to_have_count(0)
         finally:
             context.close()
             browser.close()

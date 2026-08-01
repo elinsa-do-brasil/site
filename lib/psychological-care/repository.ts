@@ -103,7 +103,7 @@ export async function createPsychologicalCareRequest(
               ? "psychological_care.created_public"
               : "psychological_care.created",
             message: isPublicSubmission
-              ? "Solicitação de atendimento psicológico recebida pelo canal público."
+              ? "Solicitação recebida pelo formulário público AmperCuida."
               : "Solicitação de atendimento psicológico recebida.",
           });
 
