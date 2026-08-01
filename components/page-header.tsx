@@ -11,6 +11,7 @@ type PageHeaderProps = {
   meta?: ReactNode;
   navigation?: ReactNode;
   title: ReactNode;
+  titleClassName?: string;
   variant?: "feature" | "workspace";
 };
 
@@ -29,6 +30,7 @@ export function PageHeader({
   meta,
   navigation,
   title,
+  titleClassName,
   variant = "workspace",
 }: PageHeaderProps) {
   const descriptionId = useId();
@@ -66,7 +68,10 @@ export function PageHeader({
             )}
             <h1
               aria-describedby={description ? descriptionId : undefined}
-              className="mt-3 text-pretty text-3xl font-bold tracking-tight sm:text-4xl"
+              className={cn(
+                "mt-3 text-pretty text-3xl font-bold tracking-tight sm:text-4xl",
+                titleClassName,
+              )}
             >
               {title}
             </h1>

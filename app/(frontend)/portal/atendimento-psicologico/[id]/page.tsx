@@ -92,6 +92,7 @@ export default async function PsychologicalCareDetailPage({
             </PageHeaderNavigation>
           }
           title={payload.employeeName}
+          titleClassName="text-lg font-semibold sm:text-xl"
         >
           <PageHeaderNavigation label="Seções da solicitação">
             <Button className="shrink-0" size="sm" variant="outline" asChild>

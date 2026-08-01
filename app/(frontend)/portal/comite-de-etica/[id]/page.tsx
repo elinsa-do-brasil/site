@@ -140,6 +140,7 @@ export default async function ReportDetailPage({
             </PageHeaderNavigation>
           }
           title={payload.title}
+          titleClassName="text-lg font-semibold sm:text-xl"
         >
           <PageHeaderNavigation label="Seções da denúncia">
             <Button className="shrink-0" size="sm" variant="outline" asChild>
