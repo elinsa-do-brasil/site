@@ -128,8 +128,12 @@ export function ReportIntroduction() {
         <div className="text-sm leading-6">
           <p className="font-bold">Existe risco imediato à vida?</p>
           <p className="mt-1 text-amber-900/80 dark:text-amber-100/75">
-            Primeiro, procure ajuda: ligue para o SAMU (192), para os Bombeiros
-            (193) ou acione a supervisão de campo. 
+            Primeiro, procure ajuda imediata acionado os serviços de emergência: 
+            <ol className="mt-1 list-inside list-disc space-y-1 pl-2">
+              <li>SAMU através do <code>192</code></li>
+              <li>Bombeiros através do <code>193</code></li>
+              <li>Polícia através do <code>190</code></li>
+            </ol>
             <br/>
             Depois, registre a denúncia para que o caso também possa ser acompanhado internamente.
           </p>
