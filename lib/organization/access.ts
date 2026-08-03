@@ -179,14 +179,6 @@ function getContextualBuiltinTools(
 ) {
   const tools = [...BUILTIN_INTERNAL_TOOLS];
 
-  tools.push({
-    id: "psychological-care-request",
-    label: "Solicitar atendimento psicológico",
-    description: "Solicite apoio psicológico para um colaborador da Elinsa.",
-    href: "/ampercuida",
-    icon: "HeartHandshake",
-  });
-
   if (
     userTeamSet.has(PSYCHOLOGICAL_CARE_TEAM) &&
     context.roles.includes(PSYCHOLOGICAL_CARE_ROLE)
