@@ -192,7 +192,7 @@ export default async function PsychologicalCareDetailPage({
                   <dl className="text-sm">
                     <DetailItem
                       label="Canal"
-                      value="Formulário público AmperCuida"
+                      value="Formulário público Amper Cuida"
                     />
                   </dl>
                   <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">

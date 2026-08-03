@@ -15,12 +15,12 @@ import { PageTransition } from "@/components/ui/page-transition";
 import { createPageMetadata } from "@/lib/seo";
 
 const DESCRIPTION =
-  "Conheça o AmperCuida, canal da Elinsa para solicitar acolhimento psicológico a colaboradores, com acesso restrito e encaminhamento responsável.";
+  "Conheça o Amper Cuida, canal da Elinsa para solicitar acolhimento psicológico a colaboradores, com acesso restrito e encaminhamento responsável.";
 
 export const metadata = createPageMetadata({
   description: DESCRIPTION,
   path: "/ampercuida/sobre",
-  title: "AmperCuida: apoio psicológico aos colaboradores",
+  title: "Amper Cuida: apoio psicológico aos colaboradores",
 });
 
 const steps = [
@@ -64,7 +64,7 @@ export default function AmperCuidaAboutPage() {
                 Cuidado com as pessoas
               </p>
               <h1 className="mt-3 text-pretty text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl lg:leading-[1.08]">
-                AmperCuida: apoio psicológico para colaboradores
+                Amper Cuida: apoio psicológico para colaboradores
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
                 Um canal para pedir acolhimento e orientação quando um
@@ -106,7 +106,7 @@ export default function AmperCuidaAboutPage() {
               className="mt-2 text-3xl font-bold tracking-tight"
               id="como-funciona"
             >
-              Como o AmperCuida funciona
+              Como o Amper Cuida funciona
             </h2>
             <p className="mt-3 leading-7 text-muted-foreground">
               O fluxo foi pensado para coletar apenas as informações necessárias
@@ -176,7 +176,7 @@ export default function AmperCuidaAboutPage() {
                 O que este canal não substitui
               </h2>
               <p className="mt-3 leading-7 text-muted-foreground">
-                O AmperCuida organiza pedidos de apoio e encaminhamento. Ele não
+                O Amper Cuida organiza pedidos de apoio e encaminhamento. Ele não
                 substitui serviços de emergência nem o Canal de Denúncias para
                 relatos de ética, assédio, discriminação ou outras condutas
                 inadequadas.
@@ -227,7 +227,7 @@ export default function AmperCuidaAboutPage() {
             </div>
             <Button asChild className="shrink-0" size="lg">
               <Link href="/ampercuida">
-                Acessar o AmperCuida
+                Acessar o Amper Cuida
                 <ArrowRight aria-hidden="true" data-icon="inline-end" />
               </Link>
             </Button>

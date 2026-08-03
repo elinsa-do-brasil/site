@@ -156,8 +156,7 @@ function PsychologicalCareWhoTakesCare() {
       <CardContent className="grid gap-4">
         <div className="grid gap-3">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Os atendimentos do Amper Cuida são realizados pela psicóloga
-            <strong>Alessandra Duarte Ferreira</strong>, responsável pelo
+            Os atendimentos do Amper Cuida são realizados pela psicóloga <strong>Alessandra Duarte Ferreira</strong>, responsável pelo
             acolhimento e pela orientação dos colaboradores da Elinsa do Brasil.
           </p>
           <Image

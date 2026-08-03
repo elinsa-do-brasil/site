@@ -140,7 +140,7 @@ export function Header() {
                         <DropdownItem
                           href="/ampercuida"
                           icon={HeartAddIcon}
-                          title="AmperCuida"
+                          title="Amper Cuida"
                           description="Solicite atendimento psicológico"
                         />
                         <DropdownItem
@@ -302,7 +302,7 @@ function MobileMenu() {
             <MobileNavLink
               href="/ampercuida"
               icon={HeartAddIcon}
-              title="AmperCuida"
+              title="Amper Cuida"
               description="Solicite atendimento psicológico"
             />
             <MobileNavLink
