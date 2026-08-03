@@ -1,13 +1,14 @@
 import { ArrowRight, TextAlignStart } from "lucide-react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Termos de uso",
   description:
     "Condições gerais para uso do site, canais públicos e portal interno da Elinsa do Brasil.",
-};
+  path: "/termos",
+});
 
 const updatedAt = "16 de maio de 2026";
 

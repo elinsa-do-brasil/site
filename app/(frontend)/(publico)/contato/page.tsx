@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import {
   Card,
   CardContent,
@@ -6,13 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createPageMetadata } from "@/lib/seo";
 import { ContatoForm } from "./contato-form";
 
-export const metadata: Metadata = {
-  title: "Contato — Elinsa do Brasil",
+export const metadata = createPageMetadata({
+  title: "Contato",
   description:
-    "Entre em contato com a Elinsa do Brasil pelo formulário oficial do site.",
-};
+    "Fale com a Elinsa do Brasil sobre assuntos comerciais, institucionais e operações de infraestrutura elétrica no Pará.",
+  path: "/contato",
+});
 
 export default function ContatoPage() {
   return (

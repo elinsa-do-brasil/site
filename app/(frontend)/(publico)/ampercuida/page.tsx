@@ -6,23 +6,21 @@ import {
   ShieldKeyIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { Metadata } from "next";
+import { ArrowRight, Info } from "lucide-react";
+import Link from "next/link";
 import { PsychologicalCareRequestForm } from "@/components/psychological-care/psychological-care-request-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageTransition } from "@/components/ui/page-transition";
+import { createNoIndexMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = createNoIndexMetadata({
   title: "Solicitação de atendimento psicológico",
   description:
     "Formulário público para solicitar apoio psicológico a colaboradores da Elinsa.",
-  robots: {
-    follow: false,
-    index: false,
-  },
-};
+});
 
 export default function AmperCuidaPage() {
   return (
@@ -38,6 +36,14 @@ export default function AmperCuidaPage() {
                 Qualquer pessoa pode preencher este formulário. Informe os dados
                 do colaborador que precisa de apoio psicológico.
               </p>
+              <Link
+                className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-elinsa-primary underline-offset-4 hover:underline"
+                href="/ampercuida/sobre"
+              >
+                <Info aria-hidden="true" className="size-4" />
+                Entenda como funciona o AmperCuida
+                <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
             </header>
 
             <div className="lg:hidden">
@@ -90,7 +96,8 @@ function PsychologicalCareImmediateHelp() {
       <CardContent className="grid gap-3">
         <p className="text-sm leading-relaxed text-amber-900/80 dark:text-amber-100/80">
           O Centro de Valorização da Vida (CVV) oferece apoio emocional gratuito
-          e confidencial por telefone, no 188, ou via internet no site cvv.org.br.
+          e confidencial por telefone, no 188, ou via internet no site
+          cvv.org.br.
         </p>
 
         <div className="grid gap-2">

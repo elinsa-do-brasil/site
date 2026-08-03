@@ -11,6 +11,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { EditorialRichText } from "@/components/editorial/editorial-rich-text";
+import { JsonLd } from "@/components/seo/json-ld";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +25,7 @@ import {
 } from "@/components/ui/card";
 import { PageTransition } from "@/components/ui/page-transition";
 import { Separator } from "@/components/ui/separator";
+import { createJobPostingStructuredData } from "@/lib/structured-data";
 import {
   formatVagaDate,
   getVagaBySlug,
@@ -78,10 +81,23 @@ export async function VagaPage({ slug }: { slug: string }) {
   }
 
   const publishedDate = formatVagaDate(vaga.publishedAt ?? vaga.createdAt);
+  const vagaPath = `/vagas/${slug}`;
 
   return (
     <PageTransition>
       <div className="min-h-screen bg-background pt-24 text-foreground">
+        {!isDraftMode && vaga._status !== "draft" ? (
+          <JsonLd
+            data={createJobPostingStructuredData({
+              city: getVagaLocationLabel(vaga),
+              datePosted: vaga.publishedAt ?? vaga.createdAt,
+              description: vaga.summary,
+              identifier: vaga.id,
+              path: vagaPath,
+              title: vaga.title,
+            })}
+          />
+        ) : null}
         {isDraftMode && (
           <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
             Pré-visualização ativa
@@ -89,6 +105,13 @@ export async function VagaPage({ slug }: { slug: string }) {
         )}
 
         <section className="mx-auto w-full max-w-6xl px-4 py-6 md:py-8">
+          <SeoBreadcrumbs
+            items={[
+              { href: "/", label: "Início" },
+              { href: "/vagas", label: "Vagas" },
+              { label: vaga.title },
+            ]}
+          />
           <Button
             asChild
             className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"

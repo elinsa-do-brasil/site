@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
 import { EditorialIndex } from "@/components/editorial/editorial-pages";
 import { getValidEditorialSubject } from "@/lib/editorial";
+import { createPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Imprensa | Elinsa",
-  description: "Notícias públicas e comunicados institucionais da Elinsa.",
-};
+export const metadata = createPageMetadata({
+  title: "Imprensa",
+  description:
+    "Acompanhe notícias, comunicados institucionais e atualizações públicas da Elinsa do Brasil no Pará.",
+  path: "/imprensa",
+});
 
 export default async function ImprensaPage({
   searchParams,

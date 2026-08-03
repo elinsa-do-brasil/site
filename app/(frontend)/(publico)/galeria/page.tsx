@@ -1,9 +1,7 @@
 import { Image01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { Metadata } from "next";
 import { GalleryExplorer } from "@/components/gallery/gallery-explorer";
 import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
 import {
   Empty,
   EmptyDescription,
@@ -13,26 +11,18 @@ import {
 } from "@/components/ui/empty";
 import { PageTransition } from "@/components/ui/page-transition";
 import { getGalleryPage } from "@/lib/gallery";
+import { createPageMetadata } from "@/lib/seo";
 
 const GALLERY_DESCRIPTION =
   "Registros das equipes, dos projetos e da operação da Elinsa do Brasil em campo.";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Galeria de fotos",
   description: GALLERY_DESCRIPTION,
-  alternates: {
-    canonical: "/galeria",
-  },
-  openGraph: {
-    title: "Galeria de fotos | Elinsa",
-    description: GALLERY_DESCRIPTION,
-    locale: "pt_BR",
-    siteName: "Elinsa do Brasil",
-    type: "website",
-  },
-};
+  path: "/galeria",
+});
 
 export default async function GaleriaPage() {
   const initialPage = await getGalleryPage();

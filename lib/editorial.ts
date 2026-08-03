@@ -1,5 +1,6 @@
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
+import { cache } from "react";
 import {
   defaultEditorialSubject,
   type EditorialSubjectValue,
@@ -48,10 +49,16 @@ export type EditorialImage = {
 };
 
 export type EditorialPost = {
+  _status?: null | "draft" | "published";
   content?: null | unknown;
   coverImage?: EditorialImage | null | number | string;
   createdAt?: string;
   id: number | string;
+  meta?: null | {
+    description?: null | string;
+    image?: EditorialImage | null | number | string;
+    title?: null | string;
+  };
   author?: EditorialAuthor | null;
   publishedAt?: null | string;
   slug?: null | string;
@@ -140,6 +147,14 @@ export async function getEditorialPost({
   draft: boolean;
   slug: string;
 }): Promise<EditorialPost | null> {
+  return getCachedEditorialPost(collection, draft, slug);
+}
+
+const getCachedEditorialPost = cache(async function getCachedEditorialPost(
+  collection: EditorialCollectionSlug,
+  draft: boolean,
+  slug: string,
+): Promise<EditorialPost | null> {
   const payload = await getPayload({ config: configPromise });
 
   const { docs } = await payload.find({
@@ -158,7 +173,7 @@ export async function getEditorialPost({
   });
 
   return (docs[0] as EditorialPost | undefined) ?? null;
-}
+});
 
 export function getAuthorName(author: EditorialAuthor | null | undefined) {
   if (!author) {
@@ -262,6 +277,12 @@ export function getRichTextNodeText(node: unknown): string {
     : "";
 
   return `${ownText}${childText}`;
+}
+
+export function getRichTextPlainText(data: unknown) {
+  return getRichTextNodeText({ children: getRootChildren(data) })
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function createHeadingId(

@@ -1,15 +1,23 @@
 import configPromise from "@payload-config";
 import { getPayload, type Where } from "payload";
+import { cache } from "react";
+import type { EditorialImage } from "@/lib/editorial";
 import { getVagaCidadeLabel, type VagaCidadeValue } from "@/lib/vaga-options";
 
 export type VagaStatus = "aberta" | "fechada";
 
 export type Vaga = {
+  _status?: null | "draft" | "published";
   city: VagaCidadeValue | string;
   content?: null | unknown;
   createdAt?: string;
   id: number | string;
   jobStatus: VagaStatus;
+  meta?: null | {
+    description?: null | string;
+    image?: EditorialImage | null | number | string;
+    title?: null | string;
+  };
   publishedAt?: null | string;
   sector: string;
   slug?: null | string;
@@ -45,6 +53,13 @@ export async function getVagaBySlug({
   draft: boolean;
   slug: string;
 }): Promise<Vaga | null> {
+  return getCachedVagaBySlug(draft, slug);
+}
+
+const getCachedVagaBySlug = cache(async function getCachedVagaBySlug(
+  draft: boolean,
+  slug: string,
+): Promise<Vaga | null> {
   const payload = await getPayload({ config: configPromise });
 
   const where: Where = draft
@@ -70,7 +85,7 @@ export async function getVagaBySlug({
 
   const { docs } = await payload.find({
     collection: "vagas",
-    depth: 0,
+    depth: 1,
     draft,
     limit: 1,
     overrideAccess: false,
@@ -78,7 +93,7 @@ export async function getVagaBySlug({
   });
 
   return (docs[0] as Vaga | undefined) ?? null;
-}
+});
 
 export function formatVagaDate(dateString: null | string | undefined) {
   if (!dateString) {

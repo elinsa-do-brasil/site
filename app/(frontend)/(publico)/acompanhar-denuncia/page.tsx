@@ -6,7 +6,6 @@ import {
   ShieldKeyIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ReportStatusBadge } from "@/components/reports/report-status-badge";
 import { Button } from "@/components/ui/button";
@@ -26,17 +25,14 @@ import {
   normalizeReportStatus,
   reportStatusPublicDescriptions,
 } from "@/lib/reports/status";
+import { createNoIndexMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = createNoIndexMetadata({
   title: "Acompanhar denúncia",
   description: "Consulta pública de status de denúncia por protocolo.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+});
 
 type FollowReportPageProps = {
   searchParams: Promise<{

@@ -13,6 +13,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EditorialCover } from "@/components/editorial/editorial-cover";
 import { EditorialRichText } from "@/components/editorial/editorial-rich-text";
+import { JsonLd } from "@/components/seo/json-ld";
+import { SeoBreadcrumbs } from "@/components/seo/seo-breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +38,7 @@ import {
   getHeadingsFromRichText,
   getPostSubjectValue,
   getReadingMinutes,
+  getRichTextPlainText,
   getSubjectCounts,
   type HeadingItem,
 } from "@/lib/editorial";
@@ -43,6 +46,8 @@ import {
   type EditorialSubjectValue,
   getEditorialSubjectLabel,
 } from "@/lib/editorial-subjects";
+import { createSeoDescription, getCmsSeoImage } from "@/lib/seo";
+import { createNewsArticleStructuredData } from "@/lib/structured-data";
 import { cn } from "@/lib/utils";
 
 type SubjectCount = ReturnType<typeof getSubjectCounts>[number];
@@ -157,6 +162,16 @@ export async function EditorialArticlePage({
   const readingMinutes = getReadingMinutes(post.content);
   const publishedDate = formatEditorialDate(post.publishedAt ?? post.createdAt);
   const updatedDate = formatEditorialDate(post.updatedAt);
+  const articlePath = `/imprensa/${slug}`;
+  const articleDescription = createSeoDescription(
+    [post.summary, getRichTextPlainText(post.content)],
+    "Notícia institucional da Elinsa do Brasil.",
+  );
+  const articleImage =
+    getCmsSeoImage(post.meta?.image)?.url ??
+    getEditorialCoverImage(post, "hero")?.url;
+  const showPublicStructuredData =
+    collection === "imprensa" && !isDraftMode && post._status !== "draft";
 
   return (
     <PageTransition>
@@ -166,6 +181,19 @@ export async function EditorialArticlePage({
           !isPortalCollection && "pt-24",
         )}
       >
+        {showPublicStructuredData ? (
+          <JsonLd
+            data={createNewsArticleStructuredData({
+              author: getAuthorName(post.author),
+              dateModified: post.updatedAt,
+              datePublished: post.publishedAt ?? post.createdAt,
+              description: articleDescription,
+              image: articleImage,
+              path: articlePath,
+              title: post.title,
+            })}
+          />
+        ) : null}
         {isDraftMode && (
           <div className="border-y border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-950">
             Pré-visualização ativa
@@ -178,6 +206,15 @@ export async function EditorialArticlePage({
             !isPortalCollection && "py-6 md:py-8",
           )}
         >
+          {!isPortalCollection ? (
+            <SeoBreadcrumbs
+              items={[
+                { href: "/", label: "Início" },
+                { href: "/imprensa", label: "Imprensa" },
+                { label: post.title },
+              ]}
+            />
+          ) : null}
           <Button
             asChild
             className="-ml-2 h-8 gap-2 px-2 text-sm font-semibold text-muted-foreground hover:text-elinsa-primary"

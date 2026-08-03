@@ -1,12 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "../globals.css";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer } from "@/components/footer";
 import { FrontendShell } from "@/components/frontend-shell";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  absoluteUrl,
+  DEFAULT_SOCIAL_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -22,22 +29,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: SITE_URL,
   title: {
-    default: "Elinsa do Brasil",
-    template: "%s | Elinsa",
+    default: `Infraestrutura elétrica no Pará | ${SITE_NAME}`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Infraestrutura elétrica, manutenção e obras para operações do Grupo Equatorial Energia.",
-  applicationName: "Elinsa do Brasil",
-  creator: "Raave Aires",
-  publisher: "Elinsa do Brasil",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   openGraph: {
-    title: "Elinsa do Brasil",
-    description:
-      "Infraestrutura elétrica, manutenção e obras para operações do Grupo Equatorial Energia.",
+    title: `Infraestrutura elétrica no Pará | ${SITE_NAME}`,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        alt: `${SITE_NAME} — infraestrutura elétrica no Pará`,
+        url: absoluteUrl(DEFAULT_SOCIAL_IMAGE),
+      },
+    ],
     locale: "pt_BR",
-    siteName: "Elinsa do Brasil",
+    siteName: SITE_NAME,
     type: "website",
+    url: absoluteUrl("/"),
   },
   icons: {
     icon: [
@@ -57,6 +70,36 @@ export const metadata: Metadata = {
     shortcut: "/favicon/e.ico",
     apple: "/favicon/e.png",
   },
+  robots: {
+    follow: true,
+    googleBot: {
+      follow: true,
+      index: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+    index: true,
+  },
+  twitter: {
+    card: "summary_large_image",
+    description: SITE_DESCRIPTION,
+    images: [absoluteUrl(DEFAULT_SOCIAL_IMAGE)],
+    title: `Infraestrutura elétrica no Pará | ${SITE_NAME}`,
+  },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  initialScale: 1,
+  themeColor: [
+    { color: "#ffffff", media: "(prefers-color-scheme: light)" },
+    { color: "#171717", media: "(prefers-color-scheme: dark)" },
+  ],
+  width: "device-width",
 };
 
 export default function RootLayout({

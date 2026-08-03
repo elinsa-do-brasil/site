@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { connection } from "next/server";
 import { CareChannelSection } from "@/components/homepage/care-channel-section";
 import { CompanyValuesSection } from "@/components/homepage/company-values-section";
@@ -8,74 +7,28 @@ import { HomeHeroSection } from "@/components/homepage/home-hero-section";
 import { OperationSection } from "@/components/homepage/operation-section";
 import { PressNewsSection } from "@/components/homepage/press-news-section";
 import { ProvidedServicesSection } from "@/components/homepage/provided-services-section";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Separator } from "@/components/ui/separator";
 import { getEditorialPosts } from "@/lib/editorial";
+import { createPageMetadata } from "@/lib/seo";
+import { createHomeStructuredData } from "@/lib/structured-data";
 
-const HOME_TITLE =
-  "Elinsa do Brasil | Infraestrutura elétrica empresarial no Pará";
+const HOME_TITLE = "Infraestrutura elétrica no Pará | Elinsa do Brasil";
 const HOME_DESCRIPTION =
   "Obras, manutenção e suporte operacional em infraestrutura elétrica para o Grupo Equatorial Energia, com bases regionais no Pará.";
-const HOME_OG_IMAGE = {
-  alt: "Equipe técnica da Elinsa em operação de infraestrutura elétrica",
-  height: 941,
-  url: "/images/eletricistas.webp",
-  width: 1672,
-};
-const siteUrl = getPublicSiteUrl();
 
-export const metadata: Metadata = {
-  title: HOME_TITLE,
+export const metadata = createPageMetadata({
+  absoluteTitle: true,
   description: HOME_DESCRIPTION,
-  ...(siteUrl
-    ? {
-        alternates: {
-          canonical: "/",
-        },
-        metadataBase: siteUrl,
-      }
-    : {}),
-  openGraph: {
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
-    locale: "pt_BR",
-    siteName: "Elinsa do Brasil",
-    type: "website",
-    ...(siteUrl
-      ? {
-          images: [HOME_OG_IMAGE],
-          url: "/",
-        }
-      : {}),
+  image: {
+    alt: "Equipe técnica da Elinsa em operação de infraestrutura elétrica",
+    height: 941,
+    url: "/images/eletricistas.webp",
+    width: 1672,
   },
-  twitter: {
-    card: "summary_large_image",
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
-    ...(siteUrl ? { images: [HOME_OG_IMAGE.url] } : {}),
-  },
-};
-
-function getPublicSiteUrl() {
-  const vercelUrl =
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
-  const candidate =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    (vercelUrl ? `https://${vercelUrl}` : "");
-
-  if (!candidate) {
-    return undefined;
-  }
-
-  const normalized = /^[a-z][a-z\d+\-.]*:\/\//i.test(candidate)
-    ? candidate
-    : `https://${candidate}`;
-
-  try {
-    return new URL(normalized);
-  } catch {
-    return undefined;
-  }
-}
+  path: "/",
+  title: HOME_TITLE,
+});
 
 export default async function Home() {
   await connection();
@@ -85,6 +38,7 @@ export default async function Home() {
 
   return (
     <div className="bg-background text-foreground">
+      <JsonLd data={createHomeStructuredData()} />
       <HomeHeroSection impactMetrics={impactMetrics} />
       <Separator />
       <OperationSection />

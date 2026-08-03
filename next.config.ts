@@ -81,14 +81,10 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/denunciar",
-        headers: [
-          { key: "Referrer-Policy", value: "no-referrer" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow" },
-          { key: "Cache-Control", value: "no-store" },
-        ],
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
       },
       {
-        source: "/denunciar/:path*",
+        source: "/denunciar/formulario",
         headers: [
           { key: "Referrer-Policy", value: "no-referrer" },
           { key: "X-Robots-Tag", value: "noindex, nofollow" },
@@ -104,7 +100,27 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/acompanhar-denuncia",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/payload/:path*",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/dev/:path*",
+        headers: noIndexHeaders,
+      },
+      {
         source: "/portal/:path*",
+        headers: noIndexHeaders,
+      },
+      {
+        source: "/configuracoes/:path*",
         headers: noIndexHeaders,
       },
       {

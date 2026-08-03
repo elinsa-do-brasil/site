@@ -1,13 +1,14 @@
 import { ArrowRight, TextAlignStart } from "lucide-react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "Política de privacidade",
   description:
     "Como a Elinsa do Brasil trata dados pessoais no site, nos canais públicos e no portal interno.",
-};
+  path: "/privacidade",
+});
 
 const updatedAt = "16 de maio de 2026";
 

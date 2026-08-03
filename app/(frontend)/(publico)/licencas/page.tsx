@@ -6,14 +6,15 @@ import {
   Scale,
   ShieldCheck,
 } from "lucide-react";
-import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Licenças de código aberto - Elinsa",
+export const metadata = createPageMetadata({
+  title: "Licenças de código aberto",
   description:
     "Reconhecimento das bibliotecas e ferramentas de código aberto usadas no site da Elinsa.",
-};
+  path: "/licencas",
+});
 
 type LicenseItem = {
   name: string;

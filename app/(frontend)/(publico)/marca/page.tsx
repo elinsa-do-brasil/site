@@ -11,7 +11,6 @@ import {
   Sun,
   SwatchBook,
 } from "lucide-react";
-import type { Metadata } from "next";
 import Image from "next/image";
 import {
   ContentSection,
@@ -35,43 +34,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { downloadAsset } from "@/lib/download-asset";
+import { createPageMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { ColorCopyButton } from "./_components/color-copy-button";
 
 const BRAND_PAGE_TITLE = "Kit de marca: logos e cores oficiais";
-const BRAND_PAGE_SOCIAL_TITLE = `${BRAND_PAGE_TITLE} | Elinsa`;
 const BRAND_PAGE_DESCRIPTION =
   "Baixe o kit de marca da Elinsa do Brasil com logos e símbolos em SVG, PNG, WebP e AVIF, paleta oficial e orientações de aplicação.";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: BRAND_PAGE_TITLE,
   description: BRAND_PAGE_DESCRIPTION,
-  keywords: [
-    "kit de marca Elinsa",
-    "logo Elinsa do Brasil",
-    "identidade visual Elinsa",
-    "guia de marca Elinsa",
-    "cores oficiais Elinsa",
-    "logo Elinsa SVG",
-    "logo Elinsa PNG",
-    "símbolo Elinsa",
-  ],
-  alternates: {
-    canonical: "/marca",
+  image: {
+    alt: "Logo colorido da Elinsa do Brasil",
+    url: "/kit-de-marca/png/logo-colorido.png",
   },
-  openGraph: {
-    title: BRAND_PAGE_SOCIAL_TITLE,
-    description: BRAND_PAGE_DESCRIPTION,
-    locale: "pt_BR",
-    siteName: "Elinsa do Brasil",
-    type: "website",
-  },
-  twitter: {
-    card: "summary",
-    title: BRAND_PAGE_SOCIAL_TITLE,
-    description: BRAND_PAGE_DESCRIPTION,
-  },
-};
+  path: "/marca",
+});
 
 type BrandColor = {
   name: string;

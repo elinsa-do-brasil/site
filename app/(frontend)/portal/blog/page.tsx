@@ -6,7 +6,7 @@ import { requireInternalAccess } from "@/lib/organization/access";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Blog | Elinsa",
+  title: "Blog",
   description:
     "Eventos internos, recrutamento e comunicados para equipes da Elinsa.",
 };

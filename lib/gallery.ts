@@ -22,6 +22,11 @@ export type GalleryPage = {
   totalPages: number;
 };
 
+export type GallerySitemapData = {
+  images: string[];
+  updatedAt?: string;
+};
+
 export const GALLERY_PAGE_SIZE = 10;
 
 export async function getGalleryPage(page = 1): Promise<GalleryPage> {
@@ -95,4 +100,37 @@ export async function getGalleryPage(page = 1): Promise<GalleryPage> {
     totalDocs: result.totalDocs,
     totalPages: result.totalPages,
   };
+}
+
+export async function getGallerySitemapData(): Promise<GallerySitemapData> {
+  const payload = await getPayload({ config: configPromise });
+  const result = await payload.find({
+    collection: "galeria",
+    depth: 0,
+    limit: 1000,
+    overrideAccess: false,
+    pagination: false,
+    select: {
+      filename: true,
+      mimeType: true,
+      prefix: true,
+      updatedAt: true,
+      url: true,
+    },
+    sort: "-updatedAt",
+    where: {
+      mimeType: {
+        contains: "image/",
+      },
+    },
+  });
+  const images = result.docs.flatMap((doc) =>
+    doc.url && doc.mimeType?.startsWith("image/") ? [doc.url] : [],
+  );
+  const updatedAt = result.docs
+    .map((doc) => doc.updatedAt)
+    .filter((value): value is string => Boolean(value))
+    .find((value) => !Number.isNaN(Date.parse(value)));
+
+  return { images, updatedAt };
 }

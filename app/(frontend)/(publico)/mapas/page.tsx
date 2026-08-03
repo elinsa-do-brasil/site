@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import { MapasExplorer } from "@/components/maps/mapas-explorer";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Mapas regionais - Elinsa",
+export const metadata = createPageMetadata({
+  title: "Mapas regionais",
   description:
-    "Mapa operacional das regionais, bases e municípios atendidos pela Elinsa.",
-};
+    "Explore as regionais, bases operacionais e municípios atendidos pela Elinsa do Brasil no Pará.",
+  path: "/mapas",
+});
 
 export default function MapasPage() {
   return <MapasExplorer />;

@@ -1,21 +1,17 @@
 import { ArrowLeft } from "lucide-react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { AnonymousReportForm } from "@/components/reports/anonymous-report-form";
 import { ReportAnonymizationInfo } from "@/components/reports/report-anonymization-info";
 import { ReportFlowSteps } from "@/components/reports/report-flow-steps";
 import { ReportPrivacyNotice } from "@/components/reports/report-privacy-notice";
 import { ReportWritingHelp } from "@/components/reports/report-writing-help";
+import { createNoIndexMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createNoIndexMetadata({
   title: "Formulário de denúncia",
   description:
     "Formulário seguro para enviar uma denúncia ao Comitê de Ética da Elinsa.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+});
 
 export default function ReportFormPage() {
   return (
