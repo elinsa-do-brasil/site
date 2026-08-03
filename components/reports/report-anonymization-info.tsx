@@ -1,4 +1,5 @@
 import {
+  Alert02Icon,
   CheckmarkCircle02Icon,
   UserShield01Icon,
 } from "@hugeicons/core-free-icons";
@@ -21,7 +22,7 @@ export function ReportAnonymizationInfo() {
                 strokeWidth={2}
               />
             </span>
-            O que fazemos para anonimizar denúncias
+            Como o envio sem identificação funciona
           </span>
         </CardTitle>
       </CardHeader>
@@ -35,8 +36,8 @@ export function ReportAnonymizationInfo() {
               strokeWidth={2}
             />
             <span>
-              Não registramos IP, navegador, cookies ou dados do dispositivo de
-              quem envia a denúncia.
+              Seu nome e seus dados de contato não fazem parte da denúncia
+              quando você escolhe não se identificar.
             </span>
           </li>
           <li className="flex gap-2">
@@ -46,8 +47,19 @@ export function ReportAnonymizationInfo() {
               strokeWidth={2}
             />
             <span>
-              Caso o usuário utilize o login, ele não será vinculado ao envio da
-              denúncia.
+              As requisições de envio não usam as credenciais da sua sessão e o
+              registro da denúncia não possui vínculo com a sua conta.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <HugeiconsIcon
+              icon={Alert02Icon}
+              className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-300"
+              strokeWidth={2}
+            />
+            <span>
+              O texto e os anexos não são anonimizados automaticamente e podem
+              revelar sua identidade. Revise o conteúdo antes de enviar.
             </span>
           </li>
           <li className="flex gap-2">
@@ -57,8 +69,9 @@ export function ReportAnonymizationInfo() {
               strokeWidth={2}
             />
             <span>
-              Esta página não utiliza cookies, nem outros métodos de
-              rastreamento.
+              Não enviamos métricas de uso nem eventos de monitoramento da
+              aplicação a partir deste canal. A infraestrutura ainda processa os
+              dados técnicos necessários para entregar e proteger a conexão.
             </span>
           </li>
         </ul>

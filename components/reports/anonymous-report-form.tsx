@@ -471,9 +471,12 @@ export function AnonymousReportForm() {
                   Deseja identificar-se?
                 </FieldLabel>
                 <FieldDescription className="max-w-2xl">
-                  Se escolher não se identificar, seu relato será totalmente
-                  anônimo e seguro. Se escolher se identificar, apenas o Comitê
-                  de Ética terá acesso aos seus dados de contato.
+                  Se escolher não se identificar, nome e contato não serão
+                  enviados e o relato não será associado à sua conta. Revise o
+                  texto e os anexos: eles podem conter detalhes que revelem sua
+                  identidade. Se escolher se identificar, seus dados de contato
+                  ficarão no conteúdo criptografado e o acesso pelo portal será
+                  restrito ao Comitê de Ética.
                 </FieldDescription>
                 <RadioGroup
                   value={field.value}

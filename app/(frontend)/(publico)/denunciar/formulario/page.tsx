@@ -10,7 +10,7 @@ import { createNoIndexMetadata } from "@/lib/seo";
 export const metadata = createNoIndexMetadata({
   title: "Formulário de denúncia",
   description:
-    "Formulário seguro para enviar uma denúncia ao Comitê de Ética da Elinsa.",
+    "Formulário para enviar uma denúncia ao Comitê de Ética da Elinsa.",
 });
 
 export default function ReportFormPage() {

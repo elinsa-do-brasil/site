@@ -124,15 +124,20 @@ export default function PrivacidadePage() {
                 No canal de denúncias, as informações enviadas são tratadas para
                 receber, registrar e apurar relatos conforme os procedimentos
                 internos da Elinsa. Quando a denúncia é realizada de forma
-                anônima, adotamos medidas técnicas para preservar a identidade
-                do denunciante, incluindo remoção de identificadores antes do
-                envio, ausência de vínculo com contas autenticadas ou sessões do
-                portal e proteção criptográfica do conteúdo. Quando o
-                denunciante opta por se identificar, tratamos os dados de nome e
-                contato fornecidos voluntariamente para comunicação,
-                acompanhamento do caso e condução da apuração. O acesso às
-                informações é restrito a pessoas autorizadas responsáveis pelo
-                tratamento da denúncia.
+                anônima, os campos de nome e contato são omitidos, as
+                requisições de envio não usam credenciais da sessão e o registro
+                não possui vínculo com uma conta do portal. O sistema não remove
+                automaticamente identificadores presentes no texto ou nos
+                anexos, por isso o denunciante deve revisar o conteúdo antes do
+                envio. O conteúdo é armazenado de forma criptografada e, no
+                portal, seu acesso é restrito a pessoas autorizadas responsáveis
+                pelo tratamento da denúncia. Quando o denunciante opta por se
+                identificar, tratamos os dados de nome e contato fornecidos
+                voluntariamente para comunicação, acompanhamento do caso e
+                condução da apuração. Provedores de hospedagem e segurança ainda
+                podem processar dados técnicos necessários para entregar e
+                proteger a conexão; esses dados não integram o registro da
+                denúncia.
               </li>
               <li>
                 Alguns fornecedores podem tratar dados necessários para hospedar

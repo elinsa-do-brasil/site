@@ -46,8 +46,9 @@ export function ReportPrivacyNotice() {
               strokeWidth={2}
             />
             <span>
-              Criptografamos as denúncias antes de serem salvas e{" "}
-              <strong>apenas</strong> o Comitê de Ética terá acesso aos dados.
+              O conteúdo da denúncia e dos anexos é armazenado de forma
+              criptografada. No portal, o acesso é restrito a pessoas
+              autorizadas do Comitê de Ética.
             </span>
           </li>
         </ul>
