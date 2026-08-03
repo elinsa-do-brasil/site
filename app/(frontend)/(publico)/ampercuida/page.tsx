@@ -36,14 +36,14 @@ export default function AmperCuidaPage() {
                 Qualquer pessoa pode preencher este formulário. Informe os dados
                 do colaborador que precisa de apoio psicológico.
               </p>
-              <Link
+              {/* <Link
                 className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-elinsa-primary underline-offset-4 hover:underline"
                 href="/ampercuida/sobre"
               >
                 <Info aria-hidden="true" className="size-4" />
                 Entenda como funciona o AmperCuida
                 <ArrowRight aria-hidden="true" className="size-4" />
-              </Link>
+              </Link> */}
             </header>
 
             <div className="lg:hidden">
