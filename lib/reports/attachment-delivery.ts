@@ -6,6 +6,10 @@ import {
   decryptAttachmentBuffer,
   decryptAttachmentOriginalNameSafely,
 } from "./attachment-crypto";
+import {
+  canRenderReportAttachmentInline,
+  REPORT_ATTACHMENT_SANDBOX_CSP,
+} from "./attachment-response-policy";
 import { downloadEncryptedAttachmentFromStorage } from "./attachment-storage";
 import {
   getReportAttachmentById,
@@ -53,7 +57,8 @@ export async function createCommitteeAttachmentResponse(input: {
       decryptAttachmentOriginalNameSafely(attachment) ?? "anexo",
     );
     const dispositionType =
-      input.action === "download" || !canRenderInline(attachment.mimeType)
+      input.action === "download" ||
+      !canRenderReportAttachmentInline(attachment.mimeType)
         ? "attachment"
         : "inline";
 
@@ -64,18 +69,19 @@ export async function createCommitteeAttachmentResponse(input: {
       action: input.action,
     });
 
-    return new Response(new Uint8Array(fileBuffer), {
-      headers: {
-        "Cache-Control": "private, no-store",
-        "Content-Disposition": contentDisposition(
-          dispositionType,
-          originalName,
-        ),
-        "Content-Length": String(fileBuffer.length),
-        "Content-Type": attachment.mimeType,
-        "X-Content-Type-Options": "nosniff",
-      },
+    const headers = new Headers({
+      "Cache-Control": "private, no-store",
+      "Content-Disposition": contentDisposition(dispositionType, originalName),
+      "Content-Length": String(fileBuffer.length),
+      "Content-Type": attachment.mimeType,
+      "X-Content-Type-Options": "nosniff",
     });
+
+    if (dispositionType === "attachment") {
+      headers.set("Content-Security-Policy", REPORT_ATTACHMENT_SANDBOX_CSP);
+    }
+
+    return new Response(new Uint8Array(fileBuffer), { headers });
   } catch {
     return plainResponse(500);
   }
@@ -88,15 +94,6 @@ function plainResponse(status: number) {
       "Cache-Control": "no-store",
     },
   });
-}
-
-function canRenderInline(mimeType: string) {
-  return (
-    mimeType === "application/pdf" ||
-    mimeType.startsWith("image/") ||
-    mimeType.startsWith("audio/") ||
-    mimeType.startsWith("video/")
-  );
 }
 
 function sanitizeFileName(value: string) {
