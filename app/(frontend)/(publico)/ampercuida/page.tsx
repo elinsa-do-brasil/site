@@ -1,13 +1,11 @@
 import {
   Alert02Icon,
   Call02Icon,
-  CheckmarkCircle02Icon,
+  Doctor01Icon,
   Message01Icon,
-  ShieldKeyIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight, Info } from "lucide-react";
-import Link from "next/link";
+import Image from "next/image";
 import { PsychologicalCareRequestForm } from "@/components/psychological-care/psychological-care-request-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,14 +34,6 @@ export default function AmperCuidaPage() {
                 Qualquer pessoa pode preencher este formulário. Informe os dados
                 do colaborador que precisa de apoio psicológico.
               </p>
-              {/* <Link
-                className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-elinsa-primary underline-offset-4 hover:underline"
-                href="/ampercuida/sobre"
-              >
-                <Info aria-hidden="true" className="size-4" />
-                Entenda como funciona o AmperCuida
-                <ArrowRight aria-hidden="true" className="size-4" />
-              </Link> */}
             </header>
 
             <div className="lg:hidden">
@@ -66,7 +56,7 @@ function PsychologicalCareSidebar() {
   return (
     <div className="grid gap-4">
       <PsychologicalCareImmediateHelp />
-      <PsychologicalCareChannelNotice />
+      <PsychologicalCareWhoTakesCare />
     </div>
   );
 }
@@ -141,7 +131,7 @@ function PsychologicalCareImmediateHelp() {
   );
 }
 
-function PsychologicalCareChannelNotice() {
+function PsychologicalCareWhoTakesCare() {
   return (
     <Card
       className="rounded-md border-elinsa-sky/20 bg-elinsa-light/30 dark:border-elinsa-sky/20 dark:bg-elinsa-dark/20"
@@ -154,30 +144,56 @@ function PsychologicalCareChannelNotice() {
               <HugeiconsIcon
                 aria-hidden="true"
                 className="size-5"
-                icon={ShieldKeyIcon}
+                icon={Doctor01Icon}
                 strokeWidth={2}
               />
             </span>
-            Sobre este canal
+            Quem realiza os atendimentos
           </span>
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
-        <ul className="flex flex-col gap-2.5 text-sm leading-relaxed text-muted-foreground">
-          <li className="flex gap-2">
-            <HugeiconsIcon
-              aria-hidden="true"
-              className="mt-0.5 size-4 shrink-0 text-elinsa-sky"
-              icon={CheckmarkCircle02Icon}
-              strokeWidth={2}
-            />
-            <span>
-              Os dados são criptografados, não são exibidos publicamente e ficam
-              disponíveis somente para a equipe responsável.
-            </span>
-          </li>
-        </ul>
+      <CardContent className="grid gap-4">
+        <div className="grid gap-3">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Os atendimentos do Amper Cuida são realizados pela psicóloga
+            <strong>Alessandra Duarte Ferreira</strong>, responsável pelo
+            acolhimento e pela orientação dos colaboradores da Elinsa do Brasil.
+          </p>
+          <Image
+            alt="Alessandra Duarte Ferreira, psicóloga responsável pelo Amper Cuida"
+            className="aspect-4/3 w-full rounded-md border border-elinsa-sky/20 object-cover object-top shadow-sm"
+            sizes="(max-width: 1023px) calc(100vw - 3rem), 280px"
+            width={1200}
+            height={900}
+            loading="eager"
+            src="https://video.elinsadobrasil.com.br/alessandra.jpeg"
+          />
+          <div className="border-l-2 border-elinsa-sky pl-3">
+            <p className="text-sm font-semibold text-foreground">
+              Alessandra Duarte Ferreira
+            </p>
+            <p className="mt-0.5 text-xs font-medium tracking-wide text-elinsa-dark dark:text-elinsa-sky">
+              Psicóloga · CRP 10/03571
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 text-sm leading-relaxed text-muted-foreground">
+          <p>
+            Alessandra é psicoterapeuta em Terapia Cognitivo-Comportamental e
+            especialista em neuropsicologia e saúde mental. Possui mais de 15
+            anos de experiência em avaliação psicológica e neuropsicológica,
+            psicoterapia e desenvolvimento humano.
+          </p>
+          <p>
+            Atua nos contextos clínico, institucional e organizacional, com
+            experiência em acolhimento psicológico, manejo de crises, promoção
+            da saúde mental no trabalho, desenvolvimento de pessoas e
+            capacitação de equipes. É servidora pública do HEMOAP e psicóloga
+            consultora do Grupo Amper, onde integra o projeto Amper Cuida.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

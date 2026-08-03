@@ -176,6 +176,11 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "video.elinsadobrasil.com.br",
+        pathname: "/**",
+      },
       ...cmsRemotePatterns,
       ...payloadDevRemotePatterns,
     ],
