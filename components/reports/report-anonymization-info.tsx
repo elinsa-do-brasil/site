@@ -47,31 +47,7 @@ export function ReportAnonymizationInfo() {
               strokeWidth={2}
             />
             <span>
-              As requisições de envio não usam as credenciais da sua sessão e o
-              registro da denúncia não possui vínculo com a sua conta.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <HugeiconsIcon
-              icon={Alert02Icon}
-              className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-300"
-              strokeWidth={2}
-            />
-            <span>
-              O texto e os anexos não são anonimizados automaticamente e podem
-              revelar sua identidade. Revise o conteúdo antes de enviar.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <HugeiconsIcon
-              icon={CheckmarkCircle02Icon}
-              className="mt-0.5 size-4 shrink-0 text-emerald-700 dark:text-emerald-300"
-              strokeWidth={2}
-            />
-            <span>
-              Não enviamos métricas de uso nem eventos de monitoramento da
-              aplicação a partir deste canal. A infraestrutura ainda processa os
-              dados técnicos necessários para entregar e proteger a conexão.
+              Caso o usuário utilize o login do portal, ele não será vinculado ao envio da denúncia.
             </span>
           </li>
         </ul>

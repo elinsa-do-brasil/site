@@ -28,9 +28,7 @@ export function ReportWritingHelp() {
 
       <CardContent className="flex flex-col gap-3">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Você pode preparar o relato diretamente neste formulário. Escreva com
-          suas palavras e inclua somente as informações necessárias para o
-          Comitê de Ética compreender o que aconteceu.
+          Escreva com suas palavras e inclua somente as informações necessárias para o Comitê de Ética compreender o que aconteceu.
         </p>
 
         <div className="rounded-md border border-violet-300/50 bg-violet-100/70 px-3 py-2.5 text-sm dark:border-violet-800/60 dark:bg-violet-900/30">
@@ -57,12 +55,6 @@ export function ReportWritingHelp() {
             </li>
           </ul>
         </div>
-
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          Não cole o relato nem envie anexos a assistentes de IA públicos,
-          aplicativos de mensagem ou outros serviços externos. Essas ferramentas
-          ficam fora dos controles deste canal.
-        </p>
       </CardContent>
     </Card>
   );
