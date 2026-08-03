@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Suspense } from "react";
 import "../globals.css";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer } from "@/components/footer";
 import { FrontendShell } from "@/components/frontend-shell";
+import { FrontendTelemetry } from "@/components/frontend-telemetry";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -131,8 +131,9 @@ export default function RootLayout({
             <FrontendShell footer={<Footer />}>{children}</FrontendShell>
           </TooltipProvider>
         </ThemeProvider>
-        <SpeedInsights />
-        <Analytics />
+        <Suspense fallback={null}>
+          <FrontendTelemetry />
+        </Suspense>
       </body>
     </html>
   );
