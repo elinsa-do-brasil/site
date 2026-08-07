@@ -251,6 +251,7 @@ function formatEventType(type: string) {
     "psychological_care.status.scheduled": "Atendimento agendado",
     "psychological_care.status.completed": "Atendimento concluído",
     "psychological_care.status.cancelled": "Solicitação cancelada",
+    "psychological_care.exported": "Solicitação incluída em exportação",
   };
 
   return labels[type] ?? "Atualização registrada";

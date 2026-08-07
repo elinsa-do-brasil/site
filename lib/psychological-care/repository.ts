@@ -1,6 +1,17 @@
 import "server-only";
 
-import { and, count, desc, eq, ilike, inArray, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  inArray,
+  lt,
+  type SQL,
+} from "drizzle-orm";
 import { db } from "@/lib/db";
 import { user } from "@/lib/db/schema/auth";
 import {
@@ -232,6 +243,25 @@ export async function listPsychologicalCareRequestSummaries({
   };
 }
 
+export async function listPsychologicalCareRequestsCreatedBetween(input: {
+  start: Date;
+  end: Date;
+}) {
+  return db
+    .select()
+    .from(psychologicalCareRequests)
+    .where(
+      and(
+        gte(psychologicalCareRequests.createdAt, input.start),
+        lt(psychologicalCareRequests.createdAt, input.end),
+      ),
+    )
+    .orderBy(
+      asc(psychologicalCareRequests.createdAt),
+      asc(psychologicalCareRequests.id),
+    );
+}
+
 export async function getPsychologicalCareRequestCountsByStatus() {
   const rows = await db
     .select({
@@ -362,6 +392,28 @@ export async function recordPsychologicalCareRequestEvent(input: {
     .returning({ id: psychologicalCareRequestEvents.id });
 
   return event ?? null;
+}
+
+export async function recordPsychologicalCareRequestExportEvents(input: {
+  requestIds: string[];
+  actorUserId: string;
+  year: number;
+  month: number;
+}) {
+  const ids = input.requestIds.filter(isUuid);
+
+  if (ids.length === 0) return;
+
+  const monthLabel = `${String(input.month).padStart(2, "0")}/${input.year}`;
+
+  await db.insert(psychologicalCareRequestEvents).values(
+    ids.map((requestId) => ({
+      requestId,
+      actorUserId: input.actorUserId,
+      type: "psychological_care.exported",
+      message: `Solicitação incluída na exportação mensal de ${monthLabel}.`,
+    })),
+  );
 }
 
 export async function recordPsychologicalCareRequestView(input: {

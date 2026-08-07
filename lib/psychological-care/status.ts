@@ -72,6 +72,7 @@ export const psychologicalCareEventLabels: Record<string, string> = {
   "psychological_care.status.scheduled": "Atendimento agendado",
   "psychological_care.status.completed": "Solicitação concluída",
   "psychological_care.status.cancelled": "Solicitação cancelada",
+  "psychological_care.exported": "Solicitação incluída em exportação",
 };
 
 export function isPsychologicalCareStatus(

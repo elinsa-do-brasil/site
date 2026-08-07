@@ -10,12 +10,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
+import { PsychologicalCareExportButton } from "@/components/psychological-care/psychological-care-export-button";
 import { PsychologicalCareStatusBadge } from "@/components/psychological-care/psychological-care-status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PageTransition } from "@/components/ui/page-transition";
 import { requirePsychologicalCarePanelAccess } from "@/lib/psychological-care/access";
+import { getSaoPauloYearMonth } from "@/lib/psychological-care/export";
 import {
   getPsychologicalCareRequestCountsByStatus,
   listPsychologicalCareRequestSummaries,
@@ -65,6 +67,8 @@ export default async function PsychologicalCarePage({
     (counts.contact_in_progress ?? 0) +
     (counts.scheduled ?? 0);
   const finishedCount = (counts.completed ?? 0) + (counts.cancelled ?? 0);
+  const { year: defaultExportYear, month: defaultExportMonth } =
+    getSaoPauloYearMonth(new Date());
 
   return (
     <PageTransition>
@@ -118,6 +122,20 @@ export default async function PsychologicalCarePage({
                 )}
               </div>
             </form>
+
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border bg-card p-3 shadow-sm">
+              <div className="min-w-0">
+                <p className="text-sm font-medium">Exportar mês em CSV</p>
+                <p className="text-xs text-muted-foreground">
+                  Inclui todas as solicitações recebidas no mês, independente
+                  dos filtros de busca e status acima.
+                </p>
+              </div>
+              <PsychologicalCareExportButton
+                defaultMonth={defaultExportMonth}
+                defaultYear={defaultExportYear}
+              />
+            </div>
 
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
               <span>
