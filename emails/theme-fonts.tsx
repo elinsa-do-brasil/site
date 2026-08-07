@@ -1,6 +1,7 @@
 import { Font } from "react-email";
+import { publicEnv } from "../lib/env.public";
 
-const publicURL = (process.env.NEXT_PUBLIC_URL || "").replace(/\/$/, "");
+const publicURL = (publicEnv.siteUrl || "").replace(/\/$/, "");
 
 function getInterFontURL(filename: string) {
   return `${publicURL}/fonts/inter/${filename}`;

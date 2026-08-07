@@ -1,8 +1,10 @@
 import crypto from "node:crypto";
+import { env } from "@/lib/env";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
 const KEY_LENGTH = 32;
+const PUBLIC_RATE_LIMIT_HMAC_CONTEXT = "reports/public-rate-limit/v1";
 
 export type EncryptedBlob = {
   ciphertext: string;
@@ -24,7 +26,7 @@ export type ReportEncryptedPayload = {
 };
 
 export function getReportsMasterKey(): Buffer {
-  const raw = process.env.REPORTS_MASTER_KEY_BASE64;
+  const raw = env.reportsMasterKeyBase64();
 
   if (!raw) {
     throw new Error("REPORTS_MASTER_KEY_BASE64 nao configurada.");
@@ -37,6 +39,15 @@ export function getReportsMasterKey(): Buffer {
   }
 
   return key;
+}
+
+export function createReportsPublicRateLimitDigest(subject: string) {
+  return crypto
+    .createHmac("sha256", getReportsMasterKey())
+    .update(PUBLIC_RATE_LIMIT_HMAC_CONTEXT)
+    .update("\0")
+    .update(subject)
+    .digest("hex");
 }
 
 export function encryptWithAesGcm(

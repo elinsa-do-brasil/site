@@ -2,8 +2,12 @@
 
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import {
+  TurnstileWidget,
+  type TurnstileWidgetHandle,
+} from "@/components/turnstile-widget";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +37,7 @@ const defaultValues: ContactFormData = {
   phone: "",
   subject: "",
   website: "",
+  turnstileToken: "",
 };
 
 export function ContatoForm() {
@@ -40,6 +45,7 @@ export function ContatoForm() {
     INITIAL_CONTACT_FORM_STATE,
   );
   const [isPending, startTransition] = useTransition();
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const form = useForm<ContactFormData>({
     defaultValues,
     resolver: standardSchemaResolver(contactFormSchema),
@@ -63,6 +69,8 @@ export function ContatoForm() {
 
           if (result.success) {
             form.reset(defaultValues);
+          } else {
+            turnstileRef.current?.reset();
           }
         },
       );
@@ -230,6 +238,17 @@ export function ContatoForm() {
             {...form.register("website")}
           />
         </div>
+
+        <Controller
+          control={form.control}
+          name="turnstileToken"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid || undefined}>
+              <TurnstileWidget onVerify={field.onChange} ref={turnstileRef} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
         <div className="flex justify-end">
           <Button disabled={isPending} size="xl" type="submit">

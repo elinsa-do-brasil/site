@@ -2,10 +2,14 @@ import type { AnonymousReportContent, SubmitReportResult } from "./types";
 
 export type SubmitEncryptedReportParams = {
   report: AnonymousReportContent;
+  turnstileToken: string;
+  website: string;
 };
 
 export async function submitEncryptedReport({
   report,
+  turnstileToken,
+  website,
 }: SubmitEncryptedReportParams): Promise<SubmitReportResult> {
   const response = await fetch("/api/reports", {
     method: "POST",
@@ -15,7 +19,7 @@ export async function submitEncryptedReport({
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(report),
+    body: JSON.stringify({ report, turnstileToken, website }),
   });
 
   if (!response.ok) {

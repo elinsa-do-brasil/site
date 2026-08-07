@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Pool, type PoolClient } from "pg";
+import { env } from "@/lib/env";
 
 const MIGRATIONS_FOLDER = resolve("lib/db/migrations");
 const BASELINE_THROUGH_INDEX = 2;
@@ -28,7 +29,7 @@ type Snapshot = {
   >;
 };
 
-const databaseUrl = process.env.SITE_DATABASE_URL;
+const databaseUrl = env.siteDatabaseUrl();
 
 if (!databaseUrl) {
   throw new Error("SITE_DATABASE_URL não configurada.");

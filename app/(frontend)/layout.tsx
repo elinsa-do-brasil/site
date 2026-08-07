@@ -7,6 +7,7 @@ import { FrontendShell } from "@/components/frontend-shell";
 import { FrontendTelemetry } from "@/components/frontend-telemetry";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { env } from "@/lib/env";
 import {
   absoluteUrl,
   DEFAULT_SOCIAL_IMAGE,
@@ -87,8 +88,8 @@ export const metadata: Metadata = {
     images: [absoluteUrl(DEFAULT_SOCIAL_IMAGE)],
     title: `Infraestrutura elétrica no Pará | ${SITE_NAME}`,
   },
-  verification: process.env.GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+  verification: env.googleSiteVerification()
+    ? { google: env.googleSiteVerification() }
     : undefined,
 };
 

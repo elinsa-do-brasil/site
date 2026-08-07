@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { env } from "@/lib/env";
 import * as schema from "./schema";
 
 declare global {
@@ -8,12 +9,12 @@ declare global {
 }
 
 function createPool() {
-  if (!process.env.SITE_DATABASE_URL) {
+  if (!env.siteDatabaseUrl()) {
     throw new Error("SITE_DATABASE_URL nao configurada.");
   }
 
   return new Pool({
-    connectionString: process.env.SITE_DATABASE_URL,
+    connectionString: env.siteDatabaseUrl(),
   });
 }
 

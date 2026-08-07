@@ -15,6 +15,7 @@ import {
   session as sessionTable,
   user as userTable,
 } from "@/lib/db/schema";
+import { env } from "@/lib/env";
 import { AccountOverviewCard } from "./components/account-overview-card";
 import { ActiveSessionsCard } from "./components/active-sessions-card";
 import { LoginMethodsCard } from "./components/login-methods-card";
@@ -110,7 +111,7 @@ export default async function AccountSettingsPage() {
   );
   const canChangeEmail =
     loginAccounts.length === 0 &&
-    !isCorporateEmail(currentUser.email, process.env.MICROSOFT_ALLOWED_DOMAIN);
+    !isCorporateEmail(currentUser.email, env.microsoftAllowedDomain());
 
   return (
     <PageTransition>

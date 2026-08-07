@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { publicEnv } from "@/lib/env.public";
 import { normalizeSignatureName } from "../signature-name";
 import { getSuspiciousSignatureTextError } from "../signature-text";
 
@@ -92,7 +93,7 @@ const CARGO_ABBREVIATIONS: Record<string, string> = {
 const SOCIAL_LINKS_HTML = `<strong>Elinsa do Brasil:</strong> <a href="https://www.instagram.com/elinsadobrasil/">Instagram</a> &bull; <a href="https://www.linkedin.com/in/elinsadobrasil/">LinkedIn</a> &bull; <a href="https://elinsadobrasil.com.br/">Site</a><br />
 <strong>Grupo Amper:</strong> <a href="https://www.linkedin.com/company/amper-sa/">LinkedIn</a> &bull; <a href="https://www.grupoamper.com/">Site</a>`;
 
-const TUTORIAL_URL = process.env.NEXT_PUBLIC_YT_LINK;
+const TUTORIAL_URL = publicEnv.youtubeTutorialLink;
 
 export function EmailSignatureGenerator({
   initialValues,

@@ -29,6 +29,8 @@ import {
   getAzureStorageAccountBaseURL,
   shouldCreateAzureContainers,
 } from "./lib/azure-storage.ts";
+import { publicEnv } from "./lib/env.public.ts";
+import { env } from "./lib/env.ts";
 import {
   canManageAdminTools,
   canPublish,
@@ -54,9 +56,8 @@ if (!process.env.API_KEY_PEXELS && process.env.PEXELS_API_KEY) {
   process.env.API_KEY_PEXELS = process.env.PEXELS_API_KEY;
 }
 
-const cmsStorageConnectionString = process.env.CMS_STORAGE_CONNECTION_STRING;
-const cmsStorageContainerName =
-  process.env.CMS_STORAGE_CONTAINER || "cms-media";
+const cmsStorageConnectionString = env.cmsStorageConnectionString();
+const cmsStorageContainerName = env.cmsStorageContainer() || "cms-media";
 // A biblioteca de mídia mantém o prefixo legado para não mover blobs existentes.
 const mediaStoragePrefix = "galeria";
 const galleryStoragePrefix = "galeria-publica";
@@ -67,7 +68,7 @@ const isCmsStorageConfigured = Boolean(
   cmsStorageConnectionString && cmsStorageBaseURL && cmsStorageContainerName,
 );
 const allowCmsContainerCreate = shouldCreateAzureContainers();
-const siteURL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+const siteURL = publicEnv.siteUrl || "http://localhost:3000";
 const publicContentCollections = ["imprensa", "blog", "vagas"] as const;
 const usersCollectionSlug = Users.slug as CollectionSlug;
 const galleryCollectionSlug = Galeria.slug as CollectionSlug;
@@ -77,10 +78,8 @@ const imageSearchConfigured = Boolean(
     process.env.API_KEY_PEXELS ||
     process.env.API_KEY_PIXABAY,
 );
-const payloadSentryEnabled = Boolean(
-  process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN,
-);
-const cmsDatabaseURL = process.env.CMS_DATABASE_URL;
+const payloadSentryEnabled = Boolean(env.sentryDsn() || publicEnv.sentryDsn);
+const cmsDatabaseURL = env.cmsDatabaseUrl();
 
 if (!cmsDatabaseURL) {
   throw new Error("CMS_DATABASE_URL is not set");
@@ -178,7 +177,7 @@ export default buildConfig({
   email: resendAdapter({
     defaultFromAddress: "payload@elinsadobrasil.com.br",
     defaultFromName: "CMS - Elinsa",
-    apiKey: process.env.RESEND_API_KEY || "",
+    apiKey: env.resendApiKey() || "",
   }),
 
   collections: [Users, Imprensa, Blog, Vagas, Media, Galeria],
@@ -352,7 +351,7 @@ export default buildConfig({
     }),
   ],
 
-  secret: process.env.PAYLOAD_SECRET || "",
+  secret: env.payloadSecret() || "",
   serverURL: siteURL,
   folders: {
     collectionOverrides: [
@@ -430,7 +429,7 @@ export default buildConfig({
       connectionString: cmsDatabaseURL,
     },
     migrationDir: "./migrations",
-    push: process.env.PAYLOAD_DB_PUSH === "true",
+    push: env.payloadDbPush() === "true",
   }),
 
   sharp,

@@ -22,6 +22,7 @@ import { auth } from "@/lib/auth";
 import { isCorporateEmail } from "@/lib/auth-policy";
 import { db } from "@/lib/db";
 import { invitation, organization, user } from "@/lib/db/schema";
+import { env } from "@/lib/env";
 import { formatOrganizationRole } from "@/lib/organization/constants";
 
 export const metadata: Metadata = {
@@ -103,7 +104,7 @@ export default async function ConvitePage({ params }: ConvitePageProps) {
   const roleLabel = formatOrganizationRole(invite.role);
   const isCorporateInvitation = isCorporateEmail(
     normalizedEmail,
-    process.env.MICROSOFT_ALLOWED_DOMAIN,
+    env.microsoftAllowedDomain(),
   );
 
   if (currentSession?.user && !isSessionForInvite) {

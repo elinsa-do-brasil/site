@@ -24,6 +24,10 @@ import {
 } from "react-hook-form";
 import type { z } from "zod/v4";
 import { PsychologicalCareSuccessMessage } from "@/components/psychological-care/psychological-care-success-message";
+import {
+  TurnstileWidget,
+  type TurnstileWidgetHandle,
+} from "@/components/turnstile-widget";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,6 +66,7 @@ const DEFAULT_FORM_VALUES: PsychologicalCareRequestFormValues = {
   management: "",
   reason: "",
   website: "",
+  turnstileToken: "",
 };
 
 const VISIBLE_FIELD_ORDER: FieldPath<PsychologicalCareRequestFormValues>[] = [
@@ -85,6 +90,7 @@ export function PsychologicalCareRequestForm() {
   );
   const submissionIdRef = useRef<string | null>(null);
   const submissionLockRef = useRef(false);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
   const form = useForm<
     PsychologicalCareRequestFormValues,
@@ -140,6 +146,7 @@ export function PsychologicalCareRequestForm() {
             : "Não foi possível enviar",
         });
         applyServerFieldErrors(result.fieldErrors);
+        turnstileRef.current?.reset();
         return;
       }
 
@@ -152,6 +159,7 @@ export function PsychologicalCareRequestForm() {
           "Não foi possível enviar agora. Verifique sua conexão e tente novamente.",
         title: "Não foi possível enviar",
       });
+      turnstileRef.current?.reset();
     }
   }
 
@@ -189,6 +197,7 @@ export function PsychologicalCareRequestForm() {
     form.reset(DEFAULT_FORM_VALUES);
     submissionIdRef.current = null;
     setSubmissionError(null);
+    turnstileRef.current?.reset();
 
     window.requestAnimationFrame(() => {
       document
@@ -478,10 +487,22 @@ export function PsychologicalCareRequestForm() {
               </Field>
             )}
           />
+
+          <Controller
+            control={form.control}
+            name="turnstileToken"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid || undefined}>
+                <TurnstileWidget onVerify={field.onChange} ref={turnstileRef} />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
         </PsychologicalCareFormSection>
 
         <div className="">
-
           <Button
             className="w-full"
             disabled={isSubmitting}
@@ -494,9 +515,7 @@ export function PsychologicalCareRequestForm() {
                 Enviando
               </>
             ) : (
-              <>
-                Enviar solicitação
-              </>
+              <>Enviar solicitação</>
             )}
           </Button>
         </div>

@@ -3,6 +3,7 @@ import {
   defaultEditorialSubject,
   editorialSubjects,
 } from "../lib/editorial-subjects.ts";
+import { publicEnv } from "../lib/env.public.ts";
 import {
   canWriteCollection,
   deleteAccess,
@@ -81,7 +82,7 @@ const createEditorialCollection = ({
     },
     livePreview: {
       url: ({ data }) => {
-        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+        const baseUrl = publicEnv.siteUrl || "http://localhost:3000";
         const path =
           slug === "blog"
             ? `/portal/blog/${data?.slug}`

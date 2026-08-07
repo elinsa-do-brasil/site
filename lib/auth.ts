@@ -27,16 +27,16 @@ import {
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
+import { env } from "@/lib/env";
+import { publicEnv } from "@/lib/env.public";
 
 const MAX_ACTIVE_SESSIONS_PER_USER = 5;
 const ELINSA_ORGANIZATION_SLUG = "elinsa";
 const MICROSOFT_PROVIDER_ID = "microsoft";
 const INVITATION_ID_HEADER = "x-elinsa-invitation-id";
 const OTP_EXPIRY_SECONDS = 10 * 60;
-const corporateDomain = normalizeCorporateDomain(
-  process.env.MICROSOFT_ALLOWED_DOMAIN,
-);
-const microsoftTenantId = process.env.MICROSOFT_TENANT_ID ?? "";
+const corporateDomain = normalizeCorporateDomain(env.microsoftAllowedDomain());
+const microsoftTenantId = env.microsoftTenantId() ?? "";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -49,8 +49,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     microsoft: {
-      clientId: process.env.MICROSOFT_CLIENT_ID as string,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET as string,
+      clientId: env.microsoftClientId() as string,
+      clientSecret: env.microsoftClientSecret() as string,
       tenantId: microsoftTenantId,
       authority: "https://login.microsoftonline.com",
       prompt: "select_account",
@@ -133,11 +133,12 @@ export const auth = betterAuth({
       },
     },
   },
-  secret: process.env.BETTER_AUTH_SECRET,
-  trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS
-    ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(",").map((origin) =>
-        origin.trim(),
-      )
+  secret: env.betterAuthSecret(),
+  trustedOrigins: env.betterAuthTrustedOrigins()
+    ? env
+        .betterAuthTrustedOrigins()
+        ?.split(",")
+        .map((origin) => origin.trim())
     : undefined,
   plugins: [
     passwordlessAccessPolicy(),
@@ -195,9 +196,7 @@ export const auth = betterAuth({
       requireEmailVerificationOnInvitation: true,
       sendInvitationEmail: async (data) => {
         const baseUrl =
-          process.env.NEXT_PUBLIC_URL ||
-          process.env.BETTER_AUTH_URL ||
-          "http://localhost:3000";
+          publicEnv.siteUrl || env.betterAuthUrl() || "http://localhost:3000";
         const inviteLink = `${baseUrl}/convite/${data.id}`;
         const expiration = data.invitation.expiresAt.getTime();
 

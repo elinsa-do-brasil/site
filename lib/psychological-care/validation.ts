@@ -35,6 +35,7 @@ export const publicPsychologicalCareRequestFormSchema =
         .max(200, "Campo inválido.")
         .optional()
         .default(""),
+      turnstileToken: z.string().min(1, "Confirme que você não é um robô."),
     })
     .strict();
 

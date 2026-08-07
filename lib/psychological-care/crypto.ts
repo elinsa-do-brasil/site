@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { env } from "@/lib/env";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -48,7 +49,7 @@ export function arePsychologicalCarePayloadsEqual(
 }
 
 export function getPsychologicalCareMasterKey() {
-  const raw = process.env.PSYCHOLOGICAL_CARE_MASTER_KEY_BASE64;
+  const raw = env.psychologicalCareMasterKeyBase64();
 
   if (!raw) {
     throw new Error("PSYCHOLOGICAL_CARE_MASTER_KEY_BASE64 nao configurada.");

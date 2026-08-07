@@ -3,47 +3,43 @@ import "server-only";
 import { consumeDatabaseRateLimit } from "@/lib/database-rate-limit";
 import { env } from "@/lib/env";
 import { getClientIp } from "@/lib/get-client-ip";
-import { createPsychologicalCarePublicRateLimitDigest } from "./crypto";
+import { createReportsPublicRateLimitDigest } from "./crypto";
 
 type HeaderReader = {
   get(name: string): string | null;
 };
 
-const RATE_LIMIT_KEY_NAMESPACE = "psychological-care/ampercuida/ip";
+const RATE_LIMIT_KEY_NAMESPACE = "reports/denuncia/ip";
 const DEFAULT_RATE_LIMIT_MAX = 5;
 const DEFAULT_RATE_LIMIT_WINDOW_MINUTES = 15;
 
-export type PsychologicalCarePublicRateLimitErrorReason =
+export type ReportsPublicRateLimitErrorReason =
   | "client_ip_unavailable"
   | "limit_exceeded";
 
-export class PsychologicalCarePublicRateLimitError extends Error {
-  constructor(
-    public readonly reason: PsychologicalCarePublicRateLimitErrorReason,
-  ) {
-    super(`Psychological care public rate limit: ${reason}.`);
-    this.name = "PsychologicalCarePublicRateLimitError";
+export class ReportsPublicRateLimitError extends Error {
+  constructor(public readonly reason: ReportsPublicRateLimitErrorReason) {
+    super(`Reports public rate limit: ${reason}.`);
+    this.name = "ReportsPublicRateLimitError";
   }
 }
 
-export async function assertPsychologicalCarePublicRateLimit(
-  headersList: HeaderReader,
-) {
+export async function assertReportsPublicRateLimit(headersList: HeaderReader) {
   const clientIp = getClientIp(headersList);
 
   if (!clientIp) {
-    throw new PsychologicalCarePublicRateLimitError("client_ip_unavailable");
+    throw new ReportsPublicRateLimitError("client_ip_unavailable");
   }
 
   const max = readPositiveInteger(
-    env.psychologicalCarePublicRateLimitMax(),
+    env.reportsPublicRateLimitMax(),
     DEFAULT_RATE_LIMIT_MAX,
   );
   const windowMinutes = readPositiveInteger(
-    env.psychologicalCarePublicRateLimitWindowMinutes(),
+    env.reportsPublicRateLimitWindowMinutes(),
     DEFAULT_RATE_LIMIT_WINDOW_MINUTES,
   );
-  const digest = createPsychologicalCarePublicRateLimitDigest(clientIp);
+  const digest = createReportsPublicRateLimitDigest(clientIp);
   const allowed = await consumeDatabaseRateLimit({
     key: `${RATE_LIMIT_KEY_NAMESPACE}/${digest}`,
     max,
@@ -51,7 +47,7 @@ export async function assertPsychologicalCarePublicRateLimit(
   });
 
   if (!allowed) {
-    throw new PsychologicalCarePublicRateLimitError("limit_exceeded");
+    throw new ReportsPublicRateLimitError("limit_exceeded");
   }
 }
 

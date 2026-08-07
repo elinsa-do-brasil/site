@@ -1,4 +1,5 @@
 import type { CollectionConfig, FieldHook } from "payload";
+import { publicEnv } from "../lib/env.public.ts";
 import {
   canWriteCollection,
   deleteAccess,
@@ -67,7 +68,7 @@ export const Vagas: CollectionConfig = {
     },
     livePreview: {
       url: ({ data }) => {
-        const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+        const baseUrl = publicEnv.siteUrl || "http://localhost:3000";
         return `${baseUrl}/vagas/${data?.slug}`;
       },
     },

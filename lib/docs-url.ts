@@ -1,3 +1,5 @@
+import { publicEnv } from "@/lib/env.public";
+
 const DEFAULT_SITE_ORIGIN = "https://elinsadobrasil.com.br";
 
 function normalizeOrigin(value: string | undefined) {
@@ -15,7 +17,7 @@ function normalizeOrigin(value: string | undefined) {
 }
 
 function getConfiguredSiteOrigin() {
-  return normalizeOrigin(process.env.NEXT_PUBLIC_URL) ?? DEFAULT_SITE_ORIGIN;
+  return normalizeOrigin(publicEnv.siteUrl) ?? DEFAULT_SITE_ORIGIN;
 }
 
 export function getDocsOrigin(origin = getConfiguredSiteOrigin()) {

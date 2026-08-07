@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { Resend } from "resend";
 import ContactNotificationEmail from "@/emails/contact-notification";
 import type { Contact } from "@/lib/db/schema";
+import { env } from "@/lib/env";
 
 type ContactEmailResult =
   | { error?: undefined; sent: true; skipped?: false }
@@ -10,14 +11,14 @@ type ContactEmailResult =
 export async function maybeSendContactEmail(
   contact: Contact,
 ): Promise<ContactEmailResult> {
-  const to = process.env.CONTACT_FORM_TO_EMAIL;
+  const to = env.contactFormToEmail();
 
   if (!to) {
     return { sent: false, skipped: true };
   }
 
-  const from = process.env.CONTACT_FORM_FROM_EMAIL;
-  const apiKey = process.env.RESEND_API_KEY;
+  const from = env.contactFormFromEmail();
+  const apiKey = env.resendApiKey();
 
   if (!from) {
     return {

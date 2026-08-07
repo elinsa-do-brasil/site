@@ -2,6 +2,8 @@ import { createElement } from "react";
 import { Resend } from "resend";
 import ReportNotificationEmail from "@/emails/report-notification";
 import type { Report } from "@/lib/db/schema";
+import { env } from "@/lib/env";
+import { publicEnv } from "@/lib/env.public";
 
 type ReportEmailResult =
   | { error?: undefined; sent: true; skipped?: false }
@@ -15,14 +17,14 @@ type ReportNotificationInput = Pick<
 export async function maybeSendReportNotificationEmail(
   report: ReportNotificationInput,
 ): Promise<ReportEmailResult> {
-  const to = parseEmailList(process.env.REPORT_NOTIFICATION_TO_EMAIL);
+  const to = parseEmailList(env.reportNotificationToEmail());
 
   if (to.length === 0) {
     return { sent: false, skipped: true };
   }
 
-  const from = process.env.REPORT_NOTIFICATION_FROM_EMAIL;
-  const apiKey = process.env.RESEND_API_KEY;
+  const from = env.reportNotificationFromEmail();
+  const apiKey = env.resendApiKey();
 
   if (!from) {
     return {
@@ -90,8 +92,8 @@ function buildReportNotificationText(
 
 function getSiteOrigin() {
   const origin =
-    process.env.NEXT_PUBLIC_URL ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
+    publicEnv.siteUrl ||
+    publicEnv.publicSiteUrl ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
     "https://elinsa-nine.vercel.app";
 

@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { type CreateEmailOptions, type ErrorResponse, Resend } from "resend";
+import { env } from "@/lib/env";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(env.resendApiKey());
 
 type SendAuthEmailOptions = {
   to: string;
@@ -18,7 +19,7 @@ export async function sendInternalAuthEmail({
   idempotencyKey,
   react,
 }: SendAuthEmailOptions) {
-  if (!process.env.RESEND_API_KEY) {
+  if (!env.resendApiKey()) {
     if (process.env.NODE_ENV === "production") {
       throw new Error("RESEND_API_KEY não configurada em produção.");
     }
@@ -31,12 +32,8 @@ export async function sendInternalAuthEmail({
 
   const key = idempotencyKey || `auth-email/${crypto.randomUUID()}`;
   const email: CreateEmailOptions = {
-    from:
-      process.env.AUTH_EMAIL_FROM ||
-      "Portal Elinsa <portal@elinsadobrasil.com.br>",
-    ...(process.env.AUTH_EMAIL_REPLY_TO
-      ? { replyTo: process.env.AUTH_EMAIL_REPLY_TO }
-      : {}),
+    from: env.authEmailFrom() || "Portal Elinsa <portal@elinsadobrasil.com.br>",
+    ...(env.authEmailReplyTo() ? { replyTo: env.authEmailReplyTo() } : {}),
     to: [to],
     subject,
     text,

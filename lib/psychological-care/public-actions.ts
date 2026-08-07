@@ -4,6 +4,8 @@ import "server-only";
 
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { getClientIp } from "@/lib/get-client-ip";
+import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 import { maybeSendPsychologicalCareNotificationEmail } from "./email";
 import { createPsychologicalCareProtocol } from "./protocol";
 import {
@@ -40,8 +42,11 @@ export async function submitPublicPsychologicalCareRequestAction(
   const parsed = publicPsychologicalCareRequestFormSchema.safeParse(input);
 
   if (!parsed.success) {
-    const { website: _websiteErrors, ...fieldErrors } =
-      parsed.error.flatten().fieldErrors;
+    const {
+      website: _websiteErrors,
+      turnstileToken: _turnstileErrors,
+      ...fieldErrors
+    } = parsed.error.flatten().fieldErrors;
 
     return {
       success: false,
@@ -50,8 +55,10 @@ export async function submitPublicPsychologicalCareRequestAction(
     };
   }
 
+  const headersList = await headers();
+
   try {
-    await assertPsychologicalCarePublicRateLimit(await headers());
+    await assertPsychologicalCarePublicRateLimit(headersList);
   } catch (error) {
     if (
       error instanceof PsychologicalCarePublicRateLimitError &&
@@ -70,7 +77,24 @@ export async function submitPublicPsychologicalCareRequestAction(
     };
   }
 
-  const { website: _website, ...formData } = parsed.data;
+  const verified = await verifyTurnstileToken({
+    token: parsed.data.turnstileToken,
+    remoteIp: getClientIp(headersList),
+  });
+
+  if (!verified) {
+    return {
+      success: false,
+      message:
+        "Não foi possível confirmar a verificação de segurança. Tente novamente.",
+    };
+  }
+
+  const {
+    website: _website,
+    turnstileToken: _turnstileToken,
+    ...formData
+  } = parsed.data;
 
   try {
     const request = await createPsychologicalCareRequest({

@@ -1,5 +1,6 @@
 "use client";
 
+import { publicEnv } from "@/lib/env.public";
 import {
   MAX_REPORT_ATTACHMENT_NAME_BYTES,
   REPORT_ATTACHMENT_KEY_ID,
@@ -108,7 +109,7 @@ export async function encryptReportAttachment(
 }
 
 async function importReportsPublicKey() {
-  const raw = process.env.NEXT_PUBLIC_REPORTS_PUBLIC_KEY_BASE64;
+  const raw = publicEnv.reportsPublicKeyBase64;
 
   if (!raw) {
     throw new Error("NEXT_PUBLIC_REPORTS_PUBLIC_KEY_BASE64 nao configurada.");

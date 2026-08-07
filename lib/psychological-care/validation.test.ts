@@ -76,13 +76,24 @@ describe("psychological care request validation", () => {
     const parsed = publicPsychologicalCareRequestFormSchema.parse({
       ...validInput,
       website: "   ",
+      turnstileToken: "dummy-token",
     });
 
     assert.equal(parsed.website, "");
     assert.equal(
       publicPsychologicalCareRequestFormSchema.safeParse({
         ...validInput,
+        turnstileToken: "dummy-token",
         unexpected: "value",
+      }).success,
+      false,
+    );
+  });
+
+  it("requires a turnstile token on the public schema", () => {
+    assert.equal(
+      publicPsychologicalCareRequestFormSchema.safeParse({
+        ...validInput,
       }).success,
       false,
     );

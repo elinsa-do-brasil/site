@@ -58,6 +58,8 @@ export const anonymousReportSchema = z
       .trim()
       .max(1000, "O contato deve ter no máximo 1.000 caracteres.")
       .optional(),
+    turnstileToken: z.string().min(1, "Confirme que você não é um robô."),
+    website: z.string().trim().max(200, "Campo inválido.").optional(),
   })
   .superRefine((data, ctx) => {
     if (data.identify === "yes") {

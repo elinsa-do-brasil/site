@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import type { ReportAttachment } from "@/lib/db/schema";
+import { env } from "@/lib/env";
 import { MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH } from "./attachment-limits";
 
 const AES_GCM_ALGORITHM = "aes-256-gcm";
@@ -93,7 +94,7 @@ function decryptWithAesGcm(input: {
 }
 
 function getReportsPrivateKey() {
-  const raw = process.env.REPORTS_PRIVATE_KEY_BASE64;
+  const raw = env.reportsPrivateKeyBase64();
 
   if (!raw) {
     throw new Error("REPORTS_PRIVATE_KEY_BASE64 nao configurada.");

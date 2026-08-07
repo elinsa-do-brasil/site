@@ -3,6 +3,8 @@ import "server-only";
 import { createElement } from "react";
 import { Resend } from "resend";
 import PsychologicalCareNotificationEmail from "@/emails/psychological-care-notification";
+import { env } from "@/lib/env";
+import { publicEnv } from "@/lib/env.public";
 
 export type PsychologicalCareEmailResult =
   | { error?: undefined; sent: true; skipped?: false }
@@ -17,16 +19,14 @@ export type PsychologicalCareNotificationInput = {
 export async function maybeSendPsychologicalCareNotificationEmail(
   request: PsychologicalCareNotificationInput,
 ): Promise<PsychologicalCareEmailResult> {
-  const to = parseEmailList(
-    process.env.PSYCHOLOGICAL_CARE_NOTIFICATION_TO_EMAIL,
-  );
+  const to = parseEmailList(env.psychologicalCareNotificationToEmail());
 
   if (to.length === 0) {
     return { sent: false, skipped: true };
   }
 
-  const from = process.env.PSYCHOLOGICAL_CARE_NOTIFICATION_FROM_EMAIL;
-  const apiKey = process.env.RESEND_API_KEY;
+  const from = env.psychologicalCareNotificationFromEmail();
+  const apiKey = env.resendApiKey();
 
   if (!from) {
     return {
@@ -97,8 +97,8 @@ function buildPsychologicalCareNotificationText(
 
 function getSiteOrigin() {
   const origin =
-    process.env.NEXT_PUBLIC_URL ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
+    publicEnv.siteUrl ||
+    publicEnv.publicSiteUrl ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
     "https://elinsa-nine.vercel.app";
 

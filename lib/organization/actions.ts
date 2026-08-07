@@ -26,6 +26,8 @@ import {
   reportAttachmentAccessLogs,
 } from "@/lib/db/schema/reports";
 import { sendInternalAuthEmail } from "@/lib/email";
+import { env } from "@/lib/env";
+import { publicEnv } from "@/lib/env.public";
 import {
   canManageTeam,
   ELINSA_ORGANIZATION_SLUG,
@@ -314,9 +316,7 @@ export async function enviarConviteAdmin(
   });
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_URL ||
-    process.env.BETTER_AUTH_URL ||
-    "http://localhost:3000";
+    publicEnv.siteUrl || env.betterAuthUrl() || "http://localhost:3000";
   const inviteLink = `${baseUrl}/convite/${inviteId}`;
   const linhasEmail = [
     "Olá,",
@@ -333,7 +333,7 @@ export async function enviarConviteAdmin(
     "Para aceitar o convite e liberar seu acesso, utilize o link abaixo:",
     inviteLink,
     "",
-    isCorporateEmail(email, process.env.MICROSOFT_ALLOWED_DOMAIN)
+    isCorporateEmail(email, env.microsoftAllowedDomain())
       ? "No primeiro acesso, entre com sua conta Microsoft corporativa."
       : "No primeiro acesso, confirme o e-mail do convite com um código de uso único.",
     "",

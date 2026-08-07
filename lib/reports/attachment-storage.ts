@@ -1,5 +1,6 @@
 import { BlobServiceClient, type ContainerClient } from "@azure/storage-blob";
 import { shouldCreateAzureContainers } from "@/lib/azure-storage";
+import { env } from "@/lib/env";
 
 type AttachmentStorageConfig = {
   allowContainerCreate: boolean;
@@ -45,9 +46,8 @@ export async function deleteEncryptedAttachmentFromStorage(key: string) {
 function getAttachmentStorageConfig() {
   if (storageConfig) return storageConfig;
 
-  const connectionString = process.env.DENUNCIAS_STORAGE_CONNECTION_STRING;
-  const containerName =
-    process.env.DENUNCIAS_STORAGE_CONTAINER || "denuncias-anexos";
+  const connectionString = env.denunciasStorageConnectionString();
+  const containerName = env.denunciasStorageContainer() || "denuncias-anexos";
 
   if (!connectionString) {
     throw new Error(

@@ -31,6 +31,10 @@ import {
 } from "react-hook-form";
 import { toast } from "sonner";
 import { ReportSuccessMessage } from "@/components/reports/report-success-message";
+import {
+  TurnstileWidget,
+  type TurnstileWidgetHandle,
+} from "@/components/turnstile-widget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -167,6 +171,7 @@ export function AnonymousReportForm() {
   );
   const [isAttachmentDragActive, setIsAttachmentDragActive] = useState(false);
   const attachmentInputRef = useRef<HTMLInputElement>(null);
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
   const form = useForm<AnonymousReportSchema>({
     resolver: standardSchemaResolver(anonymousReportSchema),
@@ -183,6 +188,8 @@ export function AnonymousReportForm() {
       previousAttempts: "",
       contactPreference: "no_contact",
       contactInfo: "",
+      turnstileToken: "",
+      website: "",
     },
   });
 
@@ -200,7 +207,11 @@ export function AnonymousReportForm() {
       setStatus("submitting");
 
       const payload = buildReportPayload(values);
-      const result = await submitEncryptedReport({ report: payload });
+      const result = await submitEncryptedReport({
+        report: payload,
+        turnstileToken: values.turnstileToken,
+        website: values.website ?? "",
+      });
       setProtocol(result.protocol);
 
       if (attachments.length > 0) {
@@ -227,6 +238,7 @@ export function AnonymousReportForm() {
       toast.error(
         "Não foi possível enviar a denúncia. Verifique sua conexão e tente novamente.",
       );
+      turnstileRef.current?.reset();
     }
   }
 
@@ -1064,6 +1076,28 @@ export function AnonymousReportForm() {
             </div>
           )}
         </ReportFormSection>
+
+        <div aria-hidden="true" className="hidden">
+          <label htmlFor="report-website">Website</label>
+          <input
+            autoComplete="off"
+            id="report-website"
+            tabIndex={-1}
+            type="text"
+            {...form.register("website")}
+          />
+        </div>
+
+        <Controller
+          control={form.control}
+          name="turnstileToken"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid || undefined}>
+              <TurnstileWidget onVerify={field.onChange} ref={turnstileRef} />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
         {/* ── Botão de envio ── */}
         <Button

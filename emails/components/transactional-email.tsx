@@ -15,11 +15,12 @@ import {
   Tailwind,
   Text,
 } from "react-email";
+import { publicEnv } from "../../lib/env.public";
 import { barebonesBoxedTailwindConfig } from "../theme";
 import { Fonts } from "../theme-fonts";
 
 export const emailAssetBaseUrl =
-  process.env.NEXT_PUBLIC_URL ||
+  publicEnv.siteUrl ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
   "https://elinsa-nine.vercel.app";
 

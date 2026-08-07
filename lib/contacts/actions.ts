@@ -19,6 +19,8 @@ import {
   contactFormSchema,
   contactStatusSchema,
 } from "@/lib/contacts/validators";
+import { getClientIp } from "@/lib/get-client-ip";
+import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 
 type ActionResult = {
   error?: string;
@@ -31,6 +33,13 @@ export async function submitContactForm(
   _previousState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  if (readFormValue(formData, "website")) {
+    return {
+      message: "Mensagem enviada com sucesso.",
+      success: true,
+    };
+  }
+
   const parsed = contactFormSchema.safeParse({
     company: readFormValue(formData, "company"),
     email: readFormValue(formData, "email"),
@@ -39,6 +48,7 @@ export async function submitContactForm(
     phone: readFormValue(formData, "phone"),
     subject: readFormValue(formData, "subject"),
     website: readFormValue(formData, "website"),
+    turnstileToken: readFormValue(formData, "turnstileToken"),
   });
 
   if (!parsed.success) {
@@ -49,16 +59,23 @@ export async function submitContactForm(
     };
   }
 
-  if (parsed.data.website) {
-    return {
-      message: "Mensagem enviada com sucesso.",
-      success: true,
-    };
-  }
-
   try {
     const headersList = await headers();
     const { ipHash } = await assertContactRateLimit(headersList);
+
+    const verified = await verifyTurnstileToken({
+      token: parsed.data.turnstileToken,
+      remoteIp: getClientIp(headersList),
+    });
+
+    if (!verified) {
+      return {
+        message:
+          "Não foi possível confirmar a verificação de segurança. Tente novamente.",
+        success: false,
+      };
+    }
+
     const contact = await createContact(parsed.data, {
       ipHash,
       userAgent: headersList.get("user-agent"),

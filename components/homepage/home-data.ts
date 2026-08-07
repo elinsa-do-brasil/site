@@ -4,6 +4,7 @@ import {
   type LucideIcon,
   NotebookText,
 } from "lucide-react";
+import { env } from "@/lib/env";
 import dadosAbertos from "@/scripts/estimates/result.json";
 
 export type ServiceCard = {
@@ -133,7 +134,7 @@ function formatPopulation(value: number) {
 
 function getDaysSinceLastAccident() {
   const lastAccidentDate =
-    process.env.ELINSA_LAST_ACCIDENT_DATE ?? LAST_ACCIDENT_DATE_FALLBACK;
+    env.elinsaLastAccidentDate() ?? LAST_ACCIDENT_DATE_FALLBACK;
   const lastAccidentDay = parseLocalDateDayNumber(lastAccidentDate);
   const today = getTodayDayNumber(SAFETY_TIME_ZONE);
 
