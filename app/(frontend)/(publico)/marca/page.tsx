@@ -17,6 +17,7 @@ import {
   ContentSectionIntro,
 } from "@/components/content-section";
 import { SectionEyebrow } from "@/components/section-eyebrow";
+import { JsonLd } from "@/components/seo/json-ld";
 import {
   Accordion,
   AccordionContent,
@@ -35,12 +36,13 @@ import {
 } from "@/components/ui/card";
 import { downloadAsset } from "@/lib/download-asset";
 import { createPageMetadata } from "@/lib/seo";
+import { createBrandPageStructuredData } from "@/lib/structured-data";
 import { cn } from "@/lib/utils";
 import { ColorCopyButton } from "./_components/color-copy-button";
 
-const BRAND_PAGE_TITLE = "Kit de marca: logos e cores oficiais";
+const BRAND_PAGE_TITLE = "Logo da Elinsa do Brasil: kit de marca e cores";
 const BRAND_PAGE_DESCRIPTION =
-  "Baixe o kit de marca da Elinsa do Brasil com logos e símbolos em SVG, PNG, WebP e AVIF, paleta oficial e orientações de aplicação.";
+  "Baixe o logo oficial da Elinsa do Brasil em SVG, PNG, WebP e AVIF, veja a paleta de cores da marca e as orientações de uso do kit completo.";
 
 export const metadata = createPageMetadata({
   title: BRAND_PAGE_TITLE,
@@ -269,6 +271,7 @@ export default function MarcaPage() {
 
   return (
     <div className="bg-background text-foreground">
+      <JsonLd data={createBrandPageStructuredData()} />
       <BrandHero />
       <UsageSection />
       <ColorsSection />
@@ -297,7 +300,7 @@ function BrandHero() {
         <div className="max-w-2xl">
           <SectionEyebrow
             className="mb-5"
-            text="Identidade visual oficial"
+            text="Kit de marca"
             icon={SwatchBook}
             variant="stamp"
           />
@@ -305,12 +308,13 @@ function BrandHero() {
             id="marca-heading"
             className="text-balance text-4xl font-black leading-none tracking-normal text-elinsa-dark sm:text-5xl md:text-6xl dark:text-white"
           >
-            Kit de marca
+            Logo da Elinsa do Brasil
           </h1>
           <p className="mt-6 max-w-xl text-base leading-7 text-foreground/80 md:text-lg md:leading-8">
-            Baixe os arquivos oficiais da Elinsa para apresentações, propostas,
-            comunicados e materiais digitais. Escolha a versão pelo contraste e
-            o formato pelo destino da peça.
+            Baixe o logo oficial, os símbolos e a paleta de cores da Elinsa do
+            Brasil para apresentações, propostas, comunicados e materiais
+            digitais. Escolha a versão pelo contraste e o formato pelo destino
+            da peça.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -373,7 +377,7 @@ function BrandStage() {
             className="absolute -right-20 -top-20 size-64 rounded-full border-[38px] border-elinsa-primary/8"
           />
           <BrandImage
-            alt="Elinsa do Brasil, Ampergroup"
+            alt="Logo oficial da Elinsa do Brasil"
             className="relative z-10 max-h-40 w-full max-w-2xl"
             kind="logo"
             preload

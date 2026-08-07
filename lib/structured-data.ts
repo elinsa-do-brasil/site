@@ -1,5 +1,6 @@
 import {
   absoluteUrl,
+  BRAND_ASSET_IMAGES,
   ORGANIZATION_LOGO,
   ORGANIZATION_SOCIAL_PROFILES,
   SITE_DESCRIPTION,
@@ -142,6 +143,41 @@ export function createJobPostingStructuredData(job: JobStructuredData) {
         { name: "Início", path: "/" },
         { name: "Vagas", path: "/vagas" },
         { name: job.title, path: job.path },
+      ]),
+    ],
+  };
+}
+
+export function createBrandPageStructuredData() {
+  const brandPageId = absoluteUrl("/marca");
+  const images = BRAND_ASSET_IMAGES.map((image) => ({
+    "@type": "ImageObject",
+    caption: image.caption,
+    contentUrl: absoluteUrl(image.url),
+    copyrightHolder: { "@id": organizationId },
+    creator: { "@id": organizationId },
+    name: image.name,
+  }));
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@id": brandPageId,
+        "@type": "WebPage",
+        about: { "@id": organizationId },
+        description:
+          "Logos, símbolos e paleta de cores oficiais da Elinsa do Brasil, disponíveis para download em SVG, PNG, WebP e AVIF.",
+        image: images,
+        inLanguage: "pt-BR",
+        isPartOf: { "@id": websiteId },
+        name: "Kit de marca da Elinsa do Brasil",
+        primaryImageOfPage: images[0],
+        url: brandPageId,
+      },
+      createBreadcrumbStructuredData([
+        { name: "Início", path: "/" },
+        { name: "Kit de marca", path: "/marca" },
       ]),
     ],
   };

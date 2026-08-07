@@ -5,7 +5,45 @@ export const SITE_URL = new URL("https://elinsadobrasil.com.br");
 export const SITE_DESCRIPTION =
   "Infraestrutura elétrica, manutenção e obras para operações no Pará.";
 export const DEFAULT_SOCIAL_IMAGE = "/images/eletricistas.webp";
-export const ORGANIZATION_LOGO = "/kit-de-marca/png/logo-colorido.png";
+// Square (2048x2048) so Google can render it in the circular Knowledge Panel /
+// brand search logo slot without letterboxing the wide wordmark.
+export const ORGANIZATION_LOGO = "/kit-de-marca/png/e-azul.png";
+export const BRAND_ASSET_IMAGES = [
+  {
+    caption:
+      "Versão colorida do logo oficial da Elinsa do Brasil, para uso em fundos claros ou neutros.",
+    name: "Logo colorido da Elinsa do Brasil",
+    url: "/kit-de-marca/png/logo-colorido.png",
+  },
+  {
+    caption:
+      "Versão branca do logo oficial da Elinsa do Brasil, para uso em fundos escuros.",
+    name: "Logo branco da Elinsa do Brasil",
+    url: "/kit-de-marca/png/logo-branco.png",
+  },
+  {
+    caption:
+      "Versão preta do logo oficial da Elinsa do Brasil, para aplicações monocromáticas.",
+    name: "Logo preto da Elinsa do Brasil",
+    url: "/kit-de-marca/png/logo-preto.png",
+  },
+  {
+    caption:
+      "Símbolo oficial da Elinsa do Brasil na cor azul, a cor principal da marca.",
+    name: "Símbolo azul da Elinsa do Brasil",
+    url: "/kit-de-marca/png/e-azul.png",
+  },
+  {
+    caption: "Símbolo oficial da Elinsa do Brasil em branco.",
+    name: "Símbolo branco da Elinsa do Brasil",
+    url: "/kit-de-marca/png/e-branco.png",
+  },
+  {
+    caption: "Símbolo oficial da Elinsa do Brasil em preto.",
+    name: "Símbolo preto da Elinsa do Brasil",
+    url: "/kit-de-marca/png/e-preto.png",
+  },
+] as const;
 
 export const ORGANIZATION_SOCIAL_PROFILES = [
   "https://www.instagram.com/elinsadobrasil/",
@@ -299,7 +337,12 @@ export function createSitemap({
 }): MetadataRoute.Sitemap {
   const staticEntries: MetadataRoute.Sitemap = STATIC_SITEMAP_PATHS.map(
     (path) => ({
-      images: path === "/" ? [absoluteUrl(DEFAULT_SOCIAL_IMAGE)] : undefined,
+      images:
+        path === "/"
+          ? [absoluteUrl(DEFAULT_SOCIAL_IMAGE)]
+          : path === "/marca"
+            ? BRAND_ASSET_IMAGES.map((image) => absoluteUrl(image.url))
+            : undefined,
       url: absoluteUrl(path),
     }),
   );

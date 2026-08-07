@@ -10,6 +10,7 @@ import {
   SITE_URL,
 } from "@/lib/seo";
 import {
+  createBrandPageStructuredData,
   createJobPostingStructuredData,
   createNewsArticleStructuredData,
   serializeJsonLd,
@@ -117,6 +118,13 @@ test("sitemap contém apenas URLs públicas, canônicas e válidas", () => {
     sitemap.find((entry) => entry.url === absoluteUrl("/galeria"))?.images,
     [absoluteUrl("/api/galeria/file/equipe.webp")],
   );
+
+  const marcaImages = sitemap.find(
+    (entry) => entry.url === absoluteUrl("/marca"),
+  )?.images;
+
+  assert.ok(marcaImages && marcaImages.length > 0);
+  assert.ok(marcaImages?.every((url) => url.startsWith(SITE_URL.toString())));
 });
 
 test("JSON-LD representa notícia e vaga e escapa início de tags", () => {
@@ -142,4 +150,13 @@ test("JSON-LD representa notícia e vaga e escapa início de tags", () => {
   assert.ok(!serialized.includes("<script>"));
   assert.equal(job["@graph"][0]["@type"], "JobPosting");
   assert.ok(JSON.stringify(job).includes('"addressRegion":"PA"'));
+});
+
+test("JSON-LD da página de marca expõe as imagens oficiais do logo", () => {
+  const serialized = JSON.stringify(createBrandPageStructuredData());
+
+  assert.ok(serialized.includes('"@type":"WebPage"'));
+  assert.ok(serialized.includes(absoluteUrl("/marca")));
+  assert.ok(serialized.includes('"@type":"ImageObject"'));
+  assert.ok(serialized.includes('"@type":"BreadcrumbList"'));
 });
