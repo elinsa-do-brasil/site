@@ -7,6 +7,7 @@ export type TurnstileRenderOptions = {
   "timeout-callback"?: () => void;
   theme?: "light" | "dark" | "auto";
   size?: "normal" | "compact" | "flexible" | "invisible";
+  appearance?: "always" | "execute" | "interaction-only";
   language?: string;
   "response-field"?: boolean;
   retry?: "auto" | "never";

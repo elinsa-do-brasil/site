@@ -68,6 +68,7 @@ export function TurnstileWidget({ onVerify, ref }: TurnstileWidgetProps) {
         language: "pt-br",
         size: "flexible",
         theme: "auto",
+        appearance: "interaction-only",
         "response-field": false,
         callback: (token) => onVerifyRef.current(token),
         "error-callback": () => {
