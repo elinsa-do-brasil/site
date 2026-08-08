@@ -206,10 +206,7 @@ function canAccessConfiguredPortalTool(
   userTeamSet: Set<string>,
   tool: { href: string; teamName: string },
 ) {
-  if (
-    tool.href === "/ampercuida" ||
-    tool.href === "/portal/atendimento-psicologico/solicitar"
-  ) {
+  if (tool.href === "/acolhimento/hjvx6e") {
     return true;
   }
 

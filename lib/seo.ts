@@ -64,7 +64,7 @@ export const STATIC_SITEMAP_PATHS = [
   "/termos",
   "/licencas",
   "/denunciar",
-  "/ampercuida/sobre",
+  "/amper-cuida",
 ] as const;
 
 export const ROBOTS_DISALLOW_PATHS = [

@@ -10,8 +10,7 @@ const LEGACY_EMAIL_SIGNATURE_PATHS = new Set([
   "/assinatura-de-email",
   "/portal/assinatura-de-email",
 ]);
-const LEGACY_PSYCHOLOGICAL_CARE_REQUEST_PATH =
-  "/portal/atendimento-psicologico/solicitar";
+const LEGACY_AMPER_CUIDA_ABOUT_PATH = "/ampercuida/sobre";
 const REDIRECT_LOOKUP_PATH = "/api/payload-redirects";
 const DOCS_PATH_ALIASES = new Map([
   ["/codigo-de-conduta", "/etica/codigo-de-conduta"],
@@ -31,8 +30,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 308);
   }
 
-  if (pathname === LEGACY_PSYCHOLOGICAL_CARE_REQUEST_PATH) {
-    const redirectUrl = new URL("/ampercuida", request.url);
+  if (pathname === LEGACY_AMPER_CUIDA_ABOUT_PATH) {
+    const redirectUrl = new URL("/amper-cuida", request.url);
     redirectUrl.search = request.nextUrl.search;
     return NextResponse.redirect(redirectUrl, 308);
   }

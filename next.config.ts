@@ -92,7 +92,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/ampercuida",
+        source: "/acolhimento/hjvx6e",
         headers: [
           { key: "Referrer-Policy", value: "no-referrer" },
           { key: "X-Robots-Tag", value: "noindex, nofollow" },

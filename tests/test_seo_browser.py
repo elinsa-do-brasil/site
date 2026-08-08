@@ -59,12 +59,13 @@ def test_seo_routes_sitemap_robots_and_googlebot_html():
             assert f"<loc>{CANONICAL_ORIGIN}/</loc>" in sitemap_text
             assert f"<loc>{CANONICAL_ORIGIN}/denunciar</loc>" in sitemap_text
             assert (
-                f"<loc>{CANONICAL_ORIGIN}/ampercuida/sobre</loc>"
+                f"<loc>{CANONICAL_ORIGIN}/amper-cuida</loc>"
                 in sitemap_text
             )
             assert "/denunciar/formulario" not in sitemap_text
             assert "/acompanhar-denuncia" not in sitemap_text
-            assert f"<loc>{CANONICAL_ORIGIN}/ampercuida</loc>" not in sitemap_text
+            assert "ampercuida" not in sitemap_text
+            assert "/acolhimento" not in sitemap_text
             assert "/portal/" not in sitemap_text
 
             public_urls = re.findall(r"<loc>([^<]+)</loc>", sitemap_text)
@@ -95,12 +96,12 @@ def test_seo_routes_sitemap_robots_and_googlebot_html():
             )
             assert_indexable_metadata(
                 page,
-                "/ampercuida/sobre",
-                "AmperCuida: apoio psicológico para colaboradores",
+                "/amper-cuida",
+                "Amper Cuida: apoio psicológico para colaboradores",
             )
 
             form_response = page.goto(
-                "/ampercuida", wait_until="domcontentloaded"
+                "/acolhimento/hjvx6e", wait_until="domcontentloaded"
             )
             assert form_response is not None
             assert form_response.ok
@@ -108,11 +109,24 @@ def test_seo_routes_sitemap_robots_and_googlebot_html():
             expect(page.locator('meta[name="robots"]')).to_have_attribute(
                 "content", re.compile(r"noindex", re.IGNORECASE)
             )
-            expect(
-                page.get_by_role(
-                    "link", name="Entenda como funciona o AmperCuida", exact=False
-                )
-            ).to_have_attribute("href", "/ampercuida/sobre")
+
+            # A rota antiga do formulário deixou de existir e não redireciona
+            # para a nova (evita revelar o endereço não óbvio automaticamente).
+            old_form_response = page.goto(
+                "/ampercuida", wait_until="domcontentloaded"
+            )
+            assert old_form_response is not None
+            assert old_form_response.status == 404
+            assert old_form_response.url.rstrip("/").endswith("/ampercuida")
+
+            # A antiga página institucional foi renomeada e redireciona (301/308)
+            # para a nova, já que ela é pública/indexada por design.
+            old_about_response = page.goto(
+                "/ampercuida/sobre", wait_until="domcontentloaded"
+            )
+            assert old_about_response is not None
+            assert old_about_response.ok
+            assert old_about_response.url.rstrip("/").endswith("/amper-cuida")
 
             for sensitive_path in (
                 "/denunciar/formulario",

@@ -3,7 +3,6 @@ import {
   Alert01Icon,
   Building01Icon,
   GoogleDocIcon,
-  HeartAddIcon,
   Image01Icon,
   InstagramIcon,
   LayoutGridIcon,
@@ -137,12 +136,6 @@ export function Header() {
                         Recursos de apoio
                       </h4>
                       <ul className="flex flex-col gap-2">
-                        <DropdownItem
-                          href="/ampercuida"
-                          icon={HeartAddIcon}
-                          title="Amper Cuida"
-                          description="Solicite atendimento psicológico"
-                        />
                         <DropdownItem
                           href={getDocsUrl()}
                           icon={LighthouseIcon}
@@ -299,12 +292,6 @@ function MobileMenu() {
           </MobileNavSection>
 
           <MobileNavSection title="Apoio">
-            <MobileNavLink
-              href="/ampercuida"
-              icon={HeartAddIcon}
-              title="Amper Cuida"
-              description="Solicite atendimento psicológico"
-            />
             <MobileNavLink
               href={getDocsUrl()}
               icon={LighthouseIcon}

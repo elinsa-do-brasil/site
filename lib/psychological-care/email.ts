@@ -1,5 +1,6 @@
-import "server-only";
-
+// Sem `import "server-only"` de propósito: importado por testes de
+// integração (tsx --env-file=.env, Node puro, fora do pipeline do Next.js) —
+// o guard lança erro incondicionalmente fora do bundler do Next.
 import { createElement } from "react";
 import { Resend } from "resend";
 import PsychologicalCareNotificationEmail from "@/emails/psychological-care-notification";

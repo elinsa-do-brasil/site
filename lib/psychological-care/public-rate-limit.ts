@@ -1,5 +1,6 @@
-import "server-only";
-
+// Sem `import "server-only"` de propósito: importado por testes de
+// integração (tsx --env-file=.env, Node puro, fora do pipeline do Next.js) —
+// o guard lança erro incondicionalmente fora do bundler do Next.
 import { consumeDatabaseRateLimit } from "@/lib/database-rate-limit";
 import { env } from "@/lib/env";
 import { getClientIp } from "@/lib/get-client-ip";

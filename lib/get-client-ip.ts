@@ -1,5 +1,3 @@
-import "server-only";
-
 import { isIP } from "node:net";
 
 type HeaderReader = {
@@ -7,6 +5,11 @@ type HeaderReader = {
 };
 
 /**
+ * Sem `import "server-only"` de propósito: importado por testes (`tsx
+ * --test`, Node puro, fora do pipeline do Next.js) — o guard lança erro
+ * incondicionalmente fora do bundler do Next. Todos os call sites reais já
+ * são server-only por natureza (Server Actions, API routes).
+ *
  * Extrai o IP do cliente a partir de x-forwarded-for (primeiro salto) com
  * fallback para x-real-ip. O proxy de deployment precisa sobrescrever esses
  * headers antes da requisição chegar ao Next.js — o endereço bruto retornado

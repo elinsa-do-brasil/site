@@ -1,5 +1,7 @@
-import "server-only";
-
+// Sem `import "server-only"` de propósito: importado por testes de
+// integração (tsx --env-file=.env, Node puro, fora do pipeline do Next.js) —
+// o guard lança erro incondicionalmente fora do bundler do Next. Todos os
+// call sites reais já são server-only por natureza (Server Actions, painel).
 import {
   and,
   asc,

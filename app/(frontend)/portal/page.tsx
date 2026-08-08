@@ -172,7 +172,7 @@ function ToolCard({ tool }: { tool: InternalTool }) {
 
 function isPageTransitionTarget(href: string) {
   return [
-    "/ampercuida",
+    "/acolhimento/hjvx6e",
     "/configuracoes",
     "/imprensa",
     "/portal/blog",

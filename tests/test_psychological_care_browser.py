@@ -15,6 +15,10 @@ def test_psychological_care_public_form_and_protected_panel():
             r"/entrar\?redirectTo=%2Fportal%2Fatendimento-psicologico$",
         ),
         (
+            "/portal/atendimento-psicologico/solicitar",
+            r"/entrar\?redirectTo=%2Fportal%2Fatendimento-psicologico%2Fsolicitar$",
+        ),
+        (
             "/portal/atendimento-psicologico/00000000-0000-4000-8000-000000000000",
             r"/entrar\?redirectTo=%2Fportal%2Fatendimento-psicologico%2F00000000-0000-4000-8000-000000000000$",
         ),
@@ -31,13 +35,15 @@ def test_psychological_care_public_form_and_protected_panel():
         page.set_default_navigation_timeout(120_000)
 
         try:
-            response = page.goto("/ampercuida", wait_until="domcontentloaded")
+            response = page.goto(
+                "/acolhimento/hjvx6e", wait_until="domcontentloaded"
+            )
             assert response is not None
             assert response.ok
             assert "no-store" in response.headers.get("cache-control", "")
             assert response.headers.get("referrer-policy") == "no-referrer"
             assert response.headers.get("x-robots-tag") == "noindex, nofollow"
-            expect(page).to_have_url(re.compile(r"/ampercuida$"))
+            expect(page).to_have_url(re.compile(r"/acolhimento/hjvx6e$"))
             expect(
                 page.get_by_role(
                     "heading",
@@ -45,15 +51,17 @@ def test_psychological_care_public_form_and_protected_panel():
                     exact=True,
                 )
             ).to_be_visible()
+            # O formulário deixou de ser divulgado pela navegação pública:
+            # o menu "Apoio" não deve mais conter um link para ele.
             page.get_by_role("button", name="Apoio", exact=True).click()
             expect(
                 page.get_by_text("Recursos de apoio", exact=True)
             ).to_be_visible()
             expect(
-                page.locator("header")
-                .get_by_role("link", name=re.compile(r"^AmperCuida"))
-                .first
-            ).to_be_visible()
+                page.locator("header").get_by_role(
+                    "link", name=re.compile(r"^Amper ?Cuida", re.IGNORECASE)
+                )
+            ).to_have_count(0)
             page.keyboard.press("Escape")
             expect(page.locator("main")).not_to_contain_text(
                 re.compile(r"lideran", re.IGNORECASE)
@@ -109,15 +117,11 @@ def test_psychological_care_public_form_and_protected_panel():
             phone.fill("98987654321")
             expect(phone).to_have_value("(98) 98765-4321")
 
-            page.get_by_role("button", name="Limpar formulário").click()
-            expect(person_name).to_have_value("")
-            expect(phone).to_have_value("")
-
-            page.goto(
-                "/portal/atendimento-psicologico/solicitar?origem=portal",
-                wait_until="domcontentloaded",
-            )
-            expect(page).to_have_url(re.compile(r"/ampercuida\?origem=portal$"))
+            # A rota interna legada de solicitação foi aposentada: hoje cai na
+            # mesma checagem de autenticação de qualquer página de /portal (não
+            # há mais nenhum atalho que redirecione para o formulário público,
+            # o que evitaria abrir uma porta lateral revelando o endereço não
+            # óbvio). Coberta pelo loop de protected_routes abaixo.
 
             for route, expected_redirect in protected_routes:
                 page.goto(route, wait_until="domcontentloaded")

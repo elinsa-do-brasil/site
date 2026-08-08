@@ -19,7 +19,7 @@ const DESCRIPTION =
 
 export const metadata = createPageMetadata({
   description: DESCRIPTION,
-  path: "/ampercuida/sobre",
+  path: "/amper-cuida",
   title: "Amper Cuida: apoio psicológico aos colaboradores",
 });
 
@@ -84,7 +84,7 @@ export default function AmperCuidaAboutPage() {
                   className="mt-4 h-auto w-full justify-between bg-elinsa-primary py-3 text-left whitespace-normal hover:bg-elinsa-sky hover:text-elinsa-dark"
                   size="lg"
                 >
-                  <Link href="/ampercuida">
+                  <Link href="/acolhimento/hjvx6e" rel="nofollow">
                     Solicitar atendimento
                     <ArrowRight aria-hidden="true" data-icon="inline-end" />
                   </Link>
@@ -176,9 +176,9 @@ export default function AmperCuidaAboutPage() {
                 O que este canal não substitui
               </h2>
               <p className="mt-3 leading-7 text-muted-foreground">
-                O Amper Cuida organiza pedidos de apoio e encaminhamento. Ele não
-                substitui serviços de emergência nem o Canal de Denúncias para
-                relatos de ética, assédio, discriminação ou outras condutas
+                O Amper Cuida organiza pedidos de apoio e encaminhamento. Ele
+                não substitui serviços de emergência nem o Canal de Denúncias
+                para relatos de ética, assédio, discriminação ou outras condutas
                 inadequadas.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
@@ -226,7 +226,7 @@ export default function AmperCuidaAboutPage() {
               </p>
             </div>
             <Button asChild className="shrink-0" size="lg">
-              <Link href="/ampercuida">
+              <Link href="/acolhimento/hjvx6e" rel="nofollow">
                 Acessar o Amper Cuida
                 <ArrowRight aria-hidden="true" data-icon="inline-end" />
               </Link>

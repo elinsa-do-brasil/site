@@ -106,11 +106,12 @@ test("sitemap contém apenas URLs públicas, canônicas e válidas", () => {
 
   assert.ok(urls.every((url) => url.startsWith(SITE_URL.toString())));
   assert.ok(urls.includes(absoluteUrl("/denunciar")));
-  assert.ok(urls.includes(absoluteUrl("/ampercuida/sobre")));
+  assert.ok(urls.includes(absoluteUrl("/amper-cuida")));
   assert.ok(urls.includes(absoluteUrl("/imprensa/nova-operacao")));
   assert.ok(urls.includes(absoluteUrl("/vagas/eletricista-belem")));
   assert.ok(!urls.some((url) => url.includes("formulario")));
   assert.ok(!urls.some((url) => url.includes("acompanhar-denuncia")));
+  assert.ok(!urls.some((url) => url.includes("acolhimento")));
   assert.ok(!urls.some((url) => url.endsWith("/ampercuida")));
   assert.ok(!urls.some((url) => url.includes("vaga-fechada")));
   assert.ok(!urls.some((url) => url.includes("draft")));

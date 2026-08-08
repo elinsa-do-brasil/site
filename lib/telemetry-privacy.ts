@@ -1,7 +1,7 @@
 export const SENSITIVE_TELEMETRY_PATHS = [
   "/denunciar",
   "/acompanhar-denuncia",
-  "/ampercuida",
+  "/acolhimento/hjvx6e",
   "/portal/comite-de-etica",
   "/portal/atendimento-psicologico",
   "/api/reports",
