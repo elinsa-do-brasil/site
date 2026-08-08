@@ -192,7 +192,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     globalNotFound: true,
-    viewTransition: true,
   },
 };
 
