@@ -190,7 +190,7 @@ function PsychologicalCareWhoTakesCare() {
             Atua nos contextos clínico, institucional e organizacional, com
             experiência em acolhimento psicológico, manejo de crises, promoção
             da saúde mental no trabalho, desenvolvimento de pessoas e
-            capacitação de equipes. É servidora pública do HEMOAP e psicóloga
+            capacitação de equipes. É a psicóloga
             consultora do Grupo Amper, onde integra o projeto Amper Cuida.
           </p>
         </div>
