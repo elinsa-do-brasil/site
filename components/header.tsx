@@ -226,7 +226,7 @@ export function Header() {
 
         <Button asChild size="lg">
           <Link href="/entrar" className="px-3 font-medium sm:px-4">
-            Entrar
+            Portal interno
           </Link>
         </Button>
       </div>
