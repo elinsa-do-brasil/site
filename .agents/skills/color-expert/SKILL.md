@@ -18,7 +18,9 @@ Match the response to the user's explicit request and clearly implied constraint
 - Use OKLCH to build perceptually uniform scales (consistent lightness across hues, no muddy mid-tones).
 - Build a token graph: reference tokens (palette) → semantic tokens (surface, on-surface, accent, success, warning, danger) → component usage; see *Implementation Guidance* below.
 - Verify every text/background pair against APCA or WCAG in both light and dark.
-- Suggest tools only as needed: Huetone (LCH/OKLCH builder), Leonardo (contrast-ratio-driven ramps + adaptive theming, Adobe), Components.ai Color Scale (parametric), dittoTones (extract perceptual DNA from Tailwind/Radix), Color Buddy (lint). For dataviz sequential/diverging ramps specifically, CuspHanger (Wijffelaars model in OKLCH, in-gamut by construction).
+- Suggest tools only as needed: Huetone (LCH/OKLCH builder), Leonardo (contrast-ratio-driven ramps + adaptive theming, Adobe), Components.ai Color Scale (parametric), dittoTones (extract perceptual DNA from Tailwind/Radix), Color Buddy (lint). For dataviz sequential/diverging ramps specifically, CuspHanger (Wijffelaars model in OKLCH, in-gamut by construction) or viscm (the viridis editor: live perceptual-derivative diagnostics + CVD + grayscale while you drag control points).
+
+The test for a sequential ramp is **flat perceptual derivative** — plot the perceptual step size between consecutive samples; it should be a horizontal line, in color *and* in grayscale. Bumps are regions where the ramp exaggerates change that isn't in the data (this is jet's core failure, not its ugliness).
 
 **Generative art / creative coding** — "color for my fxhash piece", "palette for thousands of generated strokes", "paint-like mixing in p5.js / WebGL." Different from building a palette generator: the code *is* the artwork, and the user wants to understand the *techniques*, not copy a named artist's style. Help them compose their own system. Useful techniques to teach and combine:
 
@@ -60,6 +62,7 @@ Never recommend coolors.co — it doesn't generate palettes, it picks from a har
 | Color difference (precision)    | **CIEDE2000**                          | Gold standard perceptual distance                                         |
 | Color difference (fast)         | **Euclidean in OKLAB**                 | Good enough for most applications                                         |
 | Video/image compression         | **YCbCr**                              | Luma+chroma separation enables chroma subsampling                         |
+| Colormap uniformity             | **CAM02-UCS** (or OKLAB)               | CIELAB is decent for *distant* colors but poor for *nearby* ones — which is exactly what uniform sampling depends on. MATLAB's parula was made uniform in Lab and has a visible band near the bottom as a result |
 
 ### Understanding HSL's Limitations
 
@@ -174,6 +177,8 @@ Of ~281 trillion hex color pairs (research by @mrmrs\_, computed via a Rust brut
 
 APCA is far more restrictive than WCAG at comparable readability. At APCA 90, only 239 billion of 281 trillion pairs work. JPEG compression exploits the same biology: chroma subsampling (4× less color data) is invisible because human vision resolves brightness at higher resolution than color.
 
+**Charts — the border trick.** WCAG wants 3:1 between adjacent non-text elements. Finding three chart colors that hold 3:1 against *each other* is extremely hard; beyond three it's essentially impossible. Don't try. Put a **border** on the chart elements and require 3:1 between each fill and the border color — one constraint per color instead of N². (Ström, see `references/techniques/strom-least-wrong-colors-simulated-annealing.md`.)
+
 ## Color Harmony — What Actually Works
 
 ### Hue-first harmony is a weak standalone heuristic
@@ -249,6 +254,7 @@ Note: coolors.co does not generate palettes — it picks randomly from 7,821 pre
 - **FarbVelo** — random palettes with dark→light structure
 - **ray-color** — palettes from a raytraced scene ("edit the conditions, not the colors"): sphere + five-sided room + up to 3 colored lights, mirror walls as virtual light sources; sample geodesic lines/circles off the surface. Deterministic, linear-RGB shading, zero deps, ~6 kB, DOM-free for headless use; interactive playground with draggable lights and PNG/code export
 - **IQ Cosine Formula** — `color(t) = a + b*cos(2π(c*t+d))`, 12 floats = infinite palette
+- **category-colors** (Ström) — the *optimizer* approach rather than a constructive model: write a weighted loss function (similarity to a brand reference + ΔE separation + CVD separation per deficiency type) and let simulated annealing search. Best when your criteria conflict and no color-space geometry expresses them; the weights become the explicit, auditable design decision. `npx categorycolors run`; pluggable evaluators (energy, range, JND, similarity, WCAG contrast, avoid-these-colors, saliency), per-channel locking so a brand hue survives while lightness/saturation move, and `categorycolors report` to audit any existing palette for JND collisions under simulated CVD. Node + Culori, MIT
 
 ### Palette Analysis & Linting
 
@@ -262,6 +268,8 @@ Note: coolors.co does not generate palettes — it picks randomly from 7,821 pre
 - **Culori** — 30 spaces, 10 distance metrics, gamut mapping, CVD sim
 - **nutelch** — gamut-relative chroma in OKLCH/LCH: `relC: 0.5` = "halfway to the gamut boundary" at any lightness/hue. The one OkHSL idea (boundary-relative saturation) without leaving native `oklch()` — LUT-backed (faster than OkHSL's runtime gamut math), zero runtime deps, sRGB + P3
 - **@texel/color** — 5–125× faster than Color.js, minimal, for real-time
+- **colordx** (`@colordx/core`) — chainable CSS-facing manipulation with OKLCH native, 7.6 kB, 0 deps, plugin-gated extras (Lab/LCH/CMYK/P3/Rec.2020/APCA/harmonies). Keeps out-of-gamut OKLCH unclamped and lets you pick the fold: `.mapSrgb()` (CSS Color 4 chroma reduction, holds L+H) vs `.clampSrgb()` (naive clip, what browsers render). Zero-allocation `*Into` channel converters for per-pixel work. Note `.mix()` is sRGB — use `.mixOklab()`
+- **@colordx/gpu** — the same colordx math generated as GLSL and parity-tested against the CPU library, plus a WebGL2 renderer for the gamut-slice chart behind every OKLCH/LCH picker (one draw per frame instead of a per-pixel CPU loop). Gamuts are independent layers rather than an assumed nesting, so A98 draws correctly; `maxChromaLUT` stretches the chroma axis to the gamut shell (nutelch's `relC` idea, GPU-side). Reach for it when building a picker UI or any wide-gamut visualization
 - **Spectral.js** — open-source K-M pigment mixing (blue+yellow=green)
 - **RYBitten** — RGB↔RYB with 26 historical color cubes
 - **colorgram** — 1 kB image palette extraction; 64-bucket HLS+luminance quantization, ~15 ms for 340×340, fixed memory

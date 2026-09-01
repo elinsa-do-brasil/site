@@ -5,13 +5,13 @@
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/accessibility/SKILL.md",
-      "computedHash": "10e83284d3395ab5ec2f2db602b663480a37a4ff404d16510eefe86b034fcc1a"
+      "computedHash": "612f913bcb03f0787b103c848cd7664b676a9aaf31f25d3270cc69cf5caaab95"
     },
     "ai-seo": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
       "skillPath": "skills/ai-seo/SKILL.md",
-      "computedHash": "a6265a6c9451a25987a94453f638e07bef84eb3f1cd73366d703fee79151cf09"
+      "computedHash": "cf8f80451b6ae36c2c654da1db20744067083c081a3c7ddb5a2ebf1fce89078c"
     },
     "audit-dependencies": {
       "source": "payloadcms/payload",
@@ -23,7 +23,7 @@
       "source": "better-auth/skills",
       "sourceType": "github",
       "skillPath": "better-auth/best-practices/SKILL.md",
-      "computedHash": "61ba0ef64ed2e7c424401cc848ca33dd6d790a720c44727717dc0c5cba5fc122"
+      "computedHash": "0c30be0e118c2b7a0c4c57bd9e63bf110c7e420a79ec6ce7997153f3b1e066ee"
     },
     "better-auth-security-best-practices": {
       "source": "better-auth/skills",
@@ -37,17 +37,11 @@
       "skillPath": "plugins/vibes/skills/brand-color-psychology/SKILL.md",
       "computedHash": "c1f02c1417e30a9ed2814657a48aae49dce828b2d865f9a2a8a0ed173d20f731"
     },
-    "brand-storytelling": {
-      "source": "refoundai/lenny-skills",
-      "sourceType": "github",
-      "skillPath": "skills/brand-storytelling/SKILL.md",
-      "computedHash": "a7fdb8eee04388e74341421c5e7ed88758820b420a144a8a4f565e3c102c55c4"
-    },
     "color-expert": {
       "source": "meodai/skill.color-expert",
       "sourceType": "github",
       "skillPath": "SKILL.md",
-      "computedHash": "d8a5a6da49e0df2fe13665297895aa252f6d18918002aad275e4903ce95bd448"
+      "computedHash": "f74b7e46c183f8ac7a2d5fb2619be000d727891b4ebf2e9c3d162a440923432b"
     },
     "color-theory-palette-harmony-expert": {
       "source": "erichowens/some_claude_skills",
@@ -59,7 +53,7 @@
       "source": "upstash/context7",
       "sourceType": "github",
       "skillPath": "skills/context7-cli/SKILL.md",
-      "computedHash": "b013e9b5af10ae7aae1cfba603c0b1158bb17b04829f00a165e7148401da65f8"
+      "computedHash": "f22d21491528a0aaaf21a2a7c546428ffd208852473d6afbaf5e2d4845388639"
     },
     "context7-mcp": {
       "source": "upstash/context7",
@@ -77,7 +71,7 @@
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
       "skillPath": "skills/copywriting/SKILL.md",
-      "computedHash": "c8d63b1f77be04fd54981720de65697988810bd28331097dbe0aaf3e166d638a"
+      "computedHash": "779f05c8be67da475e6a7af78de3e0400b0038e371ce898dd6ff9d3331aab7db"
     },
     "create-auth-skill": {
       "source": "better-auth/skills",
@@ -90,12 +84,6 @@
       "sourceType": "github",
       "skillPath": "plugins/business-analytics/skills/data-storytelling/SKILL.md",
       "computedHash": "90acc4df00f162fc2e22edab91ba4792a81b6d4868e6f2dd89a3d3a4da131fa3"
-    },
-    "diagnose": {
-      "source": "mattpocock/skills",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/diagnose/SKILL.md",
-      "computedHash": "15939a26f86edec2d4862042b8564e5a062cb81d04e047a0cea6305c8830b5f5"
     },
     "drizzle-best-practices": {
       "source": "honra-io/drizzle-best-practices",
@@ -125,7 +113,7 @@
       "source": "better-auth/skills",
       "sourceType": "github",
       "skillPath": "better-auth/emailAndPassword/SKILL.md",
-      "computedHash": "747d7f73bd9e2ec5317b8ef88dc70f97df716d00e3d02de4051feebaa48b062d"
+      "computedHash": "863886759f729081e265941f4f72c503835d55a1f34f6d63cebe6571159fff4a"
     },
     "email-best-practices": {
       "source": "resend/resend-skills",
@@ -161,7 +149,7 @@
       "source": "qu-skills/skills",
       "sourceType": "github",
       "skillPath": "guides/design/landing-page-design/SKILL.md",
-      "computedHash": "19ed3be1e7ee1620ecc3b5801ddcb936add37750f7cadb437afdd7394472f34b"
+      "computedHash": "435af3919183e91ded83197f9238740593cac886f45067dc729d8a7095fbfb5a"
     },
     "landing-page-guide-v2": {
       "source": "bear2u/my-skills",
@@ -181,12 +169,6 @@
       "skillPath": "skills/next-best-practices/SKILL.md",
       "computedHash": "f4678aef4ffc10a5ea64a91e57abe5a5081af813b06d58d565caf3e8ef56e26c"
     },
-    "next-browser": {
-      "source": "vercel-labs/next-browser",
-      "sourceType": "github",
-      "skillPath": "skills/next-browser/SKILL.md",
-      "computedHash": "d8e316eaad3004a1de8f6f4e1b1f774a180a65f22bc821ec07eb492a3f2689ae"
-    },
     "next-cache-components": {
       "source": "vercel-labs/next-skills",
       "sourceType": "github",
@@ -203,13 +185,13 @@
       "source": "laguagu/claude-code-nextjs-skills",
       "sourceType": "github",
       "skillPath": "skills/nextjs-seo/SKILL.md",
-      "computedHash": "d34602e896a5e23d547feb7c9f97adf178d4c2e1515d722e35e8457edb0acf1d"
+      "computedHash": "c69dfc8c15267c97f261228056e42679d5d187bfb3a70f5c108fbcaf11229977"
     },
     "organization-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
       "skillPath": "better-auth/organization/SKILL.md",
-      "computedHash": "27627eb3a13bd44eff3a5d890f96e7db052b623db90e01684f759abe3e7fe56b"
+      "computedHash": "8c85e683dabef4532f1e8b67bbed5c453d39e0e3d5aeedd69d16b568f6e6d44f"
     },
     "payload": {
       "source": "payloadcms/payload",
@@ -233,25 +215,25 @@
       "source": "resend/resend-skills",
       "sourceType": "github",
       "skillPath": "skills/resend/SKILL.md",
-      "computedHash": "8935525a4d7fa21298616b7c6150148a7df3afcfffd7ea9dca6fdac155fe0ece"
+      "computedHash": "97cea2507d410e1f8c8315fe7ca1d4f3c695a2894b97b1d92e28948c079e2131"
     },
     "resend-cli": {
       "source": "resend/resend-skills",
       "sourceType": "github",
       "skillPath": "skills/resend-cli/SKILL.md",
-      "computedHash": "846e3ea34ed68947e1a50011907decdd9693bfc3471e97113cefa032e099f9c2"
+      "computedHash": "df9445e9fbf947980b542b04c1650ebb8ada20e4923d540a3d8c50aa77099ee4"
     },
     "seo-audit": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
       "skillPath": "skills/seo-audit/SKILL.md",
-      "computedHash": "f2dc52130189068981f21e1c0bdc4471ac7cd9b08d8a1320604411aa0f950385"
+      "computedHash": "01f9f8a3feb3ea69c6c212d61189c610f96ef2cc363adc27fd314d78254bf6ae"
     },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
-      "computedHash": "c1a68ee06a668aced9ab2b5fbdea5f989864123794eb2e056b339a072dbb7f10"
+      "computedHash": "a86630dd9b32722a4ea6846abc6756d5da8f06bdc2343dbc625923cc5c7a758b"
     },
     "site-architecture": {
       "source": "coreyhaines31/marketingskills",
@@ -265,23 +247,17 @@
       "skillPath": "skills/skill-creator/SKILL.md",
       "computedHash": "5ea13a6d9f0d4bb694405d79acd00cadec0d21bb138c4dd10fcf3c500cb835c2"
     },
-    "tailwind-best-practices": {
-      "source": "mastra-ai/mastra",
-      "sourceType": "github",
-      "skillPath": ".claude/skills/tailwind-best-practices/SKILL.md",
-      "computedHash": "7a94bb24f938aec684feaf5d93e862bc3c854d86d7d7d472293be793a2f4bda2"
-    },
     "tailwind-v4-shadcn": {
       "source": "secondsky/claude-skills",
       "sourceType": "github",
       "skillPath": "plugins/tailwind-v4-shadcn/skills/tailwind-v4-shadcn/SKILL.md",
-      "computedHash": "c2b354b64cbd922c8d93121091d079026e2c8a3ca81c07c4f31b6e738c2695f1"
+      "computedHash": "f671120a57119a94f8a6447a760629878b8ead36750297697006136dbaac4355"
     },
     "two-factor-authentication-best-practices": {
       "source": "better-auth/skills",
       "sourceType": "github",
       "skillPath": "better-auth/twoFactor/SKILL.md",
-      "computedHash": "a6f720042e5a090909e0d519a6a50a7eb8179553cd5315f0bbad852a6d20dac8"
+      "computedHash": "5bc3051aef5060db013f0b3cbe812c40dbae5c22d6ba3ddde4b941158362a197"
     },
     "ui4-convert-tests": {
       "source": "payloadcms/payload",
@@ -317,7 +293,7 @@
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/react-view-transitions/SKILL.md",
-      "computedHash": "c8952fc9127fa0564d0cb71dccb4215a5608ac933b5831104f09173a97a46f85"
+      "computedHash": "2033ef20681c90d4f93deee719e55e019c254e496d9bf80381c27cc539292001"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
