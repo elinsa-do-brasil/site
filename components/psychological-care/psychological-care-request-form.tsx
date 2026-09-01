@@ -29,6 +29,14 @@ import {
   type TurnstileWidgetHandle,
 } from "@/components/turnstile-widget";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteEmpty,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
+} from "@/components/ui/autocomplete";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -37,8 +45,16 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { jobTitleOptions, managementOptions } from "@/lib/management-options";
 import { submitPublicPsychologicalCareRequestAction } from "@/lib/psychological-care/public-actions";
 import {
   type PsychologicalCareRequestFormField,
@@ -355,14 +371,33 @@ export function PsychologicalCareRequestForm() {
                   <FieldLabel htmlFor="psychological-care-job-title">
                     Função <span className="font-normal">(opcional)</span>
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
+                  <Autocomplete
                     disabled={isSubmitting}
-                    id="psychological-care-job-title"
-                    maxLength={160}
-                    placeholder="Ex.: Eletricista"
-                  />
+                    items={jobTitleOptions}
+                    name={field.name}
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value ?? ""}
+                  >
+                    <AutocompleteInput
+                      aria-invalid={fieldState.invalid}
+                      id="psychological-care-job-title"
+                      maxLength={160}
+                      onBlur={field.onBlur}
+                      placeholder="Ex.: Eletricista"
+                    />
+                    <AutocompleteContent>
+                      <AutocompleteEmpty>
+                        Nenhum cargo encontrado.
+                      </AutocompleteEmpty>
+                      <AutocompleteList>
+                        {(item) => (
+                          <AutocompleteItem key={item} value={item}>
+                            {item}
+                          </AutocompleteItem>
+                        )}
+                      </AutocompleteList>
+                    </AutocompleteContent>
+                  </Autocomplete>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -440,15 +475,28 @@ export function PsychologicalCareRequestForm() {
                   <FieldLabel htmlFor="psychological-care-management">
                     Gerência <span aria-hidden="true">*</span>
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    aria-invalid={fieldState.invalid}
+                  <Select
                     disabled={isSubmitting}
-                    id="psychological-care-management"
-                    maxLength={160}
-                    placeholder="Nome da gerência"
+                    name={field.name}
+                    onValueChange={field.onChange}
                     required
-                  />
+                    value={field.value}
+                  >
+                    <SelectTrigger
+                      aria-invalid={fieldState.invalid}
+                      className="w-full"
+                      id="psychological-care-management"
+                    >
+                      <SelectValue placeholder="Selecione a gerência" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {managementOptions.map((management) => (
+                        <SelectItem key={management} value={management}>
+                          {management}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
