@@ -7,7 +7,7 @@ import {
   SENTRY_DATA_COLLECTION,
   shouldDiscardSensitiveSentryBreadcrumb,
   shouldDiscardSensitiveSentryEvent,
-} from "./lib/telemetry-privacy";
+} from "./lib/telemetryPrivacy";
 
 function currentBrowserPath() {
   return typeof window === "undefined" ? undefined : window.location.pathname;

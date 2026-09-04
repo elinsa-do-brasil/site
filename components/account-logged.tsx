@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/authClient";
 import { SignOutDropdown } from "./auth/buttons/sign-out-dropdown";
 
 export function AccountLogged() {

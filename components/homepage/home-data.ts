@@ -5,7 +5,7 @@ import {
   NotebookText,
 } from "lucide-react";
 import { env } from "@/lib/env";
-import dadosAbertos from "@/scripts/estimates/result.json";
+import dadosAbertos from "./open-data.json";
 
 export type ServiceCard = {
   id: string;

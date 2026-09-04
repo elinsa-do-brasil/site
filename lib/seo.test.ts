@@ -14,7 +14,7 @@ import {
   createJobPostingStructuredData,
   createNewsArticleStructuredData,
   serializeJsonLd,
-} from "@/lib/structured-data";
+} from "@/lib/structuredData";
 
 test("metadata gera título sem marca duplicada e canonical absoluto", () => {
   const metadata = createPageMetadata({

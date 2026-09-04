@@ -1,5 +1,5 @@
 import { Font } from "react-email";
-import { publicEnv } from "../lib/env.public";
+import { publicEnv } from "../lib/envPublic";
 
 const publicURL = (publicEnv.siteUrl || "").replace(/\/$/, "");
 

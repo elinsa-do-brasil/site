@@ -5,7 +5,7 @@ import { createElement } from "react";
 import { Resend } from "resend";
 import PsychologicalCareNotificationEmail from "@/emails/psychological-care-notification";
 import { env } from "@/lib/env";
-import { publicEnv } from "@/lib/env.public";
+import { publicEnv } from "@/lib/envPublic";
 
 export type PsychologicalCareEmailResult =
   | { error?: undefined; sent: true; skipped?: false }

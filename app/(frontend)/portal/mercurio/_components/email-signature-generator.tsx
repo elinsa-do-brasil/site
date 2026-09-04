@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { publicEnv } from "@/lib/env.public";
+import { publicEnv } from "@/lib/envPublic";
 import { normalizeSignatureName } from "../signature-name";
 import { getSuspiciousSignatureTextError } from "../signature-text";
 

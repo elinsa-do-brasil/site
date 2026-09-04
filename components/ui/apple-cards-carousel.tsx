@@ -18,7 +18,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useOutsideClick } from "@/hooks/use-outside-click";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { cn } from "@/lib/utils";
 
 interface CarouselProps {

@@ -4,7 +4,7 @@ import { reportAttachmentAccessLogs, reportAttachments } from "@/lib/db/schema";
 import {
   MAX_REPORT_ATTACHMENTS,
   MAX_REPORT_ATTACHMENTS_TOTAL_BYTES,
-} from "./attachment-limits";
+} from "./attachmentLimits";
 
 export type CreateReportAttachmentInput = {
   id: string;

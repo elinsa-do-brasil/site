@@ -8,7 +8,7 @@ import {
   SENTRY_DATA_COLLECTION,
   shouldDiscardSensitiveSentryBreadcrumb,
   shouldDiscardSensitiveSentryEvent,
-} from "./lib/telemetry-privacy";
+} from "./lib/telemetryPrivacy";
 
 Sentry.init({
   dsn: "https://f6bb2a7b535808afd235b6f15c8e96d8@o4511542556360704.ingest.us.sentry.io/4511542560948224",

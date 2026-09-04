@@ -20,7 +20,7 @@ import {
   type PsychologicalCareRequest,
   psychologicalCareRequestEvents,
   psychologicalCareRequests,
-} from "@/lib/db/schema/psychological-care";
+} from "@/lib/db/schema/psychologicalCare";
 import {
   arePsychologicalCarePayloadsEqual,
   decryptPsychologicalCarePayload,

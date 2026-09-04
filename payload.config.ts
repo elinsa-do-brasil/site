@@ -28,8 +28,8 @@ import { Vagas } from "./collections/Vagas.ts";
 import {
   getAzureStorageAccountBaseURL,
   shouldCreateAzureContainers,
-} from "./lib/azure-storage.ts";
-import { publicEnv } from "./lib/env.public.ts";
+} from "./lib/azureStorage.ts";
+import { publicEnv } from "./lib/envPublic.ts";
 import { env } from "./lib/env.ts";
 import {
   canManageAdminTools,
@@ -38,12 +38,12 @@ import {
   getWritableCollections,
   isPayloadUser,
 } from "./lib/payload/rbac.ts";
-import { validateFolderTypes } from "./lib/payload/rbac-hooks.ts";
+import { validateFolderTypes } from "./lib/payload/rbacHooks.ts";
 import {
   restrictAdminToolCollection,
   restrictImportExportCollection,
   restrictImportExportMenuItems,
-} from "./lib/payload/rbac-plugins.ts";
+} from "./lib/payload/rbacPlugins.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -152,15 +152,15 @@ export default buildConfig({
     user: Users.slug,
     components: {
       beforeDashboard: [
-        "/components/payload/editorial-review/EditorialReviewDashboardCard#EditorialReviewDashboardCard",
+        "/components/payload/editorial-review/editorial-review-dashboard-card#EditorialReviewDashboardCard",
       ],
       beforeNavLinks: [
-        "/components/payload/editorial-review/EditorialReviewNav#EditorialReviewNav",
+        "/components/payload/editorial-review/editorial-review-nav#EditorialReviewNav",
       ],
       views: {
         editorialReview: {
           Component:
-            "/components/payload/editorial-review/EditorialReviewView#EditorialReviewView",
+            "/components/payload/editorial-review/editorial-review-view#EditorialReviewView",
           exact: true,
           meta: {
             title: "Pendências editoriais",

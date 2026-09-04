@@ -1,4 +1,4 @@
 export * from "./auth";
 export * from "./contacts";
-export * from "./psychological-care";
+export * from "./psychologicalCare";
 export * from "./reports";

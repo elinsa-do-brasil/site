@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { PsychologicalCareRequest } from "@/lib/db/schema/psychological-care";
+import type { PsychologicalCareRequest } from "@/lib/db/schema/psychologicalCare";
 import { decryptPsychologicalCareRequestRow } from "./repository";
 import { getPsychologicalCareStatusLabel } from "./status";
 

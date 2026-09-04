@@ -54,8 +54,8 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { jobTitleOptions, managementOptions } from "@/lib/management-options";
-import { submitPublicPsychologicalCareRequestAction } from "@/lib/psychological-care/public-actions";
+import { jobTitleOptions, managementOptions } from "@/lib/managementOptions";
+import { submitPublicPsychologicalCareRequestAction } from "@/lib/psychological-care/publicActions";
 import {
   type PsychologicalCareRequestFormField,
   type PublicPsychologicalCareRequestFormInput,

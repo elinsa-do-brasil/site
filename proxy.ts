@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getDocsUrl } from "@/lib/docs-url";
+import { getDocsUrl } from "@/lib/docsUrl";
 
 const SESSION_COOKIE_NAMES = [
   "better-auth.session_token",

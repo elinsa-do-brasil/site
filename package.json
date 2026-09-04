@@ -22,9 +22,7 @@
     "db:seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
     "auth:finalize-passwordless": "tsx --env-file=.env scripts/finalize-passwordless-auth.ts",
     "reports:keys": "tsx scripts/generate-report-encryption-keys.ts",
-    "email:dev": "email dev",
-    "ai:crawl": "tsx scripts/ai/agent-browser-crawl.ts",
-    "ai:improve": "tsx scripts/ai/orchestrator.ts"
+    "email:dev": "email dev"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.33.0",

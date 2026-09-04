@@ -3,7 +3,7 @@
 import { Analytics, type BeforeSendEvent } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { usePathname } from "next/navigation";
-import { isSensitiveTelemetryPath } from "@/lib/telemetry-privacy";
+import { isSensitiveTelemetryPath } from "@/lib/telemetryPrivacy";
 
 type SpeedInsightEvent = {
   route?: string;

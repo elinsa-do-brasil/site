@@ -5,9 +5,9 @@ import { rateLimit } from "../lib/db/schema/auth.ts";
 import {
   psychologicalCareRequestEvents,
   psychologicalCareRequests,
-} from "../lib/db/schema/psychological-care.ts";
+} from "../lib/db/schema/psychologicalCare.ts";
 import { createPsychologicalCarePublicRateLimitDigest } from "../lib/psychological-care/crypto.ts";
-import { processPublicPsychologicalCareRequestSubmission } from "../lib/psychological-care/process-public-submission.ts";
+import { processPublicPsychologicalCareRequestSubmission } from "../lib/psychological-care/processPublicSubmission.ts";
 import { decryptPsychologicalCareRequestRow } from "../lib/psychological-care/repository.ts";
 
 const RATE_LIMIT_KEY_NAMESPACE = "psychological-care/ampercuida/ip";

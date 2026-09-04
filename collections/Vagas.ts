@@ -1,5 +1,5 @@
 import type { CollectionConfig, FieldHook } from "payload";
-import { publicEnv } from "../lib/env.public.ts";
+import { publicEnv } from "../lib/envPublic.ts";
 import {
   canWriteCollection,
   deleteAccess,
@@ -11,8 +11,8 @@ import {
 import {
   createDraftOnlyWorkflowHook,
   preventAuthorVersionRestore,
-} from "../lib/payload/rbac-hooks.ts";
-import { vagaCidadeOptions } from "../lib/vaga-options.ts";
+} from "../lib/payload/rbacHooks.ts";
+import { vagaCidadeOptions } from "../lib/vagaOptions.ts";
 import { createContentEditor } from "./fields/contentEditor.ts";
 
 const format = (val: string): string =>
@@ -61,9 +61,9 @@ export const Vagas: CollectionConfig = {
     components: {
       edit: {
         PublishButton:
-          "/components/payload/RolePublishButton#RolePublishButton",
+          "/components/payload/role-publish-button#RolePublishButton",
         UnpublishButton:
-          "/components/payload/RoleUnpublishButton#RoleUnpublishButton",
+          "/components/payload/role-unpublish-button#RoleUnpublishButton",
       },
     },
     livePreview: {

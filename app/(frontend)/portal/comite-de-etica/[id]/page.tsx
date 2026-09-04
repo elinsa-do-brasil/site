@@ -23,8 +23,8 @@ import {
   requireCommitteeAccess,
   requireUserId,
 } from "@/lib/comite/access";
-import { decryptAttachmentOriginalNameSafely } from "@/lib/reports/attachment-crypto";
-import { formatAttachmentSize } from "@/lib/reports/attachment-limits";
+import { decryptAttachmentOriginalNameSafely } from "@/lib/reports/attachmentCrypto";
+import { formatAttachmentSize } from "@/lib/reports/attachmentLimits";
 import { listReportAttachments } from "@/lib/reports/attachments";
 import {
   decryptReportRow,

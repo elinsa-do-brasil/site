@@ -3,7 +3,7 @@ import { Resend } from "resend";
 import ReportNotificationEmail from "@/emails/report-notification";
 import type { Report } from "@/lib/db/schema";
 import { env } from "@/lib/env";
-import { publicEnv } from "@/lib/env.public";
+import { publicEnv } from "@/lib/envPublic";
 
 type ReportEmailResult =
   | { error?: undefined; sent: true; skipped?: false }

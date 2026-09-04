@@ -34,9 +34,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { downloadAsset } from "@/lib/download-asset";
+import { downloadAsset } from "@/lib/downloadAsset";
 import { createPageMetadata } from "@/lib/seo";
-import { createBrandPageStructuredData } from "@/lib/structured-data";
+import { createBrandPageStructuredData } from "@/lib/structuredData";
 import { cn } from "@/lib/utils";
 import { ColorCopyButton } from "./_components/color-copy-button";
 

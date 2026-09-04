@@ -2,7 +2,7 @@ import configPromise from "@payload-config";
 import { getPayload, type Where } from "payload";
 import { cache } from "react";
 import type { EditorialImage } from "@/lib/editorial";
-import { getVagaCidadeLabel, type VagaCidadeValue } from "@/lib/vaga-options";
+import { getVagaCidadeLabel, type VagaCidadeValue } from "@/lib/vagaOptions";
 
 export type VagaStatus = "aberta" | "fechada";
 

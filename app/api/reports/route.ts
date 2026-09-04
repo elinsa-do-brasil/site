@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getClientIp } from "@/lib/get-client-ip";
-import { createReportUploadToken } from "@/lib/reports/attachment-token";
+import { getClientIp } from "@/lib/getClientIp";
+import { createReportUploadToken } from "@/lib/reports/attachmentToken";
 import { maybeSendReportNotificationEmail } from "@/lib/reports/email";
 import {
   assertReportsPublicRateLimit,
   ReportsPublicRateLimitError,
-} from "@/lib/reports/rate-limit";
+} from "@/lib/reports/rateLimit";
 import { createReport } from "@/lib/reports/repository";
 import { createReportSchema } from "@/lib/reports/validation";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";

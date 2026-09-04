@@ -1,7 +1,7 @@
 import { asc, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
-import { FerramentasTeamAdmin } from "@/components/admin/FerramentasTeamAdmin";
-import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
+import { FerramentasTeamAdmin } from "@/components/admin/ferramentas-team-admin";
+import { GestaoPageHeader } from "@/components/admin/gestao-page-header";
 import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import { portalTool } from "@/lib/db/schema";

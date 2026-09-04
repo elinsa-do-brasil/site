@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { createCommitteeReportPdfResponse } from "@/lib/reports/pdf-delivery";
+import { createCommitteeReportPdfResponse } from "@/lib/reports/pdfDelivery";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

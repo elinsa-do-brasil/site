@@ -1,5 +1,5 @@
 import { Factory } from "lucide-react";
-import { GalleryCard } from "@/components/gallery-card";
+import { GalleryCard } from "@/components/homepage/gallery-card";
 import {
   CardContent,
   CardFooter,

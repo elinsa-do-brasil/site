@@ -25,7 +25,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/authClient";
 import { getErrorMessage } from "@/lib/errors";
 
 const INVITATION_ID_HEADER = "x-elinsa-invitation-id";

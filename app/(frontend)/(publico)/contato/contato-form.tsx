@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   type ContactFormState,
   INITIAL_CONTACT_FORM_STATE,
-} from "@/lib/contacts/action-state";
+} from "@/lib/contacts/actionState";
 import { submitContactForm } from "@/lib/contacts/actions";
 import {
   type ContactFormData,

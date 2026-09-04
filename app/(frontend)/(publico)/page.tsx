@@ -11,7 +11,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Separator } from "@/components/ui/separator";
 import { getEditorialPosts } from "@/lib/editorial";
 import { createPageMetadata } from "@/lib/seo";
-import { createHomeStructuredData } from "@/lib/structured-data";
+import { createHomeStructuredData } from "@/lib/structuredData";
 
 const HOME_TITLE = "Infraestrutura elétrica no Pará | Elinsa do Brasil";
 const HOME_DESCRIPTION =

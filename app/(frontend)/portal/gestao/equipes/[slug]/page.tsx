@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import {
   formatAdminName,
   GestaoPageHeader,
-} from "@/components/admin/GestaoPageHeader";
-import { TeamAdmin } from "@/components/admin/TeamAdmin";
-import { TeamInviteDialog } from "@/components/admin/TeamInviteDialog";
+} from "@/components/admin/gestao-page-header";
+import { TeamAdmin } from "@/components/admin/team-admin";
+import { TeamInviteDialog } from "@/components/admin/team-invite-dialog";
 import { Button } from "@/components/ui/button";
 import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";

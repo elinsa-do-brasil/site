@@ -17,7 +17,7 @@ import {
   getPostSubjectValue,
   getReadingMinutes,
 } from "@/lib/editorial";
-import { getEditorialSubjectLabel } from "@/lib/editorial-subjects";
+import { getEditorialSubjectLabel } from "@/lib/editorialSubjects";
 import { cn } from "@/lib/utils";
 import { HomeSection } from "./home-section";
 

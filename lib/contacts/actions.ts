@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod/v4";
-import type { ContactFormState } from "@/lib/contacts/action-state";
+import type { ContactFormState } from "@/lib/contacts/actionState";
 import { maybeSendContactEmail } from "@/lib/contacts/email";
 import { assertCanAccessContacts } from "@/lib/contacts/permissions";
 import {
@@ -14,12 +14,12 @@ import {
 import {
   assertContactRateLimit,
   ContactRateLimitError,
-} from "@/lib/contacts/rate-limit";
+} from "@/lib/contacts/rateLimit";
 import {
   contactFormSchema,
   contactStatusSchema,
 } from "@/lib/contacts/validators";
-import { getClientIp } from "@/lib/get-client-ip";
+import { getClientIp } from "@/lib/getClientIp";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 
 type ActionResult = {

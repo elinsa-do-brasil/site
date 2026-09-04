@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { AceitarConvite } from "@/components/auth/AcceptInvite";
-import { BotaoSair } from "@/components/auth/LogoutButton";
+import { AceitarConvite } from "@/components/auth/accept-invite";
+import { BotaoSair } from "@/components/auth/logout-button";
 import {
   CorporateInviteSignIn,
   CriarContaForm,
-} from "@/components/auth/SignUpForm";
+} from "@/components/auth/sign-up-form";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { auth } from "@/lib/auth";
-import { isCorporateEmail } from "@/lib/auth-policy";
+import { isCorporateEmail } from "@/lib/authPolicy";
 import { db } from "@/lib/db";
 import { invitation, organization, user } from "@/lib/db/schema";
 import { env } from "@/lib/env";

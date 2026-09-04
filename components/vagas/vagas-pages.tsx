@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/card";
 import { PageTransition } from "@/components/ui/page-transition";
 import { Separator } from "@/components/ui/separator";
-import { createJobPostingStructuredData } from "@/lib/structured-data";
+import { createJobPostingStructuredData } from "@/lib/structuredData";
 import {
   formatVagaDate,
   getVagaBySlug,

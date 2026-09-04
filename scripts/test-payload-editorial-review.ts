@@ -9,7 +9,7 @@ import {
 import {
   EditorialReviewForbiddenError,
   getEditorialReviewQueue,
-} from "../lib/payload/editorial-review.ts";
+} from "../lib/payload/editorialReview.ts";
 import type { User, Vagas } from "../payload-types.ts";
 
 const runID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;

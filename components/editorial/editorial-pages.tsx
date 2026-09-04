@@ -45,9 +45,9 @@ import {
 import {
   type EditorialSubjectValue,
   getEditorialSubjectLabel,
-} from "@/lib/editorial-subjects";
+} from "@/lib/editorialSubjects";
 import { createSeoDescription, getCmsSeoImage } from "@/lib/seo";
-import { createNewsArticleStructuredData } from "@/lib/structured-data";
+import { createNewsArticleStructuredData } from "@/lib/structuredData";
 import { cn } from "@/lib/utils";
 
 type SubjectCount = ReturnType<typeof getSubjectCounts>[number];

@@ -7,7 +7,7 @@ import { PageHeader, PageHeaderNavigation } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { PageTransition } from "@/components/ui/page-transition";
 import { auth } from "@/lib/auth";
-import { isCorporateEmail } from "@/lib/auth-policy";
+import { isCorporateEmail } from "@/lib/authPolicy";
 import { db } from "@/lib/db";
 import {
   account as accountTable,
@@ -16,12 +16,12 @@ import {
   user as userTable,
 } from "@/lib/db/schema";
 import { env } from "@/lib/env";
-import { AccountOverviewCard } from "./components/account-overview-card";
-import { ActiveSessionsCard } from "./components/active-sessions-card";
-import { LoginMethodsCard } from "./components/login-methods-card";
-import { PasskeysCard } from "./components/passkeys-card";
-import { ProfileCard } from "./components/profile-card";
-import { SecurityCard } from "./components/security-card";
+import { AccountOverviewCard } from "./_components/account-overview-card";
+import { ActiveSessionsCard } from "./_components/active-sessions-card";
+import { LoginMethodsCard } from "./_components/login-methods-card";
+import { PasskeysCard } from "./_components/passkeys-card";
+import { ProfileCard } from "./_components/profile-card";
+import { SecurityCard } from "./_components/security-card";
 
 export const dynamic = "force-dynamic";
 

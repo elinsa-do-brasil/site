@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { getDocsUrl } from "@/lib/docs-url";
+import { getDocsUrl } from "@/lib/docsUrl";
 import type { GalleryPage, GalleryPhoto } from "@/lib/gallery";
 
 type GalleryExplorerProps = {

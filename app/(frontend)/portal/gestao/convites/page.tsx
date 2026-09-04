@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { GerenciarConvites } from "@/components/admin/GerenciarConvites";
-import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
+import { GerenciarConvites } from "@/components/admin/gerenciar-convites";
+import { GestaoPageHeader } from "@/components/admin/gestao-page-header";
 import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {

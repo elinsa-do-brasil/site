@@ -37,7 +37,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { getDocsUrl } from "@/lib/docs-url";
+import { getDocsUrl } from "@/lib/docsUrl";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ui/theme-toggle";
 

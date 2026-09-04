@@ -19,8 +19,8 @@ import {
   canUseFolderTypes,
   createDraftOnlyWorkflowHook,
   preventAuthorVersionRestore,
-} from "./rbac-hooks.ts";
-import { restrictAdminToolCollection } from "./rbac-plugins.ts";
+} from "./rbacHooks.ts";
+import { restrictAdminToolCollection } from "./rbacPlugins.ts";
 
 const collections: RBACCollectionSlug[] = [
   "blog",

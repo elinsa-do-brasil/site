@@ -5,7 +5,7 @@ import {
   defaultEditorialSubject,
   type EditorialSubjectValue,
   editorialSubjects,
-} from "@/lib/editorial-subjects";
+} from "@/lib/editorialSubjects";
 
 export type EditorialCollectionSlug = "blog" | "imprensa";
 

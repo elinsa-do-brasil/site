@@ -15,7 +15,7 @@ import {
   Tailwind,
   Text,
 } from "react-email";
-import { publicEnv } from "../../lib/env.public";
+import { publicEnv } from "../../lib/envPublic";
 import { barebonesBoxedTailwindConfig } from "../theme";
 import { Fonts } from "../theme-fonts";
 

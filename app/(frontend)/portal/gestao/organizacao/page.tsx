@@ -1,7 +1,7 @@
 import { asc, desc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
-import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
-import { OrganizacaoAdmin } from "@/components/admin/OrganizacaoAdmin";
+import { GestaoPageHeader } from "@/components/admin/gestao-page-header";
+import { OrganizacaoAdmin } from "@/components/admin/organizacao-admin";
 import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {

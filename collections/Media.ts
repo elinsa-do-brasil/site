@@ -5,7 +5,7 @@ import {
   publicAssetReadAccess,
   writeAccess,
 } from "../lib/payload/rbac.ts";
-import { createTrashRestoreGuard } from "../lib/payload/rbac-hooks.ts";
+import { createTrashRestoreGuard } from "../lib/payload/rbacHooks.ts";
 
 type BeforeChangeHook = NonNullable<
   NonNullable<CollectionConfig["hooks"]>["beforeChange"]

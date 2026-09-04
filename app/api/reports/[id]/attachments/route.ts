@@ -6,12 +6,12 @@ import {
   MAX_REPORT_ATTACHMENT_NAME_BYTES,
   MAX_REPORT_ATTACHMENT_SIZE_BYTES,
   REPORT_ATTACHMENT_KEY_ID,
-} from "@/lib/reports/attachment-limits";
+} from "@/lib/reports/attachmentLimits";
 import {
   deleteEncryptedAttachmentFromStorage,
   uploadEncryptedAttachmentToStorage,
-} from "@/lib/reports/attachment-storage";
-import { verifyReportUploadToken } from "@/lib/reports/attachment-token";
+} from "@/lib/reports/attachmentStorage";
+import { verifyReportUploadToken } from "@/lib/reports/attachmentToken";
 import {
   canAddReportAttachment,
   createReportAttachment,

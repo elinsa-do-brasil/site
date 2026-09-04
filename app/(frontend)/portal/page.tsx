@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatAdminName } from "@/components/admin/GestaoPageHeader";
+import { formatAdminName } from "@/components/admin/gestao-page-header";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";

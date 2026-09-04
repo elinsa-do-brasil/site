@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CardContent, Card as ShadcnCard } from "@/components/ui/card";
-import { getDocsUrl } from "@/lib/docs-url";
+import { getDocsUrl } from "@/lib/docsUrl";
 import { cn } from "@/lib/utils";
 import type { ImpactMetric } from "./home-data";
 import { HomeSection, HomeSectionIntro } from "./home-section";

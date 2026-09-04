@@ -19,16 +19,16 @@ import {
   mapMicrosoftProfileToUser,
   normalizeCorporateDomain,
   normalizeEmail,
-} from "@/lib/auth-policy";
+} from "@/lib/authPolicy";
 import {
   consumeDatabaseRateLimit,
   createHashedRateLimitKey,
-} from "@/lib/database-rate-limit";
+} from "@/lib/databaseRateLimit";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendInternalAuthEmail } from "@/lib/email";
 import { env } from "@/lib/env";
-import { publicEnv } from "@/lib/env.public";
+import { publicEnv } from "@/lib/envPublic";
 
 const MAX_ACTIVE_SESSIONS_PER_USER = 5;
 const ELINSA_ORGANIZATION_SLUG = "elinsa";

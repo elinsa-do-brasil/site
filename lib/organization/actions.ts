@@ -5,11 +5,11 @@ import { icons } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import { createElement } from "react";
 import InviteEmail from "@/emails/invite";
-import { isCorporateEmail } from "@/lib/auth-policy";
+import { isCorporateEmail } from "@/lib/authPolicy";
 import {
   consumeDatabaseRateLimit,
   createHashedRateLimitKey,
-} from "@/lib/database-rate-limit";
+} from "@/lib/databaseRateLimit";
 import { db } from "@/lib/db";
 import {
   invitation,
@@ -27,7 +27,7 @@ import {
 } from "@/lib/db/schema/reports";
 import { sendInternalAuthEmail } from "@/lib/email";
 import { env } from "@/lib/env";
-import { publicEnv } from "@/lib/env.public";
+import { publicEnv } from "@/lib/envPublic";
 import {
   canManageTeam,
   ELINSA_ORGANIZATION_SLUG,

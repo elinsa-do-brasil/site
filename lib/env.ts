@@ -9,7 +9,7 @@
  * são importados diretamente pelos testes (`tsx --test`, Node puro, fora do
  * pipeline do Next.js) — o guard `server-only` lança erro incondicionalmente
  * fora do bundler do Next. Nenhuma entrada aqui expõe segredo em bundle de
- * client: variáveis `NEXT_PUBLIC_*` vivem à parte em lib/env.public.ts.
+ * client: variáveis `NEXT_PUBLIC_*` vivem à parte em lib/envPublic.ts.
  *
  * Exceções documentadas que NÃO passam por este arquivo: next.config.ts e
  * drizzle.config.ts (rodam fora do runtime normal do Next.js, sem garantia

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 
 // funções:
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/authClient";
 
 type OAuthProvider = "github" | "google" | "microsoft"; // vai só expandindo aqui
 

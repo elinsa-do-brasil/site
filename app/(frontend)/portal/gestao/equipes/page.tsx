@@ -1,7 +1,7 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
-import { GestaoPageHeader } from "@/components/admin/GestaoPageHeader";
-import { TimesAdmin } from "@/components/admin/TimesAdmin";
+import { GestaoPageHeader } from "@/components/admin/gestao-page-header";
+import { TimesAdmin } from "@/components/admin/times-admin";
 import { PageTransition } from "@/components/ui/page-transition";
 import { db } from "@/lib/db";
 import {

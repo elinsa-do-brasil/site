@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ReportFlowSteps } from "@/components/reports/report-flow-steps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getDocsUrl } from "@/lib/docs-url";
+import { getDocsUrl } from "@/lib/docsUrl";
 
 const faqItems = [
   {

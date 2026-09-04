@@ -46,7 +46,7 @@ import {
   SidebarProvider,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { mapAsset } from "@/lib/map-assets";
+import { mapAsset } from "@/lib/mapAssets";
 import { cn } from "@/lib/utils";
 
 type Coordinates = [number, number];

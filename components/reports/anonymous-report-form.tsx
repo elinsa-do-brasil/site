@@ -63,22 +63,22 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { buildReportPayload } from "@/lib/anonymous-report/build-report-payload";
-import { encryptReportAttachment } from "@/lib/anonymous-report/file-encryption";
+import { buildReportPayload } from "@/lib/anonymous-report/buildReportPayload";
+import { encryptReportAttachment } from "@/lib/anonymous-report/fileEncryption";
 import {
   type AnonymousReportSchema,
   anonymousReportSchema,
 } from "@/lib/anonymous-report/schema";
-import { submitEncryptedReport } from "@/lib/anonymous-report/submit-encrypted-report";
+import { submitEncryptedReport } from "@/lib/anonymous-report/submitEncryptedReport";
 import type { SubmitReportResult } from "@/lib/anonymous-report/types";
-import { uploadEncryptedReportAttachment } from "@/lib/anonymous-report/upload-encrypted-attachment";
+import { uploadEncryptedReportAttachment } from "@/lib/anonymous-report/uploadEncryptedAttachment";
 import {
   formatAttachmentSize,
   MAX_REPORT_ATTACHMENT_NAME_BYTES,
   MAX_REPORT_ATTACHMENT_SIZE_BYTES,
   MAX_REPORT_ATTACHMENTS,
   MAX_REPORT_ATTACHMENTS_TOTAL_BYTES,
-} from "@/lib/reports/attachment-limits";
+} from "@/lib/reports/attachmentLimits";
 import { cn } from "@/lib/utils";
 
 const REPORT_CATEGORIES = [

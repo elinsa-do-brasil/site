@@ -1,6 +1,6 @@
 import type { IconType } from "react-icons";
 import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { getDocsUrl } from "@/lib/docs-url";
+import { getDocsUrl } from "@/lib/docsUrl";
 
 export type FooterLink = {
   href: string;
