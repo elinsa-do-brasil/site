@@ -1,3 +1,4 @@
+// Camada de leitura/formatação no frontend para as collections Blog e Imprensa (Payload CMS) — busca via getPayload() e formata datas/títulos/tempo de leitura para as páginas de artigo em app/(frontend).
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
 import { cache } from "react";
@@ -279,12 +280,14 @@ export function getRichTextNodeText(node: unknown): string {
   return `${ownText}${childText}`;
 }
 
+// Achata a árvore Lexical em uma string única, sem formatação — usado para gerar description de SEO/resumo a partir do rich text.
 export function getRichTextPlainText(data: unknown) {
   return getRichTextNodeText({ children: getRootChildren(data) })
     .replace(/\s+/g, " ")
     .trim();
 }
 
+// Gera o slug do heading e desambigua repetições (duas seções "Introdução" viram introducao e introducao-2) para os links âncora do sumário.
 export function createHeadingId(
   title: string,
   usedHeadings: Map<string, number>,
@@ -297,6 +300,7 @@ export function createHeadingId(
   return count === 0 ? base : `${base}-${count + 1}`;
 }
 
+// Percorre a árvore Lexical coletando h2/h3/h4 (isTrackedHeadingTag) para montar o sumário (table of contents) do artigo.
 export function getHeadingsFromRichText(data: unknown): HeadingItem[] {
   const headings: HeadingItem[] = [];
   const usedHeadings = new Map<string, number>();
@@ -334,6 +338,7 @@ export function getHeadingsFromRichText(data: unknown): HeadingItem[] {
   return headings;
 }
 
+// Estima minutos de leitura a ~180 palavras/minuto (velocidade média de leitura em português); nunca retorna menos que 1 minuto.
 export function getReadingMinutes(content: unknown) {
   const text = getRichTextNodeText({ children: getRootChildren(content) });
   const words = text.trim().split(/\s+/).filter(Boolean).length;

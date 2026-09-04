@@ -1,3 +1,4 @@
+// Construtores de JSON-LD (schema.org) renderizados por components/seo/json-ld.tsx; reaproveita as constantes do site definidas em lib/seo.ts.
 import {
   absoluteUrl,
   BRAND_ASSET_IMAGES,
@@ -31,9 +32,11 @@ type JobStructuredData = {
   title: string;
 };
 
+// IDs estáveis (`@id`) reaproveitados em vários grafos JSON-LD abaixo, para o Google entender que "organizationId" em cada página se refere à mesma entidade Organization.
 const organizationId = absoluteUrl("/#organization");
 const websiteId = absoluteUrl("/#website");
 
+// Grafo raiz (Organization + WebSite), renderizado só na homepage; os demais createXStructuredData referenciam organizationId por @id em vez de duplicar os dados da Organization.
 export function createHomeStructuredData() {
   return {
     "@context": "https://schema.org",

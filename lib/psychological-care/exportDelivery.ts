@@ -1,3 +1,4 @@
+// Endpoint que gera e devolve o CSV mensal (lib/psychological-care/export.ts) sob demanda — nada fica salvo em disco, o arquivo é montado na memória a cada exportação.
 import "server-only";
 
 import type { NextRequest } from "next/server";
@@ -17,6 +18,7 @@ import {
 const EARLIEST_EXPORT_YEAR = 2020;
 const MAX_EXPORT_ROWS = 5_000;
 const RATE_LIMIT_RETRY_AFTER_SECONDS = "10";
+// Trava "em memória" por usuário: impede o mesmo usuário disparar duas exportações simultâneas (ex.: duplo clique). É por processo, não distribuída — em produção com múltiplas instâncias cada uma tem seu próprio Set.
 const activePsychologicalCareExports = new Set<string>();
 
 const psychologicalCareExportInputSchema = z.object({
@@ -79,6 +81,7 @@ export async function createPsychologicalCareExportResponse(input: {
       end,
     });
 
+    // Limite de linhas como salvaguarda contra um mês com volume anormal travar o processo montando o CSV inteiro em memória.
     if (requests.length > MAX_EXPORT_ROWS) {
       return plainResponse(413);
     }

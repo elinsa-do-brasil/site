@@ -1,3 +1,4 @@
+// Wrapper do Resend com retry/backoff para e-mails internos de autenticação (convites, códigos OTP); chamado por lib/auth.ts. Diferente de lib/reports/email.ts e lib/psychological-care/email.ts, que enviam para o público externo.
 import type { ReactNode } from "react";
 import { type CreateEmailOptions, type ErrorResponse, Resend } from "resend";
 import { env } from "@/lib/env";
@@ -42,6 +43,7 @@ export async function sendInternalAuthEmail({
 
   let lastError: ErrorResponse | null = null;
 
+  // Até 3 tentativas com backoff exponencial (250ms, 500ms, 1s) mais jitter aleatório; só reage a erros transitórios (429/5xx), nunca a erro 4xx de validação.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const { data, error } = await resend.emails.send(email, {
       idempotencyKey: key,

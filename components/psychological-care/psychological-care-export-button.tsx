@@ -87,6 +87,7 @@ export function PsychologicalCareExportButton({
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+      // Revoga depois de um tempo, não imediatamente: o navegador precisa de uma janela para efetivamente iniciar o download antes do blob URL deixar de ser válido.
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
 
       toast.success(
@@ -199,6 +200,7 @@ function getExportErrorMessage(error: unknown) {
   }
 }
 
+// Lê o nome do arquivo do cabeçalho Content-Disposition (formato RFC 5987, gerado por lib/psychological-care/exportDelivery.ts) em vez de montar o nome aqui de novo — mantém uma única fonte de verdade para o nome do arquivo.
 function getDownloadFileName(
   contentDisposition: string | null,
   year: number,

@@ -1,3 +1,4 @@
+// Tipos compartilhados pelo fluxo client-side de denúncia anônima (formulário → criptografia → envio → upload); o lado servidor/comitê fica em lib/reports/.
 export type AnonymousReportFormValues = {
   identify: "yes" | "no";
   reporterName?: string;
@@ -13,6 +14,7 @@ export type AnonymousReportFormValues = {
   contactInfo?: string;
 };
 
+// Versão normalizada de AnonymousReportFormValues (campos opcionais viram `string | null`, gerada por buildReportPayload.ts) — é o que de fato é criptografado e enviado.
 export type AnonymousReportContent = {
   category: string;
   title: string;

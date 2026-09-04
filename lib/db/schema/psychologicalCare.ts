@@ -9,12 +9,14 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// Armazena solicitações de atendimento psicológico já criptografadas (ver lib/psychological-care/crypto.ts) — nada nesta tabela fica em texto puro.
 export const psychologicalCareRequests = pgTable(
   "psychological_care_requests",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     protocol: varchar("protocol", { length: 40 }).notNull(),
     submissionId: uuid("submission_id").notNull(),
+    // "portal_leader" (líder logado no portal) ou "ampercuida" (canal público /amper-cuida) — requesterUserId só é preenchido no primeiro caso.
     submissionSource: varchar("submission_source", { length: 40 })
       .notNull()
       .default("portal_leader"),

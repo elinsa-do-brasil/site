@@ -1,3 +1,4 @@
+// Monta a URL docs.<domínio> a partir da origem pública do site, trocando/adicionando o subdomínio `docs.`.
 import { publicEnv } from "@/lib/envPublic";
 
 const DEFAULT_SITE_ORIGIN = "https://elinsadobrasil.com.br";

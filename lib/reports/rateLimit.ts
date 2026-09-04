@@ -1,3 +1,4 @@
+// Rate limit por IP do formulário público /denunciar — mesmo padrão de lib/psychological-care/publicRateLimit.ts (IP nunca gravado em claro, só o digest HMAC).
 import "server-only";
 
 import { consumeDatabaseRateLimit } from "@/lib/databaseRateLimit";

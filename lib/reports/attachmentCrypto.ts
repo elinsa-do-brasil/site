@@ -1,3 +1,4 @@
+// Lado servidor da criptografia ponta a ponta de anexos (contraparte de lib/anonymous-report/fileEncryption.ts, no navegador): decripta com REPORTS_PRIVATE_KEY_BASE64 (chave ECDH assimétrica) — não confundir com REPORTS_MASTER_KEY_BASE64 (lib/reports/crypto.ts), que é a chave AES simétrica do corpo da denúncia e não decripta anexo nenhum.
 import crypto from "node:crypto";
 import type { ReportAttachment } from "@/lib/db/schema";
 import { env } from "@/lib/env";
@@ -32,6 +33,7 @@ export function decryptAttachmentOriginalName(attachment: ReportAttachment) {
   return plaintext.toString("utf8");
 }
 
+// Versão "nunca lança": usada em contextos de exibição (lista de anexos) onde um nome corrompido/adulterado não deve derrubar a página inteira — o limite de tamanho evita gastar CPU decriptando um valor absurdamente grande antes mesmo de tentar.
 export function decryptAttachmentOriginalNameSafely(
   attachment: ReportAttachment,
 ) {

@@ -76,6 +76,7 @@ type ActionResult = {
   success?: boolean;
 };
 
+// Painel de /portal/gestao/equipes/[slug]: administração de uma única equipe (renomear/excluir, membros, convites) — a edição do nome/exclusão só aparece para isOrgAdmin, líderes de equipe só gerenciam membros.
 export function TeamAdmin({
   invitations,
   isOrgAdmin,
@@ -87,6 +88,7 @@ export function TeamAdmin({
   const [isPending, startTransition] = useTransition();
   const teamName = formatTeamName(team.name);
 
+  // Fábrica de onSubmit compartilhada pelos 3 formulários da página: só a ação, a mensagem de sucesso e o que fazer depois (redirecionar para a nova URL do slug, ou só recarregar os dados) mudam entre eles.
   function submitForm(
     action: (formData: FormData) => Promise<ActionResult>,
     successMessage: string,

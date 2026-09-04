@@ -22,6 +22,7 @@ type AceitarConviteProps = {
   roleLabel: string;
 };
 
+// Tela final do fluxo de convite (/convite/[id]): exige que o usuário já esteja autenticado (com o e-mail convidado) antes de aceitar — quem chega deslogado ou com a conta errada é barrado por getSession() antes mesmo de chamar acceptInvitation.
 export function AceitarConvite({
   invitationEmail,
   invitationId,

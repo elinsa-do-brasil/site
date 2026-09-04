@@ -1,3 +1,4 @@
+// Cargos do admin do Payload CMS (app/(payload)) — sistema de usuários/cargos totalmente separado do Portal Interno (lib/organization), que usa Better Auth.
 import type { Access, PayloadRequest, Where } from "payload";
 
 export const payloadRoles = [
@@ -38,6 +39,7 @@ export const rbacCollectionSlugs = [
 
 export type RBACCollectionSlug = (typeof rbacCollectionSlugs)[number];
 
+// Matriz cargo → collections que ele pode escrever: editor não mexe em vagas, recruiter só mexe em vagas/media — admin e publisher têm acesso total.
 const writableCollections: Record<PayloadRole, readonly RBACCollectionSlug[]> =
   {
     admin: rbacCollectionSlugs,
@@ -119,6 +121,7 @@ export function writeAccess(collection: RBACCollectionSlug): Access {
   return ({ req }) => canWriteCollection(req.user, collection);
 }
 
+// Quem não pode publicar (editor/recruiter) só consegue editar enquanto o documento continua em rascunho — assim que vira "published" a edição fica bloqueada para essas funções (fluxo de aprovação implícito).
 export function draftWriterUpdateAccess(
   collection: Extract<RBACCollectionSlug, "blog" | "imprensa" | "vagas">,
 ): Access {
@@ -140,6 +143,7 @@ export function deleteAccess(collection: RBACCollectionSlug): Access {
     canWriteCollection(req.user, collection) && canDelete(req.user);
 }
 
+// Três níveis de leitura para collections públicas (Imprensa/Vagas): quem publica vê tudo (inclusive lixeira), quem só escreve vê tudo exceto a lixeira, e o público só vê o que está publicado e não excluído.
 export function publicPublishedReadAccess(
   collection: "imprensa" | "vagas",
 ): Access {

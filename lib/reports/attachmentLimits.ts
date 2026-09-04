@@ -2,6 +2,7 @@ export const MAX_REPORT_ATTACHMENTS = 10;
 export const MAX_REPORT_ATTACHMENT_SIZE_BYTES = 20 * 1024 * 1024;
 export const MAX_REPORT_ATTACHMENTS_TOTAL_BYTES = 100 * 1024 * 1024;
 export const MAX_REPORT_ATTACHMENT_NAME_BYTES = 512;
+// Base64 expande o tamanho em 4/3 (arredondado por bloco de 3 bytes) — este é o teto do nome já criptografado+codificado, usado por attachmentCrypto.ts para rejeitar payloads absurdos antes de decriptar.
 export const MAX_REPORT_ATTACHMENT_ENCRYPTED_NAME_BASE64_LENGTH =
   Math.ceil(MAX_REPORT_ATTACHMENT_NAME_BYTES / 3) * 4;
 export const REPORT_ATTACHMENT_KEY_ID = "reports-ecdh-p384-v1";

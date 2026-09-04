@@ -1,3 +1,4 @@
+// Mensagens em português para os valores de `code` que o Better Auth lança via APIError.from(...) em lib/auth.ts.
 const errorCodes: Record<string, { pt_br: string }> = {
   EMAIL_MANAGED_BY_MICROSOFT: {
     pt_br: "E-mails corporativos são administrados pela Microsoft.",

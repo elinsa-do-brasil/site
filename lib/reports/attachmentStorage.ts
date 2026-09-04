@@ -1,3 +1,4 @@
+// Anexos criptografados de denúncias vivem no Azure Blob Storage (container "denuncias-anexos"), separado do storage de mídia do CMS (payload.config.ts usa outro container/conexão).
 import { BlobServiceClient, type ContainerClient } from "@azure/storage-blob";
 import { shouldCreateAzureContainers } from "@/lib/azureStorage";
 import { env } from "@/lib/env";
@@ -7,6 +8,7 @@ type AttachmentStorageConfig = {
   containerClient: ContainerClient;
 };
 
+// Cacheados no módulo (nível de processo): o client Azure e a criação do container só precisam acontecer uma vez por instância, não a cada upload/download.
 let storageConfig: AttachmentStorageConfig | null = null;
 let createContainerPromise: Promise<void> | null = null;
 

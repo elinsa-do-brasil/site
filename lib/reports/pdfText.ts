@@ -42,6 +42,7 @@ export function sanitizePdfText(value: string, maxCharacters = 10_000) {
   return boundedOutput;
 }
 
+// WinAnsi (a codificação das fontes padrão embutidas no PDF) só cobre 0x00-0xFF mais um punhado de símbolos extras (aspas curvas, travessão, etc. em WIN_ANSI_EXTRA_CODE_POINTS) — qualquer outro código vira símbolo ilegível se não for convertido.
 function isWinAnsiText(value: string) {
   return Array.from(value).every((character) => {
     const codePoint = character.codePointAt(0) ?? 0;
@@ -49,6 +50,7 @@ function isWinAnsiText(value: string) {
   });
 }
 
+// Em vez de descartar o caractere fora de WinAnsi, troca por um marcador com o code point (ex.: "[símbolo U+1F600]") — mantém rastreável no PDF que havia algo ali, sem inventar/perder informação do relato original.
 function formatUnicodeFallback(value: string) {
   const codePoints = Array.from(value, (character) =>
     (character.codePointAt(0) ?? 0).toString(16).toUpperCase().padStart(4, "0"),

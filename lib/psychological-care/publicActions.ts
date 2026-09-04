@@ -2,6 +2,7 @@
 
 import "server-only";
 
+// Casca fina em volta de processPublicSubmission.ts: só resolve headers()/revalidatePath, que exigem um request real do Next.js e por isso não podem viver no núcleo testável.
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import {

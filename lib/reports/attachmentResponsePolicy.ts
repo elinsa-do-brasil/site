@@ -1,3 +1,4 @@
+// Só tipos que navegadores renderizam sem executar nada (imagem/áudio/vídeo/PDF) podem ser exibidos inline — qualquer outro tipo é servido como download forçado, para um anexo malicioso (ex.: HTML/SVG com script) não rodar no contexto do site.
 const SAFE_INLINE_REPORT_ATTACHMENT_MIME_TYPES = new Set([
   "application/pdf",
   "image/apng",
@@ -21,6 +22,7 @@ const SAFE_INLINE_REPORT_ATTACHMENT_MIME_TYPES = new Set([
   "video/webm",
 ]);
 
+// CSP mais restritiva possível ("sandbox" sem exceções) para a resposta que serve o anexo inline — mesmo um tipo "seguro" da lista acima não ganha permissão de rodar script, navegar ou submeter formulário.
 export const REPORT_ATTACHMENT_SANDBOX_CSP =
   "sandbox; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 

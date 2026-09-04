@@ -1,3 +1,4 @@
+// Monta a fila de "pendências editoriais" (rascunhos novos/alterados nas collections blog, imprensa e vagas) exibida por components/payload/editorial-review/ no dashboard e no menu do admin do Payload.
 import type { PayloadRequest, Where } from "payload";
 import type { User } from "../../payload-types.ts";
 import { canPublish } from "./rbac.ts";
@@ -185,6 +186,7 @@ export function getEditorialReviewCandidateKey(
   return `${item.collection}:${String(item.id)}`;
 }
 
+// Junta candidatos vindos de várias collections em uma única lista: dedupe por collection+id (mantendo o mais recente), ordena por data de atualização e só então pagina — a paginação é feita depois do merge porque cada collection foi buscada independentemente.
 export function mergeEditorialReviewCandidates({
   candidates,
   page,
@@ -288,6 +290,7 @@ function getParentID(parent: unknown): number | string | undefined {
   return undefined;
 }
 
+// Um documento em rascunho é "changed" (já teve uma versão publicada antes) ou "new" (nunca foi publicado) — isso é decidido consultando o histórico de versões, não um campo direto no documento.
 async function getPublishedCandidateKeys({
   candidates,
   req,
@@ -355,6 +358,7 @@ function assertEditorialReviewAccess(req: PayloadRequest): void {
   }
 }
 
+// Busca em lote (1 query) os nomes de usuário que vieram como USER_FALLBACK — o `populate` da query principal às vezes não resolve o relacionamento; isso preenche a lacuna sem 1 query por documento.
 async function hydrateCandidateAuthors({
   candidates,
   req,
@@ -424,6 +428,7 @@ export async function getEditorialReviewQueue({
 
   const filters = parseEditorialReviewFilters(searchParams);
   const collections = getSelectedCollections(filters.area);
+  // Busca `page * perPage` itens de CADA collection (não só perPage) porque o merge final intercala várias collections por data — buscar de menos faria a página N perder itens que vieram de uma collection só.
   const candidateLimit = filters.page * perPage;
   const adminRoute = req.payload.config.routes.admin;
   const results = await Promise.all(

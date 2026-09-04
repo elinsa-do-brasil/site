@@ -1,3 +1,4 @@
+// Script avulso de CLI (`pnpm db:seed`) que semeia a organização/equipes base da Elinsa para dev local — roda direto via tsx, não é importado em lugar nenhum.
 import { db, dbPool } from "./index";
 import { organization, team } from "./schema";
 

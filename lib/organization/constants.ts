@@ -1,3 +1,4 @@
+// Slugs de cargo/equipe do Portal Interno (Better Auth) — usados em lib/organization/access.ts e actions.ts para checar acesso ao Comitê de Ética e ao Atendimento Psicológico.
 export const TEAM_LEADER_ROLE = "team_leader";
 export const ETHICS_COMMITTEE_ROLE = "ethics";
 export const ETHICS_COMMITTEE_TEAM = "comite_etica";
@@ -22,6 +23,7 @@ export const BUILTIN_ORG_ROLES = [
   PSYCHOLOGICAL_CARE_ROLE,
 ] as const;
 
+// Mapeia um cargo restrito para a equipe que ele exige — consumido por validateRestrictedRoleWithSelectedTeam em actions.ts para bloquear a atribuição do cargo sem o vínculo de equipe.
 const ROLE_REQUIRED_TEAMS: Record<string, string> = {
   [ETHICS_COMMITTEE_ROLE]: ETHICS_COMMITTEE_TEAM,
   [PSYCHOLOGICAL_CARE_ROLE]: PSYCHOLOGICAL_CARE_TEAM,

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 type OutsideClickEvent = MouseEvent | TouchEvent;
 
+// Fecha modais/dropdowns ao clicar/tocar fora do elemento referenciado — usado por components/ui/apple-cards-carousel.tsx. Escuta mousedown/touchstart (não click) para disparar antes do próprio clique terminar de processar.
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement | null>,
   callback: (event: OutsideClickEvent) => void,

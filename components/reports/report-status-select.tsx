@@ -19,6 +19,7 @@ import {
   reportStatusLabels,
 } from "@/lib/reports/status";
 
+// Mesmo padrão de atualização otimista (com rollback em falha) de components/psychological-care/psychological-care-status-select.tsx, para o status de denúncia em vez de atendimento psicológico.
 export function ReportStatusSelect({
   reportId,
   status,

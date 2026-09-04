@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/authClient";
 import { DropdownMenuItem } from "../../ui/dropdown-menu";
 
+// Mesma chamada de signOut de components/auth/logout-button.tsx, só que como item de menu (para o dropdown do avatar no header) em vez de botão avulso.
 export function SignOutDropdown() {
   const router = useRouter();
 

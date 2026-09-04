@@ -6,6 +6,7 @@ import { Separator } from "./ui/separator";
 export function HeroImageCopyright() {
   const pathname = usePathname();
 
+  // Só a home usa a foto de capa que este crédito se refere (components/homepage/home-hero-section.tsx) — some no footer de qualquer outra página.
   if (pathname !== "/") {
     return null;
   }

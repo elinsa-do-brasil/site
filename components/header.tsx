@@ -44,6 +44,7 @@ import { ThemeToggle } from "./ui/theme-toggle";
 export function Header() {
   const pathname = usePathname();
 
+  // Redundante com o roteamento de components/frontend-shell.tsx (que já não renderiza <Header> em /mapas), mas serve de salvaguarda caso este componente seja montado por outro caminho no futuro.
   if (pathname?.startsWith("/mapas")) {
     return null;
   }

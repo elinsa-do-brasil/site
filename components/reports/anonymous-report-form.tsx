@@ -132,6 +132,7 @@ const FIRST_ERROR_FIELDS: FieldPath<AnonymousReportSchema>[] = [
   "previousAttempts",
 ];
 
+// Só para campos onde `[name="campo"]` não acha o elemento focável certo (radio group, date picker) — os demais campos usam o seletor padrão em focusFirstInvalidReportField.
 const REPORT_FIELD_FOCUS_TARGETS: Partial<
   Record<FieldPath<AnonymousReportSchema>, string>
 > = {
@@ -158,6 +159,7 @@ type AttachmentItem = {
   status: AttachmentStatus;
 };
 
+// Fluxo em duas etapas: o corpo da denúncia é enviado primeiro (submitEncryptedReport) e só then os anexos são criptografados/enviados um a um (uploadAttachment) usando o reportId/uploadToken retornados — um anexo falhar não deve exigir reenviar a denúncia inteira, daí o estado "attachment-error" ficar retomável (retryAttachment) em vez de bloquear.
 export function AnonymousReportForm() {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "attachment-error"
@@ -282,6 +284,7 @@ export function AnonymousReportForm() {
     addAttachments(Array.from(event.dataTransfer.files ?? []));
   }
 
+  // Valida contra os mesmos limites de lib/reports/attachmentLimits.ts no cliente, antes de gastar tempo criptografando — o servidor reforça os mesmos limites de novo no upload (lib/reports/attachments.ts), esta checagem é só para dar feedback rápido.
   function addAttachments(selectedFiles: File[]) {
     if (selectedFiles.length === 0) return;
 
@@ -338,6 +341,7 @@ export function AnonymousReportForm() {
     setAttachments((current) => current.filter((item) => item.id !== id));
   }
 
+  // Reenvia só o anexo que falhou (a denúncia já existe, submittedReport guarda o reportId/uploadToken originais) — quando o último anexo pendente é confirmado, aí sim a submissão é considerada completa.
   async function retryAttachment(id: string) {
     if (!submittedReport) return;
 
@@ -362,6 +366,7 @@ export function AnonymousReportForm() {
     }
   }
 
+  // Pool de até 2 workers concorrentes consumindo a fila: criptografar (CPU) e enviar (rede) vários anexos ao mesmo tempo sem limite sobrecarregaria o navegador em conexões lentas ou com muitos anexos grandes.
   async function uploadAttachments(
     result: SubmitReportResult,
     items: AttachmentItem[],
@@ -1280,6 +1285,7 @@ function getTodayEnd() {
   return today;
 }
 
+// Mesmo padrão de scroll-e-foco de components/psychological-care/psychological-care-request-form.tsx's focusFirstInvalidField, adaptado para os seletores específicos deste formulário.
 function focusFirstInvalidReportField(
   errors: FieldErrors<AnonymousReportSchema>,
 ) {

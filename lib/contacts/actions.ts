@@ -1,5 +1,6 @@
 "use server";
 
+// Server actions do formulário público /contato e da listagem admin /portal/contatos — conecta validação, Turnstile, rate-limit e o e-mail de notificação.
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod/v4";
@@ -33,6 +34,7 @@ export async function submitContactForm(
   _previousState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  // Honeypot: campo "website" só é preenchido por bots (fica escondido via CSS no form real). Responde como se tivesse dado certo, sem processar nada, para não revelar a um bot que foi detectado.
   if (readFormValue(formData, "website")) {
     return {
       message: "Mensagem enviada com sucesso.",
@@ -60,6 +62,7 @@ export async function submitContactForm(
   }
 
   try {
+    // Rate-limit é checado antes do Turnstile de propósito: é mais barato (só o banco) que validar o token contra a API da Cloudflare, então barra o abuso mais cedo.
     const headersList = await headers();
     const { ipHash } = await assertContactRateLimit(headersList);
 

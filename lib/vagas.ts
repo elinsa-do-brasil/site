@@ -1,3 +1,4 @@
+// Leituras no frontend da collection Vagas do Payload — segue o mesmo formato de lib/editorial.ts para as collections Blog/Imprensa.
 import configPromise from "@payload-config";
 import { getPayload, type Where } from "payload";
 import { cache } from "react";
@@ -62,6 +63,7 @@ const getCachedVagaBySlug = cache(async function getCachedVagaBySlug(
 ): Promise<Vaga | null> {
   const payload = await getPayload({ config: configPromise });
 
+  // No modo draft (preview do Payload) o filtro de status "aberta" é ignorado de propósito, para o editor conseguir pré-visualizar uma vaga fechada/ainda não publicada.
   const where: Where = draft
     ? {
         slug: {

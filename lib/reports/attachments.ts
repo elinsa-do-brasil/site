@@ -1,3 +1,4 @@
+// CRUD de metadados de anexos (não do arquivo em si — isso é lib/reports/attachmentStorage.ts) e do log de acesso a eles.
 import { and, count, desc, eq, sum } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { reportAttachmentAccessLogs, reportAttachments } from "@/lib/db/schema";
@@ -47,6 +48,7 @@ export async function getReportAttachmentUsage(reportId: string) {
   };
 }
 
+// Todo filtro deste arquivo exige uploadStatus "completed" (o único valor gravado hoje por createReportAttachment) — a coluna existe para permitir um fluxo de upload em duas fases no futuro sem migrar o schema de novo.
 export async function canAddReportAttachment(input: {
   reportId: string;
   sizeBytes: number;

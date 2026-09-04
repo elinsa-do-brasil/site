@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 const REQUIRED_MESSAGE = "Campo obrigatório.";
 const INVALID_PHONE_MESSAGE = "Informe um telefone brasileiro válido.";
 
+// `.strict()` no final rejeita qualquer campo além dos listados — combinado com o honeypot "website" (só na variante pública, abaixo), ajuda a rejeitar submissões automatizadas que preenchem campos além do formulário real.
 export const psychologicalCareRequestFormSchema = z
   .object({
     submissionId: z.uuid("Identificador de envio inválido."),
@@ -73,6 +74,7 @@ function requiredText(min: number, max: number) {
     .max(max, `Informe no máximo ${max} caracteres.`);
 }
 
+// Remove o código do país (55) se presente — usuário pode digitar com ou sem "+55"; sem essa normalização um número com DDI seria rejeitado como inválido pelo regex de isValidBrazilianPhone.
 export function normalizeBrazilianPhoneDigits(value: string) {
   const digits = value.replace(/\D/g, "");
 

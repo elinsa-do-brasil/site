@@ -1,3 +1,4 @@
+// Endpoint que serve um anexo (view/download) para o painel do Comitê: baixa do Azure, confere integridade, decripta e registra o acesso — usado por app/api/committee/attachments/[id]/{view,download}/route.ts.
 import crypto from "node:crypto";
 import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
@@ -48,6 +49,7 @@ export async function createCommitteeAttachmentResponse(input: {
       .update(encryptedFileBuffer)
       .digest("hex");
 
+    // O hash do ciphertext foi calculado no navegador no momento do upload (lib/anonymous-report/fileEncryption.ts) e salvo junto do anexo; recalcular e comparar aqui detecta corrupção no storage antes de tentar decriptar.
     if (ciphertextSha256 !== attachment.ciphertextSha256) {
       return plainResponse(500);
     }

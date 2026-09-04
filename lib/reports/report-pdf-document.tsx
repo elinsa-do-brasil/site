@@ -47,6 +47,7 @@ const colors = {
   surface: "#F5F8F9",
 };
 
+// @react-pdf/renderer não quebra palavras longas sozinho — sem isso, um texto colado sem espaços (URL, ID) estouraria a largura da página em vez de quebrar linha.
 Font.registerHyphenationCallback((word) => {
   if (word.length <= 28) return [word];
 

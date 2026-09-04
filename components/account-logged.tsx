@@ -14,6 +14,7 @@ import {
 import { authClient } from "@/lib/authClient";
 import { SignOutDropdown } from "./auth/buttons/sign-out-dropdown";
 
+// Menu do avatar no header (público e portal) — usa o hook reativo do Better Auth (authClient.useSession) para saber se há sessão, então não renderiza nada em páginas públicas para visitante deslogado.
 export function AccountLogged() {
   const { data: session } = authClient.useSession();
 

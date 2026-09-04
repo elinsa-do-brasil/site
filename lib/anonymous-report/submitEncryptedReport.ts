@@ -1,3 +1,4 @@
+// Envia o corpo da denúncia para app/api/reports/route.ts, que criptografa/armazena no servidor; retorna o protocolo/uploadToken que uploadEncryptedAttachment.ts usa em seguida.
 import type { AnonymousReportContent, SubmitReportResult } from "./types";
 
 export type SubmitEncryptedReportParams = {
@@ -11,6 +12,7 @@ export async function submitEncryptedReport({
   turnstileToken,
   website,
 }: SubmitEncryptedReportParams): Promise<SubmitReportResult> {
+  // credentials "omit" + referrerPolicy "no-referrer": a denúncia não deve carregar cookies de sessão nem vazar a URL de origem — reforça o anonimato mesmo para quem estiver logado em outra aba.
   const response = await fetch("/api/reports", {
     method: "POST",
     credentials: "omit",

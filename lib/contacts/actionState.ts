@@ -1,3 +1,4 @@
+// Formato de estado do useActionState para submitContactForm (actions.ts) — separado para componentes client importarem o tipo sem puxar a action "use server".
 import type { z } from "zod/v4";
 import type { contactFormSchema } from "@/lib/contacts/validators";
 

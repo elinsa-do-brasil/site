@@ -1,5 +1,6 @@
 "use client";
 
+// Criptografia ponta a ponta no navegador (ECDH P-384 + HKDF + AES-GCM): cada anexo é criptografado com a chave pública do Comitê (NEXT_PUBLIC_REPORTS_PUBLIC_KEY_BASE64) antes de sair do navegador. Só o Comitê tem a chave privada (lib/reports/attachmentCrypto.ts) para decriptar.
 import { publicEnv } from "@/lib/envPublic";
 import {
   MAX_REPORT_ATTACHMENT_NAME_BYTES,
@@ -33,6 +34,7 @@ export type EncryptedReportAttachment = {
   };
 };
 
+// Envelope encryption: gera uma chave AES-GCM efêmera só para este arquivo, criptografa o conteúdo e o nome original com ela, depois embrulha (encripta) essa chave com ECDH — assim o payload grande nunca passa por operação assimétrica, só a chave pequena.
 export async function encryptReportAttachment(
   file: File,
 ): Promise<EncryptedReportAttachment> {
@@ -127,6 +129,7 @@ async function importReportsPublicKey() {
   );
 }
 
+// ECDH efêmero (ECIES): gera um par de chaves descartável, deriva um segredo compartilhado com a chave pública do Comitê e usa esse segredo (via HKDF) para encriptar a fileKey do anexo.
 async function encryptFileKeyWithEcdh(input: {
   publicKey: CryptoKey;
   rawFileKey: ArrayBuffer;
@@ -206,6 +209,7 @@ async function deriveKeyEncryptionKey(input: {
   );
 }
 
+// A WebCrypto SubtleCrypto devolve ciphertext+authTag concatenados em um único buffer; aqui eles são separados porque o backend guarda/transmite os dois campos independentemente.
 function splitAesGcmResult(buffer: ArrayBuffer) {
   if (buffer.byteLength <= AES_GCM_AUTH_TAG_LENGTH) {
     throw new Error("AES_GCM_RESULT_INVALID");

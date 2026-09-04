@@ -1,3 +1,4 @@
+// Estrutura de links do rodapé (renderizado por components/footer.tsx). Os dois links de "Ajuda ao colaborador"/"Código de conduta" apontam para o subdomínio docs.* (lib/docsUrl.ts), fora deste app.
 import type { IconType } from "react-icons";
 import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { getDocsUrl } from "@/lib/docsUrl";

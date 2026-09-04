@@ -1,3 +1,4 @@
+// Fluxo de status do Comitê de Ética — mais granular que o de atendimento psicológico (lib/psychological-care/status.ts), sem agrupamento em categorias porque /acompanhar-denuncia expõe cada status individualmente ao denunciante (via reportStatusPublicDescriptions).
 export const REPORT_STATUS_VALUES = [
   "new",
   "opened",
@@ -22,6 +23,7 @@ export const reportStatusLabels: Record<ReportStatus, string> = {
   archived: "Arquivada",
 };
 
+// Texto voltado ao denunciante anônimo em /acompanhar-denuncia — mais formal/explicativo que reportStatusLabels (usado no painel interno do Comitê).
 export const reportStatusPublicDescriptions: Record<ReportStatus, string> = {
   new: "A denúncia foi recebida e aguarda abertura pelo Comitê de Ética.",
   opened: "A denúncia foi aberta por pessoa autorizada do Comitê de Ética.",
@@ -70,6 +72,7 @@ export function isReportStatus(value: unknown): value is ReportStatus {
 }
 
 export function normalizeReportStatus(value: string): ReportStatus {
+  // "in_review"/"closed" são nomes de status de uma versão anterior do fluxo — mapeados para os nomes atuais em vez de exigir uma migration de dados nas linhas antigas.
   if (value === "in_review") return "review";
   if (value === "closed") return "completed";
 

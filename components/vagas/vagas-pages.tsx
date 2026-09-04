@@ -34,6 +34,7 @@ import {
   type Vaga,
 } from "@/lib/vagas";
 
+// Par índice/detalhe para /vagas, no mesmo espírito de components/editorial/editorial-pages.tsx para /imprensa — mas Vagas é uma única collection pública (sem variante "portal"), então não precisa do parâmetro `collection`.
 export async function VagasIndexPage() {
   const vagas = await getVagasAbertas();
 

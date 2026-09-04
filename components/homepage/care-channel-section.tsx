@@ -193,6 +193,7 @@ function CareGuideNavigation() {
   );
 }
 
+// Reaproveita 3 dos indicadores já calculados em home-data.ts (por id: população, equipes, segurança) em vez de recalcular — mesmos números do HeroMetrics, só reapresentados com foco em cuidado/segurança.
 function getCareEvidence(impactMetrics: ImpactMetric[]): CareEvidence[] {
   const metricsById = new Map(
     impactMetrics.map((metric) => [metric.id, metric]),

@@ -19,6 +19,7 @@ import {
 import { ThemeToggle } from "../ui/theme-toggle";
 import { NavigationMenuItem } from "./navigation-menu-item";
 
+// Header do /portal (área autenticada) — variante de components/header.tsx (site público), com navegação e menu próprios do portal em vez do menu institucional.
 export function InternalHeader() {
   return (
     <FloatingHeader>

@@ -1,3 +1,4 @@
+// Rate limiter de janela deslizante compartilhado, apoiado na tabela `rateLimit` (lib/db/schema); reutilizado por lib/auth.ts, lib/reports/rateLimit.ts, lib/psychological-care/publicRateLimit.ts e lib/organization/actions.ts.
 import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";

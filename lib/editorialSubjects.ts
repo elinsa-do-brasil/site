@@ -1,3 +1,4 @@
+// Taxonomia de assuntos compartilhada pelas collections Blog/Imprensa — usada por collections/Editorial.ts (config do Payload) e lib/editorial.ts (leituras no frontend).
 export const editorialSubjects = [
   { label: "Institucional", value: "institucional" },
   { label: "Operação", value: "operacao" },

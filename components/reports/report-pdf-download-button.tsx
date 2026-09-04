@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 
+// Mesmo padrão de download via blob URL de components/psychological-care/psychological-care-export-button.tsx, chamando lib/reports/pdfDelivery.tsx no lugar do endpoint de CSV.
 export function ReportPdfDownloadButton({
   protocol,
   reportId,

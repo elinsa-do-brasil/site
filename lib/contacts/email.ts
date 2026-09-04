@@ -1,3 +1,4 @@
+// E-mail de notificação best-effort para CONTACT_FORM_TO_EMAIL a cada novo contato; falhas são registradas no registro (actions.ts), não lançadas — o contato é salvo de qualquer forma.
 import { createElement } from "react";
 import { Resend } from "resend";
 import ContactNotificationEmail from "@/emails/contact-notification";
@@ -13,6 +14,7 @@ export async function maybeSendContactEmail(
 ): Promise<ContactEmailResult> {
   const to = env.contactFormToEmail();
 
+  // Sem CONTACT_FORM_TO_EMAIL configurada, a notificação é pulada silenciosamente (não é erro) — o formulário funciona normalmente, só ninguém é avisado por e-mail.
   if (!to) {
     return { sent: false, skipped: true };
   }

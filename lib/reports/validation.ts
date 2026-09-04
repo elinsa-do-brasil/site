@@ -13,6 +13,7 @@ const optionalNullableText = (max: number) =>
       return value.trim() || null;
     });
 
+// `.strict()` mais o superRefine abaixo: contactInfo só é exigido quando o denunciante pediu algum tipo de contato — evita marcar como obrigatório um campo que não faz sentido no fluxo anônimo.
 export const createReportSchema = z
   .object({
     category: z.string().trim().min(2).max(100),

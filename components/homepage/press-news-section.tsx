@@ -25,6 +25,7 @@ type PressNewsSectionProps = {
   posts: EditorialPost[];
 };
 
+// `posts` já vem buscado e ordenado por quem renderiza a home (getEditorialPosts, lib/editorial.ts) — este componente só decide o layout entre destaque e coluna secundária.
 export function PressNewsSection({ posts }: PressNewsSectionProps) {
   const [featuredPost, ...secondaryPosts] = posts;
 

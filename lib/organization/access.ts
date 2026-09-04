@@ -1,3 +1,4 @@
+// Controle de acesso do Portal Interno (org/equipes/cargos do Better Auth, banco próprio do site) — sistema de usuários/cargos separado de lib/payload/rbac.ts, que governa o admin do Payload CMS.
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
@@ -101,6 +102,7 @@ export async function getInternalAccessContext(
   const teamNames = userTeams.map((t) => t.name);
 
   const roles = parseRoleList(membership.role);
+  // Checagem redundante de propósito: roles.includes já cobriria membership.role === "admin"/"owner", mas a comparação direta fica como salvaguarda caso parseRoleList mude no futuro.
   const isOrgAdmin =
     roles.includes("admin") ||
     roles.includes("owner") ||
@@ -138,6 +140,7 @@ const BUILTIN_INTERNAL_TOOLS: InternalTool[] = [
     icon: "Mail",
   },
 ];
+// URLs que já foram (ou quase foram) ferramentas embutidas — mantidas aqui só para não duplicar o card caso alguém cadastre uma portal_tool configurável apontando para o mesmo lugar.
 const LEGACY_BUILTIN_TOOL_HREFS = new Set([
   "/assinatura-de-email",
   "/portal/assinatura-de-email",
@@ -241,6 +244,7 @@ function normalizeTeamName(teamName: string) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+// Ferramentas configuráveis por equipe (portal_tool). Tenta a query completa (com ícone) e cai para variantes mais antigas do schema se a coluna/tabela ainda não existir — permite rodar em ambientes sem a migration mais recente aplicada.
 async function listConfiguredPortalTools() {
   try {
     return await db
@@ -292,6 +296,7 @@ async function listConfiguredPortalTools() {
   }
 }
 
+// Código Postgres 42P01 = "relation does not exist" (tabela portal_tool não criada ainda nesse ambiente).
 function isMissingRelationError(error: unknown) {
   if (!(error instanceof Error)) return false;
 
@@ -308,6 +313,7 @@ function isMissingRelationError(error: unknown) {
   return error.message.includes('relation "portal_tool" does not exist');
 }
 
+// Código Postgres 42703 = "undefined column" (coluna `icon` de portal_tool ainda não migrada nesse ambiente).
 export function isMissingPortalToolIconColumnError(error: unknown) {
   if (!(error instanceof Error)) return false;
 

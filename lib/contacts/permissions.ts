@@ -1,3 +1,4 @@
+// Só membros da equipe `marketing` (lib/organization) podem ver /portal/contatos.
 import { notFound } from "next/navigation";
 import {
   type InternalAccessContext,
@@ -22,6 +23,7 @@ function isMarketingTeamMember(context: InternalAccessContext) {
   );
 }
 
+// Remove acentos/maiúsculas antes de comparar com "marketing" — defesa extra caso o nome da equipe no banco não esteja exatamente no formato esperado.
 function normalizeTeamName(teamName: string) {
   return teamName
     .trim()

@@ -67,6 +67,7 @@ function StateBadge({ state }: Pick<EditorialReviewItem, "state">) {
   );
 }
 
+// Envolve o conteúdo com o layout padrão do admin do Payload (menu lateral, topo) — necessário porque esta é uma "view" custom completa (registrada em payload.config.ts's admin.components.views), não um widget dentro de uma página já existente do admin.
 function ReviewTemplate({
   children,
   props,

@@ -26,6 +26,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { getDocsUrl } from "@/lib/docsUrl";
 import type { GalleryPage, GalleryPhoto } from "@/lib/gallery";
 
+// Grade infinita com paginação via IntersectionObserver (loadMore) e lightbox com navegação por teclado/pré-carregamento de vizinhas — as imagens em si (loading/retry/warmup) são gerenciadas em gallery-images.tsx.
 type GalleryExplorerProps = {
   initialPage: GalleryPage;
 };
@@ -66,6 +67,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
           (photo): photo is GalleryPhoto => Boolean(photo),
         );
 
+  // Só uma requisição de página por vez: o IntersectionObserver e showNextPhoto podem ambos tentar carregar mais fotos quase ao mesmo tempo; reutilizar a promise em andamento evita pedir a mesma página duas vezes.
   const loadMore = useCallback(() => {
     if (loadMorePromiseRef.current) {
       return loadMorePromiseRef.current;
@@ -206,6 +208,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
       return;
     }
 
+    // Chegou no fim do que já foi carregado, mas ainda há mais páginas: busca a próxima e só avança o índice se ainda fizer sentido (o usuário pode ter navegado para outra foto enquanto a busca estava em andamento).
     const lastLoadedIndex = photos.length - 1;
 
     void loadMore().then((newPhotos) => {
@@ -246,6 +249,7 @@ export function GalleryExplorer({ initialPage }: GalleryExplorerProps) {
     setSelectedIndex(index);
   };
 
+  // Guarda a URL exata (currentSrc) que o navegador já baixou para a miniatura no grid — passada como previewSrc ao abrir o lightbox, para mostrar algo instantâneo em vez de tela em branco enquanto a versão em alta resolução carrega.
   const rememberFeedSource = useCallback((photoId: string, source: string) => {
     feedSourcesRef.current.set(photoId, source);
   }, []);

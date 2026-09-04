@@ -35,6 +35,7 @@ function filterSpeedInsightEvent(event: SpeedInsightEvent) {
 export function FrontendTelemetry() {
   const pathname = usePathname();
 
+  // Dupla proteção: nem monta o Analytics/SpeedInsights em rotas sensíveis (lib/telemetryPrivacy.ts), e os beforeSend abaixo filtram de novo evento a evento — cobre tanto a navegação inicial quanto eventos que cheguem depois de trocar de rota client-side.
   if (isSensitiveTelemetryPath(pathname)) {
     return null;
   }

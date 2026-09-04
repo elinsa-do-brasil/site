@@ -2,6 +2,7 @@
 // integração (tsx --env-file=.env, Node puro, fora do pipeline do Next.js) —
 // o guard lança erro incondicionalmente fora do bundler do Next. Todos os
 // call sites reais já são server-only por natureza (Server Actions, painel).
+// Acesso a dados de psychologicalCareRequests + psychologicalCareRequestEvents (o log de auditoria: criação, visualização, mudança de status, exportação — tudo com actorUserId e timestamp).
 import {
   and,
   asc,
@@ -71,12 +72,14 @@ export type ListPsychologicalCareRequestSummariesOptions = {
   statusFilter?: PsychologicalCareSummaryStatusFilter;
 };
 
+// Idempotente por submissionId: reenviar o mesmo formulário (retry de rede, duplo clique) não cria duas solicitações — devolve a existente se o payload bater, ou lança conflito se algo mudou.
 export async function createPsychologicalCareRequest(
   input: CreatePsychologicalCareRequestInput,
 ) {
   const payload = toPsychologicalCareEncryptedPayload(input);
   const encrypted = encryptPsychologicalCarePayload(payload);
 
+  // Até 3 tentativas: createPsychologicalCareProtocol() pode colidir com um protocolo já existente (chance pequena, mas não nula); tenta de novo com um novo protocolo em vez de falhar a submissão.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const protocol = createPsychologicalCareProtocol();
 
@@ -147,6 +150,7 @@ export async function createPsychologicalCareRequest(
           throw new Error("PSYCHOLOGICAL_CARE_REQUEST_NOT_CREATED");
         }
 
+        // O mesmo submissionId (gerado no cliente) não pode pertencer a dois usuários/origens diferentes — só é seguro tratar como "reenvio idêntico" se tudo bater, senão é reuso indevido do ID.
         if (existing.requesterUserId !== input.requesterUserId) {
           throw new Error("PSYCHOLOGICAL_CARE_SUBMISSION_ID_CONFLICT");
         }
@@ -535,6 +539,7 @@ function sumStatusGroup(
   );
 }
 
+// Código Postgres 23505 = "unique_violation" (colisão no índice único de protocol ou submissionId).
 function isUniqueViolation(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;
 

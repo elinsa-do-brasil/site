@@ -2,6 +2,7 @@
 
 import "server-only";
 
+// Server action do painel interno para o comitê (equipe atendimento_psicologico) atualizar o status de uma solicitação — a submissão pública mora em publicActions.ts, um arquivo separado por não exigir autenticação.
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod/v4";
@@ -31,6 +32,7 @@ export async function updatePsychologicalCareRequestStatusAction(
     return { error: "Sessão expirada. Entre novamente." };
   }
 
+  // Auditoria: o histórico da solicitação registra quem mudou o status (actorUserId), não só o novo valor — ver repository.ts/updatePsychologicalCareRequestStatus.
   await requirePsychologicalCarePanelAccess(session.user.id);
 
   const parsedRequestId = psychologicalCareRequestIdSchema.safeParse(requestId);

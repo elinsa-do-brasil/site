@@ -52,6 +52,7 @@ import { cn } from "@/lib/utils";
 
 type SubjectCount = ReturnType<typeof getSubjectCounts>[number];
 
+// Compartilhado pelas duas collections editoriais: EditorialIndex/EditorialArticlePage renderizam tanto /imprensa (pública) quanto /portal/blog (interna) — o parâmetro `collection` e o booleano isPortalCollection (derivado dele) ajustam textos, JSON-LD e espaçamento entre os dois contextos.
 export async function EditorialIndex({
   collection,
   subject,
@@ -170,6 +171,7 @@ export async function EditorialArticlePage({
   const articleImage =
     getCmsSeoImage(post.meta?.image)?.url ??
     getEditorialCoverImage(post, "hero")?.url;
+  // JSON-LD só para Imprensa publicada e fora do modo preview — o Blog interno não é indexável e um rascunho não deve gerar dado estruturado que aponte para conteúdo ainda não público.
   const showPublicStructuredData =
     collection === "imprensa" && !isDraftMode && post._status !== "draft";
 
@@ -328,6 +330,7 @@ function EditorialPostShowcase({
   config: EditorialConfig;
   posts: EditorialPost[];
 }) {
+  // O post mais recente vira o card grande em destaque; os 3 seguintes formam a coluna compacta ao lado; o restante cai numa grade abaixo — puramente por ordem (posts já vem ordenado por data em lib/editorial.ts), não por um campo "destaque".
   const [featuredPost, ...secondaryPosts] = posts;
   const primarySecondaryPosts = secondaryPosts.slice(0, 3);
   const additionalPosts = secondaryPosts.slice(3);

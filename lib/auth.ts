@@ -1,3 +1,4 @@
+// Instância do Better Auth no servidor (SSO Microsoft, OTP por e-mail, Passkey). Par do authClient.ts (navegador) e do authPolicy.ts (regras de e-mail corporativo/tenant).
 import { passkey } from "@better-auth/passkey";
 import { type BetterAuthPlugin, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";

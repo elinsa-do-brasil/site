@@ -1,3 +1,4 @@
+// Deriva a URL base do Azure Blob a partir de uma connection string; consumido por payload.config.ts para configurar o adapter @payloadcms/storage-azure.
 export function parseAzureConnectionString(connectionString: string) {
   return Object.fromEntries(
     connectionString

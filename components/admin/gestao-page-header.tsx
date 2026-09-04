@@ -49,6 +49,7 @@ export function GestaoPageHeader({
   isOrgAdmin,
   title,
 }: GestaoPageHeaderProps) {
+  // Líderes de equipe (não-admin) só veem Equipes/Ferramentas — Organização e Convites são restritos a admins da organização, então nem aparecem na navegação para quem não pode acessá-los.
   const availableSections = isOrgAdmin
     ? GESTAO_NAV
     : GESTAO_NAV.filter(
@@ -95,6 +96,7 @@ export function GestaoPageHeader({
   );
 }
 
+// Transforma slugs de equipe/cargo (snake_case, ex.: "comite_etica") em rótulo legível ("Comitê Ética") — o dicionário knownWords cobre siglas/acentos que a simples capitalização por palavra não acertaria sozinha.
 export function formatAdminName(value: string) {
   const normalized = value.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
 

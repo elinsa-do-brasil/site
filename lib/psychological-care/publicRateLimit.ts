@@ -1,6 +1,7 @@
 // Sem `import "server-only"` de propósito: importado por testes de
 // integração (tsx --env-file=.env, Node puro, fora do pipeline do Next.js) —
 // o guard lança erro incondicionalmente fora do bundler do Next.
+// Rate limit por IP do formulário público /amper-cuida — o IP nunca é gravado em claro, só um digest HMAC (createPsychologicalCarePublicRateLimitDigest, em crypto.ts).
 import { consumeDatabaseRateLimit } from "@/lib/databaseRateLimit";
 import { env } from "@/lib/env";
 import { getClientIp } from "@/lib/getClientIp";

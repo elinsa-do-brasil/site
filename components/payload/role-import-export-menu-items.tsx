@@ -11,6 +11,7 @@ type RoleImportExportMenuItemsProps = ServerProps & {
   importCollectionSlug: string;
 };
 
+// Substitui o item de menu import/export do plugin oficial (que não respeita cargo) — registrado por lib/payload/rbacPlugins.ts's restrictImportExportMenuItems no lugar do componente original do plugin.
 export function RoleImportExportMenuItems({
   collectionSlug,
   exportCollectionSlug,

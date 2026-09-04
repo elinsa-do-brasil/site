@@ -1,3 +1,4 @@
+// Rate limit por IP para o formulário público /contato. O IP bruto nunca é armazenado — só um digest HMAC com chave CONTACT_IP_HASH_SECRET_BASE64.
 import { createHmac } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -50,6 +51,7 @@ export async function assertContactRateLimit(headersList: HeaderReader) {
     env.contactRateLimitWindowMinutes(),
     DEFAULT_RATE_LIMIT_WINDOW_MINUTES,
   );
+  // Janela fixa (não deslizante, ao contrário de lib/databaseRateLimit.ts): o tempo é arredondado para baixo em blocos de windowMinutes, então o contador zera em horários fixos do relógio, não X minutos após a primeira tentativa.
   const windowMs = windowMinutes * 60 * 1000;
   const windowStart = new Date(Math.floor(Date.now() / windowMs) * windowMs);
   const now = new Date();

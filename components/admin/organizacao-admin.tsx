@@ -86,6 +86,7 @@ type OrganizacaoAdminProps = {
   teams: TeamOption[];
 };
 
+// Painel de /portal/gestao/organizacao: gestão de membros, cargos customizados e vínculos de equipe em nível de organização (mais amplo que team-admin.tsx, que é escopado a uma única equipe).
 export function OrganizacaoAdmin({
   members,
   pendingInvitationCount,
@@ -300,6 +301,7 @@ function MemberItem({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  // Um membro pode acabar com um cargo restrito sem a equipe exigida (ex.: foi removido da equipe depois de já ter o cargo) — este aviso torna essa inconsistência visível em vez de escondida.
   const missingRequiredTeams = getRequiredTeamsForOrganizationRoleList(
     member.role,
   ).filter((requiredTeam) => !member.teams.includes(requiredTeam));

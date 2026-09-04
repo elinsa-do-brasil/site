@@ -15,6 +15,7 @@ export function FloatingHeader({
           "pointer-events-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/90 px-3 shadow-sm backdrop-blur-xl sm:px-4",
           className,
         )}
+        // Mesmo viewTransitionName em Header e InternalHeader: a API de View Transitions trata os dois como o "mesmo" elemento ao trocar de rota, evitando que o header pisque/reapareça na troca.
         style={{ ...style, viewTransitionName: "persistent-nav" }}
         {...props}
       >

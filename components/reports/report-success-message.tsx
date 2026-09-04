@@ -30,6 +30,7 @@ export function ReportSuccessMessage({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const copiedTimeoutRef = useRef<number | null>(null);
   const [copied, setCopied] = useState(false);
+  // Denúncias podem ser acompanhadas publicamente pelo protocolo (ao contrário de atendimento psicológico — ver components/psychological-care/psychological-care-success-message.tsx) — pré-preenche o protocolo na URL de /acompanhar-denuncia.
   const trackingHref = protocol
     ? `/acompanhar-denuncia?protocolo=${encodeURIComponent(protocol)}`
     : "/acompanhar-denuncia";

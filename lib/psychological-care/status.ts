@@ -1,3 +1,4 @@
+// Status granulares do fluxo de atendimento (workflow interno do comitê) — ver PSYCHOLOGICAL_CARE_STATUS_GROUPS abaixo para o agrupamento em 3 filtros usado nos cards de resumo do painel.
 export const PSYCHOLOGICAL_CARE_STATUS_VALUES = [
   "new",
   "triage",
@@ -52,6 +53,7 @@ export const psychologicalCareSummaryStatusFilterLabels: Record<
   finished: "Finalizadas",
 };
 
+// Mapeia cada status granular a um dos 3 grupos exibidos no painel — "cancelled" conta como finalizado junto de "completed" para fins de contagem/resumo, mesmo sendo um desfecho diferente.
 export const PSYCHOLOGICAL_CARE_STATUS_GROUPS: Record<
   PsychologicalCareSummaryStatusFilter,
   readonly PsychologicalCareStatus[]

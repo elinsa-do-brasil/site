@@ -104,7 +104,9 @@ export function PsychologicalCareRequestForm() {
   const [submittedProtocol, setSubmittedProtocol] = useState<string | null>(
     null,
   );
+  // submissionId é gerado uma vez por tentativa de envio e reaproveitado em reenvios (só é limpo em sucesso ou "Limpar") — é a chave de idempotência que lib/psychological-care/repository.ts usa para não duplicar a solicitação num duplo-clique ou retry de rede.
   const submissionIdRef = useRef<string | null>(null);
+  // Trava síncrona contra clique duplo antes mesmo do isSubmitting do react-hook-form (que só vira true depois da validação) conseguir desabilitar o botão.
   const submissionLockRef = useRef(false);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
 
@@ -610,6 +612,7 @@ function PsychologicalCareFormSection({
   );
 }
 
+// Formata o telefone enquanto digita: remove o DDI 55 se presente (colado com "+55" ou dígitos demais) e aplica a máscara (DD) DDDDD-DDDD progressivamente — espelha a normalização de lib/psychological-care/validation.ts no servidor.
 function formatBrazilianPhoneInput(value: string) {
   const rawDigits = value.replace(/\D/g, "");
   const withoutCountryCode =

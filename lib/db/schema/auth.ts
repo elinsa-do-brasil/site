@@ -1,3 +1,4 @@
+// Tabelas do próprio Better Auth (user/session/account/organization/...) — o formato é definido pelo Better Auth, não desenhado à mão aqui. lib/auth.ts é quem lê/escreve nelas.
 import {
   bigint,
   boolean,

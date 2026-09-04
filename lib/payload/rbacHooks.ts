@@ -1,3 +1,4 @@
+// Hooks de coleção que aplicam lib/payload/rbac.ts em momentos que o objeto `access` do Payload não cobre sozinho (ex.: travar em "só rascunho" durante a validação, bloquear restaurar versão/lixeira). Ligados em collections/*.ts.
 import type {
   CollectionBeforeOperationHook,
   CollectionBeforeValidateHook,
@@ -48,6 +49,7 @@ export function createDraftOnlyWorkflowHook(
       forbidden("Esta função pode salvar apenas rascunhos.");
     }
 
+    // Restaurar da lixeira é tratado como update comum (deletedAt volta a null) — sem essa checagem, quem só pode salvar rascunho conseguiria restaurar itens excluídos.
     if (
       operation === "update" &&
       originalDoc?.deletedAt &&
@@ -62,6 +64,7 @@ export function createDraftOnlyWorkflowHook(
   };
 }
 
+// Restaurar uma versão antiga pode reintroduzir conteúdo publicado — só quem tem permissão de publicar pode fazer isso, mesmo que o autor original tenha escrito aquela versão.
 export const preventAuthorVersionRestore: CollectionBeforeOperationHook = (
   args,
 ) => {
@@ -110,6 +113,7 @@ function normalizeFolderTypes(data: unknown): string[] | undefined {
   );
 }
 
+// Uma pasta (folder) do Payload pode agrupar documentos de várias collections; isso só é permitido se o usuário puder escrever em TODAS as collections marcadas na pasta (folderType), não só em alguma delas.
 export function canUseFolderTypes(
   req: Pick<PayloadRequest, "user">,
   data: unknown,

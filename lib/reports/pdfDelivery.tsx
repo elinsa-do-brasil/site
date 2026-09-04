@@ -1,3 +1,4 @@
+// Gera sob demanda o PDF confidencial de uma denúncia para o painel do Comitê (app/api/committee/reports/[id]/pdf/route.ts) — nada fica salvo em disco, o PDF é montado na memória a cada exportação com renderReportPdfArtifact.
 import "server-only";
 
 import { renderToBuffer } from "@react-pdf/renderer";
@@ -54,6 +55,7 @@ export async function createCommitteeReportPdfResponse(input: {
       since: new Date(Date.now() - 60_000),
     });
 
+    // Duas defesas somadas: contagem persistida no banco (recentExports, últimos 60s) contra abuso sustentado, e o Set em memória (activePdfExports) contra duplo clique/gerar dois PDFs ao mesmo tempo para o mesmo usuário.
     if (
       recentExports >= MAX_PDF_EXPORTS_PER_MINUTE ||
       activePdfExports.has(userId)

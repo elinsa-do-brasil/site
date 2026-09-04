@@ -1,3 +1,4 @@
+// Gera o CSV mensal descriptografado (uma linha por solicitação) para exportDelivery.ts — cada linha é descriptografada individualmente, então uma falha isolada vira "[ERRO AO DESCRIPTOGRAFAR]" em vez de derrubar a exportação inteira.
 import "server-only";
 
 import type { PsychologicalCareRequest } from "@/lib/db/schema/psychologicalCare";
@@ -115,6 +116,7 @@ export function buildPsychologicalCareMonthlyCsv(
     );
   }
 
+  // O caractere invisível antes do template literal é um BOM UTF-8 — sem ele o Excel abre acentos/caracteres especiais corrompidos.
   const csvBody = lines.join(CSV_LINE_BREAK) + CSV_LINE_BREAK;
   const buffer = Buffer.from(`﻿${csvBody}`, "utf8");
 
@@ -164,6 +166,7 @@ function formatCsvDate(date: Date): string {
   }).format(date);
 }
 
+// Calcula o instante UTC exato da meia-noite de São Paulo (UTC-3) no início do mês, sem lib de timezone: estima em UTC, mede o offset real do fuso e corrige — meia-noite em SP não é meia-noite em UTC.
 function zonedMonthStartToUtc(year: number, month: number): Date {
   const utcGuess = Date.UTC(year, month - 1, 1, 0, 0, 0, 0);
   const offsetMinutes = getTimeZoneOffsetMinutesAt(

@@ -1,3 +1,4 @@
+// Mesmo padrão de lib/psychological-care/email.ts: avisa o Comitê que uma denúncia chegou, sem incluir o conteúdo do relato no e-mail em si.
 import { createElement } from "react";
 import { Resend } from "resend";
 import ReportNotificationEmail from "@/emails/report-notification";

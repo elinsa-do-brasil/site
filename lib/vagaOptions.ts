@@ -1,3 +1,4 @@
+// Opções de cidade para os filtros de Vagas — par de lib/vagas.ts (leitura de dados) e do campo `city` em collections/Vagas.ts.
 export const vagaCidadeOptions = [
   { label: "Abaetetuba", value: "abaetetuba" },
   { label: "Acará", value: "acara" },

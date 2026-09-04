@@ -54,6 +54,7 @@ function createIdentityFormSchema(nameRequired: boolean) {
 type IdentityFormValues = z.infer<ReturnType<typeof createIdentityFormSchema>>;
 type OtpFormValues = z.infer<typeof otpFormSchema>;
 
+// Wizard de 2 passos: "identity" pede e-mail (+ nome, se nameRequired) e dispara o código; "otp" pede o código de 6 dígitos. Os dois react-hook-form são independentes — os dados de identity são lidos via getValues() no passo otp, não via um form único.
 export type EmailOtpStep = "identity" | "otp";
 
 type EmailOtpFormProps = {
@@ -176,6 +177,7 @@ export function EmailOtpForm({
       return;
     }
 
+    // Login e aceite do convite são duas chamadas separadas ao Better Auth: o código OTP só autentica; aceitar o convite (virar membro da organização) é um passo à parte, então uma pessoa pode ficar autenticada mesmo se este segundo passo falhar.
     if (invitationId) {
       const invitationResult = await authClient.organization.acceptInvitation({
         invitationId,

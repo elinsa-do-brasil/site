@@ -11,6 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// Sustenta lib/contacts/queries.ts — o formulário público /contato e a listagem admin /portal/contatos.
 export const contactStatusEnum = pgEnum("contact_status", [
   "new",
   "read",

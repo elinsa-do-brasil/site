@@ -10,6 +10,7 @@ import { PasskeySignInButton } from "./buttons/passkey-signin";
 import { EmailOtpForm, type EmailOtpStep } from "./email-otp-form";
 import { Or } from "./or";
 
+// Composição dos 3 métodos de login (Microsoft SSO, Passkey, código por e-mail) — Microsoft/Passkey só aparecem no passo "identity" do OTP; ao avançar para o passo "otp", a tela foca só no código.
 export function LoginForm({ redirectTo = "/portal" }: { redirectTo?: string }) {
   const [emailOtpStep, setEmailOtpStep] = useState<EmailOtpStep>("identity");
   const [isRedirecting, setIsRedirecting] = useState(false);

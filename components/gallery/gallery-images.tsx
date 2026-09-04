@@ -44,6 +44,7 @@ type NetworkInformation = {
   saveData?: boolean;
 };
 
+// Módulo (não estado de componente) de propósito: o cache de pré-carregamento precisa sobreviver à troca de foto no lightbox e ser compartilhado entre todos os cards do grid, não resetar a cada re-render.
 const activeWarmups = new Map<string, HTMLImageElement>();
 const warmedPhotos = new Set<string>();
 
@@ -159,6 +160,7 @@ export function GalleryFeedPhoto({
     }, IMAGE_RETRY_BASE_DELAY_MS * loadAttempt);
   }, [loadAttempt]);
 
+  // Toque não dispara pointerenter/hover — o warmup "de intenção" (scheduleWarmup) nunca rodaria em touch, então aqui dispara direto em alta prioridade assim que o dedo encosta, antes mesmo do clique completar.
   const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     if (event.pointerType === "touch") {
       cancelWarmup();
@@ -322,6 +324,7 @@ export function GalleryViewerImage({
 
     let decodeTimeout: ReturnType<typeof setTimeout> | undefined;
 
+    // image.decode() evita o "pop-in" (a imagem aparecer sem ter sido decodificada, travando o frame) mas pode nunca resolver em alguns navegadores/imagens — corrida contra um timeout garante que a UI sempre avança para "ready".
     try {
       await Promise.race([
         image.decode(),
@@ -368,6 +371,7 @@ export function GalleryViewerImage({
     }, IMAGE_RETRY_BASE_DELAY_MS * loadAttempt);
   }, [loadAttempt, previewSrc]);
 
+  // Poll manual em vez de confiar só em onLoad: quando a <Image fill> já está no cache do navegador ao montar, alguns navegadores não dessa onLoad de novo — checar .complete/.naturalWidth direto no <img> nativo garante que o estado "ready" seja alcançado mesmo nesse caso.
   useEffect(() => {
     if (loadState !== "loading") {
       return;
@@ -396,6 +400,7 @@ export function GalleryViewerImage({
     return () => clearInterval(interval);
   }, [handleError, handleLoad, loadState]);
 
+  // Sem preview disponível, mostra a imagem em alta resolução assim que começa a carregar (melhor que tela vazia); com preview, some por trás dele até estar de fato pronta, evitando um flash de imagem parcialmente carregada.
   const showHighResolutionImage =
     loadState === "ready" || (!previewSrc && loadState === "loading");
 
@@ -561,6 +566,7 @@ function canSpeculativelyWarmGalleryImages() {
   );
 }
 
+// Pré-carrega a versão em alta resolução (mesmo srcset/sizes do lightbox) num <img> invisível fora do DOM React, para já estar no cache do navegador quando o usuário efetivamente abrir a foto — usa getImageProps do Next para gerar exatamente a mesma URL otimizada que o <Image> real usaria.
 function warmGalleryPhoto(
   photo: GalleryPhoto,
   priority: WarmupPriority = "low",

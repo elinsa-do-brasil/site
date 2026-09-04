@@ -68,6 +68,7 @@ type GerenciarConvitesProps = {
   teams: TeamOption[];
 };
 
+// Painel de /portal/gestao/convites: lista/filtra convites pendentes (busca e filtros são só client-side sobre a lista já carregada, sem nova query ao servidor) e permite criar/revogar convites.
 export function GerenciarConvites({
   pendingInvitations,
   roleOptions,

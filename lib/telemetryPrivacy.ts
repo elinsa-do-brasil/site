@@ -1,3 +1,5 @@
+// Regras de redação para o Sentry, ligadas em sentry.server.config.ts, sentry.edge.config.ts e instrumentation-client.ts (erros do navegador passam por components/frontend-telemetry.tsx).
+// Rotas de denúncia/atendimento psicológico: nenhum evento de erro cujo caminho bata com um destes prefixos deve chegar ao Sentry — ver isSensitiveTelemetryPath abaixo.
 export const SENSITIVE_TELEMETRY_PATHS = [
   "/denunciar",
   "/acompanhar-denuncia",
@@ -53,6 +55,7 @@ export function isSensitiveTelemetryPath(value: unknown): boolean {
   );
 }
 
+// Checa a URL/rota do evento em vários lugares onde o Sentry pode tê-la guardado (contexts.trace.data, tags, request.url, transaction) — beforeSend descarta o evento inteiro se qualquer um bater.
 export function shouldDiscardSensitiveSentryEvent(
   event: SentryEventLike,
   currentPath?: unknown,
@@ -91,6 +94,7 @@ export function shouldDiscardSensitiveSentryBreadcrumb(
   ].some(isSensitiveTelemetryPath);
 }
 
+// Varre uma string qualquer (mensagem de erro, breadcrumb, stack) atrás de URLs absolutas e caminhos relativos tipo "/algo" — o Sentry nem sempre expõe a rota em um campo estruturado.
 function extractPathCandidates(value: string): string[] {
   const candidates: string[] = [];
   const withoutAbsoluteUrls = value.replace(

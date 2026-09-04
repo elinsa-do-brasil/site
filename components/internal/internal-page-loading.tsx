@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Skeleton genérico usado pelos loading.tsx do portal (app/(frontend)/portal/loading.tsx e .../configuracoes/loading.tsx) — o Next mostra isso automaticamente enquanto o Server Component da rota busca dados.
 export function InternalPageLoading({ label }: { label: string }) {
   return (
     <div

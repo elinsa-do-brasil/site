@@ -1,3 +1,4 @@
+// Converte os valores brutos do formulário no payload que será criptografado em seguida (submitEncryptedReport.ts), removendo a identidade do denunciante quando ele optou por ficar anônimo.
 import type {
   AnonymousReportContent,
   AnonymousReportFormValues,
@@ -13,6 +14,7 @@ export function buildReportPayload(
 ): AnonymousReportContent {
   const isIdentified = values.identify === "yes";
 
+  // Quando isIdentified é false, contactPreference/contactInfo/reporterName são forçados a "no_contact"/null mesmo que o form tivesse algo digitado antes de o usuário mudar de ideia.
   return {
     category: values.category,
     title: values.title.trim(),

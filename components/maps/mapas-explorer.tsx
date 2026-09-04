@@ -1,5 +1,6 @@
 "use client";
 
+// Explorador de cobertura /mapas: drill-down regional → base → município. REGIONALS abaixo só tem metadados estáticos (nome, cor, marcador); os polígonos GeoJSON de cada regional são buscados sob demanda em RegionalSelectionLayer (regionais/agregados/{slug}.json), não vêm todos pré-carregados.
 import {
   ArrowLeft,
   Building2,
@@ -726,6 +727,7 @@ function RegionalSelectionLayer({
   viewMode: ViewMode;
 }) {
   const { map, isLoaded } = useMap();
+  // O GeoJSON completo da regional selecionada (municípios agrupados por base) só é buscado quando o usuário troca de regional — REGIONALS (estático) só tem o suficiente para desenhar a sidebar antes disso.
   const [regionalMap, setRegionalMap] = useState<AggregatedRegional | null>(
     null,
   );
@@ -746,6 +748,7 @@ function RegionalSelectionLayer({
       viewMode,
     ],
   );
+  // Espelham collection/viewMode em refs para o listener "styledata" (registrado uma vez, sobrevive a trocas de estilo do mapa) sempre ler o valor mais recente em vez de ficar preso ao que era true quando o listener foi criado.
   const collectionRef = useRef<MunicipalityFeatureCollection>(
     EMPTY_MUNICIPALITY_COLLECTION,
   );
@@ -802,6 +805,7 @@ function RegionalSelectionLayer({
 
     const mapInstance = map;
 
+    // Cria a source/layers uma única vez (checando getLayer/getSource) e depois só atualiza via setData/setPaintProperty/setLayoutProperty — recriar do zero a cada mudança de seleção causaria flicker e perderia o estado interno do MapLibre.
     function syncLayer() {
       if (!mapInstance.isStyleLoaded()) {
         return;
@@ -909,6 +913,7 @@ function RegionalSelectionLayer({
 
     syncLayerRef.current = syncLayer;
     syncLayer();
+    // "styledata" dispara sempre que o MapLibre recarrega o estilo (ex.: troca de tema claro/escuro) — sem reassinar aqui, a camada ativa desapareceria depois de uma troca de tema.
     mapInstance.on("styledata", syncLayer);
 
     return () => {
@@ -1003,6 +1008,7 @@ function buildSelectionCollection(
   };
 }
 
+// Sobrescreve a cor vinda dos dados agregados para 3 casos específicos, mantendo consistência visual com REGIONALS/highlightedCountries definidos estaticamente acima — os dados agregados nem sempre têm a mesma cor cadastrada.
 function getBaseColor(
   regionalSlug: RegionalSlug,
   baseSlug: string,
@@ -1075,6 +1081,7 @@ type MutableBounds = {
   minLng: number;
 };
 
+// Percorre recursivamente qualquer GeoJSON (Feature, FeatureCollection, Geometry, GeometryCollection aninhada) para achar a caixa delimitadora — usado por map.fitBounds ao trocar de seleção, sem depender de uma lib externa de geometria.
 function getGeoJsonBounds(
   geoJsons: unknown[],
 ): [[number, number], [number, number]] | null {

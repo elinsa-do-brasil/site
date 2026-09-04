@@ -4,6 +4,7 @@ import {
   type LucideIcon,
   NotebookText,
 } from "lucide-react";
+// Dados e métricas da homepage. open-data.json é uma estimativa (terras indígenas/quilombolas, população, municípios atendidos) coletada uma vez e commitada como arquivo estático — não é buscada em tempo real.
 import { env } from "@/lib/env";
 import dadosAbertos from "./open-data.json";
 
@@ -112,6 +113,7 @@ const baseImpactMetrics: ImpactMetric[] = [
   },
 ];
 
+// Função (não constante) de propósito: o contador de dias sem acidente precisa ser recalculado a cada request, não congelado no momento do build.
 export function getImpactMetrics(): ImpactMetric[] {
   return [
     ...baseImpactMetrics,
@@ -132,6 +134,7 @@ function formatPopulation(value: number) {
   return ptBrDecimalFormatter.format(value / 1_000_000);
 }
 
+// A data real fica na env var ELINSA_LAST_ACCIDENT_DATE (atualizada manualmente quando necessário); o valor hardcoded aqui é só um fallback para builds/dev sem essa variável configurada.
 function getDaysSinceLastAccident() {
   const lastAccidentDate =
     env.elinsaLastAccidentDate() ?? LAST_ACCIDENT_DATE_FALLBACK;
@@ -148,6 +151,7 @@ function getDaysSinceLastAccident() {
   return Math.max(0, today - lastAccidentDay);
 }
 
+// Converte "AAAA-MM-DD" num número de dia absoluto (dias desde a época Unix) usando Date.UTC — evita que o fuso horário do servidor desloque a data em 1 dia para trás/frente, e valida que a data existe de fato (rejeita ex.: 2025-02-30).
 function parseLocalDateDayNumber(dateString: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
 
@@ -172,6 +176,7 @@ function parseLocalDateDayNumber(dateString: string) {
   return Math.floor(timestamp / MS_PER_DAY);
 }
 
+// "Hoje" no fuso de São Paulo, não no fuso do servidor (que pode ser UTC) — importante perto da virada da meia-noite, onde os dois podem discordar sobre qual é o dia atual.
 function getTodayDayNumber(timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone,

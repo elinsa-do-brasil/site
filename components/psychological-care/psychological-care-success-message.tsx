@@ -19,10 +19,12 @@ type PsychologicalCareSuccessMessageProps = {
   protocol: string;
 };
 
+// Ao contrário de lib/reports/ (que expõe /acompanhar-denuncia por protocolo), uma solicitação de atendimento psicológico não pode ser acompanhada publicamente depois — o texto abaixo avisa isso de propósito.
 export function PsychologicalCareSuccessMessage({
   onReset,
   protocol,
 }: PsychologicalCareSuccessMessageProps) {
+  // Move o foco para o título ao montar (troca de tela sem navegação de página) — leitores de tela precisam disso para anunciar a confirmação.
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {

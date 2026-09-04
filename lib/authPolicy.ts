@@ -1,3 +1,4 @@
+// Regras de e-mail corporativo/tenant Microsoft usadas por lib/auth.ts; mantido sem dependência de framework para o authPolicy.test.ts testar diretamente.
 export const DEFAULT_CORPORATE_EMAIL_DOMAIN = "grupoamperelinsa.com";
 
 export type OtpAccessDecision = "existing-user" | "invited-external" | "denied";

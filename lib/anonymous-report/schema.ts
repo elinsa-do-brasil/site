@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// Valida o formulário de /denunciar (components/reports/anonymous-report-form.tsx); turnstileToken/website são campos anti-bot (Cloudflare Turnstile + honeypot).
 export const anonymousReportSchema = z
   .object({
     identify: z.enum(["yes", "no"]),
@@ -59,8 +60,10 @@ export const anonymousReportSchema = z
       .max(1000, "O contato deve ter no máximo 1.000 caracteres.")
       .optional(),
     turnstileToken: z.string().min(1, "Confirme que você não é um robô."),
+    // Campo honeypot: fica escondido via CSS no formulário real; se vier preenchido, é um bot preenchendo todos os campos — ver components/reports/anonymous-report-form.tsx.
     website: z.string().trim().max(200, "Campo inválido.").optional(),
   })
+  // Nome/contato só são obrigatórios quando o denunciante escolhe se identificar (identify === "yes"); no anônimo esses campos ficam de fora da validação.
   .superRefine((data, ctx) => {
     if (data.identify === "yes") {
       if (!data.reporterName || data.reporterName.trim().length === 0) {

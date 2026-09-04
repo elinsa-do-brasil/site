@@ -1,3 +1,4 @@
+// Wrappers que aplicam lib/payload/rbac.ts a collections/plugins de terceiros (import-export) que não têm um sistema de permissão próprio — usados em payload.config.ts.
 import type {
   CollectionConfig,
   Endpoint,
@@ -39,6 +40,7 @@ type AdminToolCollectionOptions = {
   readOnly?: boolean;
 };
 
+// Envolve uma collection inteira (access, visibilidade no menu admin e endpoints customizados) com a mesma checagem canManageAdminTools, para não ter que repetir isso em cada collection de ferramenta admin.
 export function restrictAdminToolCollection(
   collection: CollectionConfig,
   { publicRead = false, readOnly = false }: AdminToolCollectionOptions = {},
@@ -90,6 +92,7 @@ export function restrictImportExportCollection(
   };
 }
 
+// O plugin oficial @payloadcms/plugin-import-export injeta seu próprio item de menu sem checar cargo — este plugin acha e remove esse item, substituindo por components/payload/role-import-export-menu-items.tsx, que respeita canManageAdminTools.
 export function restrictImportExportMenuItems(
   collectionSlugs: readonly string[],
 ): Plugin {

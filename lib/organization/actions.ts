@@ -1,5 +1,6 @@
 "use server";
 
+// Server actions por trás de /portal/gestao/* (convites, membros, equipes, cargos, ferramentas) — a superfície administrativa do Portal Interno (lib/organization/access.ts).
 import { and, eq, inArray } from "drizzle-orm";
 import { icons } from "lucide-react";
 import { revalidatePath } from "next/cache";
@@ -149,11 +150,13 @@ async function canManageTeamId(teamId: string) {
   return { context, selectedTeam };
 }
 
+// As equipes comite_etica e atendimento_psicologico são "reservadas": não podem ser renomeadas nem excluídas (ver atualizarTimeOrganizacao/removerTimeOrganizacao), porque seus cargos concedem acesso sensível.
 const RESERVED_ROLE_TEAMS = new Map([
   [ETHICS_COMMITTEE_TEAM, ETHICS_COMMITTEE_ROLE],
   [PSYCHOLOGICAL_CARE_TEAM, PSYCHOLOGICAL_CARE_ROLE],
 ]);
 
+// Um cargo restrito (ex.: "ethics") só pode ser atribuído junto da equipe correspondente sendo selecionada na mesma operação — evita conceder o cargo sem o vínculo de equipe.
 function validateRestrictedRoleWithSelectedTeam(input: {
   role: string;
   selectedTeam?: { name: string } | null;
@@ -196,6 +199,7 @@ async function userBelongsToTeam(input: {
   return Boolean(link);
 }
 
+// Ao remover alguém de uma equipe reservada, o cargo restrito correspondente (ex.: "ethics") é retirado junto — impede que a pessoa fique com o cargo sem mais pertencer à equipe.
 function removeRoleRestrictedToTeam(role: string, teamName: string) {
   const restrictedRole = RESERVED_ROLE_TEAMS.get(teamName);
   if (!restrictedRole) return role;
@@ -211,6 +215,7 @@ function formatTeamName(teamName: string) {
   return teamName.replaceAll("_", " ");
 }
 
+// Impede remover/rebaixar o último "owner" da organização — sem essa checagem seria possível a organização ficar sem ninguém com controle total.
 async function isLastOwner(input: {
   organizationId: string;
   memberId: string;
@@ -246,6 +251,7 @@ export async function enviarConviteAdmin(
     return { error: "O e-mail é obrigatório." };
   }
 
+  // Dois rate-limits independentes: por admin que está convidando (evita um admin disparar convites em massa) e por e-mail convidado (evita reenviar convite repetidamente para o mesmo endereço).
   const [adminRateAllowed, recipientRateAllowed] = await Promise.all([
     consumeDatabaseRateLimit({
       key: createHashedRateLimitKey("invitation/admin", context.userId),
@@ -288,6 +294,7 @@ export async function enviarConviteAdmin(
     return { error: restrictedRoleError };
   }
 
+  // Cancela qualquer convite pendente anterior para o mesmo e-mail antes de criar um novo — evita acumular convites duplicados/expirados para a mesma pessoa.
   await db
     .update(invitation)
     .set({ status: "canceled" })
@@ -1038,6 +1045,7 @@ export async function salvarFerramentaTime(
       });
     }
   } catch (error) {
+    // Mesmo fallback de lib/organization/access.ts: se a coluna `icon` ainda não existe no banco (migration pendente), tenta salvar sem ela em vez de quebrar a ação inteira.
     if (!isMissingPortalToolIconColumnError(error)) {
       throw error;
     }

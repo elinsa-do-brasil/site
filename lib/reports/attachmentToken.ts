@@ -1,3 +1,4 @@
+// Token de upload autocontido (payload + assinatura HMAC), sem estado no servidor: qualquer instância consegue validar sem consultar banco, só reconstruindo a assinatura com a mesma chave mestra.
 import crypto from "node:crypto";
 import { getReportsMasterKey } from "./crypto";
 
@@ -53,6 +54,7 @@ function signUploadTokenPayload(payload: string) {
     .digest("base64url");
 }
 
+// Comparação em tempo constante (crypto.timingSafeEqual) em vez de `===` — evita um ataque de timing revelar a assinatura correta byte a byte pela diferença de tempo de resposta.
 function constantTimeEqual(left: string, right: string) {
   const leftBuffer = Buffer.from(left);
   const rightBuffer = Buffer.from(right);

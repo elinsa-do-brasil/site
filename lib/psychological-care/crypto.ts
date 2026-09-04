@@ -1,3 +1,4 @@
+// Criptografia em repouso no servidor: cada solicitação ganha uma chave AES aleatória própria, que por sua vez é encriptada com a chave mestra (mesmo padrão de envelope de lib/reports/crypto.ts) — comprometer só a chave mestra não expõe tudo sem também ter acesso ao banco.
 import crypto from "node:crypto";
 import { env } from "@/lib/env";
 

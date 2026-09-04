@@ -1,3 +1,4 @@
+// Controle de acesso do portal do Comitê de Ética (/portal/comite-de-etica) — exige ser membro da organização, além de estar na equipe E ter o cargo do comitê de ética (lib/organization/constants.ts).
 import { notFound, redirect } from "next/navigation";
 import {
   getElinsaMembership,
@@ -31,6 +32,7 @@ export async function getCommitteeContext(
   const teams = await getUserTeamsInElinsa(userId);
   const teamNames = teams.map((item) => item.name);
   const roles = parseRoleList(membership.role);
+  // Acesso exige as duas condições ao mesmo tempo: pertencer à equipe do comitê NÃO basta sem o cargo "ethics", e vice-versa — ver hasCommitteeAccess abaixo.
   const isCommitteeTeamMember = teamNames.includes(ETHICS_COMMITTEE_TEAM);
   const isCommitteeLawyer = roles.includes(ETHICS_COMMITTEE_ROLE);
 

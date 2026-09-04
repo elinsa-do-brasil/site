@@ -1,5 +1,6 @@
 "use server";
 
+// Server action do painel do Comitê para mudar o status de uma denúncia — mesma estrutura de lib/psychological-care/actions.ts, revalida também /acompanhar-denuncia (onde o denunciante anônimo consulta pelo protocolo).
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod/v4";

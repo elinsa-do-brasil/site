@@ -1,5 +1,6 @@
 "use client";
 
+// Envia um anexo já criptografado por fileEncryption.ts, autenticado pelo uploadToken retornado por submitEncryptedReport.ts.
 import type { EncryptedReportAttachment } from "./fileEncryption";
 
 export type UploadEncryptedReportAttachmentParams = {
@@ -22,6 +23,7 @@ export async function uploadEncryptedReportAttachment({
       ...attachment.metadata,
     }),
   );
+  // Nome de arquivo e content-type genéricos de propósito: o nome/tipo reais do anexo já foram criptografados dentro de `metadata` (fileEncryption.ts) e não podem vazar aqui.
   formData.append(
     "file",
     new Blob([attachment.ciphertext], {

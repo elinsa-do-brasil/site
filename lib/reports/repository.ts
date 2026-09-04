@@ -29,6 +29,7 @@ import { toEncryptedPayload } from "./validation";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REPORT_SUMMARY_PAGE_SIZE = 20;
+// "in_review" e "closed" continuam aqui (junto dos nomes atuais "review"/"completed") para agrupar corretamente linhas antigas do banco que normalizeReportStatus (lib/reports/status.ts) converte só na leitura, não no armazenamento.
 const IN_PROGRESS_REPORT_STATUSES = [
   "opened",
   "triage",
@@ -55,9 +56,11 @@ type ListReportSummariesOptions = {
   statusFilter?: ReportSummaryStatusFilter;
 };
 
+// Ao contrário de lib/psychological-care/repository.ts, não há idempotência por submissionId aqui — uma denúncia é totalmente anônima e sem sessão, então não há um ID de envio do cliente para deduplicar contra.
 export async function createReport(input: CreateReportInput) {
   const encrypted = encryptReportPayload(toEncryptedPayload(input));
 
+  // Até 3 tentativas: createReportProtocol() pode colidir com um protocolo já existente — tenta de novo com um novo protocolo em vez de falhar a denúncia.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const protocol = createReportProtocol();
 
@@ -197,6 +200,7 @@ export async function getReportById(id: string) {
   return report ?? null;
 }
 
+// Usado por /acompanhar-denuncia (sem autenticação, só o protocolo como "senha"): filtra os eventos para REPORT_PUBLIC_EVENT_TYPES, escondendo do denunciante anônimo eventos internos do Comitê (ex.: exportação de PDF, visualização de anexo).
 export async function getPublicReportTrackingByProtocol(protocol: string) {
   const [report] = await db
     .select({
@@ -368,6 +372,7 @@ export async function openReportIfNew(input: {
         status: "opened",
         updatedAt: new Date(),
       })
+      // A condição extra eq(status, "new") faz da transição um compare-and-swap atômico: se dois membros do Comitê abrirem a mesma denúncia ao mesmo tempo, só o primeiro UPDATE afeta uma linha e gera o evento.
       .where(and(eq(reports.id, input.reportId), eq(reports.status, "new")))
       .returning({
         id: reports.id,

@@ -31,6 +31,7 @@ export function PsychologicalCareStatusSelect({
   );
   const [isPending, startTransition] = useTransition();
 
+  // Atualização otimista: a UI muda antes da confirmação do servidor; se a server action falhar, volta para previousStatus e avisa por toast em vez de deixar o select mostrando um valor não salvo.
   function handleChange(nextStatus: PsychologicalCareStatus) {
     const previousStatus = currentStatus;
     setCurrentStatus(nextStatus);

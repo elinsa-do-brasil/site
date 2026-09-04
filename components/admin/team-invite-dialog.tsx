@@ -58,6 +58,7 @@ type TeamInviteDialogProps = {
   trigger?: ReactNode;
 };
 
+// Um único formulário cobre dois fluxos: digitar um e-mail já cadastrado vincula direto à equipe (adicionarMembroExistente); um e-mail novo dispara um convite por e-mail (enviarConviteAdmin) — a busca em `matches` decide qual ação roda no submit.
 export function TeamInviteDialog({
   isOrgAdmin,
   registeredUsers,
@@ -77,6 +78,7 @@ export function TeamInviteDialog({
     registeredUsers.find(
       (user) => user.email.toLowerCase() === normalizedEmail,
     );
+  // Busca só client-side sobre a lista já carregada em registeredUsers (prop) — não é uma chamada ao servidor a cada tecla, então não precisa de debounce.
   const matches = useMemo(() => {
     const query = normalizedEmail;
     if (query.length < 2) return [];
@@ -237,6 +239,7 @@ export function TeamInviteDialog({
                   </SelectTrigger>
                   <SelectContent>
                     {roleOptions.map((role) => {
+                      // Cargos restritos (ex.: "ethics") só podem ser escolhidos se a equipe deste dialog for a exigida por eles — replica no cliente a mesma regra de validateRestrictedRoleWithSelectedTeam em lib/organization/actions.ts.
                       const requiredTeam =
                         getRequiredTeamForOrganizationRoleList(role);
                       const isDisabled = Boolean(

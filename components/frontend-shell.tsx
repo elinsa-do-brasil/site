@@ -14,6 +14,7 @@ function isAccountRoute(pathname: string) {
   );
 }
 
+// Escolhe o "chrome" da página (header público vs. InternalHeader do portal, com ou sem footer) por padrão de rota, já que app/(frontend)/layout.tsx é compartilhado entre grupos de rota bem diferentes (site público, portal autenticado, telas de conta, mapas em tela cheia).
 export function FrontendShell({
   children,
   footer,
@@ -69,6 +70,7 @@ export function FrontendShell({
     );
   }
 
+  // /mapas roda em tela cheia, sem o header institucional por cima do mapa interativo.
   if (isMapRoute) {
     return (
       <>

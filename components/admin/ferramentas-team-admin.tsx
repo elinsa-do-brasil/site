@@ -62,6 +62,7 @@ type FerramentasTeamAdminProps = {
   teams: TeamToolsRow[];
 };
 
+// Painel de /portal/gestao/ferramentas: CRUD dos cards de ferramenta por equipe (lib/organization/actions.ts, tabela portalTool) exibidos no portal para os membros de cada equipe.
 export function FerramentasTeamAdmin({ teams }: FerramentasTeamAdminProps) {
   if (teams.length === 0) {
     return (
@@ -210,6 +211,7 @@ function ToolPreviewIcon({ tool }: { tool: ToolRow }) {
   );
 }
 
+// O campo `icon` guarda o nome do componente React no estilo lucide.dev (PascalCase, ex.: "ShieldCheck"), mas o registro dynamic import do lucide-react/dynamic usa kebab-case ("shield-check") — converte e valida antes de tentar carregar.
 function toDynamicIconName(componentName: string): IconName | null {
   const name = componentName
     .trim()

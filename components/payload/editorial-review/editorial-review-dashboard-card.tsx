@@ -4,6 +4,7 @@ import { getEditorialReviewSummary } from "../../../lib/payload/editorialReview.
 import { canPublish } from "../../../lib/payload/rbac.ts";
 import "./styles.scss";
 
+// Card do dashboard do admin do Payload (registrado em payload.config.ts's admin.components.beforeDashboard) — createLocalReq monta um PayloadRequest sintético para reaproveitar getEditorialReviewSummary fora de uma requisição HTTP real.
 export async function EditorialReviewDashboardCard({
   payload,
   user,

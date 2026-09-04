@@ -20,6 +20,7 @@ type InvitationAuthProps = {
   roleLabel: string;
 };
 
+// Duas telas de ativação de convite, escolhidas por app/(frontend)/(conta)/convite/[id]/page.tsx conforme o e-mail convidado é corporativo ou não: CriarContaForm usa código por e-mail (isCorporateEmail === false), CorporateInviteSignIn manda direto para o SSO Microsoft.
 export function CriarContaForm({
   invitationId,
   invitedEmail,

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 
+// Dialog de confirmação genérico em volta de uma server action — base reutilizada por team-admin.tsx, organizacao-admin.tsx, gerenciar-convites.tsx e ferramentas-team-admin.tsx para não repetir o padrão open/pending/toast em cada um.
 type ActionResult = {
   error?: string;
   success?: boolean;

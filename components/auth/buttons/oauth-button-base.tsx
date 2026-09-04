@@ -37,6 +37,7 @@ export function OAuthButtonBase({
     try {
       setLoading(true);
       const isMicrosoft = provider === "microsoft";
+      // Para Microsoft, o redirect automático do Better Auth é desligado (disableRedirect) para dar tempo de injetar domain_hint na URL antes de navegar — isso pula a tela de "escolha uma conta" da Microsoft quando o e-mail já é corporativo.
       const result = await authClient.signIn.social({
         provider,
         callbackURL,

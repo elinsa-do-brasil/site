@@ -1,3 +1,4 @@
+// Helpers/constantes de SEO compartilhados (metadata, sitemap, robots) para app/**/page.tsx; lib/structuredData.ts monta os grafos JSON-LD em cima dessas mesmas constantes.
 import type { Metadata, MetadataRoute } from "next";
 
 export const SITE_NAME = "Elinsa do Brasil";
@@ -67,6 +68,7 @@ export const STATIC_SITEMAP_PATHS = [
   "/amper-cuida",
 ] as const;
 
+// Áreas autenticadas/internas (portal, admin, API, fluxos de auth) que nunca devem ser indexadas — ver createRobotsMetadata abaixo.
 export const ROBOTS_DISALLOW_PATHS = [
   "/api/",
   "/payload/",
@@ -151,6 +153,7 @@ export function normalizeSeoTitle(title: string) {
   return normalized || SITE_NAME;
 }
 
+// Usa o primeiro candidato não vazio (em ordem de prioridade) e trunca em 170 caracteres — limite prático para a description não ser cortada nos resultados do Google.
 export function createSeoDescription(
   candidates: Array<null | string | undefined>,
   fallback: string,
@@ -299,6 +302,7 @@ export function createNoIndexMetadata({
   };
 }
 
+// Prioriza VERCEL_ENV sobre NODE_ENV: em Preview deployments da Vercel o NODE_ENV já vem "production", então só VERCEL_ENV distingue produção real de preview.
 export function isProductionIndexingEnabled(
   env: { NODE_ENV?: string; VERCEL_ENV?: string } = process.env,
 ) {
@@ -310,6 +314,7 @@ export function isProductionIndexingEnabled(
 export function createRobotsMetadata(
   indexable = isProductionIndexingEnabled(),
 ): MetadataRoute.Robots {
+  // Fora de produção (preview/local), bloqueia indexação por completo — evita que ambientes de teste apareçam no Google.
   if (!indexable) {
     return {
       rules: { disallow: "/", userAgent: "*" },
@@ -346,6 +351,7 @@ export function createSitemap({
       url: absoluteUrl(path),
     }),
   );
+  // flatMap descarta posts sem slug ou ainda em rascunho — o sitemap nunca deve apontar para uma URL que renderiza 404 ou conteúdo não publicado.
   const postEntries: MetadataRoute.Sitemap = posts.flatMap((post) => {
     if (!post.slug || post.draft || post._status === "draft") {
       return [];

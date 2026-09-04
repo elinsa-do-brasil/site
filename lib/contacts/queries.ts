@@ -1,3 +1,4 @@
+// Leituras/escritas via Drizzle na tabela `contacts` (lib/db/schema) que sustenta /portal/contatos.
 import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { contacts } from "@/lib/db/schema";
@@ -55,6 +56,7 @@ export async function updateContactEmailNotification(
     .where(eq(contacts.id, contactId));
 }
 
+// Lista paginada por trás de /portal/contatos; `page`/`perPage` são sempre clampados (1-100) mesmo vindo de query params não confiáveis da URL.
 export async function listContacts(filters: ContactListFilters = {}) {
   const page = Math.max(1, filters.page ?? 1);
   const perPage = Math.min(100, Math.max(1, filters.perPage ?? 20));
@@ -129,6 +131,7 @@ function buildContactWhere(filters: ContactListFilters) {
     conditions.push(eq(contacts.status, filters.status));
   }
 
+  // Busca livre: um único termo é comparado (ILIKE, case-insensitive) contra nome/e-mail/telefone/empresa/assunto/mensagem ao mesmo tempo.
   if (search) {
     const pattern = `%${search}%`;
     const searchCondition = or(

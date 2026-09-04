@@ -1,3 +1,4 @@
+// Conteúdo institucional estático da página /quem-somos (histórico, marcos, pilares) — texto editorial, não vem do CMS.
 import {
   Building2,
   CalendarDays,

@@ -1,6 +1,7 @@
 // Sem `import "server-only"` de propósito: importado por testes de
 // integração (tsx --env-file=.env, Node puro, fora do pipeline do Next.js) —
 // o guard lança erro incondicionalmente fora do bundler do Next.
+// Aviso à equipe do comitê de que uma nova solicitação chegou — só o protocolo/link, nunca o conteúdo (ver texto do e-mail abaixo), já que o e-mail em si não é um canal seguro.
 import { createElement } from "react";
 import { Resend } from "resend";
 import PsychologicalCareNotificationEmail from "@/emails/psychological-care-notification";

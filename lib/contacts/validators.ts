@@ -1,5 +1,7 @@
+// Schema Zod do formulário /contato, mais o enum de status usado na listagem admin /portal/contatos.
 import { z } from "zod/v4";
 
+// Ordem reflete o fluxo esperado de triagem (novo → lido → em andamento → respondido); "archived"/"spam" são estados finais fora dessa progressão.
 export const CONTACT_STATUS_VALUES = [
   "new",
   "read",

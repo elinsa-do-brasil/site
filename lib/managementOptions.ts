@@ -1,3 +1,5 @@
+// Catálogos estáticos de gerência/cargo para o formulário de solicitação de atendimento psicológico (components/psychological-care/psychological-care-request-form.tsx).
+// Lista fixa de gerências da empresa; usada para o campo "gerência" do formulário — não vem do banco, é texto livre limitado a estas opções.
 export const managementOptions = [
   "Gerência Regional de Operações",
   "Gerência de Transporte e Logística",
@@ -13,6 +15,7 @@ export const managementOptions = [
 
 export type ManagementOption = (typeof managementOptions)[number];
 
+// `code` é o identificador do cargo na planilha/sistema de RH — mantido junto ao título para rastreabilidade, mas não é exibido na UI.
 export const jobTitleCatalog = [
   { code: 1, title: "Auxiliar Administrativo" },
   { code: 2, title: "Auxiliar de Eletricista" },
@@ -211,6 +214,7 @@ export const jobTitleCatalog = [
 
 export type JobTitleEntry = (typeof jobTitleCatalog)[number];
 
+// Dedupe por título (vários `code` do catálogo compartilham o mesmo título, ex.: "Podador" nos códigos 45 e 50) e ordena para popular o <select> do formulário.
 export const jobTitleOptions = Array.from(
   new Set(jobTitleCatalog.map(({ title }) => title)),
 ).sort((a, b) => a.localeCompare(b, "pt-BR"));

@@ -66,6 +66,7 @@ export function EditorialRichText({ data }: { data: unknown }) {
 }
 
 function createEditorialConverters(): JSXConvertersFunction {
+  // Novo Map a cada render, mas o mesmo algoritmo determinístico de lib/editorial.ts's getHeadingsFromRichText (mesma ordem de percurso) — os ids gerados aqui para as âncoras <h2 id="..."> batem com os ids usados nos links do sumário (TopicsNav em editorial-pages.tsx), mesmo sendo cálculos independentes.
   const usedHeadings = new Map<string, number>();
 
   return ({ defaultConverters }) => ({
@@ -80,6 +81,7 @@ function createEditorialConverters(): JSXConvertersFunction {
 
       return createElement(tag, id ? { id } : undefined, children);
     },
+    // Campos de relacionamento (ex.: "posts relacionados") do Lexical não têm renderização própria definida — omitidos em vez de deixar o RichText tentar um fallback genérico.
     relationship: () => null,
     upload: ({ node }: { node: unknown }) => renderUpload(node as UploadNode),
     blocks: {
@@ -118,6 +120,7 @@ function renderUpload(node: UploadNode) {
 }
 
 function renderImage(media: PayloadMedia, fields: UploadNode["fields"] = {}) {
+  // O editor escolhe entre large/normal/small (rótulos amigáveis no Payload); mapeia para os nomes reais dos tamanhos gerados pelo Payload (hero/card/thumbnail) para pegar a imagem já redimensionada certa em vez do arquivo original.
   const requestedSize = fields?.size || "normal";
   const sizeName =
     requestedSize === "large"

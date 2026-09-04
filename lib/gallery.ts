@@ -1,5 +1,6 @@
 import "server-only";
 
+// Leituras da collection `galeria` do Payload para a página pública /galeria (components/gallery) e para app/sitemap.ts.
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
 
@@ -58,6 +59,7 @@ export async function getGalleryPage(page = 1): Promise<GalleryPage> {
     },
   });
 
+  // flatMap descarta (retorna []) qualquer imagem sem alt/description/dimensões — não são exibidas com dado incompleto em vez de falhar a página inteira.
   const photos = result.docs.flatMap((doc) => {
     const alt = typeof doc.alt === "string" ? doc.alt.trim() : "";
     const description =

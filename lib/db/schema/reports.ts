@@ -9,6 +9,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+// Armazena denúncias do Comitê de Ética já criptografadas (ver lib/reports/crypto.ts) — nada nesta tabela fica em texto puro.
 export const reports = pgTable(
   "reports",
   {

@@ -1,3 +1,4 @@
+// Acesso ao painel de Atendimento Psicológico (/portal/atendimento-psicologico) — exige equipe E cargo dedicados (lib/organization/constants.ts), igual ao padrão do Comitê de Ética em lib/comite/access.ts.
 import { notFound, redirect } from "next/navigation";
 import { getInternalAccessContext } from "@/lib/organization/access";
 import {

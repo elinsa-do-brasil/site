@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
+// Relatos longos (o campo `reason`/`description` decriptado) ficam truncados por altura até o usuário pedir para expandir — evita que uma denúncia gigante domine a tela toda no painel do Comitê.
 const COLLAPSE_THRESHOLD = 1200;
 
 export function ExpandableReportText({ text }: { text: string }) {

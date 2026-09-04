@@ -20,6 +20,7 @@ export function EditorialCover({
   sizes,
   src,
 }: EditorialCoverProps) {
+  // O fundo gradiente (EditorialCoverFallback) sempre renderiza por baixo; a <Image> só cobre por cima quando existe src e não falhou — onError troca para o fallback em vez de mostrar o ícone quebrado do navegador.
   const [hasImageError, setHasImageError] = useState(false);
   const imageSrc = src && !hasImageError ? src : null;
 

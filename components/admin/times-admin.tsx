@@ -56,6 +56,7 @@ type ActionResult = {
   success?: boolean;
 };
 
+// Painel de /portal/gestao/equipes: grade de cards, um por equipe, com contagens e atalho para convidar — a administração detalhada de cada equipe vive em team-admin.tsx (/portal/gestao/equipes/[slug]).
 export function TimesAdmin({
   isOrgAdmin,
   registeredUsers,
