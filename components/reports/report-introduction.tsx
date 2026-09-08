@@ -127,16 +127,27 @@ export function ReportIntroduction() {
         <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
         <div className="text-sm leading-6">
           <p className="font-bold">Existe risco imediato à vida?</p>
-          <p className="mt-1 text-amber-900/80 dark:text-amber-100/75">
-            Primeiro, procure ajuda imediata acionado os serviços de emergência: 
+          <div className="mt-1 text-amber-900/80 dark:text-amber-100/75">
+            <p>
+              Primeiro, procure ajuda imediata acionado os serviços de
+              emergência:
+            </p>
             <ol className="mt-1 list-inside list-disc space-y-1 pl-2">
-              <li>SAMU através do <code>192</code></li>
-              <li>Bombeiros através do <code>193</code></li>
-              <li>Polícia através do <code>190</code></li>
+              <li>
+                SAMU através do <code>192</code>
+              </li>
+              <li>
+                Bombeiros através do <code>193</code>
+              </li>
+              <li>
+                Polícia através do <code>190</code>
+              </li>
             </ol>
-            <br/>
-            Depois, registre a denúncia para que o caso também possa ser acompanhado internamente.
-          </p>
+            <p className="mt-1">
+              Depois, registre a denúncia para que o caso também possa ser
+              acompanhado internamente.
+            </p>
+          </div>
         </div>
       </aside>
 
