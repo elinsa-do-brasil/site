@@ -1,6 +1,6 @@
 import path from "node:path";
 import { withPayload } from "@payloadcms/next/withPayload";
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 import { getAzureStorageAccountBaseURL } from "./lib/azureStorage";
 
