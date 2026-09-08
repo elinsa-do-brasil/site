@@ -78,8 +78,8 @@ export function GestaoPageHeader({
               aria-current={item.id === active ? "page" : undefined}
               className={
                 item.id === active
-                  ? "order-1 shrink-0 md:order-none"
-                  : "order-2 shrink-0 md:order-none"
+                  ? "order-1 shrink-0 md:order-"
+                  : "order-2 shrink-0 md:order-"
               }
               key={item.id}
               size="sm"
