@@ -1,0 +1,32 @@
+# dependencies (reinstaladas dentro da imagem)
+node_modules
+.pnpm-store
+
+# build output (gerado dentro da imagem)
+.next
+out
+build
+
+# controle de versão / editor
+.git
+.vscode
+.idea
+
+# segredos — nunca vão para o contexto de build; .env entra só via
+# `--secret` (build) e `env_file` (runtime), ver Dockerfile
+.env
+.env.*
+!.env.example
+
+# outros artefatos locais
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+coverage
+.pytest_cache
+.venv
+__pycache__
+.DS_Store
+*.pem
