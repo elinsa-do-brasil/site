@@ -1,15 +1,8 @@
 "use client";
 
-import {
-  AlertCircle,
-  Check,
-  CirclePlay,
-  Copy,
-  WandSparkles,
-  X,
-} from "lucide-react";
+import { Check, Copy, WandSparkles } from "lucide-react";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { publicEnv } from "@/lib/envPublic";
 import { normalizeSignatureName } from "../signature-name";
 import { getSuspiciousSignatureTextError } from "../signature-text";
 
@@ -93,8 +85,6 @@ const CARGO_ABBREVIATIONS: Record<string, string> = {
 const SOCIAL_LINKS_HTML = `<strong>Elinsa do Brasil:</strong> <a href="https://www.instagram.com/elinsadobrasil/">Instagram</a> &bull; <a href="https://www.linkedin.com/in/elinsadobrasil/">LinkedIn</a> &bull; <a href="https://elinsadobrasil.com.br/">Site</a><br />
 <strong>Grupo Amper:</strong> <a href="https://www.linkedin.com/company/amper-sa/">LinkedIn</a> &bull; <a href="https://www.grupoamper.com/">Site</a>`;
 
-const TUTORIAL_URL = publicEnv.youtubeTutorialLink;
-
 export function EmailSignatureGenerator({
   initialValues,
   socialLinks,
@@ -116,19 +106,6 @@ export function EmailSignatureGenerator({
   const [copyState, setCopyState] = useState<"copied" | "error" | "idle">(
     "idle",
   );
-  const [showWarning, setShowWarning] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(
-      "dismiss-elinsa-signature-tutorial-warning",
-    );
-    setShowWarning(Boolean(TUTORIAL_URL) && saved !== "true");
-  }, []);
-
-  const dismissWarning = () => {
-    setShowWarning(false);
-    localStorage.setItem("dismiss-elinsa-signature-tutorial-warning", "true");
-  };
 
   const previewValues = useMemo(() => getPreviewValues(values), [values]);
   const errors = useMemo(() => validateValues(values), [values]);
@@ -208,42 +185,6 @@ export function EmailSignatureGenerator({
   return (
     <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.1fr)]">
       <div className="min-w-0">
-        {showWarning && (
-          <div className="relative mb-6 flex items-start gap-4 rounded-md border border-elinsa-primary/20 bg-elinsa-light py-4 pr-12 pl-5 shadow-sm transition-[background-color,border-color,color,box-shadow] duration-150 dark:border-elinsa-primary/30 dark:bg-elinsa-primary/10">
-            <AlertCircle className="mt-0.5 size-5 shrink-0 text-elinsa-primary dark:text-elinsa-sky" />
-            <div className="flex flex-col gap-3">
-              <div className="space-y-1">
-                <p className="text-sm leading-snug font-bold text-elinsa-dark dark:text-elinsa-light">
-                  O processo de configuração mudou!
-                </p>
-                <p className="text-xs leading-relaxed text-elinsa-dark/95 dark:text-elinsa-light/80">
-                  A forma anterior de criar e colar a assinatura foi
-                  substituída. Siga o tutorial para garantir que ela seja
-                  exibida corretamente.
-                </p>
-              </div>
-              <Button
-                asChild
-                className="w-fit bg-elinsa-primary text-white shadow-sm hover:bg-elinsa-primary/90 dark:bg-elinsa-sky dark:text-neutral-950 dark:hover:bg-elinsa-sky/90"
-                size="sm"
-              >
-                <a href={TUTORIAL_URL} target="_blank" rel="noreferrer">
-                  Veja o tutorial
-                  <CirclePlay className="size-3.5" />
-                </a>
-              </Button>
-            </div>
-            <button
-              onClick={dismissWarning}
-              className="absolute top-3.5 right-3.5 rounded-full p-1 text-elinsa-dark/40 transition-colors hover:bg-elinsa-dark/10 hover:text-elinsa-dark dark:text-elinsa-light/40 dark:hover:bg-elinsa-light/10 dark:hover:text-elinsa-light"
-              aria-label="Dispensar aviso"
-              type="button"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-        )}
-
         <Card className="py-0" variant="form">
           <CardHeader className="border-b py-4">
             <CardTitle>Dados da assinatura</CardTitle>

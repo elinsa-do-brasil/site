@@ -1,6 +1,6 @@
 import path from "node:path";
 import { withPayload } from "@payloadcms/next/withPayload";
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 import { getAzureStorageAccountBaseURL } from "./lib/azureStorage";
 
@@ -68,6 +68,10 @@ const galleryStoragePrefix = "galeria-publica";
 const noIndexHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
 const nextConfig: NextConfig = {
+  // Usado pela imagem Docker de produção (Dockerfile) para copiar só o
+  // necessário para rodar `node server.js` — sem devDependencies nem o
+  // código-fonte completo. Não afeta `next dev`/`next start` fora do Docker.
+  output: "standalone",
   async headers() {
     return [
       {

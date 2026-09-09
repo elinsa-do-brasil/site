@@ -12,6 +12,5 @@ export const publicEnv = {
   assetsVersion: process.env.NEXT_PUBLIC_ASSETS_VERSION,
   reportsPublicKeyBase64: process.env.NEXT_PUBLIC_REPORTS_PUBLIC_KEY_BASE64,
   sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  youtubeTutorialLink: process.env.NEXT_PUBLIC_YT_LINK,
   turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
 };

@@ -1,0 +1,44 @@
+# Empacota o app (Next.js + Payload CMS) como está hoje: Postgres (2 bancos),
+# Azure Blob Storage, Resend, Turnstile, Sentry e Microsoft Entra ID
+# continuam sendo serviços externos configurados via .env — nada disso é
+# provisionado aqui. Ajuste isso se quiser um Postgres local no compose.
+#
+# Migrations (drizzle-kit / payload) não rodam neste container — aplique-as
+# em dev/CI antes de subir: `pnpm db:migrate` e `pnpm exec payload migrate`.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      secrets:
+        - dotenv
+    image: elinsa-site:latest
+    container_name: elinsa-site
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:'+(process.env.PORT||3000)+'/', () => process.exit(0)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+secrets:
+  # Usado só durante `docker compose build` (RUN --mount=type=secret no
+  # Dockerfile) para o `next build` conseguir ler as variáveis reais e
+  # inlinear as NEXT_PUBLIC_*. Nunca fica em nenhuma camada da imagem.
+  dotenv:
+    file: ./.env

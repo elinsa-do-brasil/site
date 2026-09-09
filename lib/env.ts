@@ -79,6 +79,5 @@ export const env = {
   turnstileSecret: () => process.env.TURNSTILE_SECRET,
 
   // Diversos
-  googleSiteVerification: () => process.env.GOOGLE_SITE_VERIFICATION,
   elinsaLastAccidentDate: () => process.env.ELINSA_LAST_ACCIDENT_DATE,
 };
