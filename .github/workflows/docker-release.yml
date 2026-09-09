@@ -64,13 +64,24 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest
 
-      # O Dockerfile monta o .env como build secret (RUN --mount=type=secret,
-      # id=dotenv,...) só pra inlinear as NEXT_PUBLIC_* e satisfazer os
-      # `if (!x) throw` de módulo (CMS_DATABASE_URL/SITE_DATABASE_URL) — o
-      # conteúdo nunca é escrito em disco no runner nem fica em nenhuma
-      # camada da imagem. Requer o secret de repositório DOTENV_PRODUCTION
-      # (conteúdo completo de um .env válido) configurado em Settings →
-      # Secrets and variables → Actions.
+      # O secret DOTENV_PRODUCTION guarda um .env inteiro (multi-linha), não
+      # um valor único — por isso vai como arquivo (`secret-files`), não
+      # inline (`secrets:`). O input `secrets:` do build-push-action trata
+      # cada linha como um par key=value separado; um valor multi-linha ali
+      # quebra silenciosamente (só a 1ª linha vira o secret "dotenv", o
+      # resto é interpretado como outros secrets soltos — daí os avisos
+      # "*** is not a valid secret" e o SITE_DATABASE_URL "sumindo").
+      - name: Write .env for build
+        run: printf '%s' "${{ secrets.DOTENV_PRODUCTION }}" > .env.ci
+        shell: bash
+
+      # O Dockerfile monta esse arquivo como build secret (RUN --mount=
+      # type=secret,id=dotenv,...) só pra inlinear as NEXT_PUBLIC_* e
+      # satisfazer os `if (!x) throw` de módulo (CMS_DATABASE_URL/
+      # SITE_DATABASE_URL) — o conteúdo nunca fica em nenhuma camada da
+      # imagem. Requer o secret de repositório DOTENV_PRODUCTION (conteúdo
+      # completo de um .env válido) configurado em Settings → Secrets and
+      # variables → Actions.
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -78,7 +89,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          secrets: |
-            dotenv=${{ secrets.DOTENV_PRODUCTION }}
+          secret-files: |
+            dotenv=.env.ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Clean up build env file
+        if: always()
+        run: rm -f .env.ci
