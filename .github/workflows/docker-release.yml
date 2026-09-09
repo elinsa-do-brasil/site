@@ -71,8 +71,15 @@ jobs:
       # quebra silenciosamente (só a 1ª linha vira o secret "dotenv", o
       # resto é interpretado como outros secrets soltos — daí os avisos
       # "*** is not a valid secret" e o SITE_DATABASE_URL "sumindo").
+      # Passa via env + $VAR, não interpolando ${{ }} direto no script: a
+      # interpolação ${{ }} é substituição de texto ANTES do bash processar
+      # o run:, então cada quebra de linha do secret vira uma linha nova no
+      # próprio script (quebra a sintaxe do printf, exit code 1). Via env:
+      # o valor multi-linha chega intacto como variável de ambiente comum.
       - name: Write .env for build
-        run: printf '%s' "${{ secrets.DOTENV_PRODUCTION }}" > .env.ci
+        env:
+          DOTENV_CONTENT: ${{ secrets.DOTENV_PRODUCTION }}
+        run: printf '%s' "$DOTENV_CONTENT" > .env.ci
         shell: bash
 
       # O Dockerfile monta esse arquivo como build secret (RUN --mount=
